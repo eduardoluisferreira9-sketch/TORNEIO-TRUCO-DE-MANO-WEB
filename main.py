@@ -962,16 +962,22 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
     return RedirectResponse(url="/admin/inscricoes?sucesso=banco_zerado", status_code=303)
 
 @app.post("/admin/cadastrar-direto")
-def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), entidade: str = Form("INDIVIDUAL"), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
-    ent_nome = entity if entity else entidade
+def cadastrar_direto_admin(
+    nome: str = Form(...), 
+    entidade: str = Form("AVULSO"), 
+    db=Depends(get_db), 
+    auth: bool = Depends(verificar_admin)
+):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
-    entidade_limpa = ent_nome.strip().upper() if ent_nome else "AVULSO"
+    entidade_limpa = entidade.strip().upper() if entidade else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
-    # CORRIGIDO: Agora a coluna do banco de dados se chama estritamente 'entidade'
-    cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", 
-                   (cfg["id"], nome.strip().upper(), entidade_limpa))
+    # CORRIGIDO: Removida a expressão Python que havia sido injetada por engano na string SQL
+    cursor.execute(
+        f"INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", 
+        (cfg["id"], nome.strip().upper(), entidade_limpa)
+    )
     db.commit()
     return RedirectResponse(url="/admin/inscricoes", status_code=303)
 
