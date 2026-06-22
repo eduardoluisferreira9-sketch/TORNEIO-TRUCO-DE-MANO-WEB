@@ -397,7 +397,10 @@ def processar_logout():
 @app.get("/admin-painel/api/cronometro")
 def api_cronometro(db=Depends(get_db)):
     cfg = atualizar_e_obter_cronometro(db)
-    return JSONResponse({"tempo_restante": cfg["crono_tempo_restante_seg"], "ativo": cfg["crono_ativo"]})
+    # Força o retorno como int puro para evitar flutuações no front-end
+    tempo_restante = int(cfg["crono_tempo_restante_seg"]) if cfg else 0
+    ativo = int(cfg["crono_ativo"]) if cfg else 0
+    return JSONResponse({"tempo_restante": tempo_restante, "ativo": ativo})
 
 @app.post("/admin/cronometro/controle")
 @app.post("/admin-painel/admin/cronometro/controle")
@@ -409,15 +412,26 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_nao_iniciado", status_code=303)
 
-    if acao == "iniciar" and cfg["crono_ativo"] == 0 and cfg["crono_tempo_restante_seg"] > 0:
-        cursor.execute(f"UPDATE torneios SET crono_ativo = 1, crono_ultimo_clique = {p} WHERE id = {p}", (time.time(), cfg["id"]))
+    # Tempo atual limpo (apenas segundos inteiros)
+    agora_int = int(time.time())
+
+    if acao == "iniciar" and cfg["crono_ativo"] == 0 and int(cfg["crono_tempo_restante_seg"]) > 0:
+        # Grava como número inteiro límpido no Supabase
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 1, crono_ultimo_clique = {p} WHERE id = {p}", (agora_int, cfg["id"]))
+        
     elif acao == "pausar" and cfg["crono_ativo"] == 1:
-        agora = time.time()
-        decorrido = int(agora - cfg["crono_ultimo_clique"])
-        novo_tempo = max(0, cfg["crono_tempo_restante_seg"] - decorrido)
+        try:
+            ultimo_clique = int(float(cfg["crono_ultimo_clique"]))
+        except (TypeError, ValueError):
+            ultimo_clique = agora_int
+
+        decorrido = max(0, agora_int - ultimo_clique)
+        novo_tempo = max(0, int(cfg["crono_tempo_restante_seg"]) - decorrido)
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo, cfg["id"]))
+        
     elif acao == "reiniciar":
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
+        
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
