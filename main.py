@@ -276,13 +276,22 @@ def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(ve
         return HTMLResponse(content="Nenhum torneio ativo encontrado. Vá em reset total para inicializar.", status_code=400)
         
     cursor = db.cursor()
-    p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute(f"SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = {p} ORDER BY id DESC", (cfg["id"],))
-    pendentes = [dict(row) for row in cursor.fetchall()]
-    
-    cursor.execute(f"SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (cfg["id"],))
-    oficiais = [dict(row) for row in cursor.fetchall()]
+    if DATABASE_URL:
+        # --- FLUXO DO SUPABASE (POSTGRESQL) ---
+        # No PostgreSQL com RealDictCursor, os resultados já vêm como dicionários puros.
+        cursor.execute("SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = %s ORDER BY id DESC", (cfg["id"],))
+        pendentes = list(cursor.fetchall())
+        
+        cursor.execute("SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = %s ORDER BY nome ASC", (cfg["id"],))
+        oficiais = list(cursor.fetchall())
+    else:
+        # --- FLUXO DO PC LOCAL (SQLITE) ---
+        cursor.execute("SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = ? ORDER BY id DESC", (cfg["id"],))
+        pendentes = [dict(row) for row in cursor.fetchall()]
+        
+        cursor.execute("SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = ? ORDER BY nome ASC", (cfg["id"],))
+        oficiais = [dict(row) for row in cursor.fetchall()]
     
     total_arrecadado = len(oficiais) * cfg['taxa_inscricao']
     
