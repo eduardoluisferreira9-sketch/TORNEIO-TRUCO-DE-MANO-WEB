@@ -272,18 +272,31 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
 @app.get("/admin/inscricoes")
 def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
+    if not cfg:
+        return HTMLResponse(content="Nenhum torneio ativo encontrado. Vá em reset total para inicializar.", status_code=400)
+        
     cursor = db.cursor()
     p = "%s" if DATABASE_URL else "?"
     
     cursor.execute(f"SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = {p} ORDER BY id DESC", (cfg["id"],))
-    pendentes = cursor.fetchall()
+    pendentes = [dict(row) for row in cursor.fetchall()]
+    
     cursor.execute(f"SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (cfg["id"],))
-    oficiais = cursor.fetchall()
+    oficiais = [dict(row) for row in cursor.fetchall()]
+    
     total_arrecadado = len(oficiais) * cfg['taxa_inscricao']
     
     return templates.TemplateResponse(
         request=request, name="admin_inscricoes.html", 
-        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
+        context={
+            "config": cfg, 
+            "pendentes": pendentes, 
+            "oficiais": oficiais, 
+            "total_arrecadado": f"{total_arrecadado:.2f}".replace('.', ','), 
+            "aba_ativa": "inscricoes", 
+            "dev_nome": DEV_NOME, 
+            "dev_whatsapp": DEV_WHATSAPP
+        }
     )
 
 @app.post("/admin/salvar-configuracoes")
@@ -320,6 +333,9 @@ def iniciar_torneio_e_gerar_r1(db=Depends(get_db), auth: bool = Depends(verifica
 @app.get("/admin/jogos")
 def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
+    if not cfg:
+        return HTMLResponse(content="Nenhum torneio ativo encontrado.", status_code=400)
+        
     p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
@@ -331,7 +347,7 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     rodada_atual = row_r["rodada"] if row_r else 1
     
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
-    confrontos = cursor.fetchall()
+    confrontos = [dict(row) for row in cursor.fetchall()]
     
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
     qtd_pendentes = extrair_valor_contagem(cursor.fetchone())
@@ -343,9 +359,17 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
 
     return templates.TemplateResponse(
         request=request, name="admin_jogos.html", 
-        context={"config": cfg, "rodada": rodada_atual, "confrontos": confrontos, "rodada_concluida": rodada_concluida, "tempo_formatado": tempo_formatated, "aba_ativa": "jogos", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
+        context={
+            "config": cfg, 
+            "rodada": rodada_atual, 
+            "confrontos": confrontos, 
+            "rodada_concluida": rodada_concluida, 
+            "tempo_formatado": tempo_formatado, # <-- Corrigido o erro de digitação aqui
+            "aba_ativa": "jogos", 
+            "dev_nome": DEV_NOME, 
+            "dev_whatsapp": DEV_WHATSAPP
+        }
     )
-
 
 # --- ALGORITMOS DE EMPARELHAMENTO E CHAVEAMENTO ---
 
