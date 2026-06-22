@@ -4,136 +4,187 @@
     <meta charset="UTF-8">
     <title>Painel - Classificação & Auditoria</title>
     <style>
-        body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { background: #0b140d; color: #e8e6e3; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
         .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
-        .card { background: #1e1e1e; padding: 25px; border-radius: 8px; border: 1px solid #333; margin-bottom: 30px; }
-        h2, h3 { color: #d4af37; margin-top: 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
-        th { background: #252525; color: #d4af37; }
-        tr:hover { background: #1a1a1a; }
-        .filtro-box { background: #252525; padding: 15px; border-radius: 4px; display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        select { padding: 8px 12px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; }
-        .btn-corrigir { background: #c0392b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-corrigir:hover { background: #e74c3c; }
-        .btn-matamata { background: #d4af37; color: #000; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        
+        /* Tema Feltro Musgo & Ouro */
+        .card { background: #112216; padding: 25px; border-radius: 8px; border: 1px solid #1b3622; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { color: #d4af37; margin-top: 0; border-left: 4px solid #d4af37; padding-left: 10px; font-size: 1.4rem; }
+        h3 { color: #d4af37; margin-top: 0; font-size: 1.2rem; }
+        h4 { color: #bbb; margin-top: 20px; font-size: 1.1rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #0e1b12; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #1b3622; }
+        th { background: #162e1e; color: #d4af37; font-weight: bold; }
+        tr:hover { background: #142a1b; }
+        
+        .filtro-box { background: #162e1e; padding: 15px; border-radius: 4px; border: 1px solid #1b3622; margin-bottom: 20px; }
+        .filtro-box-inner { display: table; width: 100%; }
+        .filtro-cell { display: table-cell; vertical-align: middle; }
+        
+        select, input[type="number"] { padding: 8px 12px; background: #0e1b12; border: 1px solid #1b3622; color: #fff; border-radius: 4px; font-size: 0.95rem; }
+        select:focus, input[type="number"]:focus { border-color: #d4af37; outline: none; }
+        
+        .btn-corrigir { background: #7b241c; color: #fadbd8; border: 1px solid #922b21; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .btn-corrigir:hover { background: #922b21; color: #fff; }
+        
+        .btn-matamata { background: #d4af37; color: #0b140d; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .btn-matamata:hover { background: #f1c40f; }
-        .alerta-box { background: #291a00; border-left: 5px solid #d4af37; padding: 15px; border-radius: 4px; margin-bottom: 25px; color: #f39c12; }
+        
+        .alerta-box { background: #2a2005; border-left: 5px solid #d4af37; padding: 20px; border-radius: 4px; margin-bottom: 25px; border-top: 1px solid #3a2e07; border-right: 1px solid #3a2e07; border-bottom: 1px solid #3a2e07; }
+        .alerta-box p { color: #f39c12; margin: 5px 0 15px 0; }
+        
+        /* Classes auxiliares para substituição de Layout Flex/Grid */
+        .layout-table { display: table; width: 100%; }
+        .layout-row { display: table-row; }
+        .layout-cell { display: table-cell; vertical-align: middle; }
     </style>
 </head>
 <body>
 
-    <nav style="background: #1a1a1a; padding: 15px; border-bottom: 3px solid #d4af37; display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">🏆 {{ config.nome_torneio }}</span>
-        <div style="display: flex; gap: 20px;">
-            <a href="/admin-painel/admin/inscricoes" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; color: #bbb;">📋 Inscrições & Formato</a>
-            <a href="/admin-painel/admin/jogos" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; color: #bbb;">🎴 Mesa de Jogos</a>
-            <a href="/admin-painel/admin/classificacao" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; background: #d4af37; color: #000;">📊 Classificação & Auditoria</a>
+    <nav style="background: #090f0a; padding: 15px 30px; border-bottom: 3px solid #d4af37;">
+        <div style="display: table; width: 100%;">
+            <div style="display: table-cell; text-align: left; vertical-align: middle;">
+                <span style="color: #d4af37; font-weight: bold; font-size: 1.3rem; letter-spacing: 0.5px;">🏆 {{ config.nome_torneio }}</span>
+            </div>
+            <div style="display: table-cell; text-align: right; vertical-align: middle;">
+                <a href="/admin-painel/admin/inscricoes" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">📋 Inscrições & Formato</a>
+                <a href="/admin-painel/admin/jogos" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">🎴 Mesa de Jogos</a>
+                <a href="/admin-painel/admin/classificacao" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; background: #d4af37; color: #0b140d;">📊 Classificação & Auditoria</a>
+            </div>
         </div>
     </nav>
 
     <div class="container">
         
-        {% if config.fase_torneio == 'CLASSIFICATORIA' and todas_rodadas|length >= config.max_rodadas_classificatoria %}
+        {% if config.fase_torneio == 'CLASSIFICATORIA' %}
         <div class="alerta-box">
             <h3>📢 Fase Classificatória Encerrada!</h3>
             <p>Todas as rodadas planejadas da primeira fase foram concluídas com sucesso. Defina abaixo quantos atletas avançam para iniciar as chaves eliminatórias:</p>
-            <form action="/admin-painel/admin/disparar-matamata" method="POST" style="display: flex; align-items: center; gap: 15px; margin-top: 15px;">
-                <label style="color: #fff; font-weight: bold;">Corte do Mata-Mata:</label>
-                <select name="corte" required>
-                    <option value="4">Top 4 (Direto para Semifinal)</option>
-                    <option value="8" selected>Top 8 (Quartas de Final)</option>
-                    <option value="16">Top 16 (Oitavas de Final)</option>
-                </select>
-                <button type="submit" class="btn-matamata">⚡ Gerar Chaveamento Eliminatório</button>
+            
+            <form action="/admin-painel/admin/disparar-matamata" method="POST">
+                <div class="layout-table" style="width: auto;">
+                    <div class="layout-row">
+                        <div class="layout-cell" style="padding-right: 15px;">
+                            <label style="color: #fff; font-weight: bold;">Corte do Mata-Mata:</label>
+                        </div>
+                        <div class="layout-cell" style="padding-right: 20px;">
+                            <select name="corte" required style="min-width: 250px;">
+                                <option value="4">Top 4 (Direto para Semifinal)</option>
+                                <option value="8" selected>Top 8 (Quartas de Final)</option>
+                                <option value="16">Top 16 (Oitavas de Final)</option>
+                            </select>
+                        </div>
+                        <div class="layout-cell">
+                            <button type="submit" class="btn-matamata">⚡ Gerar Chaveamento Eliminatório</button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
         {% endif %}
 
         <div class="card">
             <h2>Tabela de Classificação Geral (Classificatória)</h2>
-            <p style="font-size: 0.9rem; color: #888;">Critério Oficial: Vitórias > Sets Ganhos > Saldo Tentos > Tentos Pró > Flores.</p>
+            <p style="font-size: 0.9rem; color: #8fa393; margin-bottom: 20px;">Critério Oficial: Vitórias > Sets Ganhos > Saldo Tentos > Tentos Pró > Flores.</p>
             <table>
                 <thead>
                     <tr>
-                        <th>Pos</th>
+                        <th style="width: 80px;">Pos</th>
                         <th>Atleta</th>
-                        <th>Vitórias</th>
-                        <th>Sets Ganhos</th>
-                        <th>Saldo Tentos</th>
-                        <th>Tentos Pró</th>
-                        <th>Flores</th>
+                        <th style="text-align: center;">Vitórias</th>
+                        <th style="text-align: center;">Sets Ganhos</th>
+                        <th style="text-align: center;">Saldo Tentos</th>
+                        <th style="text-align: center;">Tentos Pró</th>
+                        <th style="text-align: center;">Flores</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in classificacao %}
-                    <tr style="{% if loop.index <= 8 and config.fase_torneio == 'CLASSIFICATORIA' %}background: #142314;{% endif %}">
+                    <tr style="{% if loop.index <= 8 and config.fase_torneio == 'CLASSIFICATORIA' %}background: #193320; border-left: 3px solid #2ecc71;{% endif %}">
                         <td><strong>{{ loop.index }}º</strong></td>
                         <td style="color: #fff; font-weight: bold;">{{ item.nome }}</td>
-                        <td style="color: #27ae60; font-weight: bold;">{{ item.vitorias }}</td>
-                        <td>{{ item.sets_ganhos }}</td>
-                        <td style="color: {% if item.saldo_tentos >= 0 %}#27ae60{% else %}#c0392b{% endif %};">{{ item.saldo_tentos }}</td>
-                        <td>{{ item.tentos_pro }}</td>
-                        <td>{{ item.flores }}</td>
+                        <td style="color: #2ecc71; font-weight: bold; text-align: center;">{{ item.vitorias }}</td>
+                        <td style="text-align: center;">{{ item.sets_ganhos }}</td>
+                        <td style="color: {% if item.saldo_tentos >= 0 %}#2ecc71{% else %}#e74c3c{% endif %}; font-weight: bold; text-align: center;">
+                            {% if item.saldo_tentos > 0 %}+{% endif %}{{ item.saldo_tentos }}
+                        </td>
+                        <td style="text-align: center;">{{ item.tentos_pro }}</td>
+                        <td style="text-align: center; color: #f1c40f;">{{ item.flores }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 30px;">Nenhum atleta listado na classificação.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <div class="card" style="border-color: #444;">
-            <h3>🔍 Módulo de Auditoria e Correção Lógica</h3>
-            <p style="font-size: 0.9rem; color: #888;">Selecione qualquer rodada abaixo (incluindo as eliminatórias) para conferir ou reverter os lançamentos.</p>
+        <div class="card" style="border-color: #24472e;">
+            <h2>🔍 Módulo de Auditoria e Correção Lógica</h2>
+            <p style="font-size: 0.9rem; color: #8fa393; margin-bottom: 20px;">Selecione qualquer rodada abaixo (incluindo as eliminatórias) para conferir ou reverter os lançamentos.</p>
             
             <div class="filtro-box">
-                <span>Filtrar Histórico:</span>
-                <select id="filtro_rodada" onchange="mudarRodadaFiltro(this.value)">
-                    {% for r in todas_rodadas %}
-                        <option value="{{ r }}" {% if r == rodada_selecionada %}selected{% endif %}>
-                            {% if r == -1 %}⚔️ Oitavas de Final
-                            {% elif r == -2 %}⚔️ Quartas de Final
-                            {% elif r == -3 %}🔥 Semifinal
-                            {% elif r == -4 %}🏆 Grande Final / 3º Lugar
-                            {% else %}Visualizar {{ r }}ª Rodada (Classificatória)
-                            {% endif %}
-                        </option>
-                    {% else %}
-                        <option>Nenhuma rodada gerada</option>
-                    {% endfor %}
-                </select>
+                <div class="filtro-box-inner">
+                    <div class="filtro-cell" style="width: 130px; font-weight: bold; color: #d4af37;">
+                        Filtrar Histórico:
+                    </div>
+                    <div class="filtro-cell">
+                        <select id="filtro_rodada" onchange="mudarRodadaFiltro(this.value)" style="min-width: 320px;">
+                            {% for r in todas_rodadas %}
+                                <option value="{{ r }}" {% if r == rodada_selecionada %}selected{% endif %}>
+                                    {% if r == -1 %}⚔️ Oitavas de Final
+                                    {% elif r == -2 %}⚔️ Quartas de Final
+                                    {% elif r == -3 %}🔥 Semifinal
+                                    {% elif r == -4 %}🏆 Grande Final / 3º Lugar
+                                    {% else %}Visualizar {{ r }}ª Rodada (Classificatória)
+                                    {% endif %}
+                                </option>
+                            {% else %}
+                                <option>Nenhuma rodada gerada</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <h4>Mesas Encontradas na Rodada Selecionada</h4>
             <table>
                 <thead>
                     <tr>
-                        <th>Mesa</th>
+                        <th style="width: 120px;">Mesa</th>
                         <th>Atleta 1</th>
                         <th>Atleta 2</th>
                         <th>Placar Registrado</th>
-                        <th>Auditoria</th>
+                        <th style="width: 180px; text-align: center;">Auditoria</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for c in confrontos_auditoria %}
                     <tr>
-                        <td>Mesa {{ c.mesa }}</td>
-                        <td style="{% if c.vencedor_id == c.atleta1_id %}color:#27ae60; font-weight:bold;{% endif %}">{{ c.atleta1_nome }}</td>
-                        <td style="{% if c.vencedor_id == c.atleta2_id %}color:#27ae60; font-weight:bold;{% endif %}">{{ c.atleta2_nome }}</td>
+                        <td><strong>Mesa {{ c.mesa }}</strong></td>
+                        <td style="{% if c.vencedor_id == c.atleta1_id %}color:#2ecc71; font-weight:bold;{% endif %}">{{ c.atleta1_nome }}</td>
+                        <td style="{% if c.vencedor_id == c.atleta2_id %}color:#2ecc71; font-weight:bold;{% endif %}">{{ c.atleta2_nome }}</td>
                         <td>
                             {% if c.vencedor_id %}
-                                <span style="color: #bbb;">Tipo: {{ c.tipo_placar }} | Placar: {{ c.tentos1 }}x{{ c.tentos2 }}</span>
+                                <span style="color: #cbd5e1;">Tipo: {{ c.tipo_placar }} | Placar: <strong style="color: #fff;">{{ c.tentos1 }} x {{ c.tentos2 }}</strong></span>
                             {% else %}
-                                <span style="color: #e67e22; font-style: italic;">Sem resultado em aberto</span>
+                                <span style="color: #e67e22; font-style: italic;">Sem resultado em aberto / Pendente</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td style="text-align: center;">
                             {% if c.atleta2_id %}
                                 <button class="btn-corrigir" onclick="abrirAuditoria('{{c.id}}', '{{c.atleta1_id}}', '{{c.atleta1_nome}}', '{{c.atleta2_id}}', '{{c.atleta2_nome}}')">Forçar Correção</button>
                             {% else %}
-                                <span style="color: #666;">Folga Automática</span>
+                                <span style="color: #666; font-style: italic;">Folga Automática</span>
                             {% endif %}
                         </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; font-style: italic; padding: 25px;">Nenhum confronto registrado para a rodada selecionada.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -142,35 +193,46 @@
     </div>
 
     <div class="modal" id="modalAuditoria" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100;">
-        <div style="background: #1e1e1e; padding: 30px; border-radius: 8px; border: 1px solid #c0392b; width: 400px;">
-            <h3 style="color: #c0392b; margin-top: 0;">⚠️ Alteração de Auditoria</h3>
+        <div style="background: #112216; padding: 30px; border-radius: 8px; border: 2px solid #7b241c; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
+            <h3 style="color: #e74c3c; margin-top: 0; border-bottom: 1px solid #332222; padding-bottom: 10px;">⚠️ Alteração de Auditoria</h3>
+            
             <form action="/admin-painel/admin/auditoria/corrigir" method="POST">
                 <input type="hidden" name="confronto_id" id="aud_id">
                 <input type="hidden" name="rodada_retorno" value="{{ rodada_selecionada }}">
 
-                <label style="display:block; margin-top:15px; font-weight:bold;">Vencedor Correto:</label>
-                <select name="vencedor_id" id="aud_vencedor" style="width:100%; padding:10px; margin-top:5px; background:#333; color:#fff; border:1px solid #444;" required></select>
+                <div style="margin-top: 15px;">
+                    <label style="display:block; font-weight:bold; color: #bbb; margin-bottom: 5px;">Vencedor Correto:</label>
+                    <select name="vencedor_id" id="aud_vencedor" style="width:100%;" required></select>
+                </div>
 
-                <label style="display:block; margin-top:15px; font-weight:bold;">Tipo de Placar:</label>
-                <select name="tipo_placar" style="width:100%; padding:10px; margin-top:5px; background:#333; color:#fff; border:1px solid #444;" required>
-                    <option value="2x0">2x0 em Sets</option>
-                    <option value="2x1">2x1 em Sets</option>
-                </select>
+                <div style="margin-top: 15px;">
+                    <label style="display:block; font-weight:bold; color: #bbb; margin-bottom: 5px;">Tipo de Placar:</label>
+                    <select name="tipo_placar" style="width:100%;" required>
+                        <option value="2x0">2x0 em Sets</option>
+                        <option value="2x1">2x1 em Sets</option>
+                    </select>
+                </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                    <div>
-                        <label>Tentos P1:</label>
-                        <input type="number" name="tentos1" value="0" style="width:100%; padding:8px; background:#333; color:#fff; border:1px solid #444;" required>
-                    </div>
-                    <div>
-                        <label>Tentos P2:</label>
-                        <input type="number" name="tentos2" value="0" style="width:100%; padding:8px; background:#333; color:#fff; border:1px solid #444;" required>
+                <div class="layout-table" style="margin-top: 20px; border-collapse: separate; border-spacing: 15px 0; margin-left: -15px; width: calc(100% + 30px);">
+                    <div class="layout-row">
+                        <div class="layout-cell" style="width: 50%;">
+                            <label style="display: block; font-weight: bold; color: #bbb; margin-bottom: 5px;">Tentos P1:</label>
+                            <input type="number" name="tentos1" value="0" min="0" style="width:100%;" required>
+                        </div>
+                        <div class="layout-cell" style="width: 50%;">
+                            <label style="display: block; font-weight: bold; color: #bbb; margin-bottom: 5px;">Tentos P2:</label>
+                            <input type="number" name="tentos2" value="0" min="0" style="width:100%;" required>
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 25px; display: flex; justify-content: space-between;">
-                    <button type="button" onclick="document.getElementById('modalAuditoria').style.display='none'" style="background:#555; border:none; padding:10px 15px; color:#fff; cursor:pointer; border-radius:4px;">Voltar</button>
-                    <button type="submit" style="background:#c0392b; color:white; font-weight:bold; border:none; padding:10px 20px; cursor:pointer; border-radius:4px;">Salvar Mudança</button>
+                <div style="margin-top: 30px; display: table; width: 100%;">
+                    <div style="display: table-cell; text-align: left;">
+                        <button type="button" onclick="document.getElementById('modalAuditoria').style.display='none'" style="background:#455a64; border:none; padding:10px 20px; color:#fff; cursor:pointer; border-radius:4px; font-weight: bold;">Voltar</button>
+                    </div>
+                    <div style="display: table-cell; text-align: right;">
+                        <button type="submit" style="background:#7b241c; color:white; font-weight:bold; border: 1px solid #922b21; padding:10px 25px; cursor:pointer; border-radius:4px; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">Salvar Mudança</button>
+                    </div>
                 </div>
             </form>
         </div>
