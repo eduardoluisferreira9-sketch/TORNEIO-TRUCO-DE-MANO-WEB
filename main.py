@@ -1,3 +1,4 @@
+import traceback
 import os
 import time
 import shutil
@@ -271,42 +272,41 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
 
 @app.get("/admin/inscricoes")
 def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
-    cfg = atualizar_e_obter_cronometro(db)
-    if not cfg:
-        return HTMLResponse(content="Nenhum torneio ativo encontrado. Vá em reset total para inicializar.", status_code=400)
+    try:
+        cfg = atualizar_e_obter_cronometro(db)
+        if not cfg:
+            return HTMLResponse(content="Nenhum torneio ativo encontrado. Vá em reset total para inicializar.", status_code=400)
+            
+        cursor = db.cursor()
+        p = "%s" if DATABASE_URL else "?"
         
-    cursor = db.cursor()
-    
-    if DATABASE_URL:
-        # --- FLUXO DO SUPABASE (POSTGRESQL) ---
-        # No PostgreSQL com RealDictCursor, os resultados já vêm como dicionários puros.
-        cursor.execute("SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = %s ORDER BY id DESC", (cfg["id"],))
-        pendentes = list(cursor.fetchall())
-        
-        cursor.execute("SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = %s ORDER BY nome ASC", (cfg["id"],))
-        oficiais = list(cursor.fetchall())
-    else:
-        # --- FLUXO DO PC LOCAL (SQLITE) ---
-        cursor.execute("SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = ? ORDER BY id DESC", (cfg["id"],))
+        cursor.execute(f"SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = {p} ORDER BY id DESC", (cfg["id"],))
         pendentes = [dict(row) for row in cursor.fetchall()]
         
-        cursor.execute("SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = ? ORDER BY nome ASC", (cfg["id"],))
+        cursor.execute(f"SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (cfg["id"],))
         oficiais = [dict(row) for row in cursor.fetchall()]
-    
-    total_arrecadado = len(oficiais) * cfg['taxa_inscricao']
-    
-    return templates.TemplateResponse(
-        request=request, name="admin_inscricoes.html", 
-        context={
-            "config": cfg, 
-            "pendentes": pendentes, 
-            "oficiais": oficiais, 
-            "total_arrecadado": f"{total_arrecadado:.2f}".replace('.', ','), 
-            "aba_ativa": "inscricoes", 
-            "dev_nome": DEV_NOME, 
-            "dev_whatsapp": DEV_WHATSAPP
-        }
-    )
+        
+        total_arrecadado = len(oficiais) * cfg['taxa_inscricao']
+        
+        return templates.TemplateResponse(
+            request=request, name="admin_inscricoes.html", 
+            context={
+                "config": cfg, 
+                "pendentes": pendentes, 
+                "oficiais": oficiais, 
+                "total_arrecadado": f"{total_arrecadado:.2f}".replace('.', ','), 
+                "aba_ativa": "inscricoes", 
+                "dev_nome": DEV_NOME, 
+                "dev_whatsapp": DEV_WHATSAPP
+            }
+        )
+    except Exception as e:
+        # Se der qualquer erro (no banco, no Jinja2, etc.), ele captura e mostra na tela do navegador
+        erro_detalhado = traceback.format_exc()
+        return HTMLResponse(
+            content=f"<h1>Ocorreu um erro na rota admin/inscricoes</h1><pre>{erro_detalhado}</pre>", 
+            status_code=500
+        )
 
 @app.post("/admin/salvar-configuracoes")
 def salvar_configuracoes(nome_torneio: str = Form(...), max_rodadas: int = Form(...), tempo_minutos: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
