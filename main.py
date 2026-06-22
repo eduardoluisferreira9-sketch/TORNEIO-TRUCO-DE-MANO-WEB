@@ -51,7 +51,12 @@ def obter_torneio_ativo(cursor):
     if not res:
         cursor.execute("SELECT * FROM torneios ORDER BY id DESC LIMIT 1")
         res = cursor.fetchone()
-    return dict(res) if res else None
+        
+    if res is None:
+        return None
+        
+    # Se já for um dicionário (Supabase), retorna direto. Se for sqlite3.Row (PC), converte.
+    return res if isinstance(res, dict) else dict(res)
 
 def atualizar_e_obter_cronometro(db):
     """Atualiza o tempo decrescente do cronômetro baseado no tempo real decorrido."""
