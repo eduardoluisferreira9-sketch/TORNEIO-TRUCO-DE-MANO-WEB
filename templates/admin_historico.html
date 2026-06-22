@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Galeria de Campeões</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=600;800&family=Montserrat:wght=400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-principal: #0d2e1b;
-            --bg-cards: #092113;
+            --bg-principal: #0b140d;
+            --bg-cards: #112216;
+            --border-feltro: #1b3622;
             --ouro: #d4af37;
             --ouro-brilhante: #f3e5ab;
-            --texto-claro: #ffffff; 
-            --texto-subtil: #bdc3c7; 
-            --texto-escuro: #111;
+            --texto-claro: #e8e6e3; 
+            --texto-subtil: #a2b3a5; 
+            --texto-escuro: #0b140d;
             --rei-flores: #9b59b6;
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
 
         body { 
             background: var(--bg-principal); 
@@ -22,38 +25,45 @@
             font-family: 'Montserrat', sans-serif; 
             margin: 0; 
             padding: 0;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
-            background-size: 100% 4px;
         }
 
+        /* Nav padronizada conforme as outras telas administrativas */
         nav { 
-            background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
-            padding: 20px 40px; 
-            border-bottom: 3px solid var(--ouro); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            background: #090f0a; 
+            padding: 15px 30px; 
+            border-bottom: 3px solid var(--ouro);
+            display: table;
+            width: 100%;
         }
-        nav span { font-family: 'Cinzel', serif; font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: var(--ouro); }
-        .nav-links { display: flex; gap: 15px; }
+        .nav-brand { display: table-cell; text-align: left; vertical-align: middle; }
+        .nav-brand span { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: bold; color: var(--ouro); letter-spacing: 0.5px; }
+        .nav-container-links { display: table-cell; text-align: right; vertical-align: middle; }
+        
         .nav-link { 
-            text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; 
-            color: var(--texto-subtil); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;
-            border: 2px solid transparent; transition: all 0.3s ease;
+            text-decoration: none; 
+            padding: 8px 16px; 
+            margin-left: 5px;
+            border-radius: 4px; 
+            font-weight: 700; 
+            color: var(--texto-subtil); 
+            text-transform: uppercase; 
+            font-size: 0.75rem; 
+            letter-spacing: 0.5px;
+            display: inline-block;
+            transition: all 0.2s ease;
         }
-        .nav-link:hover { color: var(--ouro-brilhante); background: rgba(212, 175, 55, 0.1); border-color: rgba(212,175,55,0.2); }
-        .nav-link.active { background: var(--ouro); color: var(--texto-escuro); font-weight: 800; border-color: var(--ouro-brilhante); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .nav-link:hover { color: var(--ouro-brilhante); background: rgba(212, 175, 55, 0.1); }
+        .nav-link.active { background: var(--ouro); color: var(--texto-escuro); font-weight: 800; }
 
         .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
         
         .grid-historico { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; margin-top: 40px; }
         .card-historico { 
             background: var(--bg-cards); 
-            border: 1px solid rgba(212, 175, 55, 0.2); 
+            border: 1px solid var(--border-feltro); 
             border-radius: 12px; 
             padding: 25px; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.5);
             transition: all 0.3s ease; 
         }
         .card-historico:hover { 
@@ -68,44 +78,46 @@
             font-size: 1.35rem; 
             margin-top: 0; 
             margin-bottom: 18px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2); 
+            border-bottom: 1px solid var(--border-feltro); 
             padding-bottom: 12px; 
             font-weight: 800;
         }
         
-        .linha-podio { display: flex; align-items: center; gap: 12px; margin: 10px 0; font-size: 0.95rem; font-weight: 600; }
+        .linha-podio { display: flex; align-items: center; gap: 12px; margin: 12px 0; font-size: 0.95rem; font-weight: 600; }
         .linha-podio strong { color: var(--texto-subtil); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; width: 95px; display: inline-block; }
         .linha-podio .nome-destaque { color: #fff; font-weight: 700; }
         
         .tag-flores { 
-            background: rgba(155, 89, 182, 0.1); 
-            border: 1px solid var(--rei-flores); 
+            background: rgba(155, 89, 182, 0.08); 
+            border: 1px solid rgba(155, 89, 182, 0.4); 
             color: #d68fe9; 
             border-radius: 8px; 
             padding: 12px; 
             margin-top: 20px; 
             font-size: 0.9rem; 
             font-weight: 600;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <span>🏆 {{ config.nome_torneio }}</span>
-        <div class="nav-links">
-            <a href="/admin-painel/admin/inscricoes" class="nav-link">⚔️ Inscrições</a>
-            <a href="/admin-painel/admin/jogos" class="nav-link">🌿 Mesa de Jogos</a>
-            <a href="/admin-painel/admin/classificacao" class="nav-link">🏆 Classificação</a>
+        <div class="nav-brand">
+            <span>🏆 {{ config.nome_torneio }}</span>
+        </div>
+        <div class="nav-container-links">
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link">🎴 Mesa de Jogos</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link">📊 Classificação</a>
             <a href="/admin-painel/admin/podio" class="nav-link">🥇 Pódio Final</a>
             <a href="/admin-painel/admin/historico" class="nav-link active">📜 Galeria</a>
         </div>
     </nav>
 
     <div class="container">
-        <h2 style="color: var(--ouro); font-size: 2.5rem; font-family: 'Cinzel', serif; font-weight: 800; margin-bottom: 5px; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">📜 Galeria de Imortais do Truco Cego</h2>
-        <p style="color: var(--texto-subtil); font-weight: 600; margin-bottom: 20px;">Aqui repousam as lendas que conquistaram a glória eterna nas arenas passadas.</p>
+        <h2 style="color: var(--ouro); font-size: 2.3rem; font-family: 'Cinzel', serif; font-weight: 800; margin: 0 0 5px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">📜 Galeria de Imortais do Truco Cego</h2>
+        <p style="color: var(--texto-subtil); font-weight: 600; margin-top: 0; margin-bottom: 40px; font-size: 0.95rem;">Aqui repousam as lendas que conquistaram a glória eterna nas arenas passadas.</p>
 
         <div class="grid-historico">
             {% for h in galeria %}
@@ -130,17 +142,17 @@
                 <div class="linha-podio">
                     <span style="font-size: 1.2rem;">🪵</span> 
                     <strong>4º Lugar:</strong> 
-                    <span style="color: #8d6e63;">{{ h.quarto }}</span>
+                    <span style="color: #bcaaa4;">{{ h.quarto }}</span>
                 </div>
 
                 <div class="tag-flores">
                     🌸 <strong>Rei das Flores:</strong> <span style="color: #fff;">{{ h.rei_das_flores }}</span> <br>
-                    <div style="color: #bdc3c7; font-size: 0.78rem; margin-top: 4px; font-weight: 500;">Cantou {{ h.qtd_flores }} flores ao longo do evento.</div>
+                    <div style="color: #cbd5e1; font-size: 0.78rem; margin-top: 5px; font-weight: 500;">Cantou {{ h.qtd_flores }} flores ao longo do evento.</div>
                 </div>
             </div>
             {% else %}
-            <div style="grid-column: 1 / -1; background: var(--bg-cards); padding: 40px; border-radius: 12px; border: 1px dashed rgba(212,175,55,0.3); text-align: center; margin-top: 20px;">
-                <p style="color: var(--texto-subtil); font-style: italic; margin: 0; font-size: 1.1rem; font-weight: 600;">Nenhum torneio foi arquivado ainda. O campeão da edição atual será o pioneiro deste mural!</p>
+            <div style="grid-column: 1 / -1; background: var(--bg-cards); padding: 50px 20px; border-radius: 12px; border: 2px dashed var(--border-feltro); text-align: center;">
+                <p style="color: var(--texto-subtil); font-style: italic; margin: 0; font-size: 1.05rem; font-weight: 600;">Nenhum torneio foi arquivado ainda. O campeão da edição atual será o pioneiro deste mural!</p>
             </div>
             {% endfor %}
         </div>
