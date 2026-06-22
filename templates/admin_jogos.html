@@ -188,7 +188,7 @@
                     </span>
                     
                     {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|replace(chr(39), '')|replace(chr(34), '') }}', '{{ c.atleta2_nome|replace(chr(39), '')|replace(chr(34), '') }}')">🖨️ Súmula</button>
+                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome }}', '{{ c.atleta2_nome }}')">🖨️ Súmula</button>
                     {% endif %}
                 </div>
                 
@@ -225,7 +225,7 @@
                 </div>
 
                 {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|replace(chr(39), '')|replace(chr(34), '') }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|replace(chr(39), '')|replace(chr(34), '') }}')">
+                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome }}')">
                         {% if c.vencedor_id %}⚙️ ALTERAR RESULTADO{% else %}🃏 LANÇAR PLACAR{% endif %}
                     </button>
                 {% else %}
@@ -290,13 +290,13 @@
     </div>
 
     <script>
+        // Bloco otimizado para evitar problemas de escape de strings no Jinja2 do FastAPI
         const dadosConfrontosParaImpressao = [
             {% for c in confrontos %}
             {
                 mesa: "{{ c.mesa }}",
-                atleta1: "{{ c.atleta1_nome|replace('\"', '\\\"')|replace('\n', '') }}",
-                atleta2: "{{ (c.atleta2_nome if c.atleta2_nome else '')|replace('\"', '\\\"')|replace('\n', '') }}",
-                atleta2_id: {% if c.atleta2_id is defined %}{{ c.atleta2_id if c.atleta2_id is not none else 'null' }}{% else %}{{ c.athlete2_id if c.athlete2_id is not none else 'null' }}{% endif %}
+                atleta1: "{{ c.atleta1_nome }}",
+                atleta2: "{{ c.atleta2_nome if c.atleta2_nome else '' }}"
             },
             {% endfor %}
         ];
@@ -383,7 +383,7 @@
             const secao = document.getElementById('secao-impressao-sumula');
             let htmlFinal = "";
             dadosConfrontosParaImpressao.forEach(jogo => {
-                if (jogo.atleta2_id !== null && jogo.atleta2.trim() !== "") {
+                if (jogo.atleta2 && jogo.atleta2.trim() !== "") {
                     htmlFinal += gerarHtmlCupom(jogo.mesa, jogo.atleta1, jogo.atleta2);
                 }
             });
