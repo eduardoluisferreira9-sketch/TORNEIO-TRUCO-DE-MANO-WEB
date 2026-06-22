@@ -231,9 +231,21 @@ def atualizar_e_obter_cronometro(db):
     config = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     
-    if config["crono_ativo"] == 1:
+    if config and config["crono_ativo"] == 1:
         agora = time.time()
-        decorrido = int(agora - config["crono_ultimo_clique"])
+        
+        # FORÇAR CONVERSÃO: Garante que o valor do banco seja lido como número decimal (float)
+        try:
+            ultimo_clique = float(config["crono_ultimo_clique"])
+        except (TypeError, ValueError):
+            ultimo_clique = agora
+
+        decorrido = int(agora - ultimo_clique)
+        
+        # Segurança extra: se o decorrido for menor que 0 (atraso de servidor), vira 0
+        if decorrido < 0: 
+            decorrido = 0
+            
         if decorrido > 0:
             novo_tempo = max(0, config["crono_tempo_restante_seg"] - decorrido)
             ativo = 1 if novo_tempo > 0 else 0
