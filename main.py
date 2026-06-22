@@ -232,28 +232,32 @@ def atualizar_e_obter_cronometro(db):
     p = "%s" if DATABASE_URL else "?"
     
     if config and config["crono_ativo"] == 1:
-        agora = time.time()
+        # Usamos int(time.time()) para pegar apenas os segundos puros, sem milissegundos quebrados
+        agora = int(time.time())
         
-        # FORÇAR CONVERSÃO: Garante que o valor do banco seja lido como número decimal (float)
         try:
-            ultimo_clique = float(config["crono_ultimo_clique"])
+            # Forçamos o valor vindo do banco a ser um número inteiro puro
+            ultimo_clique = int(float(config["crono_ultimo_clique"]))
         except (TypeError, ValueError):
             ultimo_clique = agora
 
-        decorrido = int(agora - ultimo_clique)
+        decorrido = agora - ultimo_clique
         
-        # Segurança extra: se o decorrido for menor que 0 (atraso de servidor), vira 0
+        # Proteção: impede valores negativos causados por micro-atrasos do servidor
         if decorrido < 0: 
             decorrido = 0
             
         if decorrido > 0:
-            novo_tempo = max(0, config["crono_tempo_restante_seg"] - decorrido)
+            novo_tempo = max(0, int(config["crono_tempo_restante_seg"]) - decorrido)
             ativo = 1 if novo_tempo > 0 else 0
+            
             cursor.execute(f'UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p}, crono_ativo = {p} WHERE id = {p}', 
                            (novo_tempo, agora, ativo, config["id"]))
             db.commit()
+            
             config["crono_tempo_restante_seg"] = novo_tempo
             config["crono_ativo"] = ativo
+            
     return config
 
 def obter_ranking_fase_classificatoria(cursor, torneio_id: int):
