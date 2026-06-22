@@ -216,14 +216,16 @@
 
             <div class="grid-tabelas">
                 <div class="card">
-                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">⚔️ Guapos Confirmados ({{ oficiais|length }})</h3>
+                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                        ⚔️ Guapos Confirmados (<span id="contador-oficiais">0</span>)
+                    </h3>
                     <table>
                         <thead>
                             <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Remover</th></tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tabela-oficiais-body">
                             {% for a in oficiais %}
-                            <tr>
+                            <tr class="linha-atleta-oficial">
                                 <td><strong style="color: #fff; font-size: 1.05rem;">{{ a.nome }}</strong></td>
                                 <td><span style="color:var(--ouro-brilhante); font-size: 0.85rem; font-weight: 700;">{{ a.entidade }}</span></td>
                                 <td style="text-align: right;">
@@ -239,8 +241,8 @@
                         </tbody>
                     </table>
                     
-                    {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
-                    <form action="/admin/iniciar-torneio" method="POST" style="margin-top:30px;">
+                    {% if config.fase_torneio == "INSCRICAO" %}
+                    <form action="/admin/iniciar-torneio" method="POST" style="margin-top:30px;" id="form-iniciar-torneio">
                         <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🪵 Cruzar os Relhos e Dar as Cartas</button>
                     </form>
                     {% endif %}
@@ -283,6 +285,18 @@
         }
         return false; 
     }
+
+    // Calcula dinamicamente a quantidade de atletas oficiais e gerencia o botão de início do torneio
+    document.addEventListener("DOMContentLoaded", function() {
+        const totalAtletas = document.querySelectorAll('.linha-atleta-oficial').length;
+        document.getElementById('contador-oficiais').innerText = totalAtletas;
+        
+        // Esconde o botão de iniciar se houver menos de 2 atletas cadastrados para evitar erros no sorteio
+        const formIniciar = document.getElementById('form-iniciar-torneio');
+        if(formIniciar && totalAtletas < 2) {
+            formIniciar.style.display = 'none';
+        }
+    });
     </script>
 
 </body>
