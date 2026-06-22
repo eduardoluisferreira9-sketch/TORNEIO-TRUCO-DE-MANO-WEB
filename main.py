@@ -18,7 +18,7 @@ UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Configuração de templates (ajuste a pasta conforme sua estrutura)
+# Configuração de templates
 templates = Jinja2Templates(directory="templates")
 
 # --- CONEXÃO COM O BANCO DE DADOS ---
@@ -27,7 +27,6 @@ def get_db():
         import psycopg2
         from psycopg2.extras import RealDictCursor
         conn = psycopg2.connect(DATABASE_URL)
-        # Configura o cursor para retornar dicionários por padrão, simulando o comportamento do SQLite row_factory
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         try:
             yield conn
@@ -46,8 +45,7 @@ def get_db():
 # --- FUNÇÕES AUXILIARES DE REGRAS DE NEGÓCIO ---
 def obter_torneio_ativo(cursor):
     """Retorna o torneio que não está concluído ou o mais recente."""
-    p = "%s" if DATABASE_URL else "?"
-    cursor.execute(f"SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
+    cursor.execute("SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
     res = cursor.fetchone()
     if not res:
         cursor.execute("SELECT * FROM torneios ORDER BY id DESC LIMIT 1")
@@ -69,7 +67,6 @@ def atualizar_e_obter_cronometro(db):
             p = "%s" if DATABASE_URL else "?"
             
             if novo_tempo == 0:
-                # Se o tempo esgotou, desativa o cronômetro automaticamente
                 cursor.execute(f"UPDATE torneios SET crono_tempo_restante_seg = 0, crono_ativo = 0, crono_ultimo_clique = {p} WHERE id = {p}", (agora, cfg["id"]))
             else:
                 cursor.execute(f"UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p} WHERE id = {p}", (novo_tempo, agora, cfg["id"]))
@@ -86,14 +83,18 @@ def verificar_admin(request: Request):
         raise HTTPException(status_code=401, detail="Não autorizado")
     return True
 
+def extrair_valor_contagem(resultado):
+    """Auxiliar para extrair valores numéricos de forma segura independente do driver."""
+    if not resultado:
+        return 0
+    if isinstance(resultado, (int, float)):
+        return resultado
+    if hasattr(resultado, 'values'):
+        return list(resultado.values())[0] or 0
+    return resultado[0] or 0
+
 def obter_ranking_fase_classificatoria(cursor, torneio_id):
-    """
-    Calcula e ordena o ranking dos atletas com base nas regras do Truco Cego:
-    1. Vitórias (Sets Ganhos)
-    2. Saldo de Tentos
-    3. Tentos Pró (Ganhos)
-    4. Flores Marcadas
-    """
+    """Calcula e ordena o ranking dos atletas com base nas regras do Truco Cego."""
     p = "%s" if DATABASE_URL else "?"
     cursor.execute(f"SELECT id, nome, entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (torneio_id,))
     atletas = cursor.fetchall()
@@ -102,26 +103,28 @@ def obter_ranking_fase_classificatoria(cursor, torneio_id):
     for atl in atletas:
         a_id = atl["id"]
         
-        # Confrontos como Atleta 1
-        cursor.execute(f"SELECT COUNT(*) as vits, SUM(sets1) as s_pro, SUM(sets2) as s_contra, SUM(tentos1) as t_pro, SUM(tentos2) as t_contra, SUM(flores1) as fl_pro FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p} AND vencedor_id IS NOT NULL", (a_id, torneio_id))
+        cursor.execute(f"SELECT SUM(sets1) as s_pro, SUM(tentos1) as t_pro, SUM(tentos2) as t_contra, SUM(flores1) as fl_pro FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p} AND vencedor_id IS NOT NULL", (a_id, torneio_id))
         c1 = cursor.fetchone()
         
-        # Confrontos como Atleta 2
-        cursor.execute(f"SELECT COUNT(*) as vits, SUM(sets2) as s_pro, SUM(sets1) as s_contra, SUM(tentos2) as t_pro, SUM(tentos1) as t_contra, SUM(flores2) as fl_pro FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p} AND vencedor_id IS NOT NULL", (a_id, torneio_id))
+        cursor.execute(f"SELECT SUM(sets2) as s_pro, SUM(tentos2) as t_pro, SUM(tentos1) as t_contra, SUM(flores2) as fl_pro FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p} AND vencedor_id IS NOT NULL", (a_id, torneio_id))
         c2 = cursor.fetchone()
         
-        # Contagem de Vitórias Reais (onde o ID é o vencedor)
         cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE vencedor_id = {p} AND torneio_id = {p}", (a_id, torneio_id))
-        vitorias = cursor.fetchone()[0] if DATABASE_URL else cursor.fetchone()[0] # Trata retorno de tupla/dicionário conforme driver
-        if not isinstance(vitorias, int):
-            # Fallback para o formato RealDictCursor/Row
-            vitorias = list(vitorias.values())[0] if hasattr(vitorias, 'values') else vitorias[0]
+        vitorias = extrair_valor_contagem(cursor.fetchone())
 
-        # Agregação segura de None para 0
-        s_pro = (c1["s_pro"] or 0) + (c2["s_pro"] or 0)
-        t_pro = (c1["t_pro"] or 0) + (c2["t_pro"] or 0)
-        t_contra = (c1["t_contra"] or 0) + (c2["t_contra"] or 0)
-        flores = (c1["fl_pro"] or 0) + (c2["fl_pro"] or 0)
+        s1_pro = c1["s_pro"] if c1 and c1["s_pro"] is not None else 0
+        s2_pro = c2["s_pro"] if c2 and c2["s_pro"] is not None else 0
+        t1_pro = c1["t_pro"] if c1 and c1["t_pro"] is not None else 0
+        t2_pro = c2["t_pro"] if c2 and c2["t_pro"] is not None else 0
+        t1_contra = c1["t_contra"] if c1 and c1["t_contra"] is not None else 0
+        t2_contra = c2["t_contra"] if c2 and c2["t_contra"] is not None else 0
+        fl1_pro = c1["fl_pro"] if c1 and c1["fl_pro"] is not None else 0
+        fl2_pro = c2["fl_pro"] if c2 and c2["fl_pro"] is not None else 0
+
+        s_pro = s1_pro + s2_pro
+        t_pro = t1_pro + t2_pro
+        t_contra = t1_contra + t2_contra
+        flores = fl1_pro + fl2_pro
         
         saldo_tentos = t_pro - t_contra
         
@@ -135,13 +138,11 @@ def obter_ranking_fase_classificatoria(cursor, torneio_id):
             "tentos_pro": t_pro,
             "flores": flores
         })
-    
-    # Ordenação conforme os critérios de desempate
+        
     ranking.sort(key=lambda x: (x["vitorias"], x["saldo_tentos"], x["tentos_pro"], x["flores"]), reverse=True)
     return ranking
 
 def aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, tentos1, tentos2, flores1, flores2):
-    """Valida e aplica os resultados dos jogos conforme as regras de pontuação."""
     p = "%s" if DATABASE_URL else "?"
     cursor.execute(f"SELECT atleta1_id, atleta2_id FROM confrontos WHERE id = {p}", (confronto_id,))
     conf = cursor.fetchone()
@@ -176,18 +177,15 @@ def aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, te
 @app.post("/inscrever")
 async def processar_inscricao_atleta(
     nome: str = Form(...), entidade: str = Form(...), whatsapp: str = Form(...),
-    comprovante: UploadFile = File(...), db=Depends(get_db)
+    comprovante: UploadFile = File(None), db=Depends(get_db)
 ):
-    if not comprovante.filename:
-        raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
-    
-    extensao = os.path.splitext(comprovante.filename)[1]
-    nome_seguro = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
-    nome_arquivo = f"comprovante_{nome_seguro}_{int(time.time())}{extensao}"
-    caminho_final = os.path.join(UPLOAD_DIR, nome_arquivo)
-    
-    with open(caminho_final, "wb") as buffer:
-        shutil.copyfileobj(comprovante.file, buffer)
+    if comprovante and comprovante.filename:
+        extensao = os.path.splitext(comprovante.filename)[1]
+        nome_seguro = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
+        nome_arquivo = f"comprovante_{nome_seguro}_{int(time.time())}{extensao}"
+        caminho_final = os.path.join(UPLOAD_DIR, nome_arquivo)
+        with open(caminho_final, "wb") as buffer:
+            shutil.copyfileobj(comprovante.file, buffer)
         
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
@@ -198,7 +196,7 @@ async def processar_inscricao_atleta(
         INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) VALUES ({p}, {p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
     db.commit()
-    return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
+    return RedirectResponse(url="/inscricao?sucesso=true", status_code=303)
 
 @app.get("/login", response_class=HTMLResponse)
 def tela_login(request: Request, erro: str = None):
@@ -245,7 +243,7 @@ def processar_logout():
 @app.get("/api/cronometro")
 def api_cronometro(db=Depends(get_db)):
     cfg = atualizar_e_obter_cronometro(db)
-    return JSONResponse({"tempo_restante": cfg["crono_tempo_restante_seg"], "ativo": cfg["crono_ativo"]})
+    return JSONResponse({"tempo_restante": cfg["crono_tempo_restante_seg"] if cfg else 3000, "ativo": cfg["crono_ativo"] if cfg else 0})
 
 
 # --- PAINEL ADMINISTRATIVO: JOGOS E GERENCIAMENTO ---
@@ -310,8 +308,7 @@ def iniciar_torneio_e_gerar_r1(db=Depends(get_db), auth: bool = Depends(verifica
         return RedirectResponse(url="/admin/jogos", status_code=303)
         
     cursor.execute(f"SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
-    count_val = cursor.fetchone()
-    count_atletas = list(count_val.values())[0] if hasattr(count_val, 'values') else count_val[0]
+    count_atletas = extrair_valor_contagem(cursor.fetchone())
     
     if count_atletas < 2:
         return RedirectResponse(url="/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
@@ -337,8 +334,7 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     confrontos = cursor.fetchall()
     
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
-    pendentes_val = cursor.fetchone()
-    qtd_pendentes = list(pendentes_val.values())[0] if hasattr(pendentes_val, 'values') else  pendentes_val[0]
+    qtd_pendentes = extrair_valor_contagem(cursor.fetchone())
     rodada_concluida = (qtd_pendentes == 0) if confrontos else False
 
     mins = cfg["crono_tempo_restante_seg"] // 60
@@ -347,7 +343,7 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
 
     return templates.TemplateResponse(
         request=request, name="admin_jogos.html", 
-        context={"config": cfg, "rodada": rodada_atual, "confrontos": confrontos, "rodada_concluida": rodada_concluida, "tempo_formatado": tempo_formatado, "aba_ativa": "jogos", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
+        context={"config": cfg, "rodada": rodada_atual, "confrontos": confrontos, "rodada_concluida": rodada_concluida, "tempo_formatado": tempo_formatated, "aba_ativa": "jogos", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
     )
 
 
@@ -361,15 +357,13 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
-    cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
-    max_r_val = cursor.fetchone()
-    rodada_atual = list(max_r_val.values())[0] if hasattr(max_r_val, 'values') else max_r_val[0]
+    cursor.execute(f"SELECT MAX(rodada) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
+    rodada_atual = extrair_valor_contagem(cursor.fetchone())
     proxima_rodada = rodada_atual + 1
     
     if rodada_atual > 0:
         cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
-        pend_val = cursor.fetchone()
-        qtd_pendentes = list(pend_val.values())[0] if hasattr(pend_val, 'values') else pend_val[0]
+        qtd_pendentes = extrair_valor_contagem(cursor.fetchone())
         if qtd_pendentes > 0:
             return RedirectResponse(url="/admin/jogos?erro=jogos_pendentes", status_code=303)
 
@@ -447,19 +441,18 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
     db.commit()
     return RedirectResponse(url="/admin/jogos", status_code=303)
 
+
 @app.post("/admin/disparar-matamata")
 def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
-    cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
-    max_r_val = cursor.fetchone()
-    r_atual = list(max_r_val.values())[0] if hasattr(max_r_val, 'values') else max_r_val[0]
+    cursor.execute(f"SELECT MAX(rodada) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
+    r_atual = extrair_valor_contagem(cursor.fetchone())
     
     if r_atual > 0:
         cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (r_atual, cfg["id"]))
-        pend_val = cursor.fetchone()
-        qtd_pendentes = list(pend_val.values())[0] if hasattr(pend_val, 'values') else pend_val[0]
+        qtd_pendentes = extrair_valor_contagem(cursor.fetchone())
         if qtd_pendentes > 0:
             return RedirectResponse(url="/admin/classificacao?erro=conclua_rodada_atual", status_code=303)
 
@@ -502,6 +495,7 @@ def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = D
     db.commit()
     return RedirectResponse(url="/admin/jogos", status_code=303)
 
+
 @app.post("/admin/avancar-matamata")
 def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
@@ -515,8 +509,7 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     fase_atual = row_f["rodada"]
     
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (fase_atual, cfg["id"]))
-    pend_val = cursor.fetchone()
-    qtd_pendentes = list(pend_val.values())[0] if hasattr(pend_val, 'values') else  pend_val[0]
+    qtd_pendentes = extrair_valor_contagem(cursor.fetchone())
     if qtd_pendentes > 0:
         return RedirectResponse(url="/admin/jogos?erro=jogos_eliminatorios_pendentes", status_code=303)
         
@@ -623,8 +616,7 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
 
     cursor = db.cursor()
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = -4 AND torneio_id = {p} AND vencedor_id IS NULL", (cfg["id"],))
-    pend_val = cursor.fetchone()
-    qtd_pendentes = list(pend_val.values())[0] if hasattr(pend_val, 'values') else  pend_val[0]
+    qtd_pendentes = extrair_valor_contagem(cursor.fetchone())
     if qtd_pendentes > 0:
         return RedirectResponse(url="/admin/jogos?erro=finais_nao_concluidas", status_code=303)
         
@@ -633,7 +625,6 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 2 AND torneio_id = {p}", (cfg["id"],))
     jogo_terceiro = cursor.fetchone()
 
-    # CORRIGIDO: Expressão redundante/inválida removida
     if not jogo_final or not jogo_terceiro:
         return RedirectResponse(url="/admin/jogos?erro=finais_nao_geradas", status_code=303)
 
@@ -650,15 +641,13 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
     max_flores = 0
     for atl in atletas:
         a_id = atl["id"]
-        cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-        f1 = cursor.fetchone()[0] if DATABASE_URL else list(cursor.fetchone())[0]
-        if hasattr(f1, 'values'): f1 = list(f1.values())[0]
+        cursor.execute(f"SELECT SUM(flores1) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
+        f1 = extrair_valor_contagem(cursor.fetchone())
         
-        cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-        f2 = cursor.fetchone()[0] if DATABASE_URL else list(cursor.fetchone())[0]
-        if hasattr(f2, 'values'): f2 = list(f2.values())[0]
+        cursor.execute(f"SELECT SUM(flores2) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
+        f2 = extrair_valor_contagem(cursor.fetchone())
             
-        total_f = (f1 or 0) + (f2 or 0)
+        total_f = f1 + f2
         if total_f > max_flores:
             max_flores = total_f
             rei_nome = atl["nome"]
@@ -741,8 +730,8 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 torneio_id INTEGER,
                 rodada INTEGER NOT NULL,
                 mesa INTEGER NOT NULL,
-                atleta1_id INTEGER,
-                atleta2_id INTEGER,
+                athlete1_id INTEGER,
+                athlete2_id INTEGER,
                 atleta1_nome VARCHAR(255),
                 atleta2_nome VARCHAR(255),
                 tipo_placar VARCHAR(50) DEFAULT NULL,
@@ -874,6 +863,8 @@ def pagina_telao_publico(request: Request, db=Depends(get_db)):
 def api_dados_publicos_telao(db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    if not cfg:
+        return JSONResponse({"erro": "Nenhum torneio ativo"})
     p = "%s" if DATABASE_URL else "?"
     
     cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
@@ -915,15 +906,13 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         max_flores = 0
         for atl in atletas:
             a_id = atl["id"]
-            cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-            f1_val = cursor.fetchone()[0] if DATABASE_URL else list(cursor.fetchone())[0]
-            if hasattr(f1_val, 'values'): f1_val = list(f1_val.values())[0]
+            cursor.execute(f"SELECT SUM(flores1) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
+            f1_val = extrair_valor_contagem(cursor.fetchone())
             
-            cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-            f2_val = cursor.fetchone()[0] if DATABASE_URL else list(cursor.fetchone())[0]
-            if hasattr(f2_val, 'values'): f2_val = list(f2_val.values())[0]
+            cursor.execute(f"SELECT SUM(flores2) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
+            f2_val = extrair_valor_contagem(cursor.fetchone())
             
-            total_f = (f1_val or 0) + (f2_val or 0)
+            total_f = f1_val + f2_val
             if total_f > max_flores:
                 max_flores = total_f
                 rei_nome = str(atl["nome"]).strip()
@@ -994,9 +983,9 @@ async def salvar_inscricao_externa(
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
     cursor.execute(f'''
-        INSERT INTO atletas (torneio_id, nome, entidade, status) 
-        VALUES ({p}, {p}, {p}, 'PENDENTE')
-    ''', (cfg["id"], nome.strip().upper(), entidade_limpa))
+        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) 
+        VALUES ({p}, {p}, {p}, {p}, 'PENDENTE')
+    ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
     db.commit()
     
     return RedirectResponse(url="/inscricao?sucesso=true", status_code=303)
