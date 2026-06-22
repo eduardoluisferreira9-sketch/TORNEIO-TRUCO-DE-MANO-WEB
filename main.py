@@ -1,26 +1,18 @@
 import os
-import sqlite3
-import random
+import sys
 import time
+import random
 import shutil
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, UploadFile, File
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-# --- CONFIGURAÇÃO DE SEGURANÇA POR VARIÁVEIS DE AMBIENTE ---
-# Pega as chaves do ambiente web, se não achar, usa os padrões locais
+# --- CONFIGURAÇÃO DE SEGURANÇA E AMBIENTE ---
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "truco123")
+DATABASE_URL = os.environ.get("DATABASE_URL")  # String de conexão do Postgres (Neon/Supabase)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# --- ALTERAÇÃO CRÍTICA DO BANCO DE DADOS (HISTÓRICO SEGURO) ---
-# Se estiver na nuvem (ex: Render), apontamos o SQLite para uma pasta persistente (/data)
-if os.path.exists("/data"):
-    DB_FILE = "/data/torneio.db"
-else:
-    DB_FILE = os.path.join(BASE_DIR, "torneio.db")
-
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 TEMPLATES_PUBLICO_DIR = os.path.join(BASE_DIR, "sistema_publico", "templates")
 
@@ -35,92 +27,190 @@ try:
 except Exception:
     pass
 
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA journal_mode=WAL;")
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS torneios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
-            taxa_inscricao REAL DEFAULT 0.0,
-            max_rodadas_classificatoria INTEGER DEFAULT 5,
-            crono_tempo_restante_seg INTEGER DEFAULT 3000,
-            crono_ativo INTEGER DEFAULT 0,
-            crono_ultimo_clique REAL DEFAULT 0,
-            fase_torneio TEXT DEFAULT 'INSCRICAO'
-        )
-    ''')
-    
-    cursor.execute("SELECT COUNT(*) FROM torneios")
-    if cursor.fetchone()[0] == 0:
-        cursor.execute('''
-            INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO')
-        ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS atletas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            torneio_id INTEGER NOT NULL DEFAULT 1,
-            nome TEXT NOT NULL,
-            entidade TEXT NOT NULL DEFAULT 'AVULSO',
-            whatsapp TEXT,
-            status TEXT DEFAULT 'PENDENTE',
-            FOREIGN KEY (torneio_id) REFERENCES torneios(id)
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS confrontos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            torneio_id INTEGER NOT NULL DEFAULT 1,
-            rodada INTEGER NOT NULL,
-            mesa INTEGER NOT NULL,
-            atleta1_id INTEGER,
-            atleta2_id INTEGER,
-            atleta1_nome TEXT,
-            atleta2_nome TEXT,
-            tipo_placar TEXT DEFAULT NULL,
-            vencedor_id INTEGER DEFAULT NULL,
-            sets1 INTEGER DEFAULT NULL,
-            sets2 INTEGER DEFAULT NULL,
-            tentos1 INTEGER DEFAULT NULL,
-            tentos2 INTEGER DEFAULT NULL,
-            flores1 INTEGER DEFAULT 0,
-            flores2 INTEGER DEFAULT 0,
-            FOREIGN KEY (torneio_id) REFERENCES torneios(id)
-        )
-    ''')
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS historico_campeoes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            torneio_id INTEGER UNIQUE,
-            nome_torneio TEXT,
-            campeao TEXT,
-            vice TEXT,
-            terceiro TEXT,
-            quarto TEXT,
-            rei_das_flores TEXT,
-            qtd_flores INTEGER,
-            FOREIGN KEY (torneio_id) REFERENCES torneios(id)
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-init_db()
-
+# ==============================================================================
+# 🗄️ GERENCIAMENTO CONEXÃO INTELIGENTE (HÍBRIDO)
+# ==============================================================================
 def get_db():
-    conn = sqlite3.connect(DB_FILE, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
+    if DATABASE_URL:
+        import psycopg2
+        from psycopg2.extras import DictCursor
+        conn = psycopg2.connect(DATABASE_URL, cursor_factory=DictCursor)
+        try:
+            yield conn
+        finally:
+            conn.close()
+    else:
+        import sqlite3
+        if os.path.exists("/data"):
+            db_file = "/data/torneio.db"
+        else:
+            db_file = os.path.join(BASE_DIR, "torneio.db")
+        conn = sqlite3.connect(db_file, check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+        finally:
+            conn.close()
+
+def execute_query(cursor, query_sqlite, query_postgres, params=()):
+    """Executa a query correta dependendo do banco ativo"""
+    query = query_postgres if DATABASE_URL else query_sqlite
+    cursor.execute(query, params)
+    return cursor
+
+def init_db():
+    """Inicializa as tabelas com sintaxes compatíveis para ambos os bancos"""
+    if DATABASE_URL:
+        import psycopg2
+        conn = psycopg2.connect(DATABASE_URL)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS torneios (
+                id SERIAL PRIMARY KEY,
+                nome_torneio VARCHAR(255) DEFAULT 'Torneio de Truco Cego',
+                taxa_inscricao REAL DEFAULT 0.0,
+                max_rodadas_classificatoria INTEGER DEFAULT 5,
+                crono_tempo_restante_seg INTEGER DEFAULT 3000,
+                crono_ativo INTEGER DEFAULT 0,
+                crono_ultimo_clique REAL DEFAULT 0,
+                fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO'
+            );
+        ''')
+        cursor.execute("SELECT COUNT(*) FROM torneios;")
+        if cursor.fetchone()[0] == 0:
+            cursor.execute('''
+                INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
+                VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO');
+            ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS atletas (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER NOT NULL DEFAULT 1,
+                nome VARCHAR(255) NOT NULL,
+                entidade VARCHAR(255) NOT NULL DEFAULT 'AVULSO',
+                whatsapp VARCHAR(50),
+                status VARCHAR(50) DEFAULT 'PENDENTE'
+            );
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS confrontos (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER NOT NULL DEFAULT 1,
+                rodada INTEGER NOT NULL,
+                mesa INTEGER NOT NULL,
+                atleta1_id INTEGER,
+                atleta2_id INTEGER,
+                atleta1_nome VARCHAR(255),
+                atleta2_nome VARCHAR(255),
+                tipo_placar VARCHAR(50) DEFAULT NULL,
+                vencedor_id INTEGER DEFAULT NULL,
+                sets1 INTEGER DEFAULT NULL,
+                sets2 INTEGER DEFAULT NULL,
+                tentos1 INTEGER DEFAULT NULL,
+                tentos2 INTEGER DEFAULT NULL,
+                flores1 INTEGER DEFAULT 0,
+                flores2 INTEGER DEFAULT 0
+            );
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS historico_campeoes (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER UNIQUE,
+                nome_torneio VARCHAR(255),
+                campeao VARCHAR(255),
+                vice VARCHAR(255),
+                terceiro VARCHAR(255),
+                quarto VARCHAR(255),
+                rei_das_flores VARCHAR(255),
+                qtd_flores INTEGER
+            );
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+    else:
+        import sqlite3
+        if os.path.exists("/data"):
+            db_file = "/data/torneio.db"
+        else:
+            db_file = os.path.join(BASE_DIR, "torneio.db")
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS torneios (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
+                taxa_inscricao REAL DEFAULT 0.0,
+                max_rodadas_classificatoria INTEGER DEFAULT 5,
+                crono_tempo_restante_seg INTEGER DEFAULT 3000,
+                crono_ativo INTEGER DEFAULT 0,
+                crono_ultimo_clique REAL DEFAULT 0,
+                fase_torneio TEXT DEFAULT 'INSCRICAO'
+            )
+        ''')
+        cursor.execute("SELECT COUNT(*) FROM torneios")
+        if cursor.fetchone()[0] == 0:
+            cursor.execute('''
+                INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
+                VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO')
+            ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS atletas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER NOT NULL DEFAULT 1,
+                nome TEXT NOT NULL,
+                entidade TEXT NOT NULL DEFAULT 'AVULSO',
+                whatsapp TEXT,
+                status TEXT DEFAULT 'PENDENTE',
+                FOREIGN KEY (torneio_id) REFERENCES torneios(id)
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS confrontos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER NOT NULL DEFAULT 1,
+                rodada INTEGER NOT NULL,
+                mesa INTEGER NOT NULL,
+                atleta1_id INTEGER,
+                atleta2_id INTEGER,
+                atleta1_nome TEXT,
+                atleta2_nome TEXT,
+                tipo_placar TEXT DEFAULT NULL,
+                vencedor_id INTEGER DEFAULT NULL,
+                sets1 INTEGER DEFAULT NULL,
+                sets2 INTEGER DEFAULT NULL,
+                tentos1 INTEGER DEFAULT NULL,
+                tentos2 INTEGER DEFAULT NULL,
+                flores1 INTEGER DEFAULT 0,
+                flores2 INTEGER DEFAULT 0,
+                FOREIGN KEY (torneio_id) REFERENCES torneios(id)
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS historico_campeoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER UNIQUE,
+                nome_torneio TEXT,
+                campeao TEXT,
+                vice TEXT,
+                terceiro TEXT,
+                quarto TEXT,
+                rei_das_flores TEXT,
+                qtd_flores INTEGER,
+                FOREIGN KEY (torneio_id) REFERENCES torneios(id)
+            )
+        ''')
+        conn.commit()
         conn.close()
 
+try:
+    init_db()
+except Exception as e:
+    print(f"Erro na inicialização do Banco: {e}", file=sys.stderr)
+
+# --- FUNÇÕES AUXILIARES AJUSTADAS ---
 def verificar_admin(request: Request):
     token = request.cookies.get("admin_token")
     if token != ADMIN_PASSWORD:
@@ -128,16 +218,18 @@ def verificar_admin(request: Request):
     return True
 
 def obter_torneio_ativo(cursor):
-    cursor.execute("SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
     torneio = cursor.fetchone()
     if not torneio:
         cursor.execute("SELECT * FROM torneios ORDER BY id DESC LIMIT 1")
         torneio = cursor.fetchone()
     return dict(torneio)
 
-def atualizar_e_obter_cronometro(db: sqlite3.Connection):
+def atualizar_e_obter_cronometro(db):
     cursor = db.cursor()
     config = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     
     if config["crono_ativo"] == 1:
         agora = time.time()
@@ -145,7 +237,7 @@ def atualizar_e_obter_cronometro(db: sqlite3.Connection):
         if decorrido > 0:
             novo_tempo = max(0, config["crono_tempo_restante_seg"] - decorrido)
             ativo = 1 if novo_tempo > 0 else 0
-            cursor.execute('UPDATE torneios SET crono_tempo_restante_seg = ?, crono_ultimo_clique = ?, crono_ativo = ? WHERE id = ?', 
+            cursor.execute(f'UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p}, crono_ativo = {p} WHERE id = {p}', 
                            (novo_tempo, agora, ativo, config["id"]))
             db.commit()
             config["crono_tempo_restante_seg"] = novo_tempo
@@ -153,31 +245,32 @@ def atualizar_e_obter_cronometro(db: sqlite3.Connection):
     return config
 
 def obter_ranking_fase_classificatoria(cursor, torneio_id: int):
-    cursor.execute("SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = ?", (torneio_id,))
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (torneio_id,))
     todos_atletas = cursor.fetchall()
     lista_classificacao = []
     
     for atleta in todos_atletas:
         atleta_id = atleta["id"]
         
-        cursor.execute("""
+        cursor.execute(f"""
             SELECT COALESCE(SUM(sets1), 0) as s_pro, COALESCE(SUM(tentos1), 0) as t_pro, 
                    COALESCE(SUM(tentos2), 0) as t_contra, COALESCE(SUM(flores1), 0) as fl, 
                    SUM(CASE WHEN atleta2_id IS NULL THEN 1 ELSE 0 END) as byes 
             FROM confrontos 
-            WHERE atleta1_id = ? AND torneio_id = ? AND rodada > 0 AND vencedor_id IS NOT NULL
+            WHERE atleta1_id = {p} AND torneio_id = {p} AND rodada > 0 AND vencedor_id IS NOT NULL
         """, (atleta_id, torneio_id))
         p1 = cursor.fetchone()
         
-        cursor.execute("""
+        cursor.execute(f"""
             SELECT COALESCE(SUM(sets2), 0) as s_pro, COALESCE(SUM(tentos2), 0) as t_pro, 
                    COALESCE(SUM(tentos1), 0) as t_contra, COALESCE(SUM(flores2), 0) as fl 
             FROM confrontos 
-            WHERE atleta2_id = ? AND torneio_id = ? AND rodada > 0 AND vencedor_id IS NOT NULL
+            WHERE atleta2_id = {p} AND torneio_id = {p} AND rodada > 0 AND vencedor_id IS NOT NULL
         """, (atleta_id, torneio_id))
         p2 = cursor.fetchone()
             
-        cursor.execute("SELECT COUNT(*) FROM confrontos WHERE vencedor_id = ? AND torneio_id = ? AND rodada > 0", (atleta_id, torneio_id))
+        cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE vencedor_id = {p} AND torneio_id = {p} AND rodada > 0", (atleta_id, torneio_id))
         vitorias = cursor.fetchone()[0]
         
         sets_ganhos = p1["s_pro"] + p2["s_pro"]
@@ -192,13 +285,15 @@ def obter_ranking_fase_classificatoria(cursor, torneio_id: int):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
 
+# --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
 @app.get("/admin-painel/inscrever", response_class=HTMLResponse)
-def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get_db)):
+def tela_inscricao_atleta(request: Request, db=Depends(get_db)):
     cursor = db.cursor()
     cfg_db = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute("SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = ? ORDER BY entidade ASC", (cfg_db["id"],))
+    cursor.execute(f"SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY entidade ASC", (cfg_db["id"],))
     entidades = [row["entidade"] for row in cursor.fetchall()]
     
     taxa_val = cfg_db["taxa_inscricao"] if cfg_db else 0.0
@@ -213,7 +308,7 @@ def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get
 @app.post("/admin-painel/inscrever")
 async def processar_inscricao_atleta(
     nome: str = Form(...), entidade: str = Form(...), whatsapp: str = Form(...),
-    comprovante: UploadFile = File(...), db: sqlite3.Connection = Depends(get_db)
+    comprovante: UploadFile = File(...), db=Depends(get_db)
 ):
     if not comprovante.filename:
         raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
@@ -229,8 +324,10 @@ async def processar_inscricao_atleta(
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
-    cursor.execute('''
-        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) VALUES (?, ?, ?, ?, 'PENDENTE')
+    p = "%s" if DATABASE_URL else "?"
+    
+    cursor.execute(f'''
+        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) VALUES ({p}, {p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
     db.commit()
     return RedirectResponse(url="/admin-painel/inscrever?sucesso=true", status_code=303)
@@ -282,39 +379,42 @@ def processar_logout():
 
 @app.get("/api/cronometro")
 @app.get("/admin-painel/api/cronometro")
-def api_cronometro(db: sqlite3.Connection = Depends(get_db)):
+def api_cronometro(db=Depends(get_db)):
     cfg = atualizar_e_obter_cronometro(db)
     return JSONResponse({"tempo_restante": cfg["crono_tempo_restante_seg"], "ativo": cfg["crono_ativo"]})
 
 @app.post("/admin/cronometro/controle")
 @app.post("/admin-painel/admin/cronometro/controle")
-def controle_cronometro(acao: str = Form(...), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_nao_iniciado", status_code=303)
 
     if acao == "iniciar" and cfg["crono_ativo"] == 0 and cfg["crono_tempo_restante_seg"] > 0:
-        cursor.execute("UPDATE torneios SET crono_ativo = 1, crono_ultimo_clique = ? WHERE id = ?", (time.time(), cfg["id"]))
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 1, crono_ultimo_clique = {p} WHERE id = {p}", (time.time(), cfg["id"]))
     elif acao == "pausar" and cfg["crono_ativo"] == 1:
         agora = time.time()
         decorrido = int(agora - cfg["crono_ultimo_clique"])
         novo_tempo = max(0, cfg["crono_tempo_restante_seg"] - decorrido)
-        cursor.execute("UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = ? WHERE id = ?", (novo_tempo, cfg["id"]))
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo, cfg["id"]))
     elif acao == "reiniciar":
-        cursor.execute("UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = ?", (cfg["id"],))
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.get("/admin/inscricoes")
 @app.get("/admin-painel/admin/inscricoes")
-def aba_inscricoes(request: Request, db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = ? ORDER BY id DESC", (cfg["id"],))
+    p = "%s" if DATABASE_URL else "?"
+    
+    cursor.execute(f"SELECT * FROM atletas WHERE status = 'PENDENTE' AND torneio_id = {p} ORDER BY id DESC", (cfg["id"],))
     pendentes = cursor.fetchall()
-    cursor.execute("SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = ? ORDER BY nome ASC", (cfg["id"],))
+    cursor.execute(f"SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (cfg["id"],))
     oficiais = cursor.fetchall()
     total_arrecadado = len(oficiais) * cfg['taxa_inscricao']
     
@@ -325,50 +425,53 @@ def aba_inscricoes(request: Request, db: sqlite3.Connection = Depends(get_db), a
 
 @app.post("/admin/salvar-configuracoes")
 @app.post("/admin-painel/admin/salvar-configuracoes")
-def salvar_configuracoes(nome_torneio: str = Form(...), max_rodadas: int = Form(...), tempo_minutos: int = Form(...), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def salvar_configuracoes(nome_torneio: str = Form(...), max_rodadas: int = Form(...), tempo_minutos: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     if cfg["fase_torneio"] != "INSCRICAO":
          return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_ja_iniciado", status_code=303)
     total_seg = tempo_minutos * 60
-    cursor.execute("UPDATE torneios SET nome_torneio = ?, max_rodadas_classificatoria = ?, crono_tempo_restante_seg = ? WHERE id = ?", 
+    cursor.execute(f"UPDATE torneios SET nome_torneio = {p}, max_rodadas_classificatoria = {p}, crono_tempo_restante_seg = {p} WHERE id = {p}", 
                    (nome_torneio.strip(), max_rodadas, total_seg, cfg["id"]))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
 
 @app.post("/admin/iniciar-torneio")
 @app.post("/admin-painel/admin/iniciar-torneio")
-def iniciar_torneio_e_gerar_r1(db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def iniciar_torneio_e_gerar_r1(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     if cfg["fase_torneio"] != "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
         
-    cursor.execute("SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO' AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
     if cursor.fetchone()[0] < 2:
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
 
-    cursor.execute("UPDATE torneios SET fase_torneio = 'CLASSIFICATORIA' WHERE id = ?", (cfg["id"],))
+    cursor.execute(f"UPDATE torneios SET fase_torneio = 'CLASSIFICATORIA' WHERE id = {p}", (cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.get("/admin/jogos")
 @app.get("/admin-painel/admin/jogos")
-def aba_jogos(request: Request, db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
+    p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor = db.cursor()
-    cursor.execute("SELECT rodada FROM confrontos WHERE torneio_id = ? ORDER BY id DESC LIMIT 1", (cfg["id"],))
+    cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_r = cursor.fetchone()
     rodada_atual = row_r["rodada"] if row_r else 1
     
-    cursor.execute("SELECT * FROM confrontos WHERE rodada = ? AND torneio_id = ? ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
     confrontos = cursor.fetchall()
     
-    cursor.execute("SELECT COUNT(*) FROM confrontos WHERE rodada = ? AND torneio_id = ? AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
+    cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
     rodada_concluida = cursor.fetchone()[0] == 0 if confrontos else False
 
     mins = cfg["crono_tempo_restante_seg"] // 60
@@ -382,30 +485,31 @@ def aba_jogos(request: Request, db: sqlite3.Connection = Depends(get_db), auth: 
 
 @app.post("/admin/gerar-rodada")
 @app.post("/admin-painel/admin/gerar-rodada")
-def gerar_rodada_admin(db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
-    cursor.execute("SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
     rodada_atual = cursor.fetchone()[0]
     proxima_rodada = rodada_atual + 1
     
     if rodada_atual > 0:
-        cursor.execute("SELECT COUNT(*) FROM confrontos WHERE rodada = ? AND torneio_id = ? AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
+        cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
         if cursor.fetchone()[0] > 0:
             return RedirectResponse(url="/admin-painel/admin/jogos?erro=jogos_pendentes", status_code=303)
 
     if proxima_rodada > cfg["max_rodadas_classificatoria"]:
         return RedirectResponse(url="/admin-painel/admin/classificacao?aviso=fim_da_classificatoria", status_code=303)
         
-    cursor.execute("SELECT id, nome, entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT id, nome, entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
     atletas_lista = [dict(row) for row in cursor.fetchall()]
     if len(atletas_lista) < 2:
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
         
-    cursor.execute("SELECT atleta1_id, atleta2_id FROM confrontos WHERE atleta2_id IS NOT NULL AND rodada > 0 AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT atleta1_id, atleta2_id FROM confrontos WHERE atleta2_id IS NOT NULL AND rodada > 0 AND torneio_id = {p}", (cfg["id"],))
     historico = {tuple(sorted((r["atleta1_id"], r["atleta2_id"]))) for r in cursor.fetchall()}
         
     sucesso = False
@@ -457,30 +561,30 @@ def gerar_rodada_admin(db: sqlite3.Connection = Depends(get_db), auth: bool = De
 
     mesa = 1
     for a1, a2 in parceiros_finais:
-        cursor.execute('INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})',
                        (cfg["id"], proxima_rodada, mesa, a1['id'], a2['id'], a1['nome'], a2['nome']))
         mesa += 1
     
     if atleta_folga:
-        cursor.execute("""
+        cursor.execute(f"""
             INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome, tipo_placar, sets1, sets2, tentos1, tentos2, vencedor_id) 
-            VALUES (?, ?, ?, ?, NULL, ?, 'FOLGA - GANHOU PONTOS', '2x0', 3, 0, 72, 0, ?)
+            VALUES ({p}, {p}, {p}, {p}, NULL, {p}, 'FOLGA - GANHOU PONTOS', '2x0', 3, 0, 72, 0, {p})
         """, (cfg["id"], proxima_rodada, mesa, atleta_folga['id'], atleta_folga['nome'], atleta_folga['id']))
-                            
-    cursor.execute("UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = ?", (cfg["id"],))
-    
+                           
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.post("/admin/disparar-matamata")
 @app.post("/admin-painel/admin/disparar-matamata")
-def disparar_matamata(corte: int = Form(...), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
-    cursor.execute("SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = ?", (cfg["id"],))
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
     r_atual = cursor.fetchone()[0]
     if r_atual > 0:
-        cursor.execute("SELECT COUNT(*) FROM confrontos WHERE rodada = ? AND torneio_id = ? AND vencedor_id IS NULL", (r_atual, cfg["id"]))
+        cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (r_atual, cfg["id"]))
         if cursor.fetchone()[0] > 0:
             return RedirectResponse(url="/admin-painel/admin/classificacao?erro=conclua_rodada_atual", status_code=303)
 
@@ -489,7 +593,7 @@ def disparar_matamata(corte: int = Form(...), db: sqlite3.Connection = Depends(g
         return RedirectResponse(url="/admin-painel/admin/classificacao?erro=atletas_insuficientes_para_corte", status_code=303)
 
     classificados = ranking[:corte]
-    cursor.execute("UPDATE torneios SET fase_torneio = 'MATA_MATA' WHERE id = ?", (cfg["id"],))
+    cursor.execute(f"UPDATE torneios SET fase_torneio = 'MATA_MATA' WHERE id = {p}", (cfg["id"],))
     
     if corte == 16: fase_id = -1
     elif corte == 8: fase_id = -2
@@ -515,39 +619,38 @@ def disparar_matamata(corte: int = Form(...), db: sqlite3.Connection = Depends(g
         ]
 
     for idx, (a1, a2) in enumerate(confrontos_fase, start=1):
-        cursor.execute('''
-            INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES (?, ?, ?, ?, ?, ?, ?)
+        cursor.execute(f'''
+            INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})
         ''', (cfg["id"], fase_id, idx, a1["id"], a2["id"], a1["nome"], a2["nome"]))
         
-    cursor.execute("UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = ?", (cfg["id"],))
-        
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.post("/admin/avancar-matamata")
 @app.post("/admin-painel/admin/avancar-matamata")
-def avancar_matamata(db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
-    cursor.execute("SELECT rodada FROM confrontos WHERE torneio_id = ? ORDER BY id DESC LIMIT 1", (cfg["id"],))
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_f = cursor.fetchone()
     if not row_f:
         return RedirectResponse(url="/admin-painel/admin/jogos?erro=nenhum_jogo", status_code=303)
         
     fase_atual = row_f["rodada"]
     
-    cursor.execute("SELECT COUNT(*) FROM confrontos WHERE rodada = ? AND torneio_id = ? AND vencedor_id IS NULL", (fase_atual, cfg["id"]))
+    cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (fase_atual, cfg["id"]))
     if cursor.fetchone()[0] > 0:
         return RedirectResponse(url="/admin-painel/admin/jogos?erro=jogos_eliminatorios_pendentes", status_code=303)
         
-    cursor.execute("SELECT * FROM confrontos WHERE rodada = ? AND torneio_id = ? ORDER BY mesa ASC", (fase_atual, cfg["id"]))
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (fase_atual, cfg["id"]))
     jogos_concluidos = cursor.fetchall()
     
     if fase_atual == -4:
         return RedirectResponse(url="/admin-painel/admin/podio", status_code=303)
 
-    cursor.execute("UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = ?", (cfg["id"],))
-
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     proxima_fase = fase_atual - 1
     
     if fase_atual in [-1, -2]:
@@ -558,11 +661,10 @@ def avancar_matamata(db: sqlite3.Connection = Depends(get_db), auth: bool = Depe
             
             v1_id = j1["vencedor_id"]
             v1_nome = j1["atleta1_nome"] if v1_id == j1["atleta1_id"] else j1["atleta2_nome"]
-                
             v2_id = j2["vencedor_id"]
             v2_nome = j2["atleta1_nome"] if v2_id == j2["atleta1_id"] else j2["atleta2_nome"]
             
-            cursor.execute('INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})',
                            (cfg["id"], proxima_fase, nova_mesa, v1_id, v2_id, v1_nome, v2_nome))
             nova_mesa += 1
             
@@ -583,14 +685,15 @@ def avancar_matamata(db: sqlite3.Connection = Depends(get_db), auth: bool = Depe
         p2_id = j2["atleta2_id"] if v2_id == j2["atleta1_id"] else j2["atleta1_id"]
         p2_nome = j2["atleta2_nome"] if v2_id == j2["atleta1_id"] else j2["atleta1_nome"]
 
-        cursor.execute('INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES (?, -4, 1, ?, ?, ?, ?)', (cfg["id"], v1_id, v2_id, v1_nome, v2_nome))
-        cursor.execute('INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES (?, -4, 2, ?, ?, ?, ?)', (cfg["id"], p1_id, p2_id, p1_nome, p2_nome))
+        cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, -4, 1, {p}, {p}, {p}, {p})', (cfg["id"], v1_id, v2_id, v1_nome, v2_nome))
+        cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, -4, 2, {p}, {p}, {p}, {p})', (cfg["id"], p1_id, p2_id, p1_nome, p2_nome))
         
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 def aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, tentos1, tentos2, flores1, flores2):
-    cursor.execute("SELECT atleta1_id, atleta2_id FROM confrontos WHERE id = ?", (confronto_id,))
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"SELECT atleta1_id, atleta2_id FROM confrontos WHERE id = {p}", (confronto_id,))
     conf = cursor.fetchone()
     id1, id2 = conf["atleta1_id"], conf["atleta2_id"]
     
@@ -614,12 +717,12 @@ def aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, te
     t1 = 72 if (tipo_placar == "2x0" and vencedor_id == id1) else tentos1
     t2 = 72 if (tipo_placar == "2x0" and vencedor_id == id2) else tentos2
 
-    cursor.execute('UPDATE confrontos SET tipo_placar = ?, vencedor_id = ?, sets1 = ?, sets2 = ?, tentos1 = ?, tentos2 = ?, flores1 = ?, flores2 = ? WHERE id = ?',
+    cursor.execute(f'UPDATE confrontos SET tipo_placar = {p}, vencedor_id = {p}, sets1 = {p}, sets2 = {p}, tentos1 = {p}, tentos2 = {p}, flores1 = {p}, flores2 = {p} WHERE id = {p}',
                    (tipo_placar, vencedor_id, s1, s2, t1, t2, flores1, flores2, confronto_id))
 
 @app.post("/admin/salvar-placar")
 @app.post("/admin-painel/admin/salvar-placar")
-def salvar_placar(confronto_id: int = Form(...), vencedor_id: int = Form(...), tipo_placar: str = Form(...), tentos1: int = Form(...), tentos2: int = Form(...), flores1: int = Form(0), flores2: int = Form(0), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def salvar_placar(confronto_id: int = Form(...), vencedor_id: int = Form(...), tipo_placar: str = Form(...), tentos1: int = Form(...), tentos2: int = Form(...), flores1: int = Form(0), flores2: int = Form(0), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     try:
         aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, tentos1, tentos2, flores1, flores2)
@@ -630,8 +733,9 @@ def salvar_placar(confronto_id: int = Form(...), vencedor_id: int = Form(...), t
 
 @app.get("/admin/classificacao")
 @app.get("/admin-painel/admin/classificacao")
-def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
+    p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
@@ -639,11 +743,11 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
     cursor = db.cursor()
     lista_classificacao = obter_ranking_fase_classificatoria(cursor, cfg["id"])
 
-    cursor.execute("SELECT DISTINCT rodada FROM confrontos WHERE torneio_id = ? ORDER BY rodada DESC", (cfg["id"],))
+    cursor.execute(f"SELECT DISTINCT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY rodada DESC", (cfg["id"],))
     todas_rodadas = [r["rodada"] for r in cursor.fetchall()]
     
     rodada_selecionada = rodada_filtro if rodada_filtro is not None else (todas_rodadas[0] if todas_rodadas else 1)
-    cursor.execute("SELECT * FROM confrontos WHERE rodada = ? AND torneio_id = ? ORDER BY mesa ASC", (rodada_selecionada, cfg["id"]))
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_selecionada, cfg["id"]))
     confrontos_auditoria = cursor.fetchall()
 
     return templates.TemplateResponse(
@@ -653,7 +757,7 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
 @app.post("/admin/auditoria/corrigir")
 @app.post("/admin-painel/admin/auditoria/corrigir")
-def corrigir_placar_auditoria(confronto_id: int = Form(...), vencedor_id: int = Form(...), tipo_placar: str = Form(...), tentos1: int = Form(...), tentos2: int = Form(...), flores1: int = Form(0), flores2: int = Form(0), rodada_retorno: int = Form(...), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def corrigir_placar_auditoria(confronto_id: int = Form(...), vencedor_id: int = Form(...), tipo_placar: str = Form(...), tentos1: int = Form(...), tentos2: int = Form(...), flores1: int = Form(0), flores2: int = Form(0), rodada_retorno: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     try:
         aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, tentos1, tentos2, flores1, flores2)
@@ -664,20 +768,21 @@ def corrigir_placar_auditoria(confronto_id: int = Form(...), vencedor_id: int = 
 
 @app.get("/admin/podio")
 @app.get("/admin-painel/admin/podio")
-def exibir_podio(request: Request, db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
+    p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor = db.cursor()
-    cursor.execute("SELECT COUNT(*) FROM confrontos WHERE rodada = -4 AND torneio_id = ? AND vencedor_id IS NULL", (cfg["id"],))
+    cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = -4 AND torneio_id = {p} AND vencedor_id IS NULL", (cfg["id"],))
     if cursor.fetchone()[0] > 0:
         return RedirectResponse(url="/admin-painel/admin/jogos?erro=finais_nao_concluidas", status_code=303)
         
-    cursor.execute("SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 1 AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 1 AND torneio_id = {p}", (cfg["id"],))
     jogo_final = cursor.fetchone()
-    cursor.execute("SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 2 AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 2 AND torneio_id = {p}", (cfg["id"],))
     jogo_terceiro = cursor.fetchone()
 
     if not jogo_final or not jogo_terceiro:
@@ -689,16 +794,16 @@ def exibir_podio(request: Request, db: sqlite3.Connection = Depends(get_db), aut
     third_place = jogo_terceiro["atleta1_nome"] if jogo_terceiro["vencedor_id"] == jogo_terceiro["atleta1_id"] else jogo_terceiro["atleta2_nome"]
     fourth_place = jogo_terceiro["atleta2_nome"] if jogo_terceiro["vencedor_id"] == jogo_terceiro["atleta1_id"] else jogo_terceiro["atleta1_nome"]
 
-    cursor.execute("SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
     atletas = cursor.fetchall()
     
     rei_nome = "Nenhum"
     max_flores = 0
     for atl in atletas:
         a_id = atl["id"]
-        cursor.execute("SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = ? AND torneio_id = ?", (a_id, cfg["id"]))
+        cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
         f1 = cursor.fetchone()[0]
-        cursor.execute("SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = ? AND torneio_id = ?", (a_id, cfg["id"]))
+        cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
         f2 = cursor.fetchone()[0]
             
         total_f = f1 + f2
@@ -713,27 +818,28 @@ def exibir_podio(request: Request, db: sqlite3.Connection = Depends(get_db), aut
 
 @app.post("/admin/encerrar-e-salvar")
 @app.post("/admin-painel/admin/encerrar-e-salvar")
-def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro: str = Form(...), quarto: str = Form(...), rei: str = Form(...), flores: int = Form(...), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro: str = Form(...), quarto: str = Form(...), rei: str = Form(...), flores: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute('INSERT INTO historico_campeoes (torneio_id, nome_torneio, campeao, vice, terceiro, quarto, rei_das_flores, qtd_flores) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    cursor.execute(f'INSERT INTO historico_campeoes (torneio_id, nome_torneio, campeao, vice, terceiro, quarto, rei_das_flores, qtd_flores) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p})',
                    (cfg["id"], cfg["nome_torneio"], campeao, vice, terceiro, quarto, rei, flores))
     
-    cursor.execute("UPDATE torneios SET fase_torneio = 'CONCLUIDO', crono_ativo = 0 WHERE id = ?", (cfg["id"],))
+    cursor.execute(f"UPDATE torneios SET fase_torneio = 'CONCLUIDO', crono_ativo = 0 WHERE id = {p}", (cfg["id"],))
     
     novo_nome_sugerido = f"Torneio de Truco Cego - Edição {cfg['id'] + 1}"
-    cursor.execute('''
+    cursor.execute(f'''
         INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
-        VALUES (?, ?, ?, ?, 'INSCRICAO')
-    ''', (novo_nome_sugerido, cfg["taxa_inscricao"], cfg["max_rodadas_classificatoria"], 3000))
+        VALUES ({p}, {p}, {p}, 3000, 'INSCRICAO')
+    ''', (novo_nome_sugerido, cfg["taxa_inscricao"], cfg["max_rodadas_classificatoria"]))
     
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/historico?sucesso=torneio_imortalizado", status_code=303)
 
 @app.get("/admin/historico")
 @app.get("/admin-painel/admin/historico")
-def exibir_historico(request: Request, db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def exibir_historico(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM historico_campeoes ORDER BY id DESC")
@@ -742,124 +848,185 @@ def exibir_historico(request: Request, db: sqlite3.Connection = Depends(get_db),
 
 @app.post("/admin/reset-total-testes")
 @app.post("/admin-painel/admin/reset-total-testes")
-def reset_total_testes(db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     
-    cursor.execute("DROP TABLE IF EXISTS confrontos")
-    cursor.execute("DROP TABLE IF EXISTS atletas")
-    cursor.execute("DROP TABLE IF EXISTS historico_campeoes")
-    cursor.execute("DROP TABLE IF EXISTS torneios")
+    cursor.execute("DROP TABLE IF EXISTS confrontos;")
+    cursor.execute("DROP TABLE IF EXISTS atletas;")
+    cursor.execute("DROP TABLE IF EXISTS historico_campeoes;")
+    cursor.execute("DROP TABLE IF EXISTS torneios;")
     
-    cursor.execute('''
-        CREATE TABLE torneios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
-            fase_torneio TEXT DEFAULT 'INSCRICAO',
-            max_rodadas_classificatoria INTEGER DEFAULT 5,
-            taxa_inscricao REAL DEFAULT 5.00,
-            crono_tempo_restante_seg INTEGER DEFAULT 3000,
-            crono_ativo INTEGER DEFAULT 0,
-            crono_ultimo_clique REAL DEFAULT 0.0
-        )
-    ''')
-    
-    cursor.execute('''
-        INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
-        VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO')
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE atletas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            torneio_id INTEGER,
-            nome TEXT NOT NULL,
-            entidade TEXT DEFAULT 'AVULSO',
-            whatsapp TEXT,
-            status TEXT DEFAULT 'PENDENTE'
-        )
-    ''')
-
-    cursor.execute('''
-        CREATE TABLE confrontos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            torneio_id INTEGER,
-            rodada INTEGER NOT NULL,
-            mesa INTEGER NOT NULL,
-            atleta1_id INTEGER,
-            atleta2_id INTEGER,
-            atleta1_nome TEXT,
-            atleta2_nome TEXT,
-            tipo_placar TEXT DEFAULT NULL,
-            sets1 INTEGER DEFAULT 0,
-            sets2 INTEGER DEFAULT 0,
-            tentos1 INTEGER DEFAULT 0,
-            tentos2 INTEGER DEFAULT 0,
-            flores1 INTEGER DEFAULT 0,
-            flores2 INTEGER DEFAULT 0,
-            vencedor_id INTEGER
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE historico_campeoes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            torneio_id INTEGER,
-            nome_torneio TEXT,
-            campeao TEXT,
-            vice TEXT,
-            terceiro TEXT,
-            quarto TEXT,
-            rei_das_flores TEXT,
-            qtd_flores INTEGER
-        )
-    ''')
+    if DATABASE_URL:
+        cursor.execute('''
+            CREATE TABLE torneios (
+                id SERIAL PRIMARY KEY,
+                nome_torneio VARCHAR(255) DEFAULT 'Torneio de Truco Cego',
+                fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO',
+                max_rodadas_classificatoria INTEGER DEFAULT 5,
+                taxa_inscricao REAL DEFAULT 5.00,
+                crono_tempo_restante_seg INTEGER DEFAULT 3000,
+                crono_ativo INTEGER DEFAULT 0,
+                crono_ultimo_clique REAL DEFAULT 0.0
+            );
+        ''')
+        cursor.execute('''
+            INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
+            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO');
+        ''')
+        cursor.execute('''
+            CREATE TABLE atletas (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER,
+                nome VARCHAR(255) NOT NULL,
+                entidade VARCHAR(255) DEFAULT 'AVULSO',
+                whatsapp VARCHAR(50),
+                status VARCHAR(50) DEFAULT 'PENDENTE'
+            );
+        ''')
+        cursor.execute('''
+            CREATE TABLE confrontos (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER,
+                rodada INTEGER NOT NULL,
+                mesa INTEGER NOT NULL,
+                atleta1_id INTEGER,
+                atleta2_id INTEGER,
+                atleta1_nome VARCHAR(255),
+                atleta2_nome VARCHAR(255),
+                tipo_placar VARCHAR(50) DEFAULT NULL,
+                sets1 INTEGER DEFAULT 0,
+                sets2 INTEGER DEFAULT 0,
+                tentos1 INTEGER DEFAULT 0,
+                tentos2 INTEGER DEFAULT 0,
+                flores1 INTEGER DEFAULT 0,
+                flores2 INTEGER DEFAULT 0,
+                vencedor_id INTEGER
+            );
+        ''')
+        cursor.execute('''
+            CREATE TABLE historico_campeoes (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER,
+                nome_torneio VARCHAR(255),
+                campeao VARCHAR(255),
+                vice VARCHAR(255),
+                terceiro VARCHAR(255),
+                quarto VARCHAR(255),
+                rei_das_flores VARCHAR(255),
+                qtd_flores INTEGER
+            );
+        ''')
+    else:
+        cursor.execute('''
+            CREATE TABLE torneios (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
+                fase_torneio TEXT DEFAULT 'INSCRICAO',
+                max_rodadas_classificatoria INTEGER DEFAULT 5,
+                taxa_inscricao REAL DEFAULT 5.00,
+                crono_tempo_restante_seg INTEGER DEFAULT 3000,
+                crono_ativo INTEGER DEFAULT 0,
+                crono_ultimo_clique REAL DEFAULT 0.0
+            )
+        ''')
+        cursor.execute('''
+            INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio) 
+            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO')
+        ''')
+        cursor.execute('''
+            CREATE TABLE atletas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER,
+                nome TEXT NOT NULL,
+                entidade TEXT DEFAULT 'AVULSO',
+                whatsapp TEXT,
+                status TEXT DEFAULT 'PENDENTE'
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE confrontos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER,
+                rodada INTEGER NOT NULL,
+                mesa INTEGER NOT NULL,
+                atleta1_id INTEGER,
+                atleta2_id INTEGER,
+                atleta1_nome TEXT,
+                atleta2_nome TEXT,
+                tipo_placar TEXT DEFAULT NULL,
+                sets1 INTEGER DEFAULT 0,
+                sets2 INTEGER DEFAULT 0,
+                tentos1 INTEGER DEFAULT 0,
+                tentos2 INTEGER DEFAULT 0,
+                flores1 INTEGER DEFAULT 0,
+                flores2 INTEGER DEFAULT 0,
+                vencedor_id INTEGER
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE historico_campeoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER,
+                nome_torneio TEXT,
+                campeao TEXT,
+                vice TEXT,
+                terceiro TEXT,
+                quarto TEXT,
+                rei_das_flores TEXT,
+                qtd_flores INTEGER
+            )
+        ''')
     
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes?sucesso=banco_zerado", status_code=303)
 
 @app.post("/admin/cadastrar-direto")
 @app.post("/admin-painel/admin/cadastrar-direto")
-def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), entidade: str = Form("INDIVIDUAL"), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), entidade: str = Form("INDIVIDUAL"), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     ent_nome = entity if entity else entidade
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     entidade_limpa = ent_nome.strip().upper() if ent_nome else "AVULSO"
+    p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute("INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES (?, ?, ?, 'APROVADO')", (cfg["id"], nome.strip().upper(), entidade_limpa))
+    cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
 
 @app.post("/admin/acao-atleta")
 @app.post("/admin-painel/admin/acao-atleta")
-def acao_atleta_admin(id_atleta: int = Form(...), acao: str = Form(...), db: sqlite3.Connection = Depends(get_db), auth: bool = Depends(verificar_admin)):
+def acao_atleta_admin(id_atleta: int = Form(...), acao: str = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
+    p = "%s" if DATABASE_URL else "?"
     if acao == "aprovar":
-        cursor.execute("UPDATE atletas SET status = 'APROVADO' WHERE id = ?", (id_atleta,))
+        cursor.execute(f"UPDATE atletas SET status = 'APROVADO' WHERE id = {p}", (id_atleta,))
     elif acao in ["recusar", "excluir"]:
-        cursor.execute("DELETE FROM atletas WHERE id = ?", (id_atleta,))
+        cursor.execute(f"DELETE FROM atletas WHERE id = {p}", (id_atleta,))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
 
 @app.get("/telao", response_class=HTMLResponse)
-def pagina_telao_publico(request: Request, db: sqlite3.Connection = Depends(get_db)):
+def pagina_telao_publico(request: Request, db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
-    cursor.execute("SELECT rodada FROM confrontos WHERE torneio_id = ? ORDER BY id DESC LIMIT 1", (cfg["id"],))
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_r = cursor.fetchone()
     rodada_atual = row_r["rodada"] if row_r else 1
     return templates.TemplateResponse(request=request, name="telao.html", context={"config": cfg, "rodada": rodada_atual})
 
 @app.get("/api/publico/dados")
 @app.get("/admin-painel/api/publico/dados")
-def api_dados_publicos_telao(db: sqlite3.Connection = Depends(get_db)):
+def api_dados_publicos_telao(db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute("SELECT rodada FROM confrontos WHERE torneio_id = ? ORDER BY id DESC LIMIT 1", (cfg["id"],))
+    cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_r = cursor.fetchone()
     rodada_atual = row_r["rodada"] if row_r else 1
     
-    cursor.execute("SELECT * FROM confrontos WHERE rodada = ? AND torneio_id = ? ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
     confrontos = [dict(row) for row in cursor.fetchall()]
     
     ranking = obter_ranking_fase_classificatoria(cursor, cfg["id"])
@@ -870,7 +1037,7 @@ def api_dados_publicos_telao(db: sqlite3.Connection = Depends(get_db)):
     if cfg["crono_ativo"] == 1 and cfg["crono_tempo_restante_seg"] == 0:
         tempo_formatado = "AGORA TUDO É FALTA!"
         
-    cursor.execute("SELECT * FROM historico_campeoes WHERE torneio_id = ?", (cfg["id"],))
+    cursor.execute(f"SELECT * FROM historico_campeoes WHERE torneio_id = {p}", (cfg["id"],))
     hist = cursor.fetchone()
     podio_dados = None
     
@@ -887,16 +1054,16 @@ def api_dados_publicos_telao(db: sqlite3.Connection = Depends(get_db)):
             "max_flores": int(hist["qtd_flores"])
         }
     else:
-        cursor.execute("SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = ?", (cfg["id"],))
+        cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
         atletas = cursor.fetchall()
         
         rei_nome = "---"
         max_flores = 0
         for atl in atletas:
             a_id = atl["id"]
-            cursor.execute("SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = ? AND torneio_id = ?", (a_id, cfg["id"]))
+            cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
             f1 = cursor.fetchone()[0]
-            cursor.execute("SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = ? AND torneio_id = ?", (a_id, cfg["id"]))
+            cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
             f2 = cursor.fetchone()[0]
             
             total_f = f1 + f2
@@ -937,7 +1104,7 @@ def api_dados_publicos_telao(db: sqlite3.Connection = Depends(get_db)):
 
 @app.get("/inscricao", response_class=HTMLResponse)
 @app.get("/admin-painel/inscricao", response_class=HTMLResponse)
-def pagina_inscricao_externa(request: Request, db: sqlite3.Connection = Depends(get_db)):
+def pagina_inscricao_externa(request: Request, db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     
@@ -963,17 +1130,19 @@ async def salvar_inscricao_externa(
     entidade: str = Form(None), 
     whatsapp: str = Form(""), 
     comprovante: UploadFile = File(None),
-    db: sqlite3.Connection = Depends(get_db)
+    db=Depends(get_db)
 ):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
     
+    ent_final = Black if entidade else ctg if 'ctg' in locals() else entidade
     ent_final = entidade if entidade else ctg
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
-    cursor.execute('''
-        INSERT INTO atletas (torneio_id, nome, entity, status) -- Corrigido para a tabela estruturada
-        VALUES (?, ?, ?, 'PENDENTE')
+    cursor.execute(f'''
+        INSERT INTO atletas (torneio_id, nome, entidade, status) 
+        VALUES ({p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
     
