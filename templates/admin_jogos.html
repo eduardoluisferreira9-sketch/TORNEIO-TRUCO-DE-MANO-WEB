@@ -116,9 +116,9 @@
     <nav>
         <span id="nome-torneio-global">🏆 {{ config.nome_torneio }}</span>
         <div class="nav-links">
-            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
-            <a href="/admin-painel/admin/jogos" class="nav-link active">🎴 Mesa de Jogos</a>
-            <a href="/admin-painel/admin/classificacao" class="nav-link">📊 Classificação</a>
+            <a href="/admin/inscricoes" class="nav-link">📋 Inscrições</a>
+            <a href="/admin/jogos" class="nav-link active">🎴 Mesa de Jogos</a>
+            <a href="/admin/classificacao" class="nav-link">📊 Classificação</a>
         </div>
     </nav>
 
@@ -129,7 +129,7 @@
                 <div class="timer" id="display-crono">{{ tempo_formatado }}</div>
             </div>
             <div>
-                <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline;">
+                <form action="/admin/cronometro/controle" method="POST" style="display: inline;">
                     <button type="submit" name="acao" value="iniciar" class="btn-crono" style="background: var(--verde-sucesso);">▶ INICIAR</button>
                     <button type="submit" name="acao" value="pausar" class="btn-crono" style="background: #d35400;">⏸ PAUSAR</button>
                     <button type="submit" name="acao" value="reiniciar" class="btn-crono" style="background: linear-gradient(135deg, #444 0%, #2b2b2b 100%); border: 1px solid #666;" onclick="return confirm('Reiniciar o cronômetro?');">🔄 REINICIAR</button>
@@ -154,16 +154,16 @@
                 {% endif %}
 
                 {% if not confrontos %}
-                    <form action="/admin-painel/admin/gerar-rodada" method="POST">
+                    <form action="/admin/gerar-rodada" method="POST">
                         <button type="submit" style="background: var(--verde-sucesso); color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🎲 Sortear Partidas da 1ª Rodada</button>
                     </form>
                 {% elif rodada_concluida %}
                     {% if rodada < 0 %}
-                        <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');">
+                        <form action="/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');">
                             <button type="submit" style="background: #e67e22; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔥 Avançar Fase Eliminatória ⏭</button>
                         </form>
                     {% else %}
-                        <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');">
+                        <form action="/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');">
                             <button type="submit" style="background: #007bff; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">⏭ Fechar Rodada & Gerar Próxima</button>
                         </form>
                     {% endif %}
@@ -241,7 +241,7 @@
             <h3 style="margin: 0 0 5px 0; color: var(--ouro); font-family: 'Cinzel', serif;">Ficha de Arbitragem</h3>
             <p style="margin: 0 0 20px 0; font-size: 0.82rem; color: var(--texto-subtil);">O formato define a atribuição lógica dos Tentos (Regra do Regulamento).</p>
             
-            <form action="/admin-painel/admin/salvar-placar" method="POST" onsubmit="return validarEnvio();">
+            <form action="/admin/salvar-placar" method="POST" onsubmit="return validarEnvio();">
                 <input type="hidden" name="confronto_id" id="m_conf_id">
                 <input type="hidden" name="vencedor_id" id="m_vencedor_id">
                 <input type="hidden" name="tipo_placar" id="m_tipo_placar">
@@ -305,24 +305,6 @@
     <script>
         let realId1 = null, realId2 = null;
         let selecionadoIdx = null;
-
-        function atualizarTempo() {
-            fetch('/admin-painel/api/cronometro').then(r => r.json()).then(data => {
-                let elCrono = document.getElementById('display-crono');
-                if (data.tempo_restante <= 0) {
-                    elCrono.innerText = "⚠️ AGORA TUDO É FALTA!";
-                    elCrono.style.color = "#ff2222";
-                    elCrono.style.fontSize = "2.2rem";
-                } else {
-                    let mins = Math.floor(data.tempo_restante / 60);
-                    let segs = data.tempo_restante % 60;
-                    elCrono.innerText = (mins < 10 ? '0' : '') + mins + ':' + (segs < 10 ? '0' : '') + segs;
-                    elCrono.style.color = "#ffcc00";
-                    elCrono.style.fontSize = "4.5rem";
-                }
-            }).catch(err => console.log("Sincronizando cronômetro..."));
-        }
-        setInterval(atualizarTempo, 2000);
 
         function obterTextoRodada() {
             const el = document.getElementById('titulo-fase-atual');
@@ -435,7 +417,6 @@
             document.getElementById('btn_atleta1').classList.toggle('active', idx === 1);
             document.getElementById('btn_atleta2').classList.toggle('active', idx === 2);
             
-            // Força a revalidação imediata do formato se já tiver sido clicado antes
             if(document.getElementById('m_tipo_placar').value) {
                 selecionarFormato(document.getElementById('m_tipo_placar').value);
             }
@@ -482,7 +463,6 @@
             if(!v_id) { alert("Selecione o vencedor!"); return false; }
             if(!fmt) { alert("Selecione o formato (2x0 ou 2x1)!"); return false; }
 
-            // Proteção idêntica às restrições do main.py
             if (fmt === '2x1') {
                 if (selecionadoIdx === 1 && t1 <= t2) {
                     alert("No formato 2x1, os tentos do Vencedor (Atleta 1) precisam ser maiores que os do perdedor!");
@@ -494,11 +474,28 @@
                 }
             }
 
-            // Habilita antes do submit para garantir que o POST capture os dados de campos desabilitados
             document.getElementById('inp_t1').disabled = false;
             document.getElementById('inp_t2').disabled = false;
             return true;
         }
+
+        function atualizarTempo() {
+            fetch('/api/cronometro').then(r => r.json()).then(data => {
+                let elCrono = document.getElementById('display-crono');
+                if (data.tempo_restante <= 0) {
+                    elCrono.innerText = "⚠️ AGORA TUDO É FALTA!";
+                    elCrono.style.color = "#ff2222";
+                    elCrono.style.fontSize = "2.2rem";
+                } else {
+                    let mins = Math.floor(data.tempo_restante / 60);
+                    let segs = data.tempo_restante % 60;
+                    elCrono.innerText = (mins < 10 ? '0' : '') + mins + ':' + (segs < 10 ? '0' : '') + segs;
+                    elCrono.style.color = "#ffcc00";
+                    elCrono.style.fontSize = "4.5rem";
+                }
+            }).catch(err => console.log("Sincronizando cronômetro..."));
+        }
+        setInterval(atualizarTempo, 2000);
     </script>
 </body>
 </html>
