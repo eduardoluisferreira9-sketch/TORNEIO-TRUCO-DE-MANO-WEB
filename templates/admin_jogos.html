@@ -272,11 +272,11 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
                         <div>
                             <label style="margin-top:0;">Flores P1:</label>
-                            <input type="number" name="flores1" value="0" class="input-num" min="0">
+                            <input type="number" name="flores1" id="inp_f1" value="0" class="input-num" min="0">
                         </div>
                         <div>
                             <label style="margin-top:0;">Flores P2:</label>
-                            <input type="number" name="flores2" value="0" class="input-num" min="0">
+                            <input type="number" name="flores2" id="inp_f2" value="0" class="input-num" min="0">
                         </div>
                     </div>
                 </div>
@@ -290,7 +290,6 @@
     </div>
 
     <script>
-        // Bloco otimizado para evitar problemas de escape de strings no Jinja2 do FastAPI
         const dadosConfrontosParaImpressao = [
             {% for c in confrontos %}
             {
@@ -405,6 +404,8 @@
             document.getElementById('m_tipo_placar').value = "";
             document.getElementById('inp_t1').value = "0"; document.getElementById('inp_t1').disabled = false;
             document.getElementById('inp_t2').value = "0"; document.getElementById('inp_t2').disabled = false;
+            document.getElementById('inp_f1').value = "0";
+            document.getElementById('inp_f2').value = "0";
             selecionadoIdx = null;
             
             document.querySelectorAll('.btn-select').forEach(b => b.classList.remove('active'));
@@ -442,15 +443,17 @@
                 if(selecionadoIdx === 1) {
                     t1.value = "72"; t1.disabled = true;
                     t2.disabled = false;
+                    if(t2.value === "72") t2.value = "0";
                 } else {
                     t2.value = "72"; t2.disabled = true;
                     t1.disabled = false;
+                    if(t1.value === "72") t1.value = "0";
                 }
             } else if(fmt === '2x1') {
                 t1.disabled = false;
                 t2.disabled = false;
-                if(t1.value === "72" || t1.value === "2") t1.value = "0";
-                if(t2.value === "72" || t2.value === "2") t2.value = "0";
+                if(t1.value === "72") t1.value = "0";
+                if(t2.value === "72") t2.value = "0";
             }
         }
 
