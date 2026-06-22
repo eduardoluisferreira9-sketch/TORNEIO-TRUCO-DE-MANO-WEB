@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Pódio & Premiação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #0d2e1b;
+            --bg-cards: #092113;
+            --ouro: #d4af37;
+            --ouro-brilhante: #f3e5ab;
+            --prata: #b0bec5;
+            --bronze: #cd7f32;
+            --madeira: #8d6e63;
+            --texto-claro: #ffffff; 
+            --texto-subtil: #bdc3c7; 
+            --texto-escuro: #111;
+            --rei-flores: #9b59b6;
+        }
+
+        body { 
+            background: var(--bg-principal); 
+            color: var(--texto-claro); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
+            background-size: 100% 4px;
+        }
+
+        nav { 
+            background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
+            padding: 20px 40px; 
+            border-bottom: 3px solid var(--ouro); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        nav span { font-family: 'Cinzel', serif; font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: var(--ouro); }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-link { 
+            text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; 
+            color: var(--texto-subtil); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;
+            border: 2px solid transparent; transition: all 0.3s ease;
+        }
+        .nav-link:hover { color: var(--ouro-brilhante); background: rgba(212, 175, 55, 0.1); border-color: rgba(212,175,55,0.2); }
+        .nav-link.active { background: var(--ouro); color: var(--texto-escuro); font-weight: 800; border-color: var(--ouro-brilhante); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+        .container { padding: 40px; max-width: 1000px; margin: 0 auto; text-align: center; }
+        
+        .podio-container { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin: 60px 0 40px 0; }
+        .podio-col { 
+            background: var(--bg-cards); 
+            border: 2px solid #333; 
+            border-radius: 12px 12px 0 0; 
+            width: 200px; 
+            padding: 25px 15px; 
+            position: relative; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+        .podio-col:hover { transform: translateY(-5px); }
+        
+        .primeiro { height: 280px; border-color: var(--ouro); background: linear-gradient(180deg, #2c2205 0%, var(--bg-cards) 100%); box-shadow: 0 15px 40px rgba(212,175,55,0.2); }
+        .segundo { height: 210px; border-color: var(--prata); background: linear-gradient(180deg, #1c2833 0%, var(--bg-cards) 100%); }
+        .terceiro { height: 170px; border-color: var(--bronze); background: linear-gradient(180deg, #2d1a04 0%, var(--bg-cards) 100%); }
+        .quarto { height: 130px; border-color: var(--madeira); background: linear-gradient(180deg, #141414 0%, var(--bg-cards) 100%); }
+        
+        .medalha { font-size: 3rem; display: block; margin-bottom: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+        
+        /* Estilo substituto seguro para o quarto lugar */
+        .medalha-quarto {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--madeira);
+            display: block;
+            margin-bottom: 18px;
+            margin-top: 5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            font-family: 'Cinzel', serif;
+        }
+
+        .nome-atleta { font-weight: 700; color: #fff; font-size: 1.15rem; word-break: break-word; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .titulo-posicao { font-family: 'Cinzel', serif; color: var(--texto-subtil); font-size: 0.8rem; margin-top: 8px; letter-spacing: 1px; font-weight: 800; }
+        
+        .card-flores { 
+            background: linear-gradient(135deg, #1f112e 0%, var(--bg-cards) 100%); 
+            border: 2px dashed var(--rei-flores); 
+            padding: 30px; 
+            border-radius: 12px; 
+            margin-bottom: 45px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .card-flores h2 { font-family: 'Cinzel', serif; font-weight: 800; letter-spacing: 1px; }
+        
+        .btn-encerrar { 
+            background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%); 
+            color: white; 
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            border: none; 
+            padding: 18px 40px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(39,174,96,0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-encerrar:hover { 
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(39,174,96,0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <span>🏆 {{ config.nome_torneio }}</span>
+        <div class="nav-links">
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">⚔️ Inscrições</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link">🌿 Mesa de Jogos</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link">🏆 Classificação</a>
+            <a href="/admin-painel/admin/podio" class="nav-link active">🥇 Pódio Final</a>
+            <a href="/admin-painel/admin/historico" class="nav-link">📜 Galeria</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="color: var(--ouro); font-size: 2.8rem; margin-bottom: 5px; font-family: 'Cinzel', serif; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">👑 Cerimônia de Premiação</h1>
+        <p style="color: var(--texto-subtil); font-weight: 600; margin-bottom: 40px;">O pódio oficial da edição está consolidado nos pergaminhos da arena!</p>
+
+        <div class="podio-container">
+            <div class="podio-col segundo">
+                <span class="medalha">🥈</span>
+                <div class="nome-atleta">{{ vice }}</div>
+                <div class="titulo-posicao" style="color: var(--prata);">Vice-Campeão</div>
+            </div>
+
+            <div class="podio-col primeiro">
+                <span class="medalha" style="font-size: 4rem; margin-top: -35px; margin-bottom: 5px;">👑</span>
+                <div class="nome-atleta" style="font-size: 1.4rem; color: var(--ouro-brilhante); text-transform: uppercase;">{{ campeao }}</div>
+                <div class="titulo-posicao" style="color: var(--ouro); font-weight: 900; font-size: 0.9rem;">Grande Campeão</div>
+            </div>
+
+            <div class="podio-col terceiro">
+                <span class="medalha">🥉</span>
+                <div class="nome-atleta">{{ terceiro }}</div>
+                <div class="titulo-posicao" style="color: var(--bronze);">3º Colocado</div>
+            </div>
+
+            <div class="podio-col quarto">
+                <span class="medalha-quarto">IV</span>
+                <div class="nome-atleta">{{ quarto }}</div>
+                <div class="titulo-posicao" style="color: var(--madeira);">4º Colocado</div>
+            </div>
+        </div>
+
+        <div class="card-flores">
+            <h2 style="color: var(--rei-flores); margin: 0 0 10px 0;">🌸 Troféu Rei das Flores 🌸</h2>
+            <p style="font-size: 1.1rem; margin: 5px 0; font-weight: 600; color: var(--texto-subtil);">O maior cantador de flores de toda a edição é:</p>
+            <div style="font-size: 2rem; font-weight: bold; color: #fff; margin: 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">{{ rei_nome }}</div>
+            <span style="background: var(--rei-flores); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(155,89,182,0.3);">
+                🎯 {{ max_flores }} Flores Cantadas no Torneio
+            </span>
+        </div>
+
+        <form action="/admin-painel/admin/encerrar-e-salvar" method="POST">
+            <input type="hidden" name="campeao" value="{{ campeao }}">
+            <input type="hidden" name="vice" value="{{ vice }}">
+            <input type="hidden" name="terceiro" value="{{ terceiro }}">
+            <input type="hidden" name="quarto" value="{{ quarto }}">
+            <input type="hidden" name="rei" value="{{ rei_nome }}">
+            <input type="hidden" name="flores" value="{{ max_flores }}">
+            
+            <button type="submit" class="btn-encerrar" onclick="return confirm('Deseja mesmo imortalizar este torneio? Isso salvará os dados permanentemente e reiniciará as tabelas para a próxima edição!')">
+                💾 Salvar na Galeria & Finalizar Edição
+            </button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Galeria de Campeões</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #0d2e1b;
+            --bg-cards: #092113;
+            --ouro: #d4af37;
+            --ouro-brilhante: #f3e5ab;
+            --texto-claro: #ffffff; 
+            --texto-subtil: #bdc3c7; 
+            --texto-escuro: #111;
+            --rei-flores: #9b59b6;
+        }
+
+        body { 
+            background: var(--bg-principal); 
+            color: var(--texto-claro); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
+            background-size: 100% 4px;
+        }
+
+        nav { 
+            background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
+            padding: 20px 40px; 
+            border-bottom: 3px solid var(--ouro); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        nav span { font-family: 'Cinzel', serif; font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: var(--ouro); }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-link { 
+            text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; 
+            color: var(--texto-subtil); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;
+            border: 2px solid transparent; transition: all 0.3s ease;
+        }
+        .nav-link:hover { color: var(--ouro-brilhante); background: rgba(212, 175, 55, 0.1); border-color: rgba(212,175,55,0.2); }
+        .nav-link.active { background: var(--ouro); color: var(--texto-escuro); font-weight: 800; border-color: var(--ouro-brilhante); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+        .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        
+        .grid-historico { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; margin-top: 40px; }
+        .card-historico { 
+            background: var(--bg-cards); 
+            border: 1px solid rgba(212, 175, 55, 0.2); 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            transition: all 0.3s ease; 
+        }
+        .card-historico:hover { 
+            border-color: var(--ouro); 
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 25px rgba(212,175,55,0.15);
+        }
+        
+        .edicao-titulo { 
+            font-family: 'Cinzel', serif;
+            color: var(--ouro); 
+            font-size: 1.35rem; 
+            margin-top: 0; 
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2); 
+            padding-bottom: 12px; 
+            font-weight: 800;
+        }
+        
+        .linha-podio { display: flex; align-items: center; gap: 12px; margin: 10px 0; font-size: 0.95rem; font-weight: 600; }
+        .linha-podio strong { color: var(--texto-subtil); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; width: 95px; display: inline-block; }
+        .linha-podio .nome-destaque { color: #fff; font-weight: 700; }
+        
+        .tag-flores { 
+            background: rgba(155, 89, 182, 0.1); 
+            border: 1px solid var(--rei-flores); 
+            color: #d68fe9; 
+            border-radius: 8px; 
+            padding: 12px; 
+            margin-top: 20px; 
+            font-size: 0.9rem; 
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <span>🏆 {{ config.nome_torneio }}</span>
+        <div class="nav-links">
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">⚔️ Inscrições</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link">🌿 Mesa de Jogos</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link">🏆 Classificação</a>
+            <a href="/admin-painel/admin/podio" class="nav-link">🥇 Pódio Final</a>
+            <a href="/admin-painel/admin/historico" class="nav-link active">📜 Galeria</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 style="color: var(--ouro); font-size: 2.5rem; font-family: 'Cinzel', serif; font-weight: 800; margin-bottom: 5px; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">📜 Galeria de Imortais do Truco Cego</h2>
+        <p style="color: var(--texto-subtil); font-weight: 600; margin-bottom: 20px;">Aqui repousam as lendas que conquistaram a glória eterna nas arenas passadas.</p>
+
+        <div class="grid-historico">
+            {% for h in galeria %}
+            <div class="card-historico">
+                <h3 class="edicao-titulo">🏅 {{ h.nome_torneio }}</h3>
+                
+                <div class="linha-podio">
+                    <span style="font-size: 1.3rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">🥇</span> 
+                    <strong>Campeão:</strong> 
+                    <span class="nome-destaque" style="color: var(--ouro-brilhante); font-size: 1.05rem;">{{ h.campeao }}</span>
+                </div>
+                <div class="linha-podio">
+                    <span style="font-size: 1.2rem;">🥈</span> 
+                    <strong>Vice:</strong> 
+                    <span class="nome-destaque">{{ h.vice }}</span>
+                </div>
+                <div class="linha-podio">
+                    <span style="font-size: 1.2rem;">🥉</span> 
+                    <strong>3º Lugar:</strong> 
+                    <span>{{ h.terceiro }}</span>
+                </div>
+                <div class="linha-podio">
+                    <span style="font-size: 1.2rem;">🪵</span> 
+                    <strong>4º Lugar:</strong> 
+                    <span style="color: #8d6e63;">{{ h.quarto }}</span>
+                </div>
+
+                <div class="tag-flores">
+                    🌸 <strong>Rei das Flores:</strong> <span style="color: #fff;">{{ h.rei_das_flores }}</span> <br>
+                    <div style="color: #bdc3c7; font-size: 0.78rem; margin-top: 4px; font-weight: 500;">Cantou {{ h.qtd_flores }} flores ao longo do evento.</div>
+                </div>
+            </div>
+            {% else %}
+            <div style="grid-column: 1 / -1; background: var(--bg-cards); padding: 40px; border-radius: 12px; border: 1px dashed rgba(212,175,55,0.3); text-align: center; margin-top: 20px;">
+                <p style="color: var(--texto-subtil); font-style: italic; margin: 0; font-size: 1.1rem; font-weight: 600;">Nenhum torneio foi arquivado ainda. O campeão da edição atual será o pioneiro deste mural!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

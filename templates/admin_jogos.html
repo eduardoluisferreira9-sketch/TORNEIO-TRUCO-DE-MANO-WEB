@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel - Mesa de Jogos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #0d2e1b;
+            --bg-cards: #092113;
+            --ouro: #d4af37;
+            --ouro-brilhante: #f3e5ab;
+            --vermelho-pampa: #922b21; 
+            --verde-sucesso: #1e8449; 
+            --texto-claro: #ffffff; 
+            --texto-subtil: #bdc3c7; 
+            --texto-escuro: #111;
+        }
+
+        body { 
+            background: var(--bg-principal); 
+            color: var(--texto-claro); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
+            background-size: 100% 4px;
+        }
+
+        nav { 
+            background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
+            padding: 20px 40px; 
+            border-bottom: 3px solid var(--ouro); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        nav span { font-family: 'Cinzel', serif; font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-link { 
+            text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; 
+            color: var(--texto-subtil); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;
+            border: 2px solid transparent; transition: all 0.3s ease;
+        }
+        .nav-link:hover { color: var(--ouro-brilhante); background: rgba(212, 175, 55, 0.1); border-color: rgba(212,175,55,0.2); }
+        .nav-link.active { background: var(--ouro); color: var(--texto-escuro); font-weight: 800; border-color: var(--ouro-brilhante); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+        .container { padding: 40px; max-width: 1300px; margin: 0 auto; }
+        
+        .crono-container { 
+            background: var(--bg-cards); padding: 25px; border-radius: 12px; 
+            border: 1px solid rgba(212, 175, 55, 0.3); text-align: center; 
+            margin-bottom: 35px; box-shadow: 0 12px 25px rgba(0,0,0,0.5); 
+        }
+        .timer-wrapper { background: #000; border: 2px solid var(--ouro); display: inline-block; padding: 10px 50px; border-radius: 8px; margin: 15px 0; min-width: 320px; }
+        .timer { font-size: 4.5rem; font-weight: bold; font-family: 'Courier New', Courier, monospace; color: #ffcc00; text-shadow: 0 0 15px rgba(255, 204, 0, 0.6); letter-spacing: 2px; }
+        
+        .btn-crono { padding: 12px 24px; font-family: 'Cinzel', serif; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin: 5px; color: #fff; font-size: 0.85rem; letter-spacing: 0.5px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .btn-crono:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        
+        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
+        .mesa-card { background: var(--bg-cards); padding: 22px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.2); box-shadow: 0 8px 16px rgba(0,0,0,0.4); transition: 0.3s; position: relative; }
+        .mesa-header { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: bold; color: var(--ouro); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .jogador-linha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px; border-radius: 6px; background: rgba(0,0,0,0.3); font-size: 0.95rem; font-weight: 600; border-left: 4px solid #444; }
+        .score-badge { font-weight: 700; color: var(--ouro-brilhante); background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; border: 1px solid rgba(212,175,55,0.2); white-space: nowrap; }
+        
+        .btn-lancar { background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); color: var(--texto-escuro); font-family: 'Cinzel', serif; border: none; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 800; margin-top: 15px; transition: 0.3s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-lancar:hover { background: linear-gradient(135deg, var(--ouro-brilhante) 0%, var(--ouro) 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
+        
+        .btn-impressao-mesa { background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--ouro-brilhante); padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-impressao-mesa:hover { background: var(--ouro); color: var(--texto-escuro); border-color: var(--ouro-brilhante); }
+        
+        .btn-impressao-geral { background: linear-gradient(135deg, #1b3d28 0%, #092113 100%); border: 1px solid var(--ouro); color: var(--ouro-brilhante); padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.2s; margin-right: 12px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-impressao-geral:hover { background: linear-gradient(135deg, #255437 0%, #0d2e1b 100%); border-color: var(--ouro-brilhante); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(212,175,55,0.15); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: var(--bg-cards); padding: 35px; border-radius: 12px; border: 2px solid var(--ouro); width: 460px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
+        .selector-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+        
+        .btn-select { background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; padding: 14px; text-align: center; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.2s; }
+        .btn-select.active { background: var(--ouro); color: var(--texto-escuro); border-color: var(--ouro-brilhante); font-weight: 800; }
+        
+        .input-num { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 1.1rem; text-align: center; font-weight: 700; }
+        .input-num:focus { border-color: var(--ouro); outline: none; }
+        .input-num:disabled { background: #000; color: #555; border-color: #222; }
+        label { display: block; margin: 15px 0 6px 0; font-size: 0.8rem; color: var(--texto-subtil); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        @media print {
+            @page { margin: 0; }
+            body * { visibility: hidden; }
+            #secao-impressao-sumula, #secao-impressao-sumula * { visibility: visible; }
+            #secao-impressao-sumula { position: absolute; left: 0; top: 0; width: 74mm; background: #fff; padding: 0; margin: 0; display: block !important; }
+            .cupom-sumula { width: 74mm; box-sizing: border-box; padding: 6mm 3mm; font-family: 'Courier New', Courier, monospace; font-size: 10pt; color: #000; page-break-after: always; display: block; }
+            .text-center { text-align: center; }
+            .text-bold { font-weight: bold; }
+            .divisor-dashed { border-top: 1px dashed #000; margin: 8px 0; }
+            .tabela-sets { width: 100%; margin-top: 10px; border-collapse: collapse; table-layout: fixed; }
+            .tabela-sets th { font-size: 8pt; font-weight: bold; padding-bottom: 6px; text-transform: uppercase; text-align: center; overflow: hidden; white-space: nowrap; }
+            .tabela-sets th.col-label { width: 20%; text-align: left; }
+            .tabela-sets th.col-atleta { width: 35%; }
+            .tabela-sets th.col-vs { width: 10%; }
+            .tabela-sets td { padding: 8px 0; font-size: 10pt; vertical-align: middle; text-align: center; }
+            .tabela-sets td.label-set { font-weight: bold; text-align: left; font-size: 8.5pt; }
+            .espaco-assinatura { margin-top: 25px; border-top: 1px solid #000; text-align: center; font-size: 8pt; padding-top: 5px; }
+        }
+
+        #secao-impressao-sumula { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="secao-impressao-sumula"></div>
+
+    <nav>
+        <span id="nome-torneio-global">🏆 {{ config.nome_torneio }}</span>
+        <div class="nav-links">
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link active">🎴 Mesa de Jogos</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link">📊 Classificação</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="crono-container">
+            <h3 style="margin: 0; color: var(--ouro); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-family: 'Cinzel', serif;">Tempo Restante da Rodada</h3>
+            <div class="timer-wrapper">
+                <div class="timer" id="display-crono">{{ tempo_formatado }}</div>
+            </div>
+            <div>
+                <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline;">
+                    <button type="submit" name="acao" value="iniciar" class="btn-crono" style="background: var(--verde-sucesso);">▶ INICIAR</button>
+                    <button type="submit" name="acao" value="pausar" class="btn-crono" style="background: #d35400;">⏸ PAUSAR</button>
+                    <button type="submit" name="acao" value="reiniciar" class="btn-crono" style="background: linear-gradient(135deg, #444 0%, #2b2b2b 100%); border: 1px solid #666;" onclick="return confirm('Reiniciar o cronômetro?');">🔄 REINICIAR</button>
+                </form>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid rgba(212,175,55,0.3); padding-bottom: 15px;">
+            <h2 id="titulo-fase-atual" data-rodada="{{ rodada }}" style="margin: 0; font-family: 'Cinzel', serif; font-size: 1.8rem;">
+                {% if rodada == -12 %} Fase Eliminatória: <span style="color: var(--ouro);">16 avos de Final</span>
+                {% elif rodada == -1 %} Fase Eliminatória: <span style="color: var(--ouro);">Oitavas de Final</span>
+                {% elif rodada == -2 %} Fase Eliminatória: <span style="color: var(--ouro);">Quartas de Final</span>
+                {% elif rodada == -3 %} Fase Eliminatória: <span style="color: var(--ouro);">Semifinal</span>
+                {% elif rodada == -4 %} Fase Final: <span style="color: var(--ouro);">Decisão de Títulos</span>
+                {% else %} Fase Classificatória: <span style="color: var(--ouro);">{{ rodada }}ª Rodada</span>
+                {% endif %}
+            </h2>
+            
+            <div style="display: flex; align-items: center;">
+                {% if confrontos %}
+                    <button type="button" class="btn-impressao-geral" onclick="imprimirTodasSumulas()">🖨️ IMPRIMIR TODAS AS SÚMULAS</button>
+                {% endif %}
+
+                {% if not confrontos %}
+                    <form action="/admin-painel/admin/gerar-rodada" method="POST">
+                        <button type="submit" style="background: var(--verde-sucesso); color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🎲 Sortear Partidas da 1ª Rodada</button>
+                    </form>
+                {% elif rodada_concluida %}
+                    {% if rodada < 0 %}
+                        <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');">
+                            <button type="submit" style="background: #e67e22; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔥 Avançar Fase Eliminatória ⏭</button>
+                        </form>
+                    {% else %}
+                        <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');">
+                            <button type="submit" style="background: #007bff; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">⏭ Fechar Rodada & Gerar Próxima</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <button disabled style="background: #111; color: #444; border: 1px solid #222; padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: not-allowed; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔒 Aguardando Fim dos Jogos</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mesa-grid">
+            {% for c in confrontos %}
+            {% set id_atleta1 = c.atleta1_id if c.atleta1_id is defined else c.athlete1_id %}
+            {% set id_atleta2 = c.atleta2_id if c.atleta2_id is defined else c.athlete2_id %}
+
+            <div class="mesa-card" style="{% if c.vencedor_id %} border-color: var(--verde-sucesso); background: #07170e; {% endif %}">
+                <div class="mesa-header">
+                    <span>
+                        {% if rodada == -4 and c.mesa == 1 %} 🥇 GRANDE FINAL
+                        {% elif rodada == -4 and c.mesa == 2 %} 🥉 DISPUTA DE 3º LUGAR
+                        {% else %} Mesa {{ c.mesa }}
+                        {% endif %}
+                    </span>
+                    
+                    {% if id_atleta2 is not none and id_atleta2 > 0 %}
+                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|replace(chr(39), '')|replace(chr(34), '') }}', '{{ c.atleta2_nome|replace(chr(39), '')|replace(chr(34), '') }}')">🖨️ Súmula</button>
+                    {% endif %}
+                </div>
+                
+                <div class="jogador-linha" style="
+                    {% if c.vencedor_id %}
+                        {% if c.vencedor_id == id_atleta1 %}
+                            background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
+                        {% else %}
+                            background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
+                        {% endif %}
+                    {% endif %}">
+                    <span>{{ "👑 " if c.vencedor_id == id_atleta1 else "👤 " }} {{ c.atleta1_nome }}</span>
+                    <span class="score-badge">
+                        {% if c.sets1 is not none %}
+                            {{ c.sets1 }}S | {{ c.tentos1 }}T | {{ c.flores1 if c.flores1 is defined and c.flores1 is not none else 0 }}F
+                        {% else %} - {% endif %}
+                    </span>
+                </div>
+                
+                <div class="jogador-linha" style="
+                    {% if c.vencedor_id %}
+                        {% if c.vencedor_id == id_atleta2 %}
+                            background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
+                        {% else %}
+                            background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
+                        {% endif %}
+                    {% endif %}">
+                    <span>{{ "👑 " if c.vencedor_id == id_atleta2 else "👤 " }} {{ c.atleta2_nome }}</span>
+                    <span class="score-badge">
+                        {% if c.sets2 is not none %}
+                            {{ c.sets2 }}S | {{ c.tentos2 }}T | {{ c.flores2 if c.flores2 is defined and c.flores2 is not none else 0 }}F
+                        {% else %} - {% endif %}
+                    </span>
+                </div>
+
+                {% if id_atleta2 is not none and id_atleta2 > 0 %}
+                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|replace(chr(39), '')|replace(chr(34), '') }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|replace(chr(39), '')|replace(chr(34), '') }}')">
+                        {% if c.vencedor_id %}⚙️ ALTERAR RESULTADO{% else %}🃏 LANÇAR PLACAR{% endif %}
+                    </button>
+                {% else %}
+                    <div style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 15px; font-size: 0.9rem;">Folga Automática (+Pontos)</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="modal" id="modalPlacar">
+        <div class="modal-content">
+            <h3 style="margin: 0 0 5px 0; color: var(--ouro); font-family: 'Cinzel', serif;">Ficha de Arbitragem</h3>
+            <p style="margin: 0 0 20px 0; font-size: 0.82rem; color: var(--texto-subtil);">O formato define a atribuição lógica dos Tentos (Regra do Regulamento).</p>
+            
+            <form action="/admin-painel/admin/salvar-placar" method="POST" onsubmit="return validarEnvio();">
+                <input type="hidden" name="confronto_id" id="m_conf_id">
+                <input type="hidden" name="vencedor_id" id="m_vencedor_id">
+                <input type="hidden" name="tipo_placar" id="m_tipo_placar">
+
+                <label>1. Quem Ganhou a Partida?</label>
+                <div class="selector-group">
+                    <div class="btn-select" id="btn_atleta1" onclick="selecionarVencedor(1)">Atleta 1</div>
+                    <div class="btn-select" id="btn_atleta2" onclick="selecionarVencedor(2)">Atleta 2</div>
+                </div>
+
+                <label>2. Formato do Resultado:</label>
+                <div class="selector-group">
+                    <div class="btn-select" id="btn_format20" onclick="selecionarFormato('2x0')">2 x 0 (Direto)</div>
+                    <div class="btn-select" id="btn_format21" onclick="selecionarFormato('2x1')">2 x 1 (Três Sets)</div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.2); margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label id="lbl_t1" style="margin-top:0;">Tentos P1:</label>
+                            <input type="number" name="tentos1" id="inp_t1" class="input-num" min="0" max="72" value="0">
+                        </div>
+                        <div>
+                            <label id="lbl_t2" style="margin-top:0;">Tentos P2:</label>
+                            <input type="number" name="tentos2" id="inp_t2" class="input-num" min="0" max="72" value="0">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                        <div>
+                            <label style="margin-top:0;">Flores P1:</label>
+                            <input type="number" name="flores1" value="0" class="input-num" min="0">
+                        </div>
+                        <div>
+                            <label style="margin-top:0;">Flores P2:</label>
+                            <input type="number" name="flores2" value="0" class="input-num" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; display: flex; justify-content: space-between;">
+                    <button type="button" onclick="document.getElementById('modalPlacar').style.display='none'" style="background:#444; border:none; padding:12px 20px; color:#fff; cursor:pointer; border-radius:6px; font-weight:bold; font-family:'Cinzel', serif; font-size:0.8rem;">Voltar</button>
+                    <button type="submit" style="background:var(--verde-sucesso); color:#fff; font-weight:bold; border:none; padding:12px 25px; cursor:pointer; border-radius:6px; font-family:'Cinzel', serif; font-size:0.8rem;">Confirmar Ficha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const dadosConfrontosParaImpressao = [
+            {% for c in confrontos %}
+            {
+                mesa: "{{ c.mesa }}",
+                atleta1: "{{ c.atleta1_nome|replace('\"', '\\\"')|replace('\n', '') }}",
+                atleta2: "{{ (c.atleta2_nome if c.atleta2_nome else '')|replace('\"', '\\\"')|replace('\n', '') }}",
+                atleta2_id: {% if c.atleta2_id is defined %}{{ c.atleta2_id if c.atleta2_id is not none else 'null' }}{% else %}{{ c.athlete2_id if c.athlete2_id is not none else 'null' }}{% endif %}
+            },
+            {% endfor %}
+        ];
+    </script>
+
+    <script>
+        let realId1 = null, realId2 = null;
+        let selecionadoIdx = null;
+
+        function atualizarTempo() {
+            fetch('/admin-painel/api/cronometro').then(r => r.json()).then(data => {
+                let elCrono = document.getElementById('display-crono');
+                if (data.tempo_restante <= 0) {
+                    elCrono.innerText = "⚠️ AGORA TUDO É FALTA!";
+                    elCrono.style.color = "#ff2222";
+                    elCrono.style.fontSize = "2.2rem";
+                } else {
+                    let mins = Math.floor(data.tempo_restante / 60);
+                    let segs = data.tempo_restante % 60;
+                    elCrono.innerText = (mins < 10 ? '0' : '') + mins + ':' + (segs < 10 ? '0' : '') + segs;
+                    elCrono.style.color = "#ffcc00";
+                    elCrono.style.fontSize = "4.5rem";
+                }
+            }).catch(err => console.log("Sincronizando cronômetro..."));
+        }
+        setInterval(atualizarTempo, 2000);
+
+        function obterTextoRodada() {
+            const el = document.getElementById('titulo-fase-atual');
+            if(!el) return "RODADA DO TORNEIO";
+            const r = parseInt(el.getAttribute('data-rodada'));
+            if (r === -12) return "16 AVOS DE FINAL";
+            if (r === -1) return "OITAVAS DE FINAL";
+            if (r === -2) return "QUARTAS DE FINAL";
+            if (r === -3) return "SEMIFINAL";
+            if (r === -4) return "FASE FINAL";
+            return `${r}ª RODADA`;
+        }
+
+        function gerarHtmlCupom(mesaNum, j1, j2) {
+            const nomeTorneio = document.getElementById('nome-torneio-global')?.innerText.replace('🏆 ', '') || "TORNEIO DE TRUCO";
+            const rodadaTexto = obterTextoRodada();
+            let identificacaoMesa = `MESA ${mesaNum}`;
+            if(rodadaTexto === "FASE FINAL") {
+                if(mesaNum == "1") identificacaoMesa = "GRANDE FINAL";
+                if(mesaNum == "2") identificacaoMesa = "DISPUTA DE 3º LUGAR";
+            }
+            const formatarNomeCurto = (nome) => {
+                if(!nome) return "FOLGA";
+                let partes = nome.trim().split(' ');
+                if(partes.length > 1) return partes[0] + " " + partes[1][0] + ".";
+                return partes[0];
+            };
+            const n1 = formatarNomeCurto(j1);
+            const n2 = formatarNomeCurto(j2);
+
+            return `
+                <div class="cupom-sumula">
+                    <div class="text-center text-bold" style="font-size: 11pt; text-transform: uppercase;">${nomeTorneio}</div>
+                    <div class="text-center" style="font-size: 8pt; margin: 2px 0; color: #444;">CTG PARTICIPANTE</div>
+                    <div class="text-center text-bold" style="font-size: 10pt; margin-top: 4px;">${rodadaTexto}</div>
+                    <div class="divisor-dashed"></div>
+                    <div class="text-center text-bold" style="font-size: 13pt; background: #000; color: #fff; padding: 3px 0; margin: 4px 0; border-radius: 4px;">${identificacaoMesa}</div>
+                    <div style="font-size: 9.5pt; margin: 8px 0; line-height: 1.3;">
+                        <span class="text-bold">Atleta 1:</span> ${j1}<br>
+                        <span class="text-bold">Atleta 2:</span> ${j2 ? j2 : 'FOLGA AUTOMÁTICA'}
+                    </div>
+                    <div class="divisor-dashed"></div>
+                    <table class="tabela-sets">
+                        <thead>
+                            <tr>
+                                <th class="col-label">SÚMULA</th>
+                                <th class="col-atleta">${n1}</th>
+                                <th class="col-vs"></th>
+                                <th class="col-atleta">${n2}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="label-set">1º SET</td><td>_______</td><td class="text-bold">X</td><td>_______</td></tr>
+                            <tr><td class="label-set">2º SET</td><td>_______</td><td class="text-bold">X</td><td>_______</td></tr>
+                            <tr><td class="label-set">3º SET</td><td>_______</td><td class="text-bold">X</td><td>_______</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center text-bold" style="margin-top: 18px; font-size: 10.5pt;">FLORES: [  ] X [  ]</div>
+                    <div class="divisor-dashed" style="margin-top: 25px;"></div>
+                    <div class="espaco-assinatura text-bold">ASSINATURA DOS ATLETAS</div>
+                </div>
+            `;
+        }
+
+        function imprimirSumulaIndividual(mesa, atleta1, atleta2) {
+            const secao = document.getElementById('secao-impressao-sumula');
+            secao.innerHTML = gerarHtmlCupom(mesa, atleta1, atleta2);
+            window.print();
+        }
+
+        function imprimirTodasSumulas() {
+            if (!dadosConfrontosParaImpressao || dadosConfrontosParaImpressao.length === 0) {
+                alert("Nenhum confronto disponível para impressão nesta rodada.");
+                return;
+            }
+            const secao = document.getElementById('secao-impressao-sumula');
+            let htmlFinal = "";
+            dadosConfrontosParaImpressao.forEach(jogo => {
+                if (jogo.atleta2_id !== null && jogo.atleta2.trim() !== "") {
+                    htmlFinal += gerarHtmlCupom(jogo.mesa, jogo.atleta1, jogo.atleta2);
+                }
+            });
+            if(htmlFinal === "") { alert("Nada a imprimir nesta rodada."); return; }
+            secao.innerHTML = htmlFinal;
+            window.print();
+        }
+
+        function abrirFichaPlacar(confId, id1, nome1, id2, nome2) {
+            document.getElementById('m_conf_id').value = confId;
+            realId1 = id1; realId2 = id2;
+            
+            document.getElementById('btn_atleta1').innerText = nome1.split(' ')[0];
+            document.getElementById('btn_atleta2').innerText = nome2.split(' ')[0];
+            document.getElementById('lbl_t1').innerText = "Tentos " + nome1.split(' ')[0] + ":";
+            document.getElementById('lbl_t2').innerText = "Tentos " + nome2.split(' ')[0] + ":";
+            
+            document.getElementById('m_vencedor_id').value = "";
+            document.getElementById('m_tipo_placar').value = "";
+            document.getElementById('inp_t1').value = "0"; document.getElementById('inp_t1').disabled = false;
+            document.getElementById('inp_t2').value = "0"; document.getElementById('inp_t2').disabled = false;
+            selecionadoIdx = null;
+            
+            document.querySelectorAll('.btn-select').forEach(b => b.classList.remove('active'));
+            document.getElementById('modalPlacar').style.display = 'flex';
+        }
+
+        function selecionarVencedor(idx) {
+            selecionadoIdx = idx;
+            document.getElementById('m_vencedor_id').value = (idx === 1) ? realId1 : realId2;
+            document.getElementById('btn_atleta1').classList.toggle('active', idx === 1);
+            document.getElementById('btn_atleta2').classList.toggle('active', idx === 2);
+            
+            // Força a revalidação imediata do formato se já tiver sido clicado antes
+            if(document.getElementById('m_tipo_placar').value) {
+                selecionarFormato(document.getElementById('m_tipo_placar').value);
+            }
+        }
+
+        function selecionarFormato(fmt) {
+            let t1 = document.getElementById('inp_t1');
+            let t2 = document.getElementById('inp_t2');
+
+            if (!selecionadoIdx) {
+                alert("Por favor, selecione primeiro quem ganhou a partida!");
+                document.getElementById('m_tipo_placar').value = "";
+                document.getElementById('btn_format20').classList.remove('active');
+                document.getElementById('btn_format21').classList.remove('active');
+                return;
+            }
+
+            document.getElementById('m_tipo_placar').value = fmt;
+            document.getElementById('btn_format20').classList.toggle('active', fmt === '2x0');
+            document.getElementById('btn_format21').classList.toggle('active', fmt === '2x1');
+
+            if(fmt === '2x0') {
+                if(selecionadoIdx === 1) {
+                    t1.value = "72"; t1.disabled = true;
+                    t2.disabled = false;
+                } else {
+                    t2.value = "72"; t2.disabled = true;
+                    t1.disabled = false;
+                }
+            } else if(fmt === '2x1') {
+                t1.disabled = false;
+                t2.disabled = false;
+                if(t1.value === "72" || t1.value === "2") t1.value = "0";
+                if(t2.value === "72" || t2.value === "2") t2.value = "0";
+            }
+        }
+
+        function validarEnvio() {
+            let v_id = document.getElementById('m_vencedor_id').value;
+            let fmt = document.getElementById('m_tipo_placar').value;
+            let t1 = parseInt(document.getElementById('inp_t1').value) || 0;
+            let t2 = parseInt(document.getElementById('inp_t2').value) || 0;
+
+            if(!v_id) { alert("Selecione o vencedor!"); return false; }
+            if(!fmt) { alert("Selecione o formato (2x0 ou 2x1)!"); return false; }
+
+            // Proteção idêntica às restrições do main.py
+            if (fmt === '2x1') {
+                if (selecionadoIdx === 1 && t1 <= t2) {
+                    alert("No formato 2x1, os tentos do Vencedor (Atleta 1) precisam ser maiores que os do perdedor!");
+                    return false;
+                }
+                if (selecionadoIdx === 2 && t2 <= t1) {
+                    alert("No formato 2x1, os tentos do Vencedor (Atleta 2) precisam ser maiores que os do perdedor!");
+                    return false;
+                }
+            }
+
+            // Habilita antes do submit para garantir que o POST capture os dados de campos desabilitados
+            document.getElementById('inp_t1').disabled = false;
+            document.getElementById('inp_t2').disabled = false;
+            return true;
+        }
+    </script>
+</body>
+</html>

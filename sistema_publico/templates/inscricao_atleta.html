@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Inscrição - Torneio de Truco{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6 col-12">
+        
+        <div class="mb-4">
+            <h1 class="text-gold h2 mb-1">Torneio de Truco Cego</h1>
+            <p class="text-light opacity-75">Faça sua inscrição online e garanta sua vaga na mesa!</p>
+        </div>
+
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('sucesso') === 'true') {
+                document.write(`
+                    <div class="alert alert-success border-0 text-white mb-4 text-center" style="background-color: #1b4d3e;" role="alert">
+                        🎉 <strong>Inscrição Enviada com Sucesso!</strong><br>Aguarde a validação no painel do diretor.
+                    </div>
+                `);
+            }
+        </script>
+
+        <div class="card card-premium p-4">
+            <div class="mb-4 border-bottom border-secondary pb-3">
+                <span class="text-light opacity-50 d-block small mb-1" style="letter-spacing: 0.5px;">TAXA DE USO DA ETAPA</span>
+                <h3 class="text-white fw-bold mb-2">R$ {{ config_taxa if ',' in config_taxa or '.' in config_taxa else config_taxa + '.00' }}</h3>
+                <div class="p-2 rounded bg-dark border border-secondary mt-2 d-flex justify-content-between align-items-center">
+                    <p class="small text-warning mb-0">Chave PIX: <strong id="pixChave">seu-pix-aqui@email.com</strong></p>
+                    <button type="button" class="btn btn-sm btn-outline-warning py-0" onclick="copiarPix()">Copiar</button>
+                </div>
+                <small id="pixFeedback" class="text-success d-block mt-1" style="display: none !important;">✓ Chave copiada!</small>
+            </div>
+
+            <form action="/inscrever" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label text-light small fw-semibold">Nome Completo</label>
+                    <input type="text" name="nome" class="form-control" placeholder="Ex: João Silva" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-light small fw-semibold">Entidade / CTG</label>
+                    <input type="text" name="entidade" list="lista-entidades" class="form-control" placeholder="Ex: CTG SENTINELA" required>
+                    <datalist id="lista-entidades">
+                        {% for ent in entidades %}<option value="{{ ent }}">{% endfor %}
+                    </datalist>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-light small fw-semibold">WhatsApp</label>
+                    <input type="text" name="whatsapp" class="form-control" placeholder="Ex: 54999998888" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-light small fw-semibold">Comprovante de Pagamento (Pix)</label>
+                    <input type="file" name="comprovante" class="form-control" accept="image/*,application/pdf" required>
+                    <div class="form-text text-white-50 small">Envie um print ou PDF do comprovante.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-gold w-100">Confirmar Inscrição</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function copiarPix() {
+    var chave = document.getElementById("pixChave").innerText;
+    navigator.clipboard.writeText(chave);
+    var feedback = document.getElementById("pixFeedback");
+    feedback.style.setProperty("display", "block", "important");
+    setTimeout(function() { feedback.style.setProperty("display", "none", "important"); }, 3000);
+}
+</script>
+{% endblock %}
