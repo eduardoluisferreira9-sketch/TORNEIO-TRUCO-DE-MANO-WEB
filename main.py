@@ -969,7 +969,9 @@ def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), enti
     entidade_limpa = ent_nome.strip().upper() if ent_nome else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entity if 'entity' in locals() else entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", (cfg["id"], nome.strip().upper(), entidade_limpa))
+    # CORRIGIDO: Agora a coluna do banco de dados se chama estritamente 'entidade'
+    cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", 
+                   (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
     return RedirectResponse(url="/admin/inscricoes", status_code=303)
 
