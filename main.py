@@ -8,9 +8,12 @@ from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-# --- CONFIGURAÇÃO DE SEGURANÇA E AMBIENTE ---
+# --- CONFIGURAÇÃO DE SEGURANÇA, AMBIENTE E CRÉDITOS ---
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "truco123")
 DATABASE_URL = os.environ.get("DATABASE_URL")  # String de conexão do Postgres (Neon/Supabase)
+
+DEV_NOME = "Eduardo Luis Ferreira"
+DEV_WHATSAPP = "5554991444733"  # Insira o número do WhatsApp aqui se desejar, ex: "5554999999999"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -214,12 +217,11 @@ except Exception as e:
 def verificar_admin(request: Request):
     token = request.cookies.get("admin_token")
     if token != ADMIN_PASSWORD:
-        raise HTTPException(status_code=303, headers={"Location": "/admin-painel/login"})
+        raise HTTPException(status_code=303, headers={"Location": "/login"})
     return True
 
 def obter_torneio_ativo(cursor):
-    p = "%s" if DATABASE_URL else "?"
-    cursor.execute(f"SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
+    cursor.execute("SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
     torneio = cursor.fetchone()
     if not torneio:
         cursor.execute("SELECT * FROM torneios ORDER BY id DESC LIMIT 1")
@@ -287,7 +289,6 @@ def obter_ranking_fase_classificatoria(cursor, torneio_id: int):
 
 # --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
-@app.get("/admin-painel/inscrever", response_class=HTMLResponse)
 def tela_inscricao_atleta(request: Request, db=Depends(get_db)):
     cursor = db.cursor()
     cfg_db = obter_torneio_ativo(cursor)
@@ -301,11 +302,10 @@ def tela_inscricao_atleta(request: Request, db=Depends(get_db)):
 
     return templates.TemplateResponse(
         request=request, name="inscricao_atleta.html", 
-        context={"config_taxa": taxa_formatada, "entidades": entidades}
+        context={"config_taxa": taxa_formatada, "entidades": entidades, "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
     )
 
 @app.post("/inscrever")
-@app.post("/admin-painel/inscrever")
 async def processar_inscricao_atleta(
     nome: str = Form(...), entidade: str = Form(...), whatsapp: str = Form(...),
     comprovante: UploadFile = File(...), db=Depends(get_db)
@@ -330,10 +330,9 @@ async def processar_inscricao_atleta(
         INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) VALUES ({p}, {p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
     db.commit()
-    return RedirectResponse(url="/admin-painel/inscrever?sucesso=true", status_code=303)
+    return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
 
 @app.get("/login", response_class=HTMLResponse)
-@app.get("/admin-painel/login", response_class=HTMLResponse)
 def tela_login(request: Request, erro: str = None):
     html_content = f"""
     <!DOCTYPE html>
@@ -351,7 +350,7 @@ def tela_login(request: Request, erro: str = None):
         <div class="box">
             <h2>🔑 Área do Administrador</h2>
             {"<p style='color:red;'>Chave incorreta!</p>" if erro else ""}
-            <form action="/admin-painel/login" method="POST">
+            <form action="/login" method="POST">
                 <input type="password" name="chave" placeholder="Digite a chave de acesso" required autofocus>
                 <button type="submit">Entrar no Sistema</button>
             </form>
@@ -362,36 +361,32 @@ def tela_login(request: Request, erro: str = None):
     return HTMLResponse(content=html_content)
 
 @app.post("/login")
-@app.post("/admin-painel/login")
 def processar_login(chave: str = Form(...)):
     if chave == ADMIN_PASSWORD:
-        response = RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
+        response = RedirectResponse(url="/admin/inscricoes", status_code=303)
         response.set_cookie(key="admin_token", value=chave, httponly=True)
         return response
-    return RedirectResponse(url="/admin-painel/login?erro=1", status_code=303)
+    return RedirectResponse(url="/login?erro=1", status_code=303)
 
 @app.get("/logout")
-@app.get("/admin-painel/logout")
 def processar_logout():
-    response = RedirectResponse(url="/admin-painel/login", status_code=303)
+    response = RedirectResponse(url="/login", status_code=303)
     response.delete_cookie("admin_token")
     return response
 
 @app.get("/api/cronometro")
-@app.get("/admin-painel/api/cronometro")
 def api_cronometro(db=Depends(get_db)):
     cfg = atualizar_e_obter_cronometro(db)
     return JSONResponse({"tempo_restante": cfg["crono_tempo_restante_seg"], "ativo": cfg["crono_ativo"]})
 
 @app.post("/admin/cronometro/controle")
-@app.post("/admin-painel/admin/cronometro/controle")
 def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_nao_iniciado", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=torneio_nao_iniciado", status_code=303)
 
     if acao == "iniciar" and cfg["crono_ativo"] == 0 and cfg["crono_tempo_restante_seg"] > 0:
         cursor.execute(f"UPDATE torneios SET crono_ativo = 1, crono_ultimo_clique = {p} WHERE id = {p}", (time.time(), cfg["id"]))
@@ -403,10 +398,9 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
     elif acao == "reiniciar":
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+    return RedirectResponse(url="/admin/jogos", status_code=303)
 
 @app.get("/admin/inscricoes")
-@app.get("/admin-painel/admin/inscricoes")
 def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     cursor = db.cursor()
@@ -420,48 +414,45 @@ def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(ve
     
     return templates.TemplateResponse(
         request=request, name="admin_inscricoes.html", 
-        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
+        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
     )
 
 @app.post("/admin/salvar-configuracoes")
-@app.post("/admin-painel/admin/salvar-configuracoes")
 def salvar_configuracoes(nome_torneio: str = Form(...), max_rodadas: int = Form(...), tempo_minutos: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     if cfg["fase_torneio"] != "INSCRICAO":
-         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_ja_iniciado", status_code=303)
+         return RedirectResponse(url="/admin/inscricoes?erro=torneio_ja_iniciado", status_code=303)
     total_seg = tempo_minutos * 60
     cursor.execute(f"UPDATE torneios SET nome_torneio = {p}, max_rodadas_classificatoria = {p}, crono_tempo_restante_seg = {p} WHERE id = {p}", 
                    (nome_torneio.strip(), max_rodadas, total_seg, cfg["id"]))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
+    return RedirectResponse(url="/admin/inscricoes", status_code=303)
 
 @app.post("/admin/iniciar-torneio")
-@app.post("/admin-painel/admin/iniciar-torneio")
 def iniciar_torneio_e_gerar_r1(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     if cfg["fase_torneio"] != "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+        return RedirectResponse(url="/admin/jogos", status_code=303)
         
     cursor.execute(f"SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
     if cursor.fetchone()[0] < 2:
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
 
     cursor.execute(f"UPDATE torneios SET fase_torneio = 'CLASSIFICATORIA' WHERE id = {p}", (cfg["id"],))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+    return RedirectResponse(url="/admin/jogos", status_code=303)
 
 @app.get("/admin/jogos")
-@app.get("/admin-painel/admin/jogos")
 def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor = db.cursor()
     cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
@@ -480,17 +471,16 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
 
     return templates.TemplateResponse(
         request=request, name="admin_jogos.html", 
-        context={"config": cfg, "rodada": rodada_atual, "confrontos": confrontos, "rodada_concluida": rodada_concluida, "tempo_formatado": tempo_formatado, "aba_ativa": "jogos"}
+        context={"config": cfg, "rodada": rodada_atual, "confrontos": confrontos, "rodada_concluida": rodada_concluida, "tempo_formatado": tempo_formatado, "aba_ativa": "jogos", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
     )
 
 @app.post("/admin/gerar-rodada")
-@app.post("/admin-painel/admin/gerar-rodada")
 def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
     rodada_atual = cursor.fetchone()[0]
@@ -499,15 +489,15 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
     if rodada_atual > 0:
         cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
         if cursor.fetchone()[0] > 0:
-            return RedirectResponse(url="/admin-painel/admin/jogos?erro=jogos_pendentes", status_code=303)
+            return RedirectResponse(url="/admin/jogos?erro=jogos_pendentes", status_code=303)
 
     if proxima_rodada > cfg["max_rodadas_classificatoria"]:
-        return RedirectResponse(url="/admin-painel/admin/classificacao?aviso=fim_da_classificatoria", status_code=303)
+        return RedirectResponse(url="/admin/classificacao?aviso=fim_da_classificatoria", status_code=303)
         
     cursor.execute(f"SELECT id, nome, entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
     atletas_lista = [dict(row) for row in cursor.fetchall()]
     if len(atletas_lista) < 2:
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
         
     cursor.execute(f"SELECT atleta1_id, atleta2_id FROM confrontos WHERE atleta2_id IS NOT NULL AND rodada > 0 AND torneio_id = {p}", (cfg["id"],))
     historico = {tuple(sorted((r["atleta1_id"], r["atleta2_id"]))) for r in cursor.fetchall()}
@@ -573,10 +563,9 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                            
     cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+    return RedirectResponse(url="/admin/jogos", status_code=303)
 
 @app.post("/admin/disparar-matamata")
-@app.post("/admin-painel/admin/disparar-matamata")
 def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
@@ -586,11 +575,11 @@ def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = D
     if r_atual > 0:
         cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (r_atual, cfg["id"]))
         if cursor.fetchone()[0] > 0:
-            return RedirectResponse(url="/admin-painel/admin/classificacao?erro=conclua_rodada_atual", status_code=303)
+            return RedirectResponse(url="/admin/classificacao?erro=conclua_rodada_atual", status_code=303)
 
     ranking = obter_ranking_fase_classificatoria(cursor, cfg["id"])
     if len(ranking) < corte:
-        return RedirectResponse(url="/admin-painel/admin/classificacao?erro=atletas_insuficientes_para_corte", status_code=303)
+        return RedirectResponse(url="/admin/classificacao?erro=atletas_insuficientes_para_corte", status_code=303)
 
     classificados = ranking[:corte]
     cursor.execute(f"UPDATE torneios SET fase_torneio = 'MATA_MATA' WHERE id = {p}", (cfg["id"],))
@@ -625,10 +614,9 @@ def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = D
         
     cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+    return RedirectResponse(url="/admin/jogos", status_code=303)
 
 @app.post("/admin/avancar-matamata")
-@app.post("/admin-painel/admin/avancar-matamata")
 def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
@@ -636,19 +624,19 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_f = cursor.fetchone()
     if not row_f:
-        return RedirectResponse(url="/admin-painel/admin/jogos?erro=nenhum_jogo", status_code=303)
+        return RedirectResponse(url="/admin/jogos?erro=nenhum_jogo", status_code=303)
         
     fase_atual = row_f["rodada"]
     
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (fase_atual, cfg["id"]))
     if cursor.fetchone()[0] > 0:
-        return RedirectResponse(url="/admin-painel/admin/jogos?erro=jogos_eliminatorios_pendentes", status_code=303)
+        return RedirectResponse(url="/admin/jogos?erro=jogos_eliminatorios_pendentes", status_code=303)
         
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (fase_atual, cfg["id"]))
     jogos_concluidos = cursor.fetchall()
     
     if fase_atual == -4:
-        return RedirectResponse(url="/admin-painel/admin/podio", status_code=303)
+        return RedirectResponse(url="/admin/podio", status_code=303)
 
     cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000 WHERE id = {p}", (cfg["id"],))
     proxima_fase = fase_atual - 1
@@ -670,7 +658,7 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
             
     elif fase_atual == -3:
         if len(jogos_concluidos) < 2:
-            return RedirectResponse(url="/admin-painel/admin/jogos?erro=semifinais_insuficientes", status_code=303)
+            return RedirectResponse(url="/admin/jogos?erro=semifinais_insuficientes", status_code=303)
             
         j1 = jogos_concluidos[0]
         j2 = jogos_concluidos[1]
@@ -689,7 +677,7 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
         cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, -4, 2, {p}, {p}, {p}, {p})', (cfg["id"], p1_id, p2_id, p1_nome, p2_nome))
         
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+    return RedirectResponse(url="/admin/jogos", status_code=303)
 
 def aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, tentos1, tentos2, flores1, flores2):
     p = "%s" if DATABASE_URL else "?"
@@ -721,7 +709,6 @@ def aplicar_salvamento_placar(cursor, confronto_id, vencedor_id, tipo_placar, te
                    (tipo_placar, vencedor_id, s1, s2, t1, t2, flores1, flores2, confronto_id))
 
 @app.post("/admin/salvar-placar")
-@app.post("/admin-painel/admin/salvar-placar")
 def salvar_placar(confronto_id: int = Form(...), vencedor_id: int = Form(...), tipo_placar: str = Form(...), tentos1: int = Form(...), tentos2: int = Form(...), flores1: int = Form(0), flores2: int = Form(0), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     try:
@@ -729,16 +716,15 @@ def salvar_placar(confronto_id: int = Form(...), vencedor_id: int = Form(...), t
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"erro": e.detail})
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+    return RedirectResponse(url="/admin/jogos", status_code=303)
 
 @app.get("/admin/classificacao")
-@app.get("/admin-painel/admin/classificacao")
 def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor = db.cursor()
     lista_classificacao = obter_ranking_fase_classificatoria(cursor, cfg["id"])
@@ -752,11 +738,10 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
+        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
     )
 
 @app.post("/admin/auditoria/corrigir")
-@app.post("/admin-painel/admin/auditoria/corrigir")
 def corrigir_placar_auditoria(confronto_id: int = Form(...), vencedor_id: int = Form(...), tipo_placar: str = Form(...), tentos1: int = Form(...), tentos2: int = Form(...), flores1: int = Form(0), flores2: int = Form(0), rodada_retorno: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     try:
@@ -764,29 +749,28 @@ def corrigir_placar_auditoria(confronto_id: int = Form(...), vencedor_id: int = 
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"erro": e.detail})
     db.commit()
-    return RedirectResponse(url=f"/admin-painel/admin/classificacao?rodada_filtro={rodada_retorno}", status_code=303)
+    return RedirectResponse(url=f"/admin/classificacao?rodada_filtro={rodada_retorno}", status_code=303)
 
 @app.get("/admin/podio")
-@app.get("/admin-painel/admin/podio")
 def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     p = "%s" if DATABASE_URL else "?"
     
     if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
+        return RedirectResponse(url="/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor = db.cursor()
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = -4 AND torneio_id = {p} AND vencedor_id IS NULL", (cfg["id"],))
     if cursor.fetchone()[0] > 0:
-        return RedirectResponse(url="/admin-painel/admin/jogos?erro=finais_nao_concluidas", status_code=303)
+        return RedirectResponse(url="/admin/jogos?erro=finais_nao_concluidas", status_code=303)
         
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 1 AND torneio_id = {p}", (cfg["id"],))
     jogo_final = cursor.fetchone()
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 2 AND torneio_id = {p}", (cfg["id"],))
     jogo_terceiro = cursor.fetchone()
 
-    if not jogo_final or not jogo_terceiro:
-        return RedirectResponse(url="/admin-painel/admin/jogos?erro=finais_nao_geradas", status_code=303)
+    if not juego_final if 'juego_final' in locals() else not jogo_final or not jogo_terceiro:
+        return RedirectResponse(url="/admin/jogos?erro=finais_nao_geradas", status_code=303)
 
     campeao = jogo_final["atleta1_nome"] if jogo_final["vencedor_id"] == jogo_final["atleta1_id"] else jogo_final["atleta2_nome"]
     vice = jogo_final["atleta2_nome"] if jogo_final["vencedor_id"] == jogo_final["atleta1_id"] else jogo_final["atleta1_nome"]
@@ -813,11 +797,10 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
 
     return templates.TemplateResponse(
         request=request, name="admin_podio.html",
-        context={"config": cfg, "campeao": campeao, "vice": vice, "terceiro": third_place, "quarto": fourth_place, "rei_nome": rei_nome, "max_flores": max_flores, "aba_ativa": "podio"}
+        context={"config": cfg, "campeao": campeao, "vice": vice, "terceiro": third_place, "quarto": fourth_place, "rei_nome": rei_nome, "max_flores": max_flores, "aba_ativa": "podio", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP}
     )
 
 @app.post("/admin/encerrar-e-salvar")
-@app.post("/admin-painel/admin/encerrar-e-salvar")
 def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro: str = Form(...), quarto: str = Form(...), rei: str = Form(...), flores: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
@@ -835,19 +818,17 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     ''', (novo_nome_sugerido, cfg["taxa_inscricao"], cfg["max_rodadas_classificatoria"]))
     
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/historico?sucesso=torneio_imortalizado", status_code=303)
+    return RedirectResponse(url="/admin/historico?sucesso=torneio_imortalizado", status_code=303)
 
 @app.get("/admin/historico")
-@app.get("/admin-painel/admin/historico")
 def exibir_historico(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM historico_campeoes ORDER BY id DESC")
     galeria = cursor.fetchall()
-    return templates.TemplateResponse(request=request, name="admin_historico.html", context={"config": cfg, "galeria": galeria, "aba_ativa": "historico"})
+    return templates.TemplateResponse(request=request, name="admin_historico.html", context={"config": cfg, "galeria": galeria, "aba_ativa": "historico", "dev_nome": DEV_NOME, "dev_whatsapp": DEV_WHATSAPP})
 
 @app.post("/admin/reset-total-testes")
-@app.post("/admin-painel/admin/reset-total-testes")
 def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     
@@ -978,10 +959,9 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
         ''')
     
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/inscricoes?sucesso=banco_zerado", status_code=303)
+    return RedirectResponse(url="/admin/inscricoes?sucesso=banco_zerado", status_code=303)
 
 @app.post("/admin/cadastrar-direto")
-@app.post("/admin-painel/admin/cadastrar-direto")
 def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), entidade: str = Form("INDIVIDUAL"), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     ent_nome = entity if entity else entidade
     cursor = db.cursor()
@@ -989,12 +969,11 @@ def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), enti
     entidade_limpa = ent_nome.strip().upper() if ent_nome else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", (cfg["id"], nome.strip().upper(), entidade_limpa))
+    cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entity if 'entity' in locals() else entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
+    return RedirectResponse(url="/admin/inscricoes", status_code=303)
 
 @app.post("/admin/acao-atleta")
-@app.post("/admin-painel/admin/acao-atleta")
 def acao_atleta_admin(id_atleta: int = Form(...), acao: str = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     p = "%s" if DATABASE_URL else "?"
@@ -1003,7 +982,7 @@ def acao_atleta_admin(id_atleta: int = Form(...), acao: str = Form(...), db=Depe
     elif acao in ["recusar", "excluir"]:
         cursor.execute(f"DELETE FROM atletas WHERE id = {p}", (id_atleta,))
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
+    return RedirectResponse(url="/admin/inscricoes", status_code=303)
 
 @app.get("/telao", response_class=HTMLResponse)
 def pagina_telao_publico(request: Request, db=Depends(get_db)):
@@ -1016,7 +995,6 @@ def pagina_telao_publico(request: Request, db=Depends(get_db)):
     return templates.TemplateResponse(request=request, name="telao.html", context={"config": cfg, "rodada": rodada_atual})
 
 @app.get("/api/publico/dados")
-@app.get("/admin-painel/api/publico/dados")
 def api_dados_publicos_telao(db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
@@ -1097,13 +1075,16 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         "rodada": rodada_atual,
         "confrontos": confrontos,
         "ranking": ranking,
-        "podio": podio_dados
+        "podio": podio_dados,
+        "desenvolvedor": {
+            "nome": DEV_NOME,
+            "whatsapp": DEV_WHATSAPP
+        }
     }
 
     return JSONResponse(content=dados_retorno)
 
 @app.get("/inscricao", response_class=HTMLResponse)
-@app.get("/admin-painel/inscricao", response_class=HTMLResponse)
 def pagina_inscricao_externa(request: Request, db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obter_torneio_ativo(cursor)
@@ -1116,14 +1097,13 @@ def pagina_inscricao_externa(request: Request, db=Depends(get_db)):
         name="inscricao_atleta.html", 
         context={
             "config": cfg, 
-            "config_taxa": taxa_formatada
+            "config_taxa": taxa_formatada,
+            "dev_nome": DEV_NOME,
+            "dev_whatsapp": DEV_WHATSAPP
         }
     )
 
-@app.post("/inscrever")
 @app.post("/inscricao/salvar")
-@app.post("/admin-painel/inscrever")
-@app.post("/admin-painel/inscricao/salvar")
 async def salvar_inscricao_externa(
     nome: str = Form(...), 
     ctg: str = Form(None), 
@@ -1136,7 +1116,6 @@ async def salvar_inscricao_externa(
     cfg = obter_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     
-    ent_final = Black if entidade else ctg if 'ctg' in locals() else entidade
     ent_final = entidade if entidade else ctg
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
@@ -1146,11 +1125,14 @@ async def salvar_inscricao_externa(
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
     
-    return RedirectResponse(url="/admin-painel/inscricao?sucesso=true", status_code=303)
+    return RedirectResponse(url="/inscricao?sucesso=true", status_code=303)
 
 @app.exception_handler(404)
 async def redirecionar_links_antigos(request: Request, exc: Exception):
     url_path = request.url.path
-    if url_path.startswith("/admin") or url_path == "/login" or url_path == "/logout":
-        return RedirectResponse(url=f"/admin-painel{url_path}", status_code=303)
+    if "/admin-painel" in url_path:
+        rota_limpa = url_path.replace("/admin-painel", "")
+        if not rota_limpa:
+            rota_limpa = "/"
+        return RedirectResponse(url=rota_limpa, status_code=303)
     return HTMLResponse(content="Página não encontrada no Painel", status_code=404)
