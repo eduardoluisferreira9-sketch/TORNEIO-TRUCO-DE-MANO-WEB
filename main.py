@@ -238,21 +238,29 @@ def atualizar_e_obter_cronometro(db):
         except (TypeError, ValueError):
             ultimo_clique = agora
 
+        # Se o ultimo_clique for 0 ou inválido, força ser o momento atual para não quebrar o cálculo
+        if ultimo_clique <= 0:
+            ultimo_clique = agora
+
         decorrido = agora - ultimo_clique
         
         if decorrido < 0: 
             decorrido = 0
             
-        if decorrido > 0:
-            novo_tempo = max(0, int(config["crono_tempo_restante_seg"]) - decorrido)
-            ativo = 1 if novo_tempo > 0 else 0
-            
-            cursor.execute(f'UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p}, crono_ativo = {p} WHERE id = {p}', 
-                           (novo_tempo, agora, ativo, config["id"]))
-            db.commit()
-            
-            config["crono_tempo_restante_seg"] = novo_tempo
-            config["crono_ativo"] = ativo
+        # CORREÇÃO: Sempre atualizamos o banco se o tempo estiver ativo, 
+        # para garantir que o 'crono_ultimo_clique' acompanhe o 'agora' passo a passo
+        tempo_restante_atual = int(config.get("crono_tempo_restante_seg", 0))
+        novo_tempo = max(0, tempo_restante_atual - decorrido)
+        ativo = 1 if novo_tempo > 0 else 0
+        
+        cursor.execute(
+            f'UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p}, crono_ativo = {p} WHERE id = {p}', 
+            (novo_tempo, agora, ativo, config["id"])
+        )
+        db.commit()
+        
+        config["crono_tempo_restante_seg"] = novo_tempo
+        config["crono_ativo"] = ativo
             
     return config
 
