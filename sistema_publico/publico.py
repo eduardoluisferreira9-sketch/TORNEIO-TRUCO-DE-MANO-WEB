@@ -217,5 +217,7 @@ def api_dados_publicos(db=Depends(get_db)):
         "tempo": tempo_formatado,
         "crono_ativo": cfg.get("crono_ativo", 0), 
         "confrontos": confrontos, 
-        "ranking": ranking
+        "ranking": ranking,
+        # ADICIONE A LINHA ABAIXO para enviar o tempo configurado pelo Admin:
+        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo", 30)
     })
