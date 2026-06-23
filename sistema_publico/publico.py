@@ -170,11 +170,19 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
     if rodada_atual != 0:
         cursor.execute("SELECT * FROM confrontos WHERE rodada = ? ORDER BY mesa ASC", (rodada_atual,))
         confrontos = [dict(row) for row in cursor.fetchall()]
-        if rodada_atual > 0: nome_fase = f"Fase de Grupos - {rodada_atual}ª Rodada"
-        elif rodada_atual == -1: nome_fase = "Oitavas de Final"
-        elif rodada_atual == -2: nome_fase = "Quartas de Final"
-        elif rodada_atual == -3: nome_fase = "Semifinal"
-        elif rodada_atual == -4: nome_fase = "Grande Final"
+        
+        # Define o nome da fase baseando-se estritamente no status oficial do torneio
+        fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA")
+        if fase_status == "CLASSIFICATORIA" and rodada_atual > 0:
+            nome_fase = f"Fase de Grupos - {rodada_atual}ª Rodada"
+        elif fase_status == "OITAVAS":
+            nome_fase = "Oitavas de Final"
+        elif fase_status == "QUARTAS":
+            nome_fase = "Quartas de Final"
+        elif fase_status == "SEMIFINAL":
+            nome_fase = "Semifinal"
+        elif fase_status == "FINAL":
+            nome_fase = "Grande Final"
 
     ranking = []
     if cfg["fase_torneio"] != "INSCRICAO":
