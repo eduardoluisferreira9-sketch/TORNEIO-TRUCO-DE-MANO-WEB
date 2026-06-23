@@ -196,7 +196,7 @@
         <div class="content">
             <h1 style="margin-top: 0; font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; border-bottom: 2px solid var(--ouro); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
                 Admissão de Gaudérios
-                <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio }}</span>
+                <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio.replace('INSCRICAO', 'INSCRIÇÃO') }}</span>
             </h1>
             
             <div class="card">
