@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
-# 📁 NOVOS CAMINHOS AJUSTADOS: Aponta para a pasta templates DENTRO de sistema_publico
+# 📁 CAMINHOS AJUSTADOS: Aponta para a pasta templates DENTRO de sistema_publico
 CORRENTE_DIR = os.path.dirname(os.path.abspath(__file__)) # Pasta 'sistema_publico'
 BASE_DIR = os.path.dirname(CORRENTE_DIR)                  # Raiz do projeto (onde está o .db)
 
@@ -150,16 +150,19 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
             )
             db.commit()
             
-    # 2. Formata o tempo para "MM:SS"
-    mins = cfg["crono_tempo_restante_seg"] // 60
-    segs = cfg["crono_tempo_restante_seg"] % 60
-    tempo_formatado = f"{mins:02d}:{segs:02d}"
-
-    # 3. Se o tempo zerou e o cronômetro ainda está ativo, muda o texto para o telão disparar o alerta
+    # 2. Formata o tempo para "MM:SS" ou detecta "Sem Tempo" / "Falta"
+    tempo_rodada_atual = cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 0
+    
     if cfg["crono_tempo_restante_seg"] <= 0 and cfg["crono_ativo"] == 1:
         tempo_formatado = "AGORA TUDO É FALTA!"
+    elif tempo_rodada_atual == 0:
+        tempo_formatado = "Sem Tempo"
+    else:
+        mins = cfg["crono_tempo_restante_seg"] // 60
+        segs = cfg["crono_tempo_restante_seg"] % 60
+        tempo_formatado = f"{mins:02d}:{segs:02d}"
 
-    # 🌟 CORREÇÃO CIRÚRGICA: Mapeia e descobre a rodada certa baseada na fase do admin
+    # 3. Mapeamento e Identificação Precisa da Fase Atual
     fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA")
     
     mapeamento_rodadas = {
@@ -174,35 +177,62 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         cursor.execute("SELECT rodada FROM confrontos WHERE rodada > 0 ORDER BY id DESC LIMIT 1")
         row_r = cursor.fetchone()
         rodada_atual = row_r["rodada"] if row_r else 1
-        nome_fase = f"Fase de Grupos - {rodada_atual}ª Rodada"
+        nome_fase = "Grande Final" if fase_status == "FINAL" else "Fase Classificatória"
+        detalhe_fase = f"{rodada_atual}ª Rodada"
     else:
         # No mata-mata, o número da rodada é definido pela fase oficial do admin
         rodada_atual = mapeamento_rodadas.get(fase_status, 0)
+        detalhe_fase = "Mata-Mata"
         if fase_status == "OITAVAS": nome_fase = "Oitavas de Final"
         elif fase_status == "QUARTAS": nome_fase = "Quartas de Final"
         elif fase_status == "SEMIFINAL": nome_fase = "Semifinal"
-        elif fase_status == "FINAL": nome_fase = "Grande Final"
-        else: nome_fase = "Inscrições Abertas"
+        elif fase_status == "FINAL": 
+            nome_fase = "Grande Final"
+            detalhe_fase = "Finais"
+        else: 
+            nome_fase = "Inscrições Abertas"
+            detalhe_fase = "--"
 
+    # 4. Busca os Confrontos e injeta o nome individual de cada mesa dinamicamente
     confrontos = []
     if rodada_atual != 0:
-        # Agora o SELECT buscará exatamente a rodada certa (ex: -3 na Semifinal)
         cursor.execute("SELECT * FROM confrontos WHERE rodada = ? ORDER BY mesa ASC", (rodada_atual,))
-        confrontos = [dict(row) for row in cursor.fetchall()]
+        linhas_confrontos = cursor.fetchall()
+        
+        for row in linhas_confrontos:
+            dados_jogo = dict(row)
+            # Regra cirúrgica para a rodada final (-4) separar os nomes das mesas em andamento
+            if rodada_atual == -4:
+                if dados_jogo["mesa"] == 1:
+                    dados_jogo["fase_mesa_nome"] = "Grande Final"
+                elif dados_jogo["mesa"] == 2:
+                    dados_jogo["fase_mesa_nome"] = "Disputa de 3º Lugar"
+                else:
+                    dados_jogo["fase_mesa_nome"] = "Final"
+            else:
+                dados_jogo["fase_mesa_nome"] = "Eliminatória" if rodada_atual < 0 else f"{rodada_atual}ª Rodada"
+                
+            confrontos.append(dados_jogo)
+
+    # 5. Busca Total de Atletas Aprovados (Corrige o "-- Atletas" na tela)
+    cursor.execute("SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO'")
+    total_atletas = cursor.fetchone()[0]
 
     ranking = []
-    if cfg["fase_torneio"] != "INSCRICAO":
+    if fase_status != "INSCRICAO":
         ranking = obter_ranking_publico(cursor)[:5]
 
     return JSONResponse({
-        "fase_torneio": cfg["fase_torneio"], 
+        "fase_torneio": fase_status, 
         "nome_fase": nome_fase, 
+        "detalhe_fase": detalhe_fase,
         "tempo": tempo_formatado,
         "crono_ativo": cfg["crono_ativo"], 
         "confrontos": confrontos, 
         "ranking": ranking,
+        "total_atletas": f"{total_atletas} Atletas",
         
-        # 🟢 Valores dinâmicos da tabela config repassados com segurança para o telão
-        "tempo_rodada": cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 50,
+        # Sincronização direta das configurações gravadas unificadas no DB
+        "tempo_rodada": tempo_rodada_atual,
         "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("max_rodadas") or 5
     })
