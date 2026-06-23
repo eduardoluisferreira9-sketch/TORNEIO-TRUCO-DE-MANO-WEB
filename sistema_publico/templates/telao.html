@@ -687,14 +687,19 @@
             let faseTexto = data.nome_fase || "Fase Inicial";
             let ehGrandeFinalFase = nomeFaseStr.includes("GRANDE FINAL") || nomeFaseStr.includes("FINAL DE TITULOS") || statusFase === "MATA_MATA";
 
+            // Captura os valores dinâmicos enviados pela API do publico.py
+            const tempoDefinido = `${data.tempo_rodada || '--'} min`;
+            const rodadasDefinitivas = `${data.max_rodadas || 5} Rodadas Max`;
+
             if (data.fase_torneio === "CLASSIFICATORIA") {
                 faseTexto = `💥 ${data.nome_fase || 'Classificatória'}`;
-                document.getElementById('info-max-rodadas').innerText = `${data.max_rodadas_classificatoria || 5} Rodadas Max`;
-                document.getElementById('info-tempo-rodada').innerText = "50 min";
+                document.getElementById('info-max-rodadas').innerText = rodadasDefinitivas;
+                document.getElementById('info-tempo-rodada').innerText = tempoDefinido;
             } else {
                 faseTexto = `🏆 ${data.nome_fase || 'Mata-Mata'}`;
+                // Mantém o tempo dinâmico do admin mesmo no Mata-Mata
+                document.getElementById('info-tempo-rodada').innerText = tempoDefinido;
                 document.getElementById('info-max-rodadas').innerText = "Eliminatória";
-                document.getElementById('info-tempo-rodada').innerText = "Sem Tempo";
             }
             document.getElementById('info-fase').innerText = faseTexto;
 
