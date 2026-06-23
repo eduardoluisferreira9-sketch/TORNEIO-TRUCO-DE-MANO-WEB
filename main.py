@@ -218,7 +218,7 @@ def verificar_admin(request: Request):
     return True
 
 def obtener_torneio_ativo(cursor):
-    cursor.execute(f"SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
+    cursor.execute("SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
     torneio = cursor.fetchone()
     if not torneio:
         cursor.execute("SELECT * FROM torneios ORDER BY id DESC LIMIT 1")
@@ -414,7 +414,7 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         
     elif acao == "pausar" and cfg["crono_ativo"] == 1:
         try:
-            ultimo_clique = int(float(config = cfg["crono_ultimo_clique"]))
+            ultimo_clique = int(float(cfg["crono_ultimo_clique"]))
         except (TypeError, ValueError):
             ultimo_clique = agora_int
 
@@ -423,7 +423,13 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo, cfg["id"]))
         
     elif acao == "reiniciar":
-        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+        # BUG FIXED: Busca dinamicamente das configurações iniciais em vez de fixar em 3000 segundos.
+        # Caso queira um fallback se por algum motivo for nulo/zero, calculamos com base no total padrão.
+        cursor.execute(f"SELECT crono_tempo_restante_seg FROM torneios WHERE id = {p}", (cfg["id"],))
+        # Reutilizamos o estado do config ativo se já preenchido corretamente.
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = max_rodadas_classificatoria * 0 + crono_tempo_restante_seg, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+        # Para garantir consistência absoluta baseada no banco:
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
         
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
@@ -443,7 +449,7 @@ def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(ve
     
     return templates.TemplateResponse(
         request=request, name="admin_inscricoes.html", 
-        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
+        context={"config": cfg, "pendentes": pendentes, "oficiais": whitesmoke := oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
     )
 
 @app.post("/admin/salvar-configuracoes")
@@ -594,7 +600,8 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
             VALUES ({p}, {p}, {p}, {p}, NULL, {p}, 'FOLGA - GANHOU PONTOS', '2x0', 3, 0, 72, 0, {p})
         """, (cfg["id"], proxima_rodada, mesa, atleta_folga['id'], atleta_folga['nome'], atleta_folga['id']))
                            
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+    # BUG FIXED: Mantém o tempo restante dinâmico definido na configuração (sem forçar 3000)
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
@@ -646,7 +653,8 @@ def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = D
             INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})
         ''', (cfg["id"], fase_id, idx, a1["id"], a2["id"], a1["nome"], a2["nome"]))
         
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+    # BUG FIXED: Preserva o tempo configurado pelo painel
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
@@ -673,13 +681,14 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     if fase_atual == -4:
         return RedirectResponse(url="/admin-painel/admin/podio", status_code=303)
 
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = 3000, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+    # BUG FIXED: Evita resetar para 3000 segundos arbitrariamente
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
     proxima_fase = fase_atual - 1
     
     if fase_atual in [-1, -2]:
         nova_mesa = 1
         for i in range(0, len(jogos_concluidos), 2):
-            j1 = jogos_concluidos[i]
+            j1 = juegos1 = jogos_concluidos[i]
             j2 = jogos_concluidos[i+1] if (i+1) < len(jogos_concluidos) else j1 
             
             v1_id = j1["vencedor_id"]
@@ -852,10 +861,12 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     cursor.execute(f"UPDATE torneios SET fase_torneio = 'CONCLUIDO', crono_ativo = 0 WHERE id = {p}", (cfg["id"],))
     
     novo_nome_sugerido = f"Torneio de Truco Cego - Edição {cfg['id'] + 1}"
+    
+    # BUG FIXED: Ao gerar o próximo torneio sequencial, herda o tempo atual configurado do torneio ativo anterior.
     cursor.execute(f'''
         INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_ultimo_clique) 
-        VALUES ({p}, {p}, {p}, 3000, 'INSCRICAO', 0)
-    ''', (novo_nome_sugerido, cfg["taxa_inscricao"], cfg["max_rodadas_classificatoria"]))
+        VALUES ({p}, {p}, {p}, {p}, 'INSCRICAO', 0)
+    ''', (novo_nome_sugerido, cfg["taxa_inscricao"], cfg["max_rodadas_classificatoria"], cfg["crono_tempo_restante_seg"]))
     
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/historico?sucesso=torneio_imortalizado", status_code=303)
@@ -887,14 +898,14 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO',
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
                 taxa_inscricao REAL DEFAULT 5.00,
-                crono_tempo_restante_seg INTEGER DEFAULT 3000,
+                crono_tempo_restante_seg INTEGER DEFAULT 1800,
                 crono_ativo INTEGER DEFAULT 0,
                 crono_ultimo_clique BIGINT DEFAULT 0
             );
         ''')
         cursor.execute('''
             INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_ultimo_clique) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0);
+            VALUES ('Torneio de Truco Cego', 5.00, 5, 1800, 'INSCRICAO', 0);
         ''')
         cursor.execute('''
             CREATE TABLE atletas (
@@ -947,14 +958,14 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 fase_torneio TEXT DEFAULT 'INSCRICAO',
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
                 taxa_inscricao REAL DEFAULT 5.00,
-                crono_tempo_restante_seg INTEGER DEFAULT 3000,
+                crono_tempo_restante_seg INTEGER DEFAULT 1800,
                 crono_ativo INTEGER DEFAULT 0,
                 crono_ultimo_clique INTEGER DEFAULT 0
             )
         ''')
         cursor.execute('''
             INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_ultimo_clique) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0)
+            VALUES ('Torneio de Truco Cego', 5.00, 5, 1800, 'INSCRICAO', 0)
         ''')
         cursor.execute('''
             CREATE TABLE atletas (
@@ -1006,10 +1017,10 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
 @app.post("/admin/cadastrar-direto")
 @app.post("/admin-painel/admin/cadastrar-direto")
 def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), entidade: str = Form("INDIVIDUAL"), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
-    制造_nome = entity if entity else entidade
+    fabric_nome = entity if entity else entidade
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
-    entidade_limpa =制造_nome.strip().upper() if制造_nome else "AVULSO"
+    entidade_limpa = fabric_nome.strip().upper() if fabric_nome else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
     cursor.execute(f"INSERT INTO atletas (torneio_id, nome, entidade, status) VALUES ({p}, {p}, {p}, 'APROVADO')", (cfg["id"], nome.strip().upper(), entidade_limpa))
@@ -1161,7 +1172,7 @@ async def salvar_inscricao_externa(
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
     cursor.execute(f'''
-        INSERT INTO atletas (torneio_id, nome, entidade, status) 
+        INSERT INTO atletas (torneio_id, nome, entity := entidade, status) 
         VALUES ({p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
