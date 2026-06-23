@@ -785,10 +785,14 @@
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const tipoConfrontoStr = jogo.tipo_confronto ? jogo.tipo_confronto.toUpperCase() : "";
 
-                            if (tipoConfrontoStr === "FINAL" || (ehGrandeFinalFase && Number(jogo.mesa) === 1)) {
+                            const faseStatusFirme = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
+
+                            if (tipoConfrontoStr === "FINAL" || (faseStatusFirme === "FINAL" && Number(jogo.mesa) === 1)) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (tipoConfrontoStr === "TERCEIRO" || tipoConfrontoStr === "3LUGAR" || tipoConfrontoStr === "BRONZE" || (ehGrandeFinalFase && Number(jogo.mesa) === 2)) {
+                            } else if (tipoConfrontoStr === "TERCEIRO" || tipoConfrontoStr === "3LUGAR" || tipoConfrontoStr === "BRONZE" || (faseStatusFirme === "FINAL" && Number(jogo.mesa) === 2)) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                            } else if (faseStatusFirme === "SEMIFINAL") {
+                                textoTagMesa = `Mesa ${jogo.mesa} — Semifinal`;
                             } else if (data.fase_torneio !== "CLASSIFICATORIA") {
                                 textoTagMesa = `Mesa ${jogo.mesa} — Eliminatória`;
                             }
