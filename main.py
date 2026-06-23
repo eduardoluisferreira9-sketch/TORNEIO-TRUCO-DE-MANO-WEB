@@ -77,6 +77,12 @@ def init_db():
                 fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO'
             );
         ''')
+        
+        # 💥 COLOQUE ESSAS LINHAS DE MIGRAÇÃO EXCLUSIVAS DO POSTGRES AQUI:
+        cursor.execute("ALTER TABLE torneios ADD COLUMN IF NOT EXISTS crono_ativo INTEGER DEFAULT 0;")
+        cursor.execute("ALTER TABLE torneios ADD COLUMN IF NOT EXISTS crono_fim_ms BIGINT DEFAULT 0;")
+        cursor.execute("ALTER TABLE torneios ADD COLUMN IF NOT EXISTS crono_tempo_restante_seg INTEGER DEFAULT 3000;")
+        
         cursor.execute("SELECT COUNT(*) FROM torneios;")
         if cursor.fetchone()[0] == 0:
             cursor.execute('''
@@ -204,7 +210,6 @@ def init_db():
         ''')
         conn.commit()
         conn.close()
-
 try:
     init_db()
 except Exception as e:
