@@ -2,296 +2,289 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel - Mesa de Jogos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Arbitragem - Torneio de Truco</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* PALETA TRADICIONAL - FELTRO MUSGO PROFUNDO */
-            --bg-principal: #0d2e1b;
-            --bg-cards: #092113;
             --ouro: #d4af37;
-            --ouro-brilhante: #f3e5ab;
-            --vermelho-pampa: #922b21; 
-            --verde-sucesso: #1e8449; 
-            --texto-claro: #ffffff; 
-            --texto-subtil: #bdc3c7; 
-            --texto-escuro: #111;
+            --texto-subtil: #888;
+            --verde-sucesso: #28a745;
+            --fundo: #121212;
+            --fundo-card: #1e1e1e;
+            --texto: #ffffff;
         }
 
-        body { 
-            background: var(--bg-principal); 
-            color: var(--texto-claro); 
-            font-family: 'Montserrat', sans-serif; 
-            margin: 0; 
-            padding: 0;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
-            background-size: 100% 4px;
+        body {
+            background-color: var(--fundo);
+            color: var(--texto);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* ESTRUTURA DO WRAPPER DE ACORDO COM A TELA DE INSCRIÇÕES */
-        .wrapper { display: grid; grid-template-columns: 340px 1fr; min-height: 100vh; }
-        
-        /* BARRA LATERAL UNIFICADA */
-        .sidebar { 
-            background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
-            padding: 25px; 
-            border-right: 3px solid var(--ouro);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.7);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            z-index: 5;
+        /* Estilos do Cronômetro Global */
+        .crono-container {
+            text-align: center;
+            margin-bottom: 30px;
+            background: var(--fundo-card);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
-        .sidebar-topo h2 {
-            font-family: 'Cinzel', serif;
+        #display-crono {
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos da Listagem de Confrontos */
+        .fase-titulo {
             color: var(--ouro);
-            text-shadow: 0px 3px 6px rgba(0,0,0,0.9);
-            letter-spacing: 1px;
-            border-bottom: 2px double var(--ouro);
-            padding-bottom: 15px;
-            margin-top: 0;
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .grid-confrontos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card-confronto {
+            background: var(--fundo-card);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .mesa-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #000;
+            color: var(--ouro);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .atleta-linha {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .btn-acao {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 0.85rem;
+        }
+
+        .btn-acao:hover {
+            background: #444;
+        }
+
+        /* Estilos do Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--fundo-card);
+            border: 2px solid var(--ouro);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .selector-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-select {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-select:hover {
+            background: #333;
+        }
+
+        .btn-select.active {
+            background: var(--ouro);
+            color: #000;
+            border-color: var(--ouro);
+        }
+
+        .input-num {
+            width: 100%;
+            background: #111;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
             text-align: center;
         }
 
-        .content { padding: 40px; position: relative; z-index: 2; }
-        
-        .crono-container { 
-            background: var(--bg-cards); padding: 25px; border-radius: 12px; 
-            border: 1px solid rgba(212, 175, 55, 0.3); text-align: center; 
-            margin-bottom: 35px; box-shadow: 0 12px 25px rgba(0,0,0,0.5); 
+        .input-num:disabled {
+            background: #222;
+            color: #666;
+            border-color: #333;
         }
-        .timer-wrapper { background: #000; border: 2px solid var(--ouro); display: inline-block; padding: 10px 50px; border-radius: 8px; margin: 15px 0; min-width: 320px; }
-        .timer { font-size: 4.5rem; font-weight: bold; font-family: 'Courier New', Courier, monospace; color: #ffcc00; text-shadow: 0 0 15px rgba(255, 204, 0, 0.6); letter-spacing: 2px; }
-        
-        .btn-crono { padding: 12px 24px; font-family: 'Cinzel', serif; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin: 5px; color: #fff; font-size: 0.85rem; letter-spacing: 0.5px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: inline-flex; align-items: center; gap: 8px;}
-        .btn-crono:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        
-        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
-        .mesa-card { background: var(--bg-cards); padding: 22px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.2); box-shadow: 0 8px 16px rgba(0,0,0,0.4); transition: 0.3s; position: relative; }
-        .mesa-header { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: bold; color: var(--ouro); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        
-        .jogador-linha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px; border-radius: 6px; background: rgba(0,0,0,0.3); font-size: 0.95rem; font-weight: 600; border-left: 4px solid #444; }
-        .score-badge { font-weight: 700; color: var(--ouro-brilhante); background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; border: 1px solid rgba(212,175,55,0.2); white-space: nowrap; }
-        
-        /* BOTÕES ATUALIZADOS */
-        .btn { 
-            background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); 
-            color: var(--texto-escuro); font-family: 'Cinzel', serif; font-weight: 800; border: none; padding: 14px 20px; 
-            border-radius: 6px; cursor: pointer; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; 
-            text-decoration: none; transition: all 0.3s ease; text-transform: uppercase; font-size: 0.9rem;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5); letter-spacing: 1px;
+
+        /* Área de Impressão Oculta na Tela */
+        #secao-impressao-sumula {
+            display: none;
         }
-        .btn:hover { background: linear-gradient(135deg, var(--ouro-brilhante) 0%, var(--ouro) 100%); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212,175,55,0.4); }
-        
-        .btn-danger { background: linear-gradient(135deg, var(--vermelho-pampa) 0%, #5c1d16 100%); color: white; }
-        .btn-danger:hover { background: linear-gradient(135deg, #ba3c2f 0%, var(--vermelho-pampa) 100%); box-shadow: 0 10px 20px rgba(146,43,33,0.4); }
 
-        .btn-lancar { background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); color: var(--texto-escuro); font-family: 'Cinzel', serif; border: none; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 800; margin-top: 15px; transition: 0.3s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-lancar:hover { background: linear-gradient(135deg, var(--ouro-brilhante) 0%, var(--ouro) 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
-
-        .btn-impressao-mesa { background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--ouro-brilhante); padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-impressao-mesa:hover { background: var(--ouro); color: var(--texto-escuro); border-color: var(--ouro-brilhante); }
-        
-        .btn-impressao-geral { background: linear-gradient(135deg, #1b3d28 0%, #092113 100%); border: 1px solid var(--ouro); color: var(--ouro-brilhante); padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.2s; margin-right: 12px; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase;}
-        .btn-impressao-geral:hover { background: linear-gradient(135deg, #255437 0%, #0d2e1b 100%); border-color: var(--ouro-brilhante); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(212,175,55,0.15); }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
-        .modal-content { background: var(--bg-cards); padding: 35px; border-radius: 12px; border: 2px solid var(--ouro); width: 460px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
-        .selector-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
-        
-        .btn-select { background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; padding: 14px; text-align: center; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.2s; }
-        .btn-select.active { background: var(--ouro); color: var(--texto-escuro); border-color: var(--ouro-brilhante); font-weight: 800; }
-        
-        .input-num { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 1.1rem; text-align: center; font-weight: 700; }
-        .input-num:focus { border-color: var(--ouro); outline: none; }
-        .input-num:disabled { background: #000; color: #555; border-color: #222; }
-        label { display: block; margin: 15px 0 6px 0; font-size: 0.8rem; color: var(--texto-subtil); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* NAVEGAÇÃO DA SIDEBAR PURIFICADA */
-        .nav-links { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
-        .nav-item { 
-            padding: 15px 18px; color: #dfdfdf; text-decoration: none; border-radius: 8px; 
-            transition: all 0.3s ease; display: flex; align-items: center; gap: 14px; font-weight: 700;
-            border: 2px solid transparent; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;
-        }
-        .nav-item:hover { background: rgba(212, 175, 55, 0.1); color: var(--ouro-brilhante); border-color: rgba(212,175,55,0.2); padding-left: 26px; }
-        .nav-item.active { background: linear-gradient(90deg, var(--ouro) 0%, rgba(212,175,55,0.15) 100%); color: var(--texto-escuro); font-weight: 800; box-shadow: 0 6px 15px rgba(0,0,0,0.6); border-color: var(--ouro-brilhante); }
-        .nav-item.active:hover { color: var(--texto-escuro); padding-left: 18px; }
-
-        .naipe-icon { font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center; width: 24px; text-align: center; }
-
+        /* Estilos CSS específicos para a Impressão */
         @media print {
-            @page { margin: 0; }
-            body * { visibility: hidden; }
-            #secao-impressao-sumula, #secao-impressao-sumula * { visibility: visible; }
-            #secao-impressao-sumula { position: absolute; left: 0; top: 0; width: 74mm; background: #fff; padding: 0; margin: 0; display: block !important; }
-            .cupom-sumula { width: 74mm; box-sizing: border-box; padding: 6mm 3mm; font-family: 'Courier New', Courier, monospace; font-size: 10pt; color: #000; page-break-after: always; display: block; }
+            body * {
+                visibility: hidden;
+            }
+            #secao-impressao-sumula, #secao-impressao-sumula * {
+                visibility: visible;
+            }
+            #secao-impressao-sumula {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
+            .cupom-sumula {
+                width: 75mm;
+                padding: 4mm;
+                margin-bottom: 15mm;
+                border: none;
+                page-break-inside: avoid;
+                font-family: Arial, sans-serif;
+                color: #000;
+                background: #fff;
+            }
             .text-center { text-align: center; }
             .text-bold { font-weight: bold; }
-            .divisor-dashed { border-top: 1px dashed #000; margin: 8px 0; }
-            .tabela-sets { width: 100%; margin-top: 10px; border-collapse: collapse; table-layout: fixed; }
-            .tabela-sets th { font-size: 8pt; font-weight: bold; padding-bottom: 6px; text-transform: uppercase; text-align: center; overflow: hidden; white-space: nowrap; }
-            .tabela-sets th.col-label { width: 20%; text-align: left; }
-            .tabela-sets th.col-atleta { width: 35%; }
-            .tabela-sets th.col-vs { width: 10%; }
-            .tabela-sets td { padding: 8px 0; font-size: 10pt; vertical-align: middle; text-align: center; }
-            .tabela-sets td.label-set { font-weight: bold; text-align: left; font-size: 8.5pt; }
-            .espaco-assinatura { margin-top: 25px; border-top: 1px solid #000; text-align: center; font-size: 8pt; padding-top: 5px; }
+            .divisor-dashed {
+                border-top: 1px dashed #000;
+                margin: 6px 0;
+                width: 100%;
+            }
+            .tabela-sets {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 8px;
+            }
+            .tabela-sets th, .tabela-sets td {
+                border: 1px solid #000;
+                padding: 5px;
+                text-align: center;
+                font-size: 9pt;
+            }
+            .tabela-sets th { background: #f0f0f0; }
+            .col-label { width: 25%; }
+            .col-atleta { width: 33%; max-width: 25mm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .col-vs { width: 8%; }
+            .label-set { font-weight: bold; font-size: 8pt; }
+            .espaco-assinatura {
+                border-top: 1px solid #000;
+                margin-top: 40px;
+                text-align: center;
+                font-size: 8pt;
+                padding-top: 5px;
+            }
         }
-
-        #secao-impressao-sumula { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="secao-impressao-sumula"></div>
+    <div id="nome-torneio-global" style="display: none;">⚔️ {{ torneio.nome }} ⚔️</div>
 
-    <div class="wrapper">
-        <div class="sidebar">
-            <div class="sidebar-topo">
-                <h2 id="nome-torneio-global">⚔️ {{ config.nome_torneio }} ⚔️</h2>
-                
-                <div class="nav-links">
-                    <a href="/admin-painel/admin/inscricoes" class="nav-item">
-                        <span class="naipe-icon" style="color: #922b21;"><i class="fas fa-user-plus"></i></span> Inscrições
-                    </a>
-                    <a href="/admin-painel/admin/jogos" class="nav-item active">
-                        <span class="naipe-icon" style="color: #1e8449;"><i class="fas fa-border-all"></i></span> Mesa de Jogos
-                    </a>
-                    <a href="/admin-painel/admin/classificacao" class="nav-item">
-                        <span class="naipe-icon" style="color: #d4af37;"><i class="fas fa-trophy"></i></span> Classificação
-                    </a>
-                    <a href="/admin-painel/admin/historico" class="nav-item">
-                        <span class="naipe-icon" style="color: #f1c40f;"><i class="fas fa-award"></i></span> Galeria de Lendas
-                    </a>
-                </div>
-            </div>
-
-            <div class="sidebar-rodape">
-                <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirm('Tem certeza que deseja reiniciar o salão?');">
-                    <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;"><i class="fas fa-power-off"></i> Reiniciar Salão</button>
-                </form>
-                <a href="/admin-painel/logout" style="color:var(--ouro); text-align:center; display:block; margin-top:20px; font-size:0.85rem; font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:1px;">🚪 Sair</a>
-            </div>
-        </div>
-
-        <div class="content">
-            <div class="crono-container">
-                <h3 style="margin: 0; color: var(--ouro); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-family: 'Cinzel', serif;">Tempo Restante da Rodada</h3>
-                <div class="timer-wrapper">
-                    <div class="timer" id="display-crono" data-inicial="{{ config.crono_tempo_restante_seg }}">{{ tempo_formatado }}</div>
-                </div>
-                <div>
-                    <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline;">
-                        <button type="submit" name="acao" value="iniciar" class="btn-crono" style="background: var(--verde-sucesso);"><i class="fas fa-play"></i> INICIAR</button>
-                        <button type="submit" name="acao" value="pausar" class="btn-crono" style="background: #d35400;"><i class="fas fa-pause"></i> PAUSAR</button>
-                        <button type="submit" name="acao" value="reiniciar" class="btn-crono" style="background: linear-gradient(135deg, #444 0%, #2b2b2b 100%); border: 1px solid #666;" onclick="return confirm('Reiniciar o cronômetro?');"><i class="fas fa-rotate-left"></i> REINICIAR</button>
-                    </form>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--ouro); padding-bottom: 15px;">
-                <h2 id="titulo-fase-atual" data-rodada="{{ rodada }}" style="margin: 0; font-family: 'Cinzel', serif; font-size: 1.8rem;">
-                    {% if rodada == -12 %} Fase Eliminatória: <span style="color: var(--ouro);">16 avos de Final</span>
-                    {% elif rodada == -1 %} Fase Eliminatória: <span style="color: var(--ouro);">Oitavas de Final</span>
-                    {% elif rodada == -2 %} Fase Eliminatória: <span style="color: var(--ouro);">Quartas de Final</span>
-                    {% elif rodada == -3 %} Fase Eliminatória: <span style="color: var(--ouro);">Semifinal</span>
-                    {% elif rodada == -4 %} Fase Final: <span style="color: var(--ouro);">Decisão de Títulos</span>
-                    {% else %} Fase Classificatória: <span style="color: var(--ouro);">{{ rodada }}ª Rodada</span>
-                    {% endif %}
-                </h2>
-                
-                <div style="display: flex; align-items: center;">
-                    {% if confrontos %}
-                        <button type="button" class="btn-impressao-geral" onclick="imprimirTodasSumulas()"><i class="fas fa-print"></i> IMPRIMIR TODAS AS SÚMULAS</button>
-                    {% endif %}
-
-                    {% if not confrontos %}
-                        <form action="/admin-painel/admin/gerar-rodada" method="POST">
-                            <button type="submit" class="btn" style="width:auto;"><i class="fas fa-dice"></i> Sortear Partidas da 1ª Rodada</button>
-                        </form>
-                    {% elif rodada_concluida %}
-                        {% if rodada < 0 %}
-                            <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');">
-                                <button type="submit" class="btn" style="background: #e67e22; color: white; width:auto;"><i class="fas fa-fire"></i> Avançar Fase Eliminatória ⏭</button>
-                            </form>
-                        {% else %}
-                            <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');">
-                                <button type="submit" class="btn btn-success" style="width:auto;"><i class="fas fa-forward"></i> Fechar Rodada & Gerar Próxima</button>
-                            </form>
-                        {% endif %}
-                    {% else %}
-                        <button disabled class="btn" style="background: #111; color: #444; border: 1px solid #222; cursor: not-allowed; width:auto;"><i class="fas fa-lock"></i> Aguardando Fim dos Jogos</button>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="mesa-grid">
-                {% for c in confrontos %}
-                {% set id_atleta1 = c.atleta1_id if c.atleta1_id is defined else c.athlete1_id %}
-                {% set id_atleta2 = c.atleta2_id if c.atleta2_id is defined else c.athlete2_id %}
-
-                <div class="mesa-card" style="{% if c.vencedor_id %} border-color: var(--verde-sucesso); background: #07170e; {% endif %}">
-                    <div class="mesa-header">
-                        <span>
-                            {% if rodada == -4 and c.mesa == 1 %} 🥇 GRANDE FINAL
-                            {% elif rodada == -4 and c.mesa == 2 %} 🥉 DISPUTA DE 3º LUGAR
-                            {% else %} Mesa {{ c.mesa }}
-                            {% endif %}
-                        </span>
-                        
-                        {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                        <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome }}', '{{ c.atleta2_nome }}')"><i class="fas fa-file-invoice"></i> Súmula</button>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="jogador-linha" style="
-                        {% if c.vencedor_id %}
-                            {% if c.vencedor_id == id_atleta1 %}
-                                background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
-                            {% else %}
-                                background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
-                            {% endif %}
-                        {% endif %}">
-                        <span>{% if c.vencedor_id == id_atleta1 %}<i class="fas fa-crown" style="color:var(--ouro); margin-right:4px;"></i>{% else %}<i class="fas fa-user" style="margin-right:6px; color:#777;"></i>{% endif %} {{ c.atleta1_nome }}</span>
-                        <span class="score-badge">
-                            {% if c.sets1 is not none %}
-                                {{ c.sets1 }}S | {{ c.tentos1 }}T | {{ c.flores1 if c.flores1 is defined and c.flores1 is not none else 0 }}F
-                            {% else %} - {% endif %}
-                        </span>
-                    </div>
-                    
-                    <div class="jogador-linha" style="
-                        {% if c.vencedor_id %}
-                            {% if c.vencedor_id == id_atleta2 %}
-                                background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
-                            {% else %}
-                                background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
-                            {% endif %}
-                        {% endif %}">
-                        <span>{% if c.vencedor_id == id_atleta2 %}<i class="fas fa-crown" style="color:var(--ouro); margin-right:4px;"></i>{% else %}<i class="fas fa-user" style="margin-right:6px; color:#777;"></i>{% endif %} {{ c.atleta2_nome }}</span>
-                        <span class="score-badge">
-                            {% if c.sets2 is not none %}
-                                {{ c.sets2 }}S | {{ c.tentos2 }}T | {{ c.flores2 if c.flores2 is defined and c.flores2 is not none else 0 }}F
-                            {% else %} - {% endif %}
-                        </span>
-                    </div>
-
-                    {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                        <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome }}')">
-                            {% if c.vencedor_id %><i class="fas fa-sliders"></i> ALTERAR RESULTADO{% else %><i class="fas fa-pen-to-square"></i> LANÇAR PLACAR{% endif %}
-                        </button>
-                    {% else %}
-                        <div style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 15px; font-size: 0.9rem;"><i class="fas fa-couch"></i> Folga Automática (+Pontos)</div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+    <div class="crono-container">
+        <div style="font-size: 1rem; color: var(--ouro); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Tempo de Rodada</div>
+        <div id="display-crono" style="color: #ffcc00; font-size: 4.5rem;">50:00</div>
     </div>
+
+    <h2 class="fase-titulo" id="titulo-fase-atual" data-rodada="{{ fase_atual_rodada }}">
+        {% if fase_atual_rodada == -12 %} 16 Avos de Final
+        {% elif fase_atual_rodada == -1 %} Oitavas de Final
+        {% elif fase_atual_rodada == -2 %} Quartas de Final
+        {% elif fase_atual_rodada == -3 %} Semifinal
+        {% elif fase_atual_rodada == -4 %} Fase Final
+        {% else %} {{ fase_atual_rodada }}ª Rodada
+        {% endif %}
+    </h2>
+
+    <div style="text-align: center; margin-bottom: 25px;">
+        <button class="btn-acao" style="background: var(--ouro); color: #000; font-weight: bold;" onclick="imprimirTodasSumulas()">
+            <i class="fas fa-print"></i> Imprimir Todas as Súmulas
+        </button>
+    </div>
+
+    <div class="grid-confrontos">
+        {% for c in confrontos %}
+        <div class="card-confronto">
+            <span class="mesa-tag">Mesa {{ c.mesa }}</span>
+            <div style="margin-top: 10px;">
+                <div class="atleta-linha">
+                    <i class="fas fa-user" style="color: var(--ouro);"></i> <strong>P1:</strong> {{ c.atleta1_nome }}
+                </div>
+                <div class="atleta-linha">
+                    <i class="fas fa-user" style="color: #aaa;"></i> <strong>P2:</strong> {{ c.atleta2_nome if c.atleta2_nome else 'FOLGA AUTOMÁTICA' }}
+                </div>
+            </div>
+            
+            {% if c.atleta2_nome %}
+            <div style="margin-top: 15px; display: flex; gap: 5px;">
+                <button class="btn-acao" onclick="abrirFichaPlacar('{{ c.id }}', '{{ c.atleta1_id }}', '{{ c.atleta1_nome }}', '{{ c.atleta2_id }}', '{{ c.atleta2_nome }}')">
+                    <i class="fas fa-gavel"></i> Arbitrar
+                </button>
+                <button class="btn-acao" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome }}', '{{ c.atleta2_nome }}')">
+                    <i class="fas fa-print"></i> Súmula
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="secao-impressao-sumula"></div>
 
     <div class="modal" id="modalPlacar">
         <div class="modal-content">
@@ -561,10 +554,7 @@
                 .catch(err => console.log("Sincronizando cronômetro..."));
         }
 
-        // ⏱️ Atualiza a cada 1 segundo (1000ms) para contagem fluida e precisa na tela
         setInterval(atualizarTempo, 1000);
-
-        // 🔥 Executa IMEDIATAMENTE assim que a página carrega para matar o "50:00" fantasma na hora
         document.addEventListener("DOMContentLoaded", atualizarTempo);
     </script>
 </body>
