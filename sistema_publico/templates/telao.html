@@ -728,10 +728,10 @@
             // --- RENDERIZAÇÃO DOS CONFRONTOS (MESA INTELIGENTE) ---
             const containerJogos = document.getElementById('container-jogos');
             if (containerJogos) {
-                const assinaturaAtualJogos = JSON.stringify(data.confrontos || []);
+                const signatureAtualJogos = JSON.stringify(data.confrontos || []);
                 
-                if (assinaturaAtualJogos !== ultimoEstadoJogosStr) {
-                    ultimoEstadoJogosStr = assinaturaAtualJogos; 
+                if (signatureAtualJogos !== ultimoEstadoJogosStr) {
+                    ultimoEstadoJogosStr = signatureAtualJogos; 
                     containerJogos.innerHTML = '';
                     
                     if (!data.confrontos || data.confrontos.length === 0) {
@@ -792,10 +792,10 @@
             const tableBody = document.getElementById('tabela-ranking-corpo');
             if (tableBody) {
                 const top5Data = data.ranking ? data.ranking.slice(0, 5) : [];
-                const assinaturaAtualRanking = JSON.stringify(top5Data);
+                const signatureAtualRanking = JSON.stringify(top5Data);
 
-                if (assinaturaAtualRanking !== ultimoEstadoRankingStr) {
-                    ultimoEstadoRankingStr = assinaturaAtualRanking; 
+                if (signatureAtualRanking !== ultimoEstadoRankingStr) {
+                    ultimoEstadoRankingStr = signatureAtualRanking; 
                     tableBody.innerHTML = '';
                     
                     if (top5Data.length > 0) {
