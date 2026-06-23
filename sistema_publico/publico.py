@@ -171,7 +171,7 @@ def api_dados_publicos(db=Depends(get_db)):
     p = "%s" if DATABASE_URL else "?"
     
     if not cfg:
-        return JSONResponse({"fase_torneio": "INSCRICAO", "nome_fase": "Nenhum Torneio Ativo", "tempo": "00:00", "crono_ativo": 0, "confrontos": [], "ranking": [], "tempo_rodada": 50, "max_rodadas": 5})
+        return JSONResponse({"fase_torneio": "INSCRICAO", "nome_fase": "Nenhum Torneio Ativo", "tempo": "00:00", "crono_ativo": 0, "confrontos": [], "ranking": []})
 
     # Cálculo dinâmico do cronômetro usando a marca de tempo final em milissegundos
     tempo_restante = int(cfg.get("crono_tempo_restante_seg", 3000))
@@ -211,26 +211,9 @@ def api_dados_publicos(db=Depends(get_db)):
     if cfg["fase_torneio"] != "INSCRICAO":
         ranking = obter_ranking_publico(cursor)[:5]
 
-    # 🔍 CAPTURA BLINDADA DO TEMPO FIXO CONFIGURADO PELO ADMIN
-    # Varre todas as colunas possíveis para não ter erro de digitação/mapeamento do banco
-    tempo_original_minutos = (
-        cfg.get("duracao_rodada") or 
-        cfg.get("tempo_rodada") or 
-        cfg.get("config_tempo") or 
-        cfg.get("duracao") or 
-        cfg.get("tempo_limite") or 
-        50
-    )
-
-    # 🔍 CAPTURA BLINDADA DO NÚMERO DE RODADAS CONFIGURADO PELO ADMIN
-    max_rodadas_definidas = (
-        cfg.get("max_rodadas_classificatoria") or 
-        cfg.get("total_rodadas") or 
-        cfg.get("qtd_rodadas") or 
-        cfg.get("rodadas") or 
-        cfg.get("limite_rodadas") or 
-        5
-    )
+    # Recupera o tempo total definido dividindo o valor salvo por 60 (evita problemas de cronômetro correndo)
+    tempo_inicial_seg = int(cfg.get("crono_tempo_restante_seg", 3000))
+    tempo_definido_minutos = tempo_inicial_seg // 60
 
     return JSONResponse({
         "fase_torneio": cfg["fase_torneio"], 
@@ -240,8 +223,8 @@ def api_dados_publicos(db=Depends(get_db)):
         "confrontos": confrontos, 
         "ranking": ranking,
         
-        # Enviando limpo e mastigado para o JavaScript não se perder
-        "nome_torneio": cfg.get("nome_torneio", "Torneio Truco Cego"),
-        "tempo_rodada": int(tempo_original_minutos),
-        "max_rodadas": int(max_rodadas_definidas)
+        # Mapeamento oficial baseado nas colunas reais do painel de controle
+        "nome_torneio": cfg.get("nome_torneio") or "Torneio Truco Cego",
+        "tempo_rodada": tempo_definido_minutos,
+        "max_rodadas": cfg.get("max_rodadas_classificatoria", 5)
     })
