@@ -465,7 +465,7 @@
             <div id="info-tempo-rodada" class="info-valor">-- min</div>
         </div>
         <div class="info-item">
-            <div class="info-max-rodadas">Fase Classificatória</div>
+            <div class="info-rotulo">Fase Classificatória</div>
             <div id="info-max-rodadas" class="info-valor">-- Rodadas Max</div>
         </div>
         <div class="info-item">
@@ -648,12 +648,12 @@
                                     <div class="podio-nome">${p3}</div>
                                 </div>
 
-                                <div class="podio-card quarto-lugar" style="background: rgba(20,20,20,0.5); border: 2px solid #333; height: 190px;">
+                                <div class="podio-card quarto">
                                     <div>
                                         <div class="podio-medalha" style="font-size: 2rem; margin-top: 5px;">🏅</div>
-                                        <div class="podio-rotulo-lugar" style="color: #888; font-size: 1rem; margin-bottom: 5px;">4º Colocado</div>
+                                        <div class="podio-rotulo-lugar">4º Colocado</div>
                                     </div>
-                                    <div class="podio-nome" style="color: #aaa; font-size: 1.1rem;">${p4}</div>
+                                    <div class="podio-nome">${p4}</div>
                                 </div>
                             </div>
 
@@ -740,11 +740,10 @@
             // --- ATUALIZAÇÃO DOS CONFRONTOS SEM FLICKER ---
             const containerJogos = document.getElementById('container-jogos');
             if (containerJogos) {
-                // Cria uma assinatura rápida dos confrontos para checar mudanças
                 const assinaturaAtualJogos = JSON.stringify(data.confrontos || []);
                 
                 if (assinaturaAtualJogos !== ultimoEstadoJogosStr) {
-                    ultimoEstadoJogosStr = assinaturaAtualJogos; // Atualiza o estado
+                    ultimoEstadoJogosStr = assinaturaAtualJogos;
                     containerJogos.innerHTML = '';
                     
                     if (!data.confrontos || data.confrontos.length === 0) {
@@ -755,11 +754,11 @@
                             card.className = 'card-jogo';
                             const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA - GANHOU PONTOS";
                             
-                            const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
+                            const f1 = jogo.sets1 !== undefined && jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
                             const t1 = jogo.tentos1 || 0;
                             const fa1 = jogo.faltas1 || 0;
 
-                            const f2 = jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
+                            const f2 = jogo.sets2 !== undefined && jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
                             const t2 = jogo.tentos2 || 0;
                             const fa2 = jogo.faltas2 || 0;
 
@@ -807,7 +806,7 @@
                 const assinaturaAtualRanking = JSON.stringify(top5Data);
 
                 if (assinaturaAtualRanking !== ultimoEstadoRankingStr) {
-                    ultimoEstadoRankingStr = assinaturaAtualRanking; // Atualiza o estado
+                    ultimoEstadoRankingStr = assinaturaAtualRanking;
                     tableBody.innerHTML = '';
                     
                     if (top5Data.length > 0) {
@@ -834,3 +833,5 @@
     atualizarTelao();
     setInterval(atualizarTelao, 3000); // pooling de 3 segundos
 </script>
+</body>
+</html>
