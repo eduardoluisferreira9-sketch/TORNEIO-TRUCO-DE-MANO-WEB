@@ -7,19 +7,16 @@
     <style>
         :root {
             /* PALETA TRADICIONAL - FELTRO MUSGO PROFUNDO */
-            --bg-principal: #0b140d;
-            --bg-cards: #112216;
-            --border-feltro: #1b3622;
-            --ouro: #d4af37;
+            --bg-principal: #0d2e1b; /* Verde-Musgo Fechado e Elegante */
+            --bg-cards: #092113; /* Tom ainda mais profundo para destacar os painéis */
+            --ouro: #d4af37; /* Ouro Velho Clássico */
             --ouro-brilhante: #f3e5ab;
             --vermelho-pampa: #922b21; 
             --verde-sucesso: #1e8449; 
-            --texto-claro: #e8e6e3; 
-            --texto-subtil: #a2b3a5; 
-            --texto-escuro: #0b140d;
+            --texto-claro: #ffffff; 
+            --texto-subtil: #bdc3c7; 
+            --texto-escuro: #111;
         }
-
-        *, *::before, *::after { box-sizing: border-box; }
 
         body { 
             background: var(--bg-principal); 
@@ -27,11 +24,13 @@
             font-family: 'Montserrat', sans-serif; 
             margin: 0; 
             padding: 0;
+            /* Textura suave simulando o tecido de feltro fosco */
             background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
             background-size: 100% 4px;
             position: relative;
         }
 
+        /* Detalhe sutil de fundo em marca d'água */
         body::after {
             content: "⚔️ 🌿 💰 🏆";
             position: fixed;
@@ -45,7 +44,7 @@
 
         .wrapper { display: grid; grid-template-columns: 340px 1fr; min-height: 100vh; }
         
-        /* BARRA LATERAL ADMINISTRATIVA */
+        /* BARRA LATERAL */
         .sidebar { 
             background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
             padding: 25px; 
@@ -71,10 +70,10 @@
 
         .content { padding: 40px; position: relative; z-index: 2; }
         
-        /* CARDS DO SALÃO DE JOGOS */
+        /* CARDS NO ESTILO TABULEIRO */
         .card { 
             background: var(--bg-cards); 
-            border: 1px solid var(--border-feltro); 
+            border: 1px solid rgba(212, 175, 55, 0.3); 
             border-radius: 12px; 
             padding: 25px; 
             margin-bottom: 30px; 
@@ -82,9 +81,10 @@
             position: relative;
         }
         
+        /* Moldura interna fina */
         .card::before {
             content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 1px solid rgba(212, 175, 55, 0.04); border-radius: 6px; pointer-events: none;
+            border: 1px solid rgba(212, 175, 55, 0.08); border-radius: 6px; pointer-events: none;
         }
 
         .form-group { margin-bottom: 18px; position: relative; z-index: 2; }
@@ -92,13 +92,13 @@
         
         input, select { 
             width: 100%; padding: 12px; background: rgba(0,0,0,0.4); color: #fff; 
-            border: 1px solid var(--border-feltro); border-radius: 6px;
+            border: 1px solid #273746; border-radius: 6px; box-sizing: border-box;
             transition: all 0.3s ease; font-family: 'Montserrat', sans-serif;
             font-weight: 600;
         }
         input:focus { border-color: var(--ouro); outline: none; box-shadow: 0 0 12px rgba(212,175,55,0.4); background: rgba(0,0,0,0.6); }
 
-        /* BOTÕES EM GRADIENTE */
+        /* BOTÕES */
         .btn { 
             background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); 
             color: var(--texto-escuro); font-family: 'Cinzel', serif; font-weight: 800; border: none; padding: 14px 20px; 
@@ -115,21 +115,18 @@
         .btn-success { background: linear-gradient(135deg, var(--verde-sucesso) 0%, #0e4827 100%); color: white; }
         .btn-success:hover { background: linear-gradient(135deg, #27ae60 0%, var(--verde-sucesso) 100%); box-shadow: 0 10px 20px rgba(30,132,73,0.4); }
 
-        /* TABELAS COMPATÍVEIS COM O ESTILO MESA */
+        /* TABELAS */
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 15px; }
-        th, td { padding: 16px; text-align: left; vertical-align: middle; }
+        th, td { padding: 16px; text-align: left; }
         th { background: #050d08; color: var(--ouro); font-family: 'Cinzel', serif; font-size: 0.9rem; border-bottom: 2px solid var(--ouro); text-transform: uppercase; letter-spacing: 1px; }
         td { background: rgba(0,0,0,0.25); border-top: 1px solid rgba(212,175,55,0.05); border-bottom: 1px solid rgba(212,175,55,0.05); color: var(--texto-claro); font-weight: 600; }
         tr td:first-child { border-left: 1px solid rgba(212,175,55,0.05); border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-        tr td:last-child { border-right: 1px solid rgba(212,175,55,0.05); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
-        
-        /* Forçando mesmo alinhamento para colunas de ação e cabeçalhos correspondentes */
-        th.col-acao, td.col-acao { text-align: right; }
+        tr td:last-child { border-right: 1px solid rgba(212,175,55,0.05); border-top-right-radius: 8px; border-bottom-right-radius: 8px; text-align: right;}
 
-        /* NAVEGAÇÃO LATERAL - PADRÃO ADMIN PAINEL */
+        /* MENU LATERAL - ABAS PURIFICADAS */
         .nav-links { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
         .nav-item { 
-            padding: 15px 18px; color: var(--texto-subtil); text-decoration: none; border-radius: 8px; 
+            padding: 15px 18px; color: #dfdfdf; text-decoration: none; border-radius: 8px; 
             transition: all 0.3s ease; display: flex; align-items: center; gap: 14px; font-weight: 700;
             border: 2px solid transparent; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;
         }
@@ -187,23 +184,23 @@
                     </a>
                 </div>
             </div>
-            
+
             <div class="sidebar-rodape">
                 <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
                     <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;">🚨 Reiniciar Salão</button>
                 </form>
-                <a href="/admin-painel/admin/logout" style="color:var(--ouro); text-align:center; display:block; margin-top:20px; font-size:0.85rem; font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:1px;">🚪 Sair</a>
+                <a href="/admin-painel/logout" style="color:var(--ouro); text-align:center; display:block; margin-top:20px; font-size:0.85rem; font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:1px;">🚪 Sair</a>
             </div>
         </div>
 
         <div class="content">
-            <h1 style="margin-top: 0; font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; border-bottom: 2px double var(--ouro); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
-                Cadastro de Jogadores
+            <h1 style="margin-top: 0; font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; border-bottom: 2px solid var(--ouro); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
+                Admissão de Gaudérios
                 <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio }}</span>
             </h1>
             
             <div class="card">
-                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição </h3>
+                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição (Secretaria)</h3>
                 <form action="/admin-painel/admin/cadastrar-direto" method="POST" style="display:flex; gap:25px; align-items:flex-end;">
                     <div style="flex:2;">
                         <label>Nome do Competidor</label>
@@ -211,7 +208,7 @@
                     </div>
                     <div style="flex:1;">
                         <label>CTG / Entidade </label>
-                        <input type="text" name="entidade" placeholder="Ex: Passo Fundo">
+                        <input type="text" name="entity" placeholder="Ex: Passo Fundo">
                     </div>
                     <button type="submit" class="btn" style="width:auto; height:50px; padding: 0 35px; font-size: 0.95rem;">➕ Inscrever</button>
                 </form>
@@ -219,23 +216,17 @@
 
             <div class="grid-tabelas">
                 <div class="card">
-                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                        ⚔️ Confirmados (<span id="contador-oficiais">0</span>)
-                    </h3>
+                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">⚔️ Guapos Confirmados ({{ oficiais|length }})</h3>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Atleta</th>
-                                <th>Entidade</th>
-                                <th class="col-acao">Remover</th>
-                            </tr>
+                            <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Remover</th></tr>
                         </thead>
-                        <tbody id="tabela-oficiais-body">
+                        <tbody>
                             {% for a in oficiais %}
-                            <tr class="linha-atleta-oficial">
+                            <tr>
                                 <td><strong style="color: #fff; font-size: 1.05rem;">{{ a.nome }}</strong></td>
                                 <td><span style="color:var(--ouro-brilhante); font-size: 0.85rem; font-weight: 700;">{{ a.entidade }}</span></td>
-                                <td class="col-acao">
+                                <td style="text-align: right;">
                                     <form action="/admin-painel/admin/acao-atleta" method="POST" style="margin:0;">
                                         <input type="hidden" name="id_atleta" value="{{ a.id }}">
                                         <button type="submit" name="acao" value="excluir" style="background:none; border:none; color:var(--vermelho-pampa); font-weight:800; cursor:pointer; font-size: 0.85rem;" onclick="return confirm('Excluir competidor?')">❌</button>
@@ -243,16 +234,14 @@
                                 </td>
                             </tr>
                             {% else %}
-                            <tr>
-                                <td colspan="3" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhum gaudério confirmado na mesa.</td>
-                            </tr>
+                            <tr><td colspan="3" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhum gaudério confirmado na mesa.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
                     
-                    {% if config.fase_torneio == "INSCRIÇÃO" %}
-                    <form action="/admin-painel/admin/iniciar-torneio" method="POST" style="margin-top:30px;" id="form-iniciar-torneio">
-                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🪵 Iniciar torneio </button>
+                    {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
+                    <form action="/admin-painel/admin/iniciar-torneio" method="POST" style="margin-top:30px;">
+                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🪵 Cruzar os Relhos e Dar as Cartas</button>
                     </form>
                     {% endif %}
                 </div>
@@ -261,18 +250,14 @@
                     <h3 style="color:#e67e22; margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">⏳ Pedindo Entrada (Web)</h3>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Atleta</th>
-                                <th>Entidade</th>
-                                <th class="col-acao">Ação</th>
-                            </tr>
+                            <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Ação</th></tr>
                         </thead>
                         <tbody>
                             {% for p in pendentes %}
                             <tr>
                                 <td>{{ p.nome }}</td>
                                 <td>{{ p.entidade }}</td>
-                                <td class="col-acao">
+                                <td style="text-align: right;">
                                     <form action="/admin-painel/admin/acao-atleta" method="POST" style="display:inline-block; margin:0;">
                                         <input type="hidden" name="id_atleta" value="{{ p.id }}">
                                         <button type="submit" name="acao" value="aprovar" style="background:var(--verde-sucesso); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem;">Aceitar</button>
@@ -281,9 +266,7 @@
                                 </td>
                             </tr>
                             {% else %}
-                            <tr>
-                                <td colspan="3" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhuma cancela aberta no momento.</td>
-                            </tr>
+                            <tr><td colspan="3" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhuma cancela aberta no momento.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -294,23 +277,16 @@
 
     <script>
     function confirmarResetMesa() {
+        // Primeiro aviso de impacto geral
         const passo1 = confirm("⚠️ ATENÇÃO MÁXIMA:\nIsso vai deletar TODOS os guapos cadastrados, confrontos gerados e o histórico da Galeria de Lendas para sempre!\n\nDeseja mesmo prosseguir com a limpeza?");
+        
         if (passo1) {
+            // Segundo aviso para evitar o click automatizado/empolgado
             return confirm("🔴 ÚLTIMO AVISO:\nVocê tem certeza absoluta? Essa ação NÃO tem volta e o salão será resetado para o estado inicial de testes.");
         }
-        return false; 
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const totalAtletas = document.querySelectorAll('.linha-atleta-oficial').length;
-        const contador = document.getElementById('contador-oficiais');
-        if (contador) contador.innerText = totalAtletas;
         
-        const formIniciar = document.getElementById('form-iniciar-torneio');
-        if(formIniciar && totalAtletas < 2) {
-            formIniciar.style.display = 'none';
-        }
-    });
+        return false; // Cancela e não envia nada se clicar em cancelar no primeiro prompt
+    }
     </script>
 
 </body>
