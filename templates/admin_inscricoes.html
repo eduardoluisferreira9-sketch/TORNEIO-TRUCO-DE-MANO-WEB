@@ -149,7 +149,7 @@
                 <h2>⚔️ {{ config.nome_torneio }} ⚔️</h2>
                 
                 <div style="background: rgba(0,0,0,0.4); padding: 18px; border-radius: 10px; border: 1px solid var(--border-feltro); margin-top: 25px;">
-                    <form action="/admin-painel/admin/salvar-configuracoes" method="POST">
+                    <form action="/admin-painel/admin/salvar-configurações" method="POST">
                         <div class="form-group">
                             <label>Nome do Torneio</label>
                             <input type="text" name="nome_torneio" value="{{ config.nome_torneio }}" required>
@@ -173,19 +173,19 @@
                 </div>
 
                 <div class="nav-links">
-                    <a href="/admin-painel/admin/inscricoes" class="nav-item active">
+                    <a href="/admin-painel/admin/inscrições" class="nav-item active">
                         <span class="naipe-icon" style="color: #922b21;">⚔️</span> Inscrições
                     </a>
                     <a href="/admin-painel/admin/jogos" class="nav-item">
                         <span class="naipe-icon" style="color: #1e8449;">🌿</span> Mesa de Jogos
                     </a>
-                    <a href="/admin-painel/admin/classificacao" class="nav-item">
+                    <a href="/admin-painel/admin/classificação" class="nav-item">
                         <span class="naipe-icon" style="color: #d4af37;">💰</span> Classificação
                     </a>
                     <a href="/admin-painel/admin/podio" class="nav-item">
                         <span class="naipe-icon" style="color: #e74c3c;">🥇</span> Pódio Final
                     </a>
-                    <a href="/admin-painel/admin/historico" class="nav-item">
+                    <a href="/admin-painel/admin/histórico" class="nav-item">
                         <span class="naipe-icon" style="color: #f1c40f;">🏆</span> Galeria de Lendas
                     </a>
                 </div>
@@ -206,7 +206,7 @@
             </h1>
             
             <div class="card">
-                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição (</h3>
+                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição </h3>
                 <form action="/admin-painel/admin/cadastrar-direto" method="POST" style="display:flex; gap:25px; align-items:flex-end;">
                     <div style="flex:2;">
                         <label>Nome do Competidor</label>
