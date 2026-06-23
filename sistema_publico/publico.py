@@ -194,5 +194,9 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         "tempo": tempo_formatado,
         "crono_ativo": cfg["crono_ativo"], 
         "confrontos": confrontos, 
-        "ranking": ranking
+        "ranking": ranking,
+        
+        # 🟢 Incluindo os valores dinâmicos da tabela config para o JavaScript ler
+        "tempo_rodada": cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 50,
+        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("max_rodadas") or 5
     })
