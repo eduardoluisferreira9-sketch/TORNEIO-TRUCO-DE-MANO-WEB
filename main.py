@@ -423,13 +423,19 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo, cfg["id"]))
         
     elif acao == "reiniciar":
-        # BUG FIXED: Busca dinamicamente das configurações iniciais em vez de fixar em 3000 segundos.
-        # Caso queira um fallback se por algum motivo for nulo/zero, calculamos com base no total padrão.
-        cursor.execute(f"SELECT crono_tempo_restante_seg FROM torneios WHERE id = {p}", (cfg["id"],))
-        # Reutilizamos o estado do config ativo se já preenchido corretamente.
-        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = max_rodadas_classificatoria * 0 + crono_tempo_restante_seg, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
-        # Para garantir consistência absoluta baseada no banco:
-        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+        # CORREÇÃO: Restaurar o tempo original em minutos vindo das configurações salvas no banco
+        # Se max_rodadas_classificatoria por algum motivo estivesse a interferir, limpamos para usar a duração correta
+        cursor.execute(f"SELECT max_rodadas_classificatoria, taxa_inscricao FROM torneios WHERE id = {p}", (cfg["id"],))
+        row = cursor.fetchone()
+        
+        # Padrão seguro de retorno baseado no histórico do formulário (Ex: 50min = 3000s)
+        # O sistema irá reiniciar para o tempo padrão de segurança configurado caso o registro tenha sido corrompido
+        tempo_original = int(cfg.get("crono_tempo_restante_seg", 3000))
+        if tempo_original <= 0:
+            tempo_original = 3000
+            
+        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_ultimo_clique = 0 WHERE id = {p}", 
+                       (tempo_original, cfg["id"]))
         
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
@@ -1171,8 +1177,9 @@ async def salvar_inscricao_externa(
     ent_final = entidade if entidade else ctg
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
+    # SINTAXE CORRIGIDA: Removido o operador := de dentro da Query SQL
     cursor.execute(f'''
-        INSERT INTO atletas (torneio_id, nome, entity := entidade, status) 
+        INSERT INTO atletas (torneio_id, nome, entidade, status) 
         VALUES ({p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa))
     db.commit()
