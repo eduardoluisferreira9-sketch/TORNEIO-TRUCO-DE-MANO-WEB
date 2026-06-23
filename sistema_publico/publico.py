@@ -211,9 +211,11 @@ def api_dados_publicos(db=Depends(get_db)):
     if cfg["fase_torneio"] != "INSCRICAO":
         ranking = obter_ranking_publico(cursor)[:5]
 
-    # Recupera o tempo total definido dividindo o valor salvo por 60 (evita problemas de cronômetro correndo)
-    tempo_inicial_seg = int(cfg.get("crono_tempo_restante_seg", 3000))
-    tempo_definido_minutos = tempo_inicial_seg // 60
+    # 🔍 LINHA PROVISÓRIA DE DIAGNÓSTICO: Mostra no console do servidor as chaves do banco!
+    logger.info(f"--- COLUNAS DO BANCO DE DADOS: {list(cfg.keys())} ---")
+
+    # Criamos uma lista com os nomes de todas as colunas que vieram do banco
+    colunas_banco = list(cfg.keys()) if cfg else []
 
     return JSONResponse({
         "fase_torneio": cfg["fase_torneio"], 
@@ -223,8 +225,10 @@ def api_dados_publicos(db=Depends(get_db)):
         "confrontos": confrontos, 
         "ranking": ranking,
         
-        # Mapeamento oficial baseado nas colunas reais do painel de controle
-        "nome_torneio": cfg.get("nome_torneio") or "Torneio Truco Cego",
-        "tempo_rodada": tempo_definido_minutos,
-        "max_rodadas": cfg.get("max_rodadas_classificatoria", 5)
+        # Envia todas as colunas como texto para o JS ler se precisar
+        "lista_colunas": ", ".join(colunas_banco),
+        
+        # Testando todas as variações possíveis para o Tempo e Rodadas
+        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo") or cfg.get("duracao") or cfg.get("tempo_limite"),
+        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("total_rodadas") or cfg.get("qtd_rodadas") or cfg.get("rodadas") or cfg.get("limite_rodadas")
     })
