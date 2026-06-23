@@ -164,7 +164,7 @@
                                 <input type="number" name="tempo_minutos" value="{{ config.tempo_minutos_rodada }}" min="5" required>
                             </div>
                         </div>
-                        {% if config.fase_torneio == "INSCRICAO" %}
+                        {% if config.fase_torneio == "INSCRIÇÃO" %}
                             <button type="submit" class="btn" style="font-size: 0.8rem; padding: 10px;">💾 Atualizar Mesa</button>
                         {% else %}
                             <button type="button" class="btn" style="background:#1c241e; color:#526356; cursor:not-allowed; font-size: 0.8rem; padding: 10px; border: 1px solid #253329;" disabled>Em Andamento</button>
@@ -201,19 +201,19 @@
 
         <div class="content">
             <h1 style="margin-top: 0; font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; border-bottom: 2px double var(--ouro); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
-                Admissão de Gaudérios
+                Cadastro de Jogadores
                 <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio }}</span>
             </h1>
             
             <div class="card">
-                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição (Secretaria)</h3>
+                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição (</h3>
                 <form action="/admin-painel/admin/cadastrar-direto" method="POST" style="display:flex; gap:25px; align-items:flex-end;">
                     <div style="flex:2;">
                         <label>Nome do Competidor</label>
                         <input type="text" name="nome" placeholder="Ex: Teixeirinha" required>
                     </div>
                     <div style="flex:1;">
-                        <label>CTG / Entidade / Piquete</label>
+                        <label>CTG / Entidade </label>
                         <input type="text" name="entidade" placeholder="Ex: Passo Fundo">
                     </div>
                     <button type="submit" class="btn" style="width:auto; height:50px; padding: 0 35px; font-size: 0.95rem;">➕ Inscrever</button>
@@ -223,7 +223,7 @@
             <div class="grid-tabelas">
                 <div class="card">
                     <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                        ⚔️ Guapos Confirmados (<span id="contador-oficiais">0</span>)
+                        ⚔️ Confirmados (<span id="contador-oficiais">0</span>)
                     </h3>
                     <table>
                         <thead>
@@ -253,9 +253,9 @@
                         </tbody>
                     </table>
                     
-                    {% if config.fase_torneio == "INSCRICAO" %}
+                    {% if config.fase_torneio == "INSCRIÇÃO" %}
                     <form action="/admin-painel/admin/iniciar-torneio" method="POST" style="margin-top:30px;" id="form-iniciar-torneio">
-                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🪵 Cruzar os Relhos e Dar as Cartas</button>
+                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🪵 Iniciar torneio </button>
                     </form>
                     {% endif %}
                 </div>
