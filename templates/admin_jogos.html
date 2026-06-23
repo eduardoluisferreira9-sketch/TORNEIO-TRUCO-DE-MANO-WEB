@@ -126,7 +126,7 @@
         <div class="crono-container">
             <h3 style="margin: 0; color: var(--ouro); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-family: 'Cinzel', serif;">Tempo Restante da Rodada</h3>
             <div class="timer-wrapper">
-                <div class="timer" id="display-crono">{{ tempo_formatado }}</div>
+                <div class="timer" id="display-crono" data-inicial="{{ config.crono_tempo_restante_seg }}">{{ tempo_formatado }}</div>
             </div>
             <div>
                 <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline;">
@@ -482,24 +482,34 @@
             return true;
         }
 
-        function atualizarTempo() {
-            // CORREÇÃO 2: Apontando o fetch em segundo plano para a rota com prefixo /admin-painel
-            fetch('/admin-painel/api/cronometro').then(r => r.json()).then(data => {
-                let elCrono = document.getElementById('display-crono');
-                if (data.tempo_restante <= 0) {
-                    elCrono.innerText = "⚠️ AGORA TUDO É FALTA!";
-                    elCrono.style.color = "#ff2222";
-                    elCrono.style.fontSize = "2.2rem";
-                } else {
-                    let mins = Math.floor(data.tempo_restante / 60);
-                    let segs = data.tempo_restante % 60;
-                    elCrono.innerText = (mins < 10 ? '0' : '') + mins + ':' + (segs < 10 ? '0' : '') + segs;
-                    elCrono.style.color = "#ffcc00";
-                    elCrono.style.fontSize = "4.5rem";
-                }
-            }).catch(err => console.log("Sincronizando cronômetro..."));
+       function atualizarTempo() {
+            // Buscando o tempo real e atualizado diretamente do servidor com o prefixo correto
+            fetch('/admin-painel/api/cronometro')
+                .then(r => r.json())
+                .then(data => {
+                    let elCrono = document.getElementById('display-crono');
+                    if (!elCrono) return;
+
+                    if (data.tempo_restante <= 0) {
+                        elCrono.innerText = "⚠️ AGORA TUDO É FALTA!";
+                        elCrono.style.color = "#ff2222";
+                        elCrono.style.fontSize = "2.2rem";
+                    } else {
+                        let mins = Math.floor(data.tempo_restante / 60);
+                        let segs = data.tempo_restante % 60;
+                        elCrono.innerText = (mins < 10 ? '0' : '') + mins + ':' + (segs < 10 ? '0' : '') + segs;
+                        elCrono.style.color = "#ffcc00";
+                        elCrono.style.fontSize = "4.5rem";
+                    }
+                })
+                .catch(err => console.log("Sincronizando cronômetro..."));
         }
-        setInterval(atualizarTempo, 2000);
+
+        // ⏱️ Atualiza a cada 1 segundo (1000ms) para contagem fluida e precisa na tela
+        setInterval(atualizarTempo, 1000);
+
+        // 🔥 Executa IMEDIATAMENTE assim que a página carrega para matar o "50:00" fantasma na hora
+        document.addEventListener("DOMContentLoaded", atualizarTempo);
     </script>
 </body>
 </html>
