@@ -696,21 +696,34 @@
             let faseTexto = data.nome_fase || "Fase Inicial";
             let ehGrandeFinalFase = nomeFaseStr.includes("GRANDE FINAL") || nomeFaseStr.includes("FINAL DE TITULOS") || statusFase === "MATA_MATA";
 
-            if (data.fase_torneio === "CLASSIFICATORIA") {
-                faseTexto = `💥 ${data.nome_fase || 'Classificatória'}`;
-                document.getElementById('info-max-rodadas').innerText = `${data.max_rodadas_classificatoria || 5} Rodadas Max`;
-                document.getElementById('info-tempo-rodada').innerText = "50 min";
-            } else {
-                faseTexto = `🏆 ${data.nome_fase || 'Mata-Mata'}`;
-                document.getElementById('info-max-rodadas').innerText = "Eliminatória";
-                document.getElementById('info-tempo-rodada').innerText = "Sem Tempo";
-            }
-            document.getElementById('info-fase').innerText = faseTexto;
-
-            if (data.ranking) {
-                document.getElementById('info-total-atletas').innerText = `${data.ranking.length} Atletas`;
+            const elFase = document.getElementById('info-fase');
+            if (elFase) {
+                if (data.fase_torneio === "CLASSIFICATORIA") {
+                    elFase.innerText = `💥 ${data.nome_fase || 'CLASSIFICATÓRIA'}`;
+                } else {
+                    elFase.innerText = `🏆 ${data.nome_fase || 'MATA-MATA'}`;
+                }
             }
 
+            const elTempo = document.getElementById('info-tempo-rodada');
+            if (elTempo) {
+                // Se estiver no Mata-Mata, remove o tempo. Se estiver na classificatória, usa o valor do Python
+                if (data.fase_torneio === "CLASSIFICATORIA") {
+                    elTempo.innerText = `${data.tempo_rodada || 50} min`;
+                } else {
+                    elTempo.innerText = "Sem Tempo";
+                }
+            }
+
+            const elMax = document.getElementById('info-max-rodadas');
+            if (elMax) {
+                if (data.fase_torneio === "CLASSIFICATORIA") {
+                    elMax.innerText = `${data.max_rodadas || 5} Rodadas Max`;
+                } else {
+                    elMax.innerText = "Eliminatória";
+                }
+            }
+            
             const tempoFormatado = data.tempo || "00:00";
             const cronoAtivo = data.crono_ativo === 1;
             const cronoElement = document.getElementById('cronometro');
