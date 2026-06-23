@@ -1,44 +1,241 @@
-{% extends "base.html" %}
-{% block title %}Inscrição - Torneio de Truco{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6 col-12">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscrição - Torneio de Truco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-principal: #0d2e1b;
+            --bg-cards: #092113;
+            --ouro: #d4af37;
+            --ouro-brilhante: #f3e5ab;
+            --texto-claro: #ffffff; 
+            --texto-subtil: #bdc3c7; 
+            --verde-sucesso: #1b4d3e;
+        }
+
+        body { 
+            background: var(--bg-principal); 
+            color: var(--texto-claro); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
+            background-size: 100% 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container-inscricao {
+            width: 100%;
+            max-width: 550px;
+            margin: 20px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .header-bloco {
+            margin-bottom: 25px;
+        }
+
+        .header-bloco h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--ouro);
+            font-size: 1.8rem;
+            margin: 0 0 5px 0;
+            text-shadow: 0px 3px 6px rgba(0,0,0,0.9);
+        }
+
+        .header-bloco p {
+            color: var(--texto-subtil);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .card-premium {
+            background: var(--bg-cards);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid var(--ouro);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+
+        .taxa-secao {
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .taxa-titulo {
+            font-size: 0.75rem;
+            color: var(--texto-subtil);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .taxa-valor {
+            color: #fff;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+        }
+
+        .pix-container {
+            background: #000;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pix-texto {
+            font-size: 0.85rem;
+            color: var(--ouro-brilhante);
+            margin: 0;
+        }
+
+        .btn-copiar {
+            background: transparent;
+            border: 1px solid var(--ouro);
+            color: var(--ouro);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-copiar:hover {
+            background: var(--ouro);
+            color: #111;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--texto-subtil);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--ouro);
+            outline: none;
+            box-shadow: 0 0 10px rgba(212,175,55,0.15);
+        }
+
+        .form-text {
+            font-size: 0.75rem;
+            color: var(--texto-subtil);
+            margin-top: 6px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); 
+            color: #111; 
+            font-family: 'Cinzel', serif; 
+            font-weight: 800; 
+            border: none; 
+            padding: 15px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            width: 100%; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            text-transform: uppercase; 
+            font-size: 0.95rem;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5); 
+            letter-spacing: 1px;
+            transition: 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-gold:hover { 
+            background: linear-gradient(135deg, var(--ouro-brilhante) 0%, var(--ouro) 100%); 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px rgba(212,175,55,0.3); 
+        }
+
+        .alerta-sucesso {
+            background-color: var(--verde-sucesso);
+            border: 1px solid rgba(46, 204, 113, 0.4);
+            color: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-inscricao">
         
-        <div class="mb-4">
-            <h1 class="text-gold h2 mb-1">Torneio de Truco Cego</h1>
-            <p class="text-light opacity-75">Faça sua inscrição online e garanta sua vaga na mesa!</p>
+        <div class="header-bloco">
+            <h1>Torneio de Truco Cego</h1>
+            <p>Faça sua inscrição online e garanta sua vaga na mesa!</p>
         </div>
 
-        {% if request.args.get('sucesso') == 'true' %}
-        <div class="alert alert-success border-0 text-white mb-4 text-center shadow-sm" style="background-color: #1b4d3e;" role="alert">
-            🎉 <strong>Inscrição Enviada com Sucesso!</strong><br>Aguarde a validação no painel do diretor.
+        <div id="alertaSucesso" class="alerta-sucesso" style="display: none;">
+            🎉 <strong>Inscrição Enviada com Sucesso!</strong><br>
+            Aguarde a validação no painel do diretor.
         </div>
-        {% endif %}
 
-        <div class="card card-premium p-4 shadow-lg">
-            <div class="mb-4 border-bottom border-secondary pb-3">
-                <span class="text-light opacity-50 d-block small mb-1" style="letter-spacing: 0.5px;">TAXA DE USO DA ETAPA</span>
+        <div class="card-premium">
+            <div class="taxa-secao">
+                <span class="taxa-titulo">TAXA DE USO DA ETAPA</span>
+                <h3 class="taxa-valor">R$ {{ config_taxa }}</h3>
                 
-                {# Formatação monetária robusta usando filtros do Jinja #}
-                <h3 class="text-white fw-bold mb-2">
-                    R$ {{ "%0.2f"|format(config_taxa|float) if config_taxa else "0.00" }}
-                </h3>
-                
-                <div class="p-2 rounded bg-dark border border-secondary mt-2 d-flex justify-content-between align-items-center">
-                    <p class="small text-warning mb-0">Chave PIX: <strong id="pixChave">seu-pix-aqui@email.com</strong></p>
-                    <button type="button" class="btn btn-sm btn-outline-warning py-0" onclick="copiarPix()">Copiar</button>
+                <div class="pix-container">
+                    <p class="pix-texto">Chave PIX: <strong id="pixChave">seu-pix-aqui@email.com</strong></p>
+                    <button type="button" class="btn-copiar" onclick="copiarPix()">Copiar</button>
                 </div>
-                <small id="pixFeedback" class="text-success mt-1" style="display: none !important;">✓ Chave copiada com sucesso!</small>
+                <small id="pixFeedback" style="display: none; color: #2ecc71; font-size: 0.75rem; margin-top: 5px; font-weight: bold;">✓ Chave copiada com sucesso!</small>
             </div>
 
             <form action="/inscrever" method="POST" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label class="form-label text-light small fw-semibold">Nome Completo</label>
+                <div class="form-group">
+                    <label>Nome Completo</label>
                     <input type="text" name="nome" class="form-control" placeholder="Ex: João Silva" required>
                 </div>
                 
-                <div class="mb-3">
-                    <label class="form-label text-light small fw-semibold">Entidade / CTG</label>
+                <div class="form-group">
+                    <label>Entidade / CTG</label>
                     <input type="text" name="entidade" list="lista-entidades" class="form-control" placeholder="Ex: CTG SENTINELA" required>
                     <datalist id="lista-entidades">
                         {% for ent in entidades %}
@@ -47,33 +244,40 @@
                     </datalist>
                 </div>
                 
-                <div class="mb-3">
-                    <label class="form-label text-light small fw-semibold">WhatsApp</label>
+                <div class="form-group">
+                    <label>WhatsApp</label>
                     <input type="tel" id="whatsappInput" name="whatsapp" class="form-control" placeholder="Ex: (54) 99999-8888" maxlength="15" required>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label text-light small fw-semibold">Comprovante de Pagamento (Pix)</label>
+                <div class="form-group">
+                    <label>Comprovante de Pagamento (Pix)</label>
                     <input type="file" name="comprovante" class="form-control" accept="image/*,application/pdf" required>
-                    <div class="form-text text-white-50 small">Envie um print de imagem ou o arquivo PDF do comprovante.</div>
+                    <div class="form-text">Envie um print de imagem ou o arquivo PDF do comprovante.</div>
                 </div>
                 
-                <button type="submit" class="btn btn-gold w-100 py-2 fw-bold text-uppercase" style="letter-spacing: 1px;">Confirmar Inscrição</button>
+                <button type="submit" class="btn-gold">Confirmar Inscrição</button>
             </form>
         </div>
 
     </div>
-</div>
 
 <script>
-// Função para cópia da chave PIX para a área de transferência
+// Captura parâmetros da URL de maneira limpa sem depender do request do objeto Jinja
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('sucesso') === 'true') {
+        document.getElementById('alertaSucesso').style.display = 'block';
+    }
+}
+
+// Cópia da chave PIX para a área de transferência
 function copiarPix() {
     var chave = document.getElementById("pixChave").innerText;
     navigator.clipboard.writeText(chave).then(function() {
         var feedback = document.getElementById("pixFeedback");
-        feedback.style.setProperty("display", "block", "important");
+        feedback.style.display = "block";
         setTimeout(function() { 
-            feedback.style.setProperty("display", "none", "important"); 
+            feedback.style.display = "none"; 
         }, 3000);
     }).catch(function(err) {
         console.error("Erro ao copiar chave: ", err);
@@ -86,4 +290,5 @@ document.getElementById('whatsappInput').addEventListener('input', function (e) 
     e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
 });
 </script>
-{% endblock %}
+</body>
+</html>
