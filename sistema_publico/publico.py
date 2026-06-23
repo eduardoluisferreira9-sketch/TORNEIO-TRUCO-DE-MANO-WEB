@@ -159,30 +159,36 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
     if cfg["crono_tempo_restante_seg"] <= 0 and cfg["crono_ativo"] == 1:
         tempo_formatado = "AGORA TUDO É FALTA!"
 
-    # --- (Mantém o restante do seu código original intacto) ---
-    cursor.execute("SELECT rodada FROM confrontos ORDER BY id DESC LIMIT 1")
-    row_r = cursor.fetchone()
-    rodada_atual = row_r["rodada"] if row_r else 0
+    # 🌟 CORREÇÃO CIRÚRGICA: Mapeia e descobre a rodada certa baseada na fase do admin
+    fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA")
     
+    mapeamento_rodadas = {
+        "OITAVAS": -1,
+        "QUARTAS": -2,
+        "SEMIFINAL": -3,
+        "FINAL": -4
+    }
+    
+    if fase_status == "CLASSIFICATORIA":
+        # Na classificatória, pegamos a maior rodada positiva que existe
+        cursor.execute("SELECT rodada FROM confrontos WHERE rodada > 0 ORDER BY id DESC LIMIT 1")
+        row_r = cursor.fetchone()
+        rodada_atual = row_r["rodada"] if row_r else 1
+        nome_fase = f"Fase de Grupos - {rodada_atual}ª Rodada"
+    else:
+        # No mata-mata, o número da rodada é definido pela fase oficial do admin
+        rodada_atual = mapeamento_rodadas.get(fase_status, 0)
+        if fase_status == "OITAVAS": nome_fase = "Oitavas de Final"
+        elif fase_status == "QUARTAS": nome_fase = "Quartas de Final"
+        elif fase_status == "SEMIFINAL": nome_fase = "Semifinal"
+        elif fase_status == "FINAL": nome_fase = "Grande Final"
+        else: nome_fase = "Inscrições Abertas"
+
     confrontos = []
-    nome_fase = "Inscrições Abertas"
-    
     if rodada_atual != 0:
+        # Agora o SELECT buscará exatamente a rodada certa (ex: -3 na Semifinal)
         cursor.execute("SELECT * FROM confrontos WHERE rodada = ? ORDER BY mesa ASC", (rodada_atual,))
         confrontos = [dict(row) for row in cursor.fetchall()]
-        
-        # Define o nome da fase baseando-se estritamente no status oficial do torneio
-        fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA")
-        if fase_status == "CLASSIFICATORIA" and rodada_atual > 0:
-            nome_fase = f"Fase de Grupos - {rodada_atual}ª Rodada"
-        elif fase_status == "OITAVAS":
-            nome_fase = "Oitavas de Final"
-        elif fase_status == "QUARTAS":
-            nome_fase = "Quartas de Final"
-        elif fase_status == "SEMIFINAL":
-            nome_fase = "Semifinal"
-        elif fase_status == "FINAL":
-            nome_fase = "Grande Final"
 
     ranking = []
     if cfg["fase_torneio"] != "INSCRICAO":
@@ -196,7 +202,7 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         "confrontos": confrontos, 
         "ranking": ranking,
         
-        # 🟢 Incluindo os valores dinâmicos da tabela config para o JavaScript ler
+        # 🟢 Valores dinâmicos da tabela config repassados com segurança para o telão
         "tempo_rodada": cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 50,
         "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("max_rodadas") or 5
     })
