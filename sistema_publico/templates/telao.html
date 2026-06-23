@@ -335,7 +335,7 @@
             width: 100%;
             border-collapse: collapse;
         }
-
+        
         .tabela-ranking th {
             color: var(--texto-mutado);
             font-size: 0.85rem;
@@ -756,7 +756,6 @@
                             const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
                             const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
 
-                            // Usa o nome cirúrgico injetado pela API (Grande Final / Disputa 3º Lugar)
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             if (jogo.fase_mesa_nome) {
                                 if (jogo.fase_mesa_nome === "Grande Final") {
@@ -824,3 +823,5 @@
 </script>
 </body>
 </html>
+    </style>
+</head>
