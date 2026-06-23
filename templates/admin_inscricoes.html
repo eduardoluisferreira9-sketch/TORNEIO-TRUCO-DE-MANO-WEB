@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>{{ config.nome_torneio }} - Salão de Jogos</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             /* PALETA TRADICIONAL - FELTRO MUSGO PROFUNDO */
@@ -102,7 +103,7 @@
         .btn { 
             background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); 
             color: var(--texto-escuro); font-family: 'Cinzel', serif; font-weight: 800; border: none; padding: 14px 20px; 
-            border-radius: 6px; cursor: pointer; width: 100%; display: block; text-align: center; 
+            border-radius: 6px; cursor: pointer; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; 
             text-decoration: none; transition: all 0.3s ease; text-transform: uppercase; font-size: 0.9rem;
             box-shadow: 0 6px 12px rgba(0,0,0,0.5); letter-spacing: 1px;
         }
@@ -134,7 +135,7 @@
         .nav-item.active { background: linear-gradient(90deg, var(--ouro) 0%, rgba(212,175,55,0.15) 100%); color: var(--texto-escuro); font-weight: 800; box-shadow: 0 6px 15px rgba(0,0,0,0.6); border-color: var(--ouro-brilhante); }
         .nav-item.active:hover { color: var(--texto-escuro); padding-left: 18px; }
 
-        .naipe-icon { font-size: 1.2rem; display: inline-block; width: 24px; text-align: center; }
+        .naipe-icon { font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center; width: 24px; text-align: center; }
         .grid-tabelas { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; }
     </style>
 </head>
@@ -162,7 +163,7 @@
                             </div>
                         </div>
                         {% if config.fase_torneio == "INSCRICAO" %}
-                            <button type="submit" class="btn" style="font-size: 0.8rem; padding: 10px;">🏆⚙️ Cadastrar Torneio</button>
+                            <button type="submit" class="btn" style="font-size: 0.8rem; padding: 10px;"><i class="fas fa-sliders"></i> Cadastrar Torneio</button>
                         {% else %}
                             <button type="button" class="btn" style="background:#222; color:#555; cursor:not-allowed; font-size: 0.8rem; padding: 10px;" disabled>Em Andamento</button>
                         {% endif %}
@@ -171,23 +172,23 @@
 
                 <div class="nav-links">
                     <a href="/admin-painel/admin/inscricoes" class="nav-item active">
-                        <span class="naipe-icon" style="color: #922b21;">⚔️</span> Inscrições
+                        <span class="naipe-icon" style="color: #922b21;"><i class="fas fa-user-plus"></i></span> Inscrições
                     </a>
                     <a href="/admin-painel/admin/jogos" class="nav-item">
-                        <span class="naipe-icon" style="color: #1e8449;">🌿</span> Mesa de Jogos
+                        <span class="naipe-icon" style="color: #1e8449;"><i class="fas fa-border-all"></i></span> Mesa de Jogos
                     </a>
                     <a href="/admin-painel/admin/classificacao" class="nav-item">
-                        <span class="naipe-icon" style="color: #d4af37;">💰</span> Classificação
+                        <span class="naipe-icon" style="color: #d4af37;"><i class="fas fa-trophy"></i></span> Classificação
                     </a>
                     <a href="/admin-painel/admin/historico" class="nav-item">
-                        <span class="naipe-icon" style="color: #f1c40f;">🏆</span> Galeria de Lendas
+                        <span class="naipe-icon" style="color: #f1c40f;"><i class="fas fa-award"></i></span> Galeria de Lendas
                     </a>
                 </div>
             </div>
 
             <div class="sidebar-rodape">
                 <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
-                    <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;">🚨 Reiniciar Salão</button>
+                    <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;"><i class="fas fa-power-off"></i> Reiniciar Salão</button>
                 </form>
                 <a href="/admin-painel/logout" style="color:var(--ouro); text-align:center; display:block; margin-top:20px; font-size:0.85rem; font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:1px;">🚪 Sair</a>
             </div>
@@ -200,7 +201,7 @@
             </h1>
             
             <div class="card">
-                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;">📝 Nova Inscrição </h3>
+                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;"><i class="fas fa-feather-alt"></i> Nova Inscrição </h3>
                 <form action="/admin-painel/admin/cadastrar-direto" method="POST" style="display:flex; gap:25px; align-items:flex-end;">
                     <div style="flex:2;">
                         <label>Nome do Competidor</label>
@@ -210,13 +211,13 @@
                         <label>CTG / Entidade </label>
                         <input type="text" name="entity" placeholder="Ex: Passo Fundo">
                     </div>
-                    <button type="submit" class="btn" style="width:auto; height:50px; padding: 0 35px; font-size: 0.95rem;">➕ Inscrever</button>
+                    <button type="submit" class="btn" style="width:auto; height:50px; padding: 0 35px; font-size: 0.95rem;"><i class="fas fa-plus"></i> Inscrever</button>
                 </form>
             </div>
 
             <div class="grid-tabelas">
                 <div class="card">
-                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">⚔️ Competidores Confirmados ({{ oficiais|length }})</h3>
+                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"><i class="fas fa-users"></i> Competidores Confirmados ({{ oficiais|length }})</h3>
                     <table>
                         <thead>
                             <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Remover</th></tr>
@@ -229,7 +230,7 @@
                                 <td style="text-align: right;">
                                     <form action="/admin-painel/admin/acao-atleta" method="POST" style="margin:0;">
                                         <input type="hidden" name="id_atleta" value="{{ a.id }}">
-                                        <button type="submit" name="acao" value="excluir" style="background:none; border:none; color:var(--vermelho-pampa); font-weight:800; cursor:pointer; font-size: 0.85rem;" onclick="return confirm('Excluir competidor?')">❌</button>
+                                        <button type="submit" name="acao" value="excluir" style="background:none; border:none; color:var(--vermelho-pampa); font-weight:800; cursor:pointer; font-size: 0.85rem;" onclick="return confirm('Excluir competidor?')"><i class="fas fa-user-xmark"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -241,13 +242,13 @@
                     
                     {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
                     <form action="/admin-painel/admin/iniciar-torneio" method="POST" style="margin-top:30px;">
-                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🏁 Iniciar Torneio</button>
+                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;"><i class="fas fa-flag-checkered"></i> Iniciar Torneio</button>
                     </form>
                     {% endif %}
                 </div>
 
                 <div class="card">
-                    <h3 style="color:#e67e22; margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">⏳ Pedindo Entrada (Web)</h3>
+                    <h3 style="color:#e67e22; margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"><i class="fas fa-hourglass-half"></i> Pedindo Entrada (Web)</h3>
                     <table>
                         <thead>
                             <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Ação</th></tr>
@@ -260,8 +261,8 @@
                                 <td style="text-align: right;">
                                     <form action="/admin-painel/admin/acao-atleta" method="POST" style="display:inline-block; margin:0;">
                                         <input type="hidden" name="id_atleta" value="{{ p.id }}">
-                                        <button type="submit" name="acao" value="aprovar" style="background:var(--verde-sucesso); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem;">Aceitar</button>
-                                        <button type="submit" name="acao" value="recusar" style="background:var(--vermelho-pampa); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem; margin-left:5px;">Golar</button>
+                                        <button type="submit" name="acao" value="aprovar" style="background:var(--verde-sucesso); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem;"><i class="fas fa-check"></i> Aceitar</button>
+                                        <button type="submit" name="acao" value="recusar" style="background:var(--vermelho-pampa); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem; margin-left:5px;"><i class="fas fa-xmark"></i> Golar</button>
                                     </form>
                                 </td>
                             </tr>
@@ -277,17 +278,12 @@
 
     <script>
     function confirmarResetMesa() {
-        // Primeiro aviso de impacto geral
         const passo1 = confirm("⚠️ ATENÇÃO MÁXIMA:\nIsso vai deletar TODOS os guapos cadastrados, confrontos gerados e o histórico da Galeria de Lendas para sempre!\n\nDeseja mesmo prosseguir com a limpeza?");
-        
         if (passo1) {
-            // Segundo aviso para evitar o click automatizado/empolgado
             return confirm("🔴 ÚLTIMO AVISO:\nVocê tem certeza absoluta? Essa ação NÃO tem volta e o salão será resetado para o estado inicial de testes.");
         }
-        
-        return false; // Cancela e não envia nada se clicar em cancelar no primeiro prompt
+        return false;
     }
     </script>
-
 </body>
 </html>
