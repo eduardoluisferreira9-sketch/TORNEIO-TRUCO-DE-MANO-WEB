@@ -505,329 +505,331 @@
         window.location.reload();
     }
 
-    async function atualizarTelao() {
-        try {
-            const response = await fetch(`/api/publico/dados?t=${new Date().getTime()}`);
-            if (!response.ok) return;
-            const data = await response.json();
-            if (!data) return;
+   async function atualizarTelao() {
+    try {
+        const response = await fetch(`/api/publico/dados?t=${new Date().getTime()}`);
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!data) return;
 
-            const statusFase = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
-            const nomeFaseStr = data.nome_fase ? data.nome_fase.toUpperCase() : "";
-            
-            const exibirCerimonial = podioForcadoManualmente || 
-                                     statusFase === "ENCERRADO" || 
-                                     statusFase === "CONCLUIDO" || 
-                                     statusFase === "FINALIZADO" ||
-                                     nomeFaseStr.includes("ENCERRADO") || 
-                                     nomeFaseStr.includes("CONCLUÍDO");
+        const statusFase = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
+        const nomeFaseStr = data.nome_fase ? data.nome_fase.toUpperCase() : "";
+        
+        const exibirCerimonial = podioForcadoManualmente || 
+                                 statusFase === "ENCERRADO" || 
+                                 statusFase === "CONCLUIDO" || 
+                                 statusFase === "FINALIZADO" ||
+                                 nomeFaseStr.includes("ENCERRADO") || 
+                                 nomeFaseStr.includes("CONCLUÍDO");
 
-            if (exibirCerimonial) {
-                // Força reset dos estados de cache visual se entrar no modo pódio
-                ultimoEstadoJogosStr = "";
-                ultimoEstadoRankingStr = "";
+        if (exibirCerimonial) {
+            // Força reset dos estados de cache visual se entrar no modo pódio
+            ultimoEstadoJogosStr = "";
+            ultimoEstadoRankingStr = "";
 
-                const telaPrincipal = document.getElementById('conteudo-principal-telao');
-                if (telaPrincipal) telaPrincipal.style.gridTemplateColumns = "1fr"; 
+            const telaPrincipal = document.getElementById('conteudo-principal-telao');
+            if (telaPrincipal) telaPrincipal.style.gridTemplateColumns = "1fr"; 
 
-                let p1 = "---", p2 = "---", p3 = "---", p4 = "---";
-                let reiDasFloresNome = "---";
-                let qtdFloresTotal = 0;
+            let p1 = "---", p2 = "---", p3 = "---", p4 = "---";
+            let reiDasFloresNome = "---";
+            let qtdFloresTotal = 0;
 
-                if ((nomeFaseStr.includes("FINAL") || statusFase === "MATA_MATA") && data.confrontos && data.confrontos.length > 0) {
-                    const jogoFinal = data.confrontos.find(j => Number(j.mesa) === 1);
-                    if (jogoFinal) {
-                        const t1 = Number(jogoFinal.tentos1 || 0);
-                        const t2 = Number(jogoFinal.tentos2 || 0);
-                        const vId = jogoFinal.vencedor_id;
-                        const idA1 = jogoFinal.atleta1_id || jogoFinal.athlete1_id;
+            if ((nomeFaseStr.includes("FINAL") || statusFase === "MATA_MATA") && data.confrontos && data.confrontos.length > 0) {
+                const jogoFinal = data.confrontos.find(j => Number(j.mesa) === 1);
+                if (jogoFinal) {
+                    const t1 = Number(jogoFinal.tentos1 || 0);
+                    const t2 = Number(jogoFinal.tentos2 || 0);
+                    const vId = jogoFinal.vencedor_id;
+                    const idA1 = jogoFinal.atleta1_id || jogoFinal.athlete1_id;
 
-                        if (vId || t1 > 0 || t2 > 0) {
-                            if (vId == idA1 || t1 > t2) {
-                                p1 = jogoFinal.atleta1_nome || "---";
-                                p2 = jogoFinal.atleta2_nome || "---";
-                            } else {
-                                p1 = jogoFinal.atleta2_nome || "---";
-                                p2 = jogoFinal.atleta1_nome || "---";
-                            }
+                    if (vId || t1 > 0 || t2 > 0) {
+                        if (vId == idA1 || t1 > t2) {
+                            p1 = jogoFinal.atleta1_nome || "---";
+                            p2 = jogoFinal.atleta2_nome || "---";
                         } else {
-                            p1 = `${jogoFinal.atleta1_nome} (Finalista)`;
-                            p2 = `${jogoFinal.atleta2_nome} (Finalista)`;
+                            p1 = jogoFinal.atleta2_nome || "---";
+                            p2 = jogoFinal.atleta1_nome || "---";
                         }
+                    } else {
+                        p1 = `${jogoFinal.atleta1_nome} (Finalista)`;
+                        p2 = `${jogoFinal.atleta2_nome} (Finalista)`;
                     }
+                }
 
-                    const jogoBronze = data.confrontos.find(j => Number(j.mesa) === 2);
-                    if (jogoBronze) {
-                        const t1 = Number(jogoBronze.tentos1 || 0);
-                        const t2 = Number(jogoBronze.tentos2 || 0);
-                        const vId = jogoBronze.vencedor_id;
-                        const idA1 = jogoBronze.atleta1_id || jogoBronze.athlete1_id;
+                const jogoBronze = data.confrontos.find(j => Number(j.mesa) === 2);
+                if (jogoBronze) {
+                    const t1 = Number(jogoBronze.tentos1 || 0);
+                    const t2 = Number(jogoBronze.tentos2 || 0);
+                    const vId = jogoBronze.vencedor_id;
+                    const idA1 = jogoBronze.atleta1_id || jogoBronze.athlete1_id;
 
-                        if (vId || t1 > 0 || t2 > 0) {
-                            if (vId == idA1 || t1 > t2) {
-                                p3 = jogoBronze.atleta1_nome || "---";
-                                p4 = jogoBronze.atleta2_nome || "---";
-                            } else {
-                                p3 = jogoBronze.atleta2_nome || "---";
-                                p4 = jogoBronze.atleta1_nome || "---";
-                            }
+                    if (vId || t1 > 0 || t2 > 0) {
+                        if (vId == idA1 || t1 > t2) {
+                            p3 = jogoBronze.atleta1_nome || "---";
+                            p4 = jogoBronze.atleta2_nome || "---";
                         } else {
-                            p3 = `${jogoBronze.atleta1_nome} (Disputa)`;
-                            p4 = `${jogoBronze.atleta2_nome} (Disputa)`;
+                            p3 = jogoBronze.atleta2_nome || "---";
+                            p4 = jogoBronze.atleta1_nome || "---";
                         }
+                    } else {
+                        p3 = `${jogoBronze.atleta1_nome} (Disputa)`;
+                        p4 = `${jogoBronze.atleta2_nome} (Disputa)`;
                     }
+                }
 
-                    if (data.podio) {
-                        reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
-                        qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
-                    }
-                } 
-                else if (data.podio) {
-                    p1 = data.podio.campeao || data.podio.p1 || "---";
-                    p2 = data.podio.vice || data.podio.p2 || "---";
-                    p3 = data.podio.terceiro || data.podio.p3 || "---";
-                    p4 = data.podio.quarto || data.podio.p4 || "---";
+                if (data.podio) {
                     reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
                     qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
-                } 
-                else if (data.ranking && data.ranking.length > 0) {
-                    p1 = data.ranking[0]?.nome || "---";
-                    p2 = data.ranking[1]?.nome || "---";
-                    p3 = data.ranking[2]?.nome || "---";
-                    p4 = data.ranking[3]?.nome || "---";
                 }
-
-                if (p1 !== "---" && p1 !== "") {
-                    localStorage.setItem('cache_nomes_podio', JSON.stringify({p1, p2, p3, p4, reiDasFloresNome, qtdFloresTotal}));
-                } else {
-                    const cache = JSON.parse(localStorage.getItem('cache_nomes_podio') || '{}');
-                    if (cache.p1) {
-                        p1 = cache.p1; p2 = cache.p2; p3 = cache.p3; p4 = cache.p4;
-                        reiDasFloresNome = cache.reiDasFloresNome || "---";
-                        qtdFloresTotal = cache.qtdFloresTotal || 0;
-                    }
-                }
-
-                if (telaPrincipal) {
-                    telaPrincipal.innerHTML = `
-                        <div class="podio-wrapper">
-                            <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
-                            <div style="text-align:center; color:var(--texto-mutado); margin-bottom:45px; font-style:italic; font-size:1.2rem;">O pódio oficial da edição está consolidado nos pergaminhos da arena!</div>
-                            
-                            <div class="podio-flex">
-                                <div class="podio-card prata">
-                                    <div>
-                                        <div class="podio-medalha">🥈</div>
-                                        <div class="podio-rotulo-lugar">Vice-Campeão</div>
-                                    </div>
-                                    <div class="podio-nome">${p2}</div>
-                                </div>
-
-                                <div class="podio-card ouro">
-                                    <div>
-                                        <div class="podio-medalha">👑</div>
-                                        <div class="podio-rotulo-lugar">GRANDE CAMPEÃO</div>
-                                    </div>
-                                    <div class="podio-nome" style="font-size: 1.6rem; color: var(--dourado-brilhante);">${p1}</div>
-                                </div>
-
-                                <div class="podio-card bronze">
-                                    <div>
-                                        <div class="podio-medalha">🥉</div>
-                                        <div class="podio-rotulo-lugar">3º Colocado</div>
-                                    </div>
-                                    <div class="podio-nome">${p3}</div>
-                                </div>
-
-                                <div class="podio-card quarto">
-                                    <div>
-                                        <div class="podio-medalha" style="font-size: 2rem; margin-top: 5px;">🏅</div>
-                                        <div class="podio-rotulo-lugar">4º Colocado</div>
-                                    </div>
-                                    <div class="podio-nome">${p4}</div>
-                                </div>
-                            </div>
-
-                            <div class="painel-rei-flores" style="border: 2px dashed #8a2be2; background: linear-gradient(135deg, rgba(75,0,130,0.2), rgba(138,43,226,0.05)); padding: 25px; border-radius: 12px; text-align: center; max-width: 650px; margin: 50px auto 0 auto; box-shadow: 0 0 15px rgba(138,43,226,0.15);">
-                                <div style="color: #da70d6; font-size: 1.3rem; font-weight: bold; margin-bottom: 6px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
-                                <div style="color: #aaa; font-size: 0.95rem; margin-bottom: 12px;">O maior cantador de flores de toda a edição é:</div>
-                                <div style="color: #ffffff; font-size: 2rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px;">${reiDasFloresNome.toUpperCase()}</div>
-                                <div style="display: inline-block; background: #8a2be2; color: #fff; padding: 6px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-                                    🎯 ${qtdFloresTotal} Flores Cantadas no Torneio
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                document.getElementById('info-fase').innerText = "🏁 Torneio Concluído";
-                document.getElementById('cronometro').innerText = "--:--";
-                return;
+            } 
+            else if (data.podio) {
+                p1 = data.podio.campeao || data.podio.p1 || "---";
+                p2 = data.podio.vice || data.podio.p2 || "---";
+                p3 = data.podio.terceiro || data.podio.p3 || "---";
+                p4 = data.podio.quarto || data.podio.p4 || "---";
+                reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
+                qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
+            } 
+            else if (data.ranking && data.ranking.length > 0) {
+                p1 = data.ranking[0]?.nome || "---";
+                p2 = data.ranking[1]?.nome || "---";
+                p3 = data.ranking[2]?.nome || "---";
+                p4 = data.ranking[3]?.nome || "---";
             }
 
-            // FLUXO NORMAL (Mostrando as mesas ativas se não estiver em modo pódio)
-            const telaPrincipal = document.getElementById('conteudo-principal-telao');
-            if (telaPrincipal && !document.getElementById('container-jogos')) {
-                telaPrincipal.style.gridTemplateColumns = "2fr 1fr";
+            if (p1 !== "---" && p1 !== "") {
+                localStorage.setItem('cache_nomes_podio', JSON.stringify({p1, p2, p3, p4, reiDasFloresNome, qtdFloresTotal}));
+            } else {
+                const cache = JSON.parse(localStorage.getItem('cache_nomes_podio') || '{}');
+                if (cache.p1) {
+                    p1 = cache.p1; p2 = cache.p2; p3 = cache.p3; p4 = cache.p4;
+                    reiDasFloresNome = cache.reiDasFloresNome || "---";
+                    qtdFloresTotal = cache.qtdFloresTotal || 0;
+                }
+            }
+
+            if (telaPrincipal) {
                 telaPrincipal.innerHTML = `
-                    <div>
-                        <h2 class="secao-titulo">Mesas em Andamento</h2>
-                        <div id="container-jogos" class="grid-jogos"></div>
-                    </div>
-                    <div class="ranking-container">
-                        <h2 class="secao-titulo" style="margin-bottom: 20px;">Top 5 Líderes</h2>
-                        <table class="tabela-ranking">
-                            <thead><tr><th>Pos</th><th>Atleta</th><th style="text-align: right;">Vitórias</th></tr></thead>
-                            <tbody id="tabela-ranking-corpo"></tbody>
-                        </table>
+                    <div class="podio-wrapper">
+                        <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
+                        <div style="text-align:center; color:var(--texto-mutado); margin-bottom:45px; font-style:italic; font-size:1.2rem;">O pódio oficial da edição está consolidado nos pergaminhos da arena!</div>
+                        
+                        <div class="podio-flex">
+                            <div class="podio-card prata">
+                                <div>
+                                    <div class="podio-medalha">🥈</div>
+                                    <div class="podio-rotulo-lugar">Vice-Campeão</div>
+                                </div>
+                                <div class="podio-nome">${p2}</div>
+                            </div>
+
+                            <div class="podio-card ouro">
+                                <div>
+                                    <div class="podio-medalha">👑</div>
+                                    <div class="podio-rotulo-lugar">GRANDE CAMPEÃO</div>
+                                </div>
+                                <div class="podio-nome" style="font-size: 1.6rem; color: var(--dourado-brilhante);">${p1}</div>
+                            </div>
+
+                            <div class="podio-card bronze">
+                                <div>
+                                    <div class="podio-medalha">🥉</div>
+                                    <div class="podio-rotulo-lugar">3º Colocado</div>
+                                </div>
+                                <div class="podio-nome">${p3}</div>
+                            </div>
+
+                            <div class="podio-card quarto">
+                                <div>
+                                    <div class="podio-medalha" style="font-size: 2rem; margin-top: 5px;">🏅</div>
+                                    <div class="podio-rotulo-lugar">4º Colocado</div>
+                                </div>
+                                <div class="podio-nome">${p4}</div>
+                            </div>
+                        </div>
+
+                        <div class="painel-rei-flores" style="border: 2px dashed #8a2be2; background: linear-gradient(135deg, rgba(75,0,130,0.2), rgba(138,43,226,0.05)); padding: 25px; border-radius: 12px; text-align: center; max-width: 650px; margin: 50px auto 0 auto; box-shadow: 0 0 15px rgba(138,43,226,0.15);">
+                            <div style="color: #da70d6; font-size: 1.3rem; font-weight: bold; margin-bottom: 6px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
+                            <div style="color: #aaa; font-size: 0.95rem; margin-bottom: 12px;">O maior cantador de flores de toda a edição é:</div>
+                            <div style="color: #ffffff; font-size: 2rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px;">${reiDasFloresNome.toUpperCase()}</div>
+                            <div style="display: inline-block; background: #8a2be2; color: #fff; padding: 6px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                🎯 ${qtdFloresTotal} Flores Cantadas no Torneio
+                            </div>
+                        </div>
                     </div>
                 `;
             }
-
-            let faseTexto = data.nome_fase || "Fase Inicial";
-            let ehGrandeFinalFase = nomeFaseStr.includes("GRANDE FINAL") || nomeFaseStr.includes("FINAL DE TITULOS") || statusFase === "MATA_MATA";
-
-            // Captura os valores dinâmicos enviados pela API do publico.py
-            const tempoDefinido = `${data.tempo_rodada || '--'} min`;
-            const rodadasDefinitivas = `${data.max_rodadas || 5} Rodadas Max`;
-
-            if (data.fase_torneio === "CLASSIFICATORIA") {
-                faseTexto = `💥 ${data.nome_fase || 'Classificatória'}`;
-                document.getElementById('info-max-rodadas').innerText = rodadasDefinitivas;
-                document.getElementById('info-tempo-rodada').innerText = tempoDefinido;
-            } else {
-                faseTexto = `🏆 ${data.nome_fase || 'Mata-Mata'}`;
-                // Mantém o tempo dinâmico do admin mesmo no Mata-Mata
-                document.getElementById('info-tempo-rodada').innerText = tempoDefinido;
-                document.getElementById('info-max-rodadas').innerText = "Eliminatória";
-            }
-            document.getElementById('info-fase').innerText = faseTexto;
-
-            if (data.ranking) {
-                document.getElementById('info-total-atletas').innerText = `${data.ranking.length} Atletas`;
-            }
-
-            const tempoFormatado = data.tempo || "00:00";
-            const cronoAtivo = data.crono_ativo === 1;
-            const cronoElement = document.getElementById('cronometro');
-            const alertaElement = document.getElementById('alerta-falta');
             
-            if (!cronoAtivo) {
-                cronoElement.innerText = tempoFormatado;
-                cronoElement.style.color = '#555555';
-                cronoElement.parentElement.style.borderColor = '#444444';
-                cronoElement.parentElement.style.boxShadow = 'none';
-                alertaElement.style.display = 'none';
-            } else {
-                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
-                cronoElement.parentElement.style.boxShadow = '0 0 15px rgba(212, 175, 55, 0.3)';
-                
-                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
-                    cronoElement.innerText = "00:00";
-                    cronoElement.style.color = 'var(--danger)';
-                    alertaElement.style.display = 'flex';
-                } else {
-                    cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--borda-ouro)';
-                    alertaElement.style.display = 'none';
-                }
-            }
-
-            // --- ATUALIZAÇÃO DOS CONFRONTOS SEM FLICKER ---
-            const containerJogos = document.getElementById('container-jogos');
-            if (containerJogos) {
-                const assinaturaAtualJogos = JSON.stringify(data.confrontos || []);
-                
-                if (assinaturaAtualJogos !== ultimoEstadoJogosStr) {
-                    ultimoEstadoJogosStr = assinaturaAtualJogos;
-                    containerJogos.innerHTML = '';
-                    
-                    if (!data.confrontos || data.confrontos.length === 0) {
-                        containerJogos.innerHTML = `<div style="color: var(--texto-mutado); font-style: italic; padding: 10px;">Nenhum confronto ativo. Aguardando rodada...</div>`;
-                    } else {
-                        data.confrontos.forEach(jogo => {
-                            const card = document.createElement('div');
-                            card.className = 'card-jogo';
-                            const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA - GANHOU PONTOS";
-                            
-                            const f1 = jogo.sets1 !== undefined && jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
-                            const t1 = jogo.tentos1 || 0;
-                            const fa1 = jogo.faltas1 || 0;
-
-                            const f2 = jogo.sets2 !== undefined && jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
-                            const t2 = jogo.tentos2 || 0;
-                            const fa2 = jogo.faltas2 || 0;
-
-                            const p1Str = `${f1}S | ${t1}T | ${fa1}F`;
-                            const p2Str = `${f2}S | ${t2}T | ${fa2}F`;
-                            
-                            const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
-                            const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
-
-                            let textoTagMesa = `Mesa ${jogo.mesa}`;
-                            const tipoConfrontoStr = jogo.tipo_confronto ? jogo.tipo_confronto.toUpperCase() : "";
-
-                            if (tipoConfrontoStr === "FINAL" || (ehGrandeFinalFase && Number(jogo.mesa) === 1)) {
-                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (tipoConfrontoStr === "TERCEIRO" || tipoConfrontoStr === "3LUGAR" || tipoConfrontoStr === "BRONZE" || (ehGrandeFinalFase && Number(jogo.mesa) === 2)) {
-                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
-                            } else if (data.fase_torneio !== "CLASSIFICATORIA") {
-                                textoTagMesa = `Mesa ${jogo.mesa} — Eliminatória`;
-                            }
-
-                            card.innerHTML = `
-                                <div class="mesa-tag">${textoTagMesa}</div>
-                                <div class="confronto-flex">
-                                    <div class="atleta-box ${j1Lider ? 'lider-mesa' : ''}">
-                                        <span class="atleta-linha">${jogo.atleta1_nome}</span>
-                                        <span class="placar-tag">${p1Str}</span>
-                                    </div>
-                                    <div class="vs-tag">VS</div>
-                                    <div class="atleta-box ${j2Lider ? 'lider-mesa' : ''}">
-                                        <span class="atleta-linha">${advNome}</span>
-                                        <span class="placar-tag">${p2Str}</span>
-                                    </div>
-                                </div>
-                            `;
-                            containerJogos.appendChild(card);
-                        });
-                    }
-                }
-            }
-
-            // --- ATUALIZAÇÃO DO RANKING SEM FLICKER ---
-            const tableBody = document.getElementById('tabela-ranking-corpo');
-            if (tableBody) {
-                const top5Data = data.ranking ? data.ranking.slice(0, 5) : [];
-                const assinaturaAtualRanking = JSON.stringify(top5Data);
-
-                if (assinaturaAtualRanking !== ultimoEstadoRankingStr) {
-                    ultimoEstadoRankingStr = assinaturaAtualRanking;
-                    tableBody.innerHTML = '';
-                    
-                    if (top5Data.length > 0) {
-                        top5Data.forEach((player, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td class="posicao-num">${index + 1}º</td>
-                                <td style="font-weight: 500;">${player.nome}</td>
-                                <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                    } else {
-                        tableBody.innerHTML = `<tr><td colspan="3" style="color: var(--texto-mutado); text-align: center; font-style: italic; padding: 20px 0;">Nenhum atleta listado.</td></tr>`;
-                    }
-                }
-            }
-
-        } catch (error) {
-            console.error("Erro no processamento de dados do telão:", error);
+            document.getElementById('info-fase').innerText = "🏁 Torneio Concluído";
+            document.getElementById('cronometro').innerText = "--:--";
+            return;
         }
-    }
 
-    atualizarTelao();
-    setInterval(atualizarTelao, 3000); // pooling de 3 segundos
-</script>
-</body>
+        // FLUXO NORMAL (Mostrando as mesas ativas se não estiver em modo pódio)
+        const telaPrincipal = document.getElementById('conteudo-principal-telao');
+        if (telaPrincipal && !document.getElementById('container-jogos')) {
+            telaPrincipal.style.gridTemplateColumns = "2fr 1fr";
+            telaPrincipal.innerHTML = `
+                <div>
+                    <h2 class="secao-titulo">Mesas em Andamento</h2>
+                    <div id="container-jogos" class="grid-jogos"></div>
+                </div>
+                <div class="ranking-container">
+                    <h2 class="secao-titulo" style="margin-bottom: 20px;">Top 5 Líderes</h2>
+                    <table class="tabela-ranking">
+                        <thead><tr><th>Pos</th><th>Atleta</th><th style="text-align: right;">Vitórias</th></tr></thead>
+                        <tbody id="tabela-ranking-corpo"></tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        let faseTexto = data.nome_fase || "Fase Inicial";
+        let ehGrandeFinalFase = nomeFaseStr.includes("GRANDE FINAL") || nomeFaseStr.includes("FINAL DE TITULOS") || statusFase === "MATA_MATA";
+
+        // 💥 CORREÇÃO DE LEITURA: Captura os valores reais vindos diretamente do banco de dados mapeados pelo publico.py
+        const tempoDefinido = data.tempo_rodada ? `${data.tempo_rodada} min` : "50 min";
+        const rodadasDefinitivas = data.max_rodadas ? `${data.max_rodadas} Rodadas Max` : "5 Rodadas Max";
+
+        if (data.fase_torneio === "CLASSIFICATORIA") {
+            faseTexto = `💥 ${data.nome_fase || 'Classificatória'}`;
+            document.getElementById('info-max-rodadas').innerText = rodadasDefinitivas;
+        } else {
+            faseTexto = `🏆 ${data.nome_fase || 'Mata-Mata'}`;
+            document.getElementById('info-max-rodadas').innerText = "Eliminatória";
+        }
+        
+        // 🔥 CORREÇÃO VISUAL: Força a duração por rodada a exibir o tempo do admin em ambas as fases (Garante que nunca fique "-- min")
+        const elementoTempoRodada = document.getElementById('info-tempo-rodada');
+        if (elementoTempoRodada) {
+            elementoTempoRodada.innerText = tempoDefinido;
+        }
+
+        document.getElementById('info-fase').innerText = faseTexto;
+
+        if (data.ranking) {
+            document.getElementById('info-total-atletas').innerText = `${data.ranking.length} Atletas`;
+        }
+
+        const tempoFormatado = data.tempo || "00:00";
+        const cronoAtivo = data.crono_ativo === 1;
+        const cronoElement = document.getElementById('cronometro');
+        const alertaElement = document.getElementById('alerta-falta');
+        
+        if (!cronoAtivo) {
+            cronoElement.innerText = tempoFormatado;
+            cronoElement.style.color = '#555555';
+            cronoElement.parentElement.style.borderColor = '#444444';
+            cronoElement.parentElement.style.boxShadow = 'none';
+            alertaElement.style.display = 'none';
+        } else {
+            cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
+            cronoElement.parentElement.style.boxShadow = '0 0 15px rgba(212, 175, 55, 0.3)';
+            
+            if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
+                cronoElement.innerText = "00:00";
+                cronoElement.style.color = 'var(--danger)';
+                alertaElement.style.display = 'flex';
+            } else {
+                cronoElement.innerText = tempoFormatado;
+                cronoElement.style.color = 'var(--borda-ouro)';
+                alertaElement.style.display = 'none';
+            }
+        }
+
+        // --- ATUALIZAÇÃO DOS CONFRONTOS SEM FLICKER ---
+        const containerJogos = document.getElementById('container-jogos');
+        if (containerJogos) {
+            const assinaturaAtualJogos = JSON.stringify(data.confrontos || []);
+            
+            if (assinaturaAtualJogos !== ultimoEstadoJogosStr) {
+                ultimoEstadoJogosStr = assinaturaAtualJogos;
+                containerJogos.innerHTML = '';
+                
+                if (!data.confrontos || data.confrontos.length === 0) {
+                    containerJogos.innerHTML = `<div style="color: var(--texto-mutado); font-style: italic; padding: 10px;">Nenhum confronto ativo. Aguardando rodada...</div>`;
+                } else {
+                    data.confrontos.forEach(jogo => {
+                        const card = document.createElement('div');
+                        card.className = 'card-jogo';
+                        const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA - GANHOU PONTOS";
+                        
+                        const f1 = jogo.sets1 !== undefined && jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
+                        const t1 = jogo.tentos1 || 0;
+                        const fa1 = jogo.faltas1 || 0;
+
+                        const f2 = jogo.sets2 !== undefined && jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
+                        const t2 = jogo.tentos2 || 0;
+                        const fa2 = jogo.faltas2 || 0;
+
+                        const p1Str = `${f1}S | ${t1}T | ${fa1}F`;
+                        const p2Str = `${f2}S | ${t2}T | ${fa2}F`;
+                        
+                        const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
+                        const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
+
+                        let textoTagMesa = `Mesa ${jogo.mesa}`;
+                        const tipoConfrontoStr = jogo.tipo_confronto ? jogo.tipo_confronto.toUpperCase() : "";
+
+                        if (tipoConfrontoStr === "FINAL" || (ehGrandeFinalFase && Number(jogo.mesa) === 1)) {
+                            textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                        } else if (tipoConfrontoStr === "TERCEIRO" || tipoConfrontoStr === "3LUGAR" || tipoConfrontoStr === "BRONZE" || (ehGrandeFinalFase && Number(jogo.mesa) === 2)) {
+                            textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                        } else if (data.fase_torneio !== "CLASSIFICATORIA") {
+                            textoTagMesa = `Mesa ${jogo.mesa} — Eliminatória`;
+                        }
+
+                        card.innerHTML = `
+                            <div class="mesa-tag">${textoTagMesa}</div>
+                            <div class="confronto-flex">
+                                <div class="atleta-box ${j1Lider ? 'lider-mesa' : ''}">
+                                    <span class="atleta-linha">${jogo.atleta1_nome}</span>
+                                    <span class="placar-tag">${p1Str}</span>
+                                </div>
+                                <div class="vs-tag">VS</div>
+                                <div class="atleta-box ${j2Lider ? 'lider-mesa' : ''}">
+                                    <span class="atleta-linha">${advNome}</span>
+                                    <span class="placar-tag">${p2Str}</span>
+                                </div>
+                            </div>
+                        `;
+                        containerJogos.appendChild(card);
+                    });
+                }
+            }
+        }
+
+        // --- ATUALIZAÇÃO DO RANKING SEM FLICKER ---
+        const tableBody = document.getElementById('tabela-ranking-corpo');
+        if (tableBody) {
+            const top5Data = data.ranking ? data.ranking.slice(0, 5) : [];
+            const assinaturaAtualRanking = JSON.stringify(top5Data);
+
+            if (assinaturaAtualRanking !== ultimoEstadoRankingStr) {
+                ultimoEstadoRankingStr = assinaturaAtualRanking;
+                tableBody.innerHTML = '';
+                
+                if (top5Data.length > 0) {
+                    top5Data.forEach((player, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="posicao-num">${index + 1}º</td>
+                            <td style="font-weight: 500;">${player.nome}</td>
+                            <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="3" style="color: var(--texto-mutado); text-align: center; font-style: italic; padding: 20px 0;">Nenhum atleta listado.</td></tr>`;
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error("Erro no processamento de dados do telão:", error);
+    }
+}
+
+atualizarTelao();
+setInterval(atualizarTelao, 3000); // pooling de 3 segundos
 </html>
