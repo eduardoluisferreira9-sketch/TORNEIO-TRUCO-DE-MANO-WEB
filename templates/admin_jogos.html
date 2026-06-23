@@ -188,7 +188,7 @@
                     </span>
                     
                     {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|replace(chr(39), '')|replace(chr(34), '') }}', '{{ c.atleta2_nome|replace(chr(39), '')|replace(chr(34), '') }}')">🖨️ Súmula</button>
+                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|escapejs }}', '{{ c.atleta2_nome|escapejs }}')">🖨️ Súmula</button>
                     {% endif %}
                 </div>
                 
@@ -225,7 +225,7 @@
                 </div>
 
                 {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|replace(chr(39), '')|replace(chr(34), '') }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|replace(chr(39), '')|replace(chr(34), '') }}')">
+                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|escapejs }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|escapejs }}')">
                         {% if c.vencedor_id %}⚙️ ALTERAR RESULTADO{% else %}🃏 LANÇAR PLACAR{% endif %}
                     </button>
                 {% else %}
@@ -248,7 +248,7 @@
 
                 <label>1. Quem Ganhou a Partida?</label>
                 <div class="selector-group">
-                    <div class="btn-select" id="btn_atleta1" onclick="selecionarVencedor(1)">Atleta 1</div>
+                    <div class="btn-select" id="btn_atleta1" onclick="selecionorVencedor(1)">Atleta 1</div>
                     <div class="btn-select" id="btn_atleta2" onclick="selecionarVencedor(2)">Atleta 2</div>
                 </div>
 
@@ -294,8 +294,8 @@
             {% for c in confrontos %}
             {
                 mesa: "{{ c.mesa }}",
-                atleta1: "{{ c.atleta1_nome|replace('\"', '\\\"')|replace('\n', '') }}",
-                atleta2: "{{ (c.atleta2_nome if c.atleta2_nome else '')|replace('\"', '\\\"')|replace('\n', '') }}",
+                atleta1: "{{ c.atleta1_nome|escapejs }}",
+                atleta2: "{{ (c.atleta2_nome if c.atleta2_nome else '')|escapejs }}",
                 atleta2_id: {% if c.atleta2_id is defined %}{{ c.atleta2_id if c.atleta2_id is not none else 'null' }}{% else %}{{ c.athlete2_id if c.athlete2_id is not none else 'null' }}{% endif %}
             },
             {% endfor %}
@@ -336,7 +336,7 @@
             return `${r}ª RODADA`;
         }
 
-        function gerarHtmlCupom(mesaNum, j1, j2) {
+function gerarHtmlCupom(mesaNum, j1, j2) {
             const nomeTorneio = document.getElementById('nome-torneio-global')?.innerText.replace('🏆 ', '') || "TORNEIO DE TRUCO";
             const rodadaTexto = obterTextoRodada();
             let identificacaoMesa = `MESA ${mesaNum}`;
@@ -482,7 +482,7 @@
             if(!v_id) { alert("Selecione o vencedor!"); return false; }
             if(!fmt) { alert("Selecione o formato (2x0 ou 2x1)!"); return false; }
 
-            // Proteção idêntica às restrições do main.py
+            // Proteção idêntica às restrições do backend
             if (fmt === '2x1') {
                 if (selecionadoIdx === 1 && t1 <= t2) {
                     alert("No formato 2x1, os tentos do Vencedor (Atleta 1) precisam ser maiores que os do perdedor!");
@@ -494,7 +494,7 @@
                 }
             }
 
-            // Habilita antes do submit para garantir que o POST capture os dados de campos desabilitados
+            // Habilita os campos no final da validação para garantir que os valores entrem no POST payload
             document.getElementById('inp_t1').disabled = false;
             document.getElementById('inp_t2').disabled = false;
             return true;
