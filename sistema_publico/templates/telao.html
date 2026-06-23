@@ -275,7 +275,7 @@
             font-weight: bold;
         }
 
-        /* PÓDIO ESTILIZADO CORRIGIDO */
+        /* PÓDIO ESTILIZADO */
         .podio-wrapper {
             grid-column: span 2;
             text-align: center;
@@ -311,25 +311,14 @@
         .podio-card.ouro { border-color: #d4af37; height: 320px; box-shadow: 0 0 30px rgba(212,175,55,0.25); }
         .podio-card.prata { border-color: #cbd5e1; height: 260px; }
         .podio-card.bronze { border-color: #cd7f32; height: 220px; }
-        .podio-card.quarto { border-color: var(--madeira); height: 180px; } /* Estilo para o 4º colocado */
         
         .podio-medalha { font-size: 3.5rem; margin-bottom: 5px; }
         .podio-card.ouro .podio-medalha { font-size: 4.5rem; }
         
-        /* Estilo de texto seguro e alinhado para o 4º lugar */
-        .podio-num-quarto {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--madeira);
-            margin-bottom: 15px;
-            line-height: 1;
-        }
-
         .podio-rotulo-lugar { font-weight: bold; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; }
         .podio-card.ouro .podio-rotulo-lugar { color: var(--dourado-brilhante); }
         .podio-card.prata .podio-rotulo-lugar { color: #cbd5e1; }
         .podio-card.bronze .podio-rotulo-lugar { color: #f0a85d; }
-        .podio-card.quarto .podio-rotulo-lugar { color: var(--madeira); }
         
         .podio-nome { font-size: 1.4rem; font-weight: bold; color: #fff; }
 
@@ -461,11 +450,11 @@
             <div id="info-fase" class="info-valor">---</div>
         </div>
         <div class="info-item">
-            <div class="info-rotulo">Duração por Rodada</div>
-            <div id="info-tempo-rodada" class="info-valor">-- min</div>
+            <div class="info-rotulo">Andamento</div>
+            <div id="info-detalhe-fase" class="info-valor">---</div>
         </div>
         <div class="info-item">
-            <div class="info-rotulo">Fase Classificatória</div>
+            <div class="info-rotulo">Configuração</div>
             <div id="info-max-rodadas" class="info-valor">-- Rodadas Max</div>
         </div>
         <div class="info-item">
@@ -494,7 +483,7 @@
             </table>
         </div>
     </div>
-   
+
     <script>
     let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
     
@@ -532,7 +521,6 @@
                                      nomeFaseStr.includes("CONCLUÍDO");
 
             if (exibirCerimonial) {
-                // Força reset dos estados de cache visual se entrar no modo pódio
                 ultimoEstadoJogosStr = "";
                 ultimoEstadoRankingStr = "";
 
@@ -543,7 +531,7 @@
                 let reiDasFloresNome = "---";
                 let qtdFloresTotal = 0;
 
-                if ((nomeFaseStr.includes("FINAL") || statusFase === "MATA_MATA") && data.confrontos && data.confrontos.length > 0) {
+                if ((nomeFaseStr.includes("FINAL") || statusFase === "FINAL" || statusFase === "MATA_MATA") && data.confrontos && data.confrontos.length > 0) {
                     const jogoFinal = data.confrontos.find(j => Number(j.mesa) === 1);
                     if (jogoFinal) {
                         const t1 = Number(jogoFinal.tentos1 || 0);
@@ -585,21 +573,16 @@
                             p4 = `${jogoBronze.atleta2_nome} (Disputa)`;
                         }
                     }
-
-                    if (data.podio) {
-                        reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
-                        qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
-                    }
                 } 
-                else if (data.podio) {
-                    p1 = data.podio.campeao || data.podio.p1 || "---";
-                    p2 = data.podio.vice || data.podio.p2 || "---";
-                    p3 = data.podio.terceiro || data.podio.p3 || "---";
-                    p4 = data.podio.quarto || data.podio.p4 || "---";
+                
+                if (data.podio) {
                     reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
                     qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
-                } 
-                else if (data.ranking && data.ranking.length > 0) {
+                    if (p1 === "---") p1 = data.podio.campeao || data.podio.p1 || "---";
+                    if (p2 === "---") p2 = data.podio.vice || data.podio.p2 || "---";
+                    if (p3 === "---") p3 = data.podio.terceiro || data.podio.p3 || "---";
+                    if (p4 === "---") p4 = data.podio.quarto || data.podio.p4 || "---";
+                } else if (data.ranking && data.ranking.length > 0 && p1 === "---") {
                     p1 = data.ranking[0]?.nome || "---";
                     p2 = data.ranking[1]?.nome || "---";
                     p3 = data.ranking[2]?.nome || "---";
@@ -648,7 +631,7 @@
                                     <div class="podio-nome">${p3}</div>
                                 </div>
 
-                                <div class="podio-card quarto-lugar" style="background: rgba(20,20,20,0.5); border: 2px solid #333; height: 190px;">
+                                <div class="podio-card quarto-lugar" style="background: rgba(20,20,20,0.5); border: 2px solid #333; height: 190px; border-radius: 12px; padding: 25px; width: 260px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>
                                         <div class="podio-medalha" style="font-size: 2rem; margin-top: 5px;">🏅</div>
                                         <div class="podio-rotulo-lugar" style="color: #888; font-size: 1rem; margin-bottom: 5px;">4º Colocado</div>
@@ -669,12 +652,13 @@
                     `;
                 }
                 
-                document.getElementById('info-fase').innerText = "🏁 Torneio Concluído";
+                document.getElementById('info-fase').innerText = "🏁 ENCERRADO";
+                document.getElementById('info-detalhe-fase').innerText = "Torneio Concluído";
                 document.getElementById('cronometro').innerText = "--:--";
                 return;
             }
 
-            // FLUXO NORMAL (Mostrando as mesas ativas se não estiver em modo pódio)
+            // FLUXO NORMAL (Mesas ativas)
             const telaPrincipal = document.getElementById('conteudo-principal-telao');
             if (telaPrincipal && !document.getElementById('container-jogos')) {
                 telaPrincipal.style.gridTemplateColumns = "2fr 1fr";
@@ -693,28 +677,12 @@
                 `;
             }
 
-            // =========================================================
-            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES (CORRIGIDO)
-            // =========================================================
-            let faseTexto = data.nome_fase || "Fase Inicial";
-            let ehGrandeFinalFase = nomeFaseStr.includes("GRANDE FINAL") || nomeFaseStr.includes("FINAL DE TITULOS") || statusFase === "MATA_MATA";
-
-            const elFase = document.getElementById('info-fase');
-            if (elFase) {
-                if (data.fase_torneio === "CLASSIFICATORIA") {
-                    elFase.innerText = `💥 ${data.nome_fase || 'CLASSIFICATÓRIA'}`;
-                } else {
-                    elFase.innerText = `🏆 ${data.nome_fase || 'MATA-MATA'}`;
-                }
+            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS
+            if (document.getElementById('info-fase')) {
+                document.getElementById('info-fase').innerText = data.nome_fase || "Fase Classificatória";
             }
-
-            const elTempo = document.getElementById('info-tempo-rodada');
-            if (elTempo) {
-                if (data.fase_torneio === "CLASSIFICATORIA") {
-                    elTempo.innerText = `${data.tempo_rodada || 50} min`;
-                } else {
-                    elTempo.innerText = "Sem Tempo";
-                }
+            if (document.getElementById('info-detalhe-fase')) {
+                document.getElementById('info-detalhe-fase').innerText = data.detalhe_fase || "---";
             }
 
             const elMax = document.getElementById('info-max-rodadas');
@@ -722,25 +690,13 @@
                 if (data.fase_torneio === "CLASSIFICATORIA") {
                     elMax.innerText = `${data.max_rodadas || 5} Rodadas Max`;
                 } else {
-                    elMax.innerText = "Eliminatória";
+                    elMax.innerText = "Chaveamento M.M";
                 }
             }
             
-            // 🛡️ CORREÇÃO CIRÚRGICA DOS ATLETAS INSCRITOS: Mantém estável de forma dinâmica
             const elAtletas = document.getElementById('info-total-atletas');
-            if (elAtletas) {
-                if (data.total_atletas !== undefined && data.total_atletas !== null) {
-                    elAtletas.innerText = `${data.total_atletas} Atletas`;
-                } else if (data.ranking && data.ranking.length > 0) {
-                    if (data.fase_torneio === "CLASSIFICATORIA") {
-                        elAtletas.innerText = `${data.ranking.length} Atletas`;
-                    } else {
-                        // Se o ranking virou Top 5 reduzido, impede a queda limpando o '--' apenas se não tiver cache prévio
-                        if (elAtletas.innerText.includes('--') || elAtletas.innerText === '') {
-                            elAtletas.innerText = "Cadastrados";
-                        }
-                    }
-                }
+            if (elAtletas && data.total_atletas) {
+                elAtletas.innerText = data.total_atletas;
             }
             
             const tempoFormatado = data.tempo || "00:00";
@@ -769,7 +725,7 @@
                 }
             }
 
-            // --- ATUALIZAÇÃO DOS CONFRONTOS SEM FLICKER ---
+            // --- RENDERIZAÇÃO DOS CONFRONTOS (MESA INTELIGENTE) ---
             const containerJogos = document.getElementById('container-jogos');
             if (containerJogos) {
                 const assinaturaAtualJogos = JSON.stringify(data.confrontos || []);
@@ -800,18 +756,16 @@
                             const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
                             const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
 
+                            // Usa o nome cirúrgico injetado pela API (Grande Final / Disputa 3º Lugar)
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
-                            const tipoConfrontoStr = jogo.tipo_confronto ? jogo.tipo_confronto.toUpperCase() : "";
-                            const faseStatusFirme = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
-
-                            if (tipoConfrontoStr === "FINAL" || (faseStatusFirme === "FINAL" && Number(jogo.mesa) === 1)) {
-                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (tipoConfrontoStr === "TERCEIRO" || tipoConfrontoStr === "3LUGAR" || tipoConfrontoStr === "BRONZE" || (faseStatusFirme === "FINAL" && Number(jogo.mesa) === 2)) {
-                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
-                            } else if (faseStatusFirme === "SEMIFINAL") {
-                                textoTagMesa = `Mesa ${jogo.mesa} — Semifinal`;
-                            } else if (data.fase_torneio !== "CLASSIFICATORIA") {
-                                textoTagMesa = `Mesa ${jogo.mesa} — Eliminatória`;
+                            if (jogo.fase_mesa_nome) {
+                                if (jogo.fase_mesa_nome === "Grande Final") {
+                                    textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                                } else if (jogo.fase_mesa_nome === "Disputa de 3º Lugar") {
+                                    textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                                } else {
+                                    textoTagMesa = `Mesa ${jogo.mesa} — ${jogo.fase_mesa_nome}`;
+                                }
                             }
 
                             card.innerHTML = `
@@ -834,7 +788,7 @@
                 }
             }
 
-            // --- ATUALIZAÇÃO DO RANKING SEM FLICKER ---
+            // --- RENDERIZAÇÃO DO RANKING (TOP 5 LÍDERES) ---
             const tableBody = document.getElementById('tabela-ranking-corpo');
             if (tableBody) {
                 const top5Data = data.ranking ? data.ranking.slice(0, 5) : [];
