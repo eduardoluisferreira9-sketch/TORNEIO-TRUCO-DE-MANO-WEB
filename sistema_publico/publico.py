@@ -218,6 +218,8 @@ def api_dados_publicos(db=Depends(get_db)):
         "crono_ativo": cfg.get("crono_ativo", 0), 
         "confrontos": confrontos, 
         "ranking": ranking,
-        # ADICIONE A LINHA ABAIXO para enviar o tempo configurado pelo Admin:
-        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo", 30)
+        # Envia o tempo definido pelo admin
+        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo", 30),
+        # Envia o máximo de rodadas definido pelo admin (ajusta o nome da coluna se for diferente no teu banco)
+        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("total_rodadas") or 5
     })
