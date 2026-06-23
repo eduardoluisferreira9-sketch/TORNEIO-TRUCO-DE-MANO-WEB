@@ -3,6 +3,7 @@ import sys
 import time
 import random
 import shutil
+import json  # <--- ADICIONADO AQUI PARA O FILTRO FUNCIONAR
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, UploadFile, File
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -20,6 +21,17 @@ app = FastAPI(title="Painel de Controle do Administrador - Truco Cego")
 templates = Jinja2Templates(directory=[TEMPLATES_DIR, TEMPLATES_PUBLICO_DIR])
 templates.env.globals.update(chr=chr)
 
+# ---------------------------------------------------------
+# NOVO: FILTRO ESCAPEJS PARA COMPATIBILIDADE COM JINJA2
+# ---------------------------------------------------------
+def escapejs_filter(val):
+    if not val:
+        return ""
+    return json.dumps(str(val))[1:-1]
+
+templates.env.filters["escapejs"] = escapejs_filter
+# ---------------------------------------------------------
+
 UPLOAD_DIR = os.path.join(BASE_DIR, "static", "comprovantes")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -27,7 +39,7 @@ try:
     app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 except Exception:
     pass
-
+    
 # ==============================================================================
 # 🗄️ GERENCIAMENTO CONEXÃO INTELIGENTE (HÍBRIDO)
 # ==============================================================================
