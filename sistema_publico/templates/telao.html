@@ -677,26 +677,38 @@
                 `;
             }
 
-            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS
+            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS (CORRIGIDO)
             if (document.getElementById('info-fase')) {
-                document.getElementById('info-fase').innerText = data.nome_fase || "Fase Classificatória";
+                // Busca 'nome_fase' ou 'fase_atual' ou 'fase'
+                document.getElementById('info-fase').innerText = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
             }
+
             if (document.getElementById('info-detalhe-fase')) {
-                document.getElementById('info-detalhe-fase').innerText = data.detalhe_fase || "---";
+                // Busca 'detalhe_fase', 'andamento', 'status_rodada' ou tenta montar com rodada/turno se existirem
+                let andamentoTexto = data.detalhe_fase || data.andamento || data.status_rodada;
+                if (!andamentoTexto && (data.rodada_atual || data.rodada)) {
+                    andamentoTexto = `Rodada ${data.rodada_atual || data.rodada}`;
+                }
+                document.getElementById('info-detalhe-fase').innerText = andamentoTexto || "Em andamento";
             }
 
             const elMax = document.getElementById('info-max-rodadas');
             if (elMax) {
-                if (data.fase_torneio === "CLASSIFICATORIA") {
-                    elMax.innerText = `${data.max_rodadas || 5} Rodadas Max`;
+                // Busca 'max_rodadas', 'total_rodadas', 'limite_rodadas' ou configurações do torneio
+                const maxRodadas = data.max_rodadas || data.total_rodadas || data.limite_rodadas || (data.configuracao ? data.configuracao.max_rodadas : null);
+    
+                if (data.fase_torneio === "CLASSIFICATORIA" || !data.fase_torneio) {
+                    elMax.innerText = maxRodadas ? `${maxRodadas} Rodadas Max` : "Configurando...";
                 } else {
                     elMax.innerText = "Chaveamento M.M";
                 }
             }
-            
+
             const elAtletas = document.getElementById('info-total-atletas');
-            if (elAtletas && data.total_atletas) {
-                elAtletas.innerText = data.total_atletas;
+            if (elAtletas) {
+                // Busca 'total_atletas', 'inscritos', 'jogadores_contagem' ou 'atletas_confirmados'
+                const qtdAtletas = data.total_atletas || data.inscritos || data.atletas_confirmados || data.total_jogadores || 0;
+                elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
             
             const tempoFormatado = data.tempo || "00:00";
