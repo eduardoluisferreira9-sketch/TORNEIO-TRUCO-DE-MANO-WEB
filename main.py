@@ -490,13 +490,34 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     cursor = db.cursor()
     cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_r = cursor.fetchone()
-    rodada_atual = row_r["rodada"] if row_r else 1
+    
+    # CORREÇÃO 1: Trata o retorno caso seja dicionário ou tupla/lista
+    if row_r:
+        if isinstance(row_r, dict):
+            rodada_atual = row_r["rodada"]
+        else:
+            rodada_atual = row_r[0]
+    else:
+        rodada_atual = 1
     
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
-    confrontos = cursor.fetchall()
     
+    # CORREÇÃO 2: Garante que os confrontos virem dicionários limpos para o HTML não quebrar
+    confrontos_cru = cursor.fetchall()
+    confrontos = []
+    for row in confrontos_cru:
+        if isinstance(row, dict):
+            confrontos.append(row)
+        else:
+            # Se for tupla, mapeia manualmente baseado nas colunas do seu banco
+            # (id, torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome, tipo_placar, sets1, sets2, tentos1, tentos2, flores1, flores2, vencedor_id)
+            confrontos.append(dict(row)) # O row_factory costuma resolver, mas dict(row) previne falhas
+
+    # O restante do seu código permanece igual
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
-    rodada_concluida = cursor.fetchone()[0] == 0 if confrontos else False
+    res_concluida = cursor.fetchone()
+    qtd_pendentes = res_concluida["COUNT(*)"] if isinstance(res_concluida, dict) else res_concluida[0]
+    rodada_concluida = (qtd_pendentes == 0) if confrontos else False
 
     mins = cfg["crono_tempo_restante_seg"] // 60
     segs = cfg["crono_tempo_restante_seg"] % 60
