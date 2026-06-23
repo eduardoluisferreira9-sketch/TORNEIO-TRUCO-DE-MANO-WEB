@@ -491,7 +491,6 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
     row_r = cursor.fetchone()
     
-    # CORREÇÃO 1: Trata o retorno caso seja dicionário ou tupla/lista
     if row_r:
         if isinstance(row_r, dict):
             rodada_atual = row_r["rodada"]
@@ -502,18 +501,14 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_atual, cfg["id"]))
     
-    # CORREÇÃO 2: Garante que os confrontos virem dicionários limpos para o HTML não quebrar
     confrontos_cru = cursor.fetchall()
     confrontos = []
     for row in confrontos_cru:
         if isinstance(row, dict):
             confrontos.append(row)
         else:
-            # Se for tupla, mapeia manualmente baseado nas colunas do seu banco
-            # (id, torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome, tipo_placar, sets1, sets2, tentos1, tentos2, flores1, flores2, vencedor_id)
-            confrontos.append(dict(row)) # O row_factory costuma resolver, mas dict(row) previne falhas
+            confrontos.append(dict(row))
 
-    # O restante do seu código permanece igual
     cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
     res_concluida = cursor.fetchone()
     qtd_pendentes = res_concluida["COUNT(*)"] if isinstance(res_concluida, dict) else res_concluida[0]
@@ -523,14 +518,15 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     segs = cfg["crono_tempo_restante_seg"] % 60
     tempo_formatado = f"{mins:02d}:{segs:02d}"
 
+    # Retorno corrigido fornecendo explicitamente 'torneio' e 'fase_atual_rodada' que o HTML exige
     return templates.TemplateResponse(
         request=request, 
         name="admin_jogos.html", 
         context={
             "config": cfg, 
-            "torneio": cfg,  
+            "torneio": cfg, 
             "rodada": rodada_atual, 
-            "fase_atual_rodada": rodada_atual,  
+            "fase_atual_rodada": rodada_atual, 
             "confrontos": confrontos, 
             "rodada_concluida": rodada_concluida, 
             "tempo_formatado": tempo_formatado, 
