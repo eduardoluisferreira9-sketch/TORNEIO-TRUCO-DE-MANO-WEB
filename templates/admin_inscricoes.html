@@ -196,7 +196,7 @@
         <div class="content">
             <h1 style="margin-top: 0; font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; border-bottom: 2px solid var(--ouro); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
                 Cadastro do Competidor
-                <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio.replace('INSCRICAO', 'INSCRIÇÃO') }}</span>
+                <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio.replace('INSCRICAO', 'INSCRIÇÃO').replace('CLASSIFICATORIA', 'CLASSIFICATÓRIA') }}</span>
             </h1>
             
             <div class="card">
@@ -241,7 +241,7 @@
                     
                     {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
                     <form action="/admin-painel/admin/iniciar-torneio" method="POST" style="margin-top:30px;">
-                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🪵 Cruzar os Relhos e Dar as Cartas</button>
+                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;">🏁 Iniciar Torneio</button>
                     </form>
                     {% endif %}
                 </div>
