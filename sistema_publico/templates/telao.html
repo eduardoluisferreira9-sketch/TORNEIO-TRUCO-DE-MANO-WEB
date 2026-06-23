@@ -14,7 +14,7 @@
             --texto-mutado: #a8c3af; 
             --sucesso: #2ecc71;
             --danger: #ff4757;
-            --madeira: #8d6e63; /* Adicionado para o quarto colocado */
+            --madeira: #8d6e63;
         }
 
         body {
@@ -513,12 +513,14 @@
             const statusFase = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
             const nomeFaseStr = data.nome_fase ? data.nome_fase.toUpperCase() : "";
             
+            // 💡 Condições numéricas exatas adicionadas ao gatilho do Cerimonial
             const exibirCerimonial = podioForcadoManualmente || 
                                      statusFase === "ENCERRADO" || 
                                      statusFase === "CONCLUIDO" || 
                                      statusFase === "FINALIZADO" ||
                                      nomeFaseStr.includes("ENCERRADO") || 
-                                     nomeFaseStr.includes("CONCLUÍDO");
+                                     nomeFaseStr.includes("CONCLUÍDO") ||
+                                     Number(data.fase_atual) === -12; // Suporte ao ID numérico de encerramento se aplicável
 
             if (exibirCerimonial) {
                 ultimoEstadoJogosStr = "";
@@ -531,8 +533,12 @@
                 let reiDasFloresNome = "---";
                 let qtdFloresTotal = 0;
 
-                if ((nomeFaseStr.includes("FINAL") || statusFase === "FINAL" || statusFase === "MATA_MATA") && data.confrontos && data.confrontos.length > 0) {
-                    const jogoFinal = data.confrontos.find(j => Number(j.mesa) === 1);
+                // Identifica se está no chaveamento final (-1 ou pelo nome da fase)
+                const isMataMataFinal = Number(data.fase_atual) === -1 || nomeFaseStr.includes("FINAL") || statusFase === "FINAL" || statusFase === "MATA_MATA";
+
+                if (isMataMataFinal && data.confrontos && data.confrontos.length > 0) {
+                    // Busca a Grande Final pelo ID numérico (-2) ou pelo número da mesa (1)
+                    const jogoFinal = data.confrontos.find(j => Number(j.fase_mesa) === -2 || Number(j.mesa) === 1);
                     if (jogoFinal) {
                         const t1 = Number(jogoFinal.tentos1 || 0);
                         const t2 = Number(jogoFinal.tentos2 || 0);
@@ -553,7 +559,8 @@
                         }
                     }
 
-                    const jogoBronze = data.confrontos.find(j => Number(j.mesa) === 2);
+                    // Busca a Disputa de 3º Lugar pelo ID numérico (-3) ou pelo número da mesa (2)
+                    const jogoBronze = data.confrontos.find(j => Number(j.fase_mesa) === -3 || Number(j.mesa) === 2);
                     if (jogoBronze) {
                         const t1 = Number(jogoBronze.tentos1 || 0);
                         const t2 = Number(jogoBronze.tentos2 || 0);
@@ -631,10 +638,10 @@
                                     <div class="podio-nome">${p3}</div>
                                 </div>
 
-                                <div class="podio-card quarto-lugar" style="background: rgba(20,20,20,0.5); border: 2px solid #333; height: 190px; border-radius: 12px; padding: 25px; width: 260px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div class="podio-card quarto-lugar" style="background: rgba(20,20,20,0.5); border: 2px solid var(--madeira); height: 190px; border-radius: 12px; padding: 25px; width: 260px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>
                                         <div class="podio-medalha" style="font-size: 2rem; margin-top: 5px;">🏅</div>
-                                        <div class="podio-rotulo-lugar" style="color: #888; font-size: 1rem; margin-bottom: 5px;">4º Colocado</div>
+                                        <div class="podio-rotulo-lugar" style="color: var(--madeira); font-size: 1rem; margin-bottom: 5px;">4º Colocado</div>
                                     </div>
                                     <div class="podio-nome" style="color: #aaa; font-size: 1.1rem;">${p4}</div>
                                 </div>
@@ -677,14 +684,18 @@
                 `;
             }
 
-            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS (CORRIGIDO)
+            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS
             if (document.getElementById('info-fase')) {
-                // Busca 'nome_fase' ou 'fase_atual' ou 'fase'
-                document.getElementById('info-fase').innerText = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
+                // Se a fase for numérica (-1 ou -4), atribui nomes legíveis no topo
+                const faseRaw = Number(data.fase_atual);
+                let nomeExibicaoFase = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
+                if (faseRaw === -1) nomeExibicaoFase = "Mata-Mata Final";
+                if (faseRaw === -4) nomeExibicaoFase = "Semifinal";
+                
+                document.getElementById('info-fase').innerText = nomeExibicaoFase;
             }
 
             if (document.getElementById('info-detalhe-fase')) {
-                // Busca 'detalhe_fase', 'andamento', 'status_rodada' ou tenta montar com rodada/turno se existirem
                 let andamentoTexto = data.detalhe_fase || data.andamento || data.status_rodada;
                 if (!andamentoTexto && (data.rodada_atual || data.rodada)) {
                     andamentoTexto = `Rodada ${data.rodada_atual || data.rodada}`;
@@ -694,10 +705,9 @@
 
             const elMax = document.getElementById('info-max-rodadas');
             if (elMax) {
-                // Busca 'max_rodadas', 'total_rodadas', 'limite_rodadas' ou configurações do torneio
                 const maxRodadas = data.max_rodadas || data.total_rodadas || data.limite_rodadas || (data.configuracao ? data.configuracao.max_rodadas : null);
-    
-                if (data.fase_torneio === "CLASSIFICATORIA" || !data.fase_torneio) {
+                // Verifica via string ou IDs negativos se não está mais na fase classificatória comum
+                if (data.fase_torneio === "CLASSIFICATORIA" || !data.fase_torneio || Number(data.fase_atual) >= 0) {
                     elMax.innerText = maxRodadas ? `${maxRodadas} Rodadas Max` : "Configurando...";
                 } else {
                     elMax.innerText = "Chaveamento M.M";
@@ -706,7 +716,6 @@
 
             const elAtletas = document.getElementById('info-total-atletas');
             if (elAtletas) {
-                // Busca 'total_atletas', 'inscritos', 'jogadores_contagem' ou 'atletas_confirmados'
                 const qtdAtletas = data.total_atletas || data.inscritos || data.atletas_confirmados || data.total_jogadores || 0;
                 elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
@@ -768,15 +777,18 @@
                             const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
                             const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
 
+                            // 💡 Validação exata das tags baseadas em IDs numéricos do painel administrativo
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
-                            if (jogo.fase_mesa_nome) {
-                                if (jogo.fase_mesa_nome === "Grande Final") {
-                                    textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                                } else if (jogo.fase_mesa_nome === "Disputa de 3º Lugar") {
-                                    textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
-                                } else {
-                                    textoTagMesa = `Mesa ${jogo.mesa} — ${jogo.fase_mesa_nome}`;
-                                }
+                            const idMesaEspecial = Number(jogo.fase_mesa);
+
+                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final") {
+                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                            } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar") {
+                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                            } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
+                                textoTagMesa = `Mesa ${jogo.mesa} — <span style="color:var(--borda-ouro); font-weight:bold;">SEMIFINAL</span>`;
+                            } else if (jogo.fase_mesa_nome) {
+                                textoTagMesa = `Mesa ${jogo.mesa} — ${jogo.fase_mesa_nome}`;
                             }
 
                             card.innerHTML = `
@@ -835,5 +847,3 @@
 </script>
 </body>
 </html>
-    </style>
-</head>
