@@ -211,6 +211,9 @@ def api_dados_publicos(db=Depends(get_db)):
     if cfg["fase_torneio"] != "INSCRICAO":
         ranking = obter_ranking_publico(cursor)[:5]
 
+    # 🔍 LINHA PROVISÓRIA DE DIAGNÓSTICO: Mostra no console do servidor as chaves do banco!
+    logger.info(f"--- COLUNAS DO BANCO DE DADOS: {list(cfg.keys())} ---")
+
     return JSONResponse({
         "fase_torneio": cfg["fase_torneio"], 
         "nome_fase": nome_fase, 
@@ -218,8 +221,7 @@ def api_dados_publicos(db=Depends(get_db)):
         "crono_ativo": cfg.get("crono_ativo", 0), 
         "confrontos": confrontos, 
         "ranking": ranking,
-        # Envia o tempo definido pelo admin
-        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo", 30),
-        # Envia o máximo de rodadas definido pelo admin (ajusta o nome da coluna se for diferente no teu banco)
-        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("total_rodadas") or 5
+        # Tenta mapear variantes comuns do banco
+        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo") or cfg.get("duracao") or 30,
+        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("total_rodadas") or cfg.get("qtd_rodadas") or cfg.get("rodadas") or 5
     })
