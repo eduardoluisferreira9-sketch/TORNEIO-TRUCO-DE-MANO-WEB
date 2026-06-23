@@ -148,8 +148,8 @@
             <div class="sidebar-topo">
                 <h2>⚔️ {{ config.nome_torneio }} ⚔️</h2>
                 
-                <div style="background: rgba(0,0,0,0.4); padding: 18px; border-radius: 10px; border: 1px solid var(--border-feltro); margin-top: 25px;">
-                    <form action="/admin-painel/admin/salvar-configurações" method="POST">
+                <div style="background: rgba(0,0,0,0.4); padding: 18px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.3); margin-top: 25px;">
+                    <form action="/admin-painel/admin/salvar-configuracoes" method="POST">
                         <div class="form-group">
                             <label>Nome do Torneio</label>
                             <input type="text" name="nome_torneio" value="{{ config.nome_torneio }}" required>
@@ -164,10 +164,10 @@
                                 <input type="number" name="tempo_minutos" value="{{ config.tempo_minutos_rodada }}" min="5" required>
                             </div>
                         </div>
-                        {% if config.fase_torneio == "INSCRIÇÃO" %}
+                        {% if config.fase_torneio == "INSCRICAO" %}
                             <button type="submit" class="btn" style="font-size: 0.8rem; padding: 10px;">💾 Atualizar Mesa</button>
                         {% else %}
-                            <button type="button" class="btn" style="background:#1c241e; color:#526356; cursor:not-allowed; font-size: 0.8rem; padding: 10px; border: 1px solid #253329;" disabled>Em Andamento</button>
+                            <button type="button" class="btn" style="background:#222; color:#555; cursor:not-allowed; font-size: 0.8rem; padding: 10px;" disabled>Em Andamento</button>
                         {% endif %}
                     </form>
                 </div>
@@ -182,15 +182,12 @@
                     <a href="/admin-painel/admin/classificacao" class="nav-item">
                         <span class="naipe-icon" style="color: #d4af37;">💰</span> Classificação
                     </a>
-                    <a href="/admin-painel/admin/podio" class="nav-item">
-                        <span class="naipe-icon" style="color: #e74c3c;">🥇</span> Pódio Final
-                    </a>
                     <a href="/admin-painel/admin/historico" class="nav-item">
                         <span class="naipe-icon" style="color: #f1c40f;">🏆</span> Galeria de Lendas
                     </a>
                 </div>
             </div>
-
+            
             <div class="sidebar-rodape">
                 <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
                     <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;">🚨 Reiniciar Salão</button>
