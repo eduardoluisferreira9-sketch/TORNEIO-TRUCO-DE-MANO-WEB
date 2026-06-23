@@ -684,22 +684,31 @@
                 `;
             }
 
-            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS
+            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES DINÂMICOS (SEM REPETIÇÃO)
             if (document.getElementById('info-fase')) {
-                // Se a fase for numérica (-1 ou -4), atribui nomes legíveis no topo
                 const faseRaw = Number(data.fase_atual);
                 let nomeExibicaoFase = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
+    
+                // Se for número negativo (Mata-Mata), mostra o nome bonito da fase
                 if (faseRaw === -1) nomeExibicaoFase = "Mata-Mata Final";
                 if (faseRaw === -4) nomeExibicaoFase = "Semifinal";
-                
+    
                 document.getElementById('info-fase').innerText = nomeExibicaoFase;
-            }
+             }
 
             if (document.getElementById('info-detalhe-fase')) {
                 let andamentoTexto = data.detalhe_fase || data.andamento || data.status_rodada;
+    
+                // Se o detalhe for idêntico ao nome da fase (evita "1ª Rodada" e "Rodada 1")
+                const faseTexto = document.getElementById('info-fase').innerText.toUpperCase();
+                if (andamentoTexto && andamentoTexto.toUpperCase() === faseTexto || (andamentoTexto && andamentoTexto.replace(/\D/g,'') === faseTexto.replace(/\D/g,''))) {
+                    andamentoTexto = "Em Andamento"; // Substitui a repetição por um status limpo
+                }
+
                 if (!andamentoTexto && (data.rodada_atual || data.rodada)) {
                     andamentoTexto = `Rodada ${data.rodada_atual || data.rodada}`;
                 }
+    
                 document.getElementById('info-detalhe-fase').innerText = andamentoTexto || "Em andamento";
             }
 
