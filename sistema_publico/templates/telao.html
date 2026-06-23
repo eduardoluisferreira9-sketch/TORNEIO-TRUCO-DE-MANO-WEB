@@ -465,7 +465,7 @@
             <div id="info-tempo-rodada" class="info-valor">-- min</div>
         </div>
         <div class="info-item">
-            <div class="info-max-rodadas">Fase Classificatória</div>
+            <div class="info-rotulo">Fase Classificatória</div>
             <div id="info-max-rodadas" class="info-valor">-- Rodadas Max</div>
         </div>
         <div class="info-item">
@@ -693,6 +693,9 @@
                 `;
             }
 
+            // =========================================================
+            // 🟢 PREENCHIMENTO DOS QUADROS SUPERIORES (CORRIGIDO)
+            // =========================================================
             let faseTexto = data.nome_fase || "Fase Inicial";
             let ehGrandeFinalFase = nomeFaseStr.includes("GRANDE FINAL") || nomeFaseStr.includes("FINAL DE TITULOS") || statusFase === "MATA_MATA";
 
@@ -707,7 +710,6 @@
 
             const elTempo = document.getElementById('info-tempo-rodada');
             if (elTempo) {
-                // Se estiver no Mata-Mata, remove o tempo. Se estiver na classificatória, usa o valor do Python
                 if (data.fase_torneio === "CLASSIFICATORIA") {
                     elTempo.innerText = `${data.tempo_rodada || 50} min`;
                 } else {
@@ -721,6 +723,23 @@
                     elMax.innerText = `${data.max_rodadas || 5} Rodadas Max`;
                 } else {
                     elMax.innerText = "Eliminatória";
+                }
+            }
+            
+            // 🛡️ CORREÇÃO CIRÚRGICA DOS ATLETAS INSCRITOS: Mantém estável de forma dinâmica
+            const elAtletas = document.getElementById('info-total-atletas');
+            if (elAtletas) {
+                if (data.total_atletas !== undefined && data.total_atletas !== null) {
+                    elAtletas.innerText = `${data.total_atletas} Atletas`;
+                } else if (data.ranking && data.ranking.length > 0) {
+                    if (data.fase_torneio === "CLASSIFICATORIA") {
+                        elAtletas.innerText = `${data.ranking.length} Atletas`;
+                    } else {
+                        // Se o ranking virou Top 5 reduzido, impede a queda limpando o '--' apenas se não tiver cache prévio
+                        if (elAtletas.innerText.includes('--') || elAtletas.innerText === '') {
+                            elAtletas.innerText = "Cadastrados";
+                        }
+                    }
                 }
             }
             
@@ -753,11 +772,10 @@
             // --- ATUALIZAÇÃO DOS CONFRONTOS SEM FLICKER ---
             const containerJogos = document.getElementById('container-jogos');
             if (containerJogos) {
-                // Cria uma assinatura rápida dos confrontos para checar mudanças
                 const assinaturaAtualJogos = JSON.stringify(data.confrontos || []);
                 
                 if (assinaturaAtualJogos !== ultimoEstadoJogosStr) {
-                    ultimoEstadoJogosStr = assinaturaAtualJogos; // Atualiza o estado
+                    ultimoEstadoJogosStr = assinaturaAtualJogos; 
                     containerJogos.innerHTML = '';
                     
                     if (!data.confrontos || data.confrontos.length === 0) {
@@ -784,7 +802,6 @@
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const tipoConfrontoStr = jogo.tipo_confronto ? jogo.tipo_confronto.toUpperCase() : "";
-
                             const faseStatusFirme = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
 
                             if (tipoConfrontoStr === "FINAL" || (faseStatusFirme === "FINAL" && Number(jogo.mesa) === 1)) {
@@ -824,7 +841,7 @@
                 const assinaturaAtualRanking = JSON.stringify(top5Data);
 
                 if (assinaturaAtualRanking !== ultimoEstadoRankingStr) {
-                    ultimoEstadoRankingStr = assinaturaAtualRanking; // Atualiza o estado
+                    ultimoEstadoRankingStr = assinaturaAtualRanking; 
                     tableBody.innerHTML = '';
                     
                     if (top5Data.length > 0) {
@@ -851,3 +868,5 @@
     atualizarTelao();
     setInterval(atualizarTelao, 3000); // pooling de 3 segundos
 </script>
+</body>
+</html>
