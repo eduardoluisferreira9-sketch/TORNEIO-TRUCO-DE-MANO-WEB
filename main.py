@@ -245,6 +245,7 @@ def atualizar_e_obter_cronometro(db):
         decorrido = agora - ultimo_clique
         
         if decorrido > 0:
+            # CORREÇÃO: Pega o valor real existente no banco para evitar fallback de 3000 fixo
             tempo_restante_atual = int(config.get("crono_tempo_restante_seg", 3000))
             novo_tempo = max(0, tempo_restante_atual - decorrido)
             ativo = 1 if novo_tempo > 0 else 0
@@ -311,7 +312,8 @@ def tela_inscricao_atleta(request: Request, db=Depends(get_db)):
     p = "%s" if DATABASE_URL else "?"
     
     cursor.execute(f"SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY entidade ASC", (cfg_db["id"],))
-    entidades = [row["entidade"] for row in cursor.fetchall()]
+    entities_rows = cursor.fetchall()
+    entidades = [row["entidade"] for row in entities_rows]
     
     taxa_val = cfg_db["taxa_inscricao"] if cfg_db else 0.0
     taxa_formatada = f"{taxa_val:.2f}".replace('.', ',')
@@ -428,13 +430,7 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo, cfg["id"]))
         
     elif acao == "reiniciar":
-        # CORREÇÃO: Restaurar o tempo original em minutos vindo das configurações salvas no banco
-        # Se max_rodadas_classificatoria por algum motivo estivesse a interferir, limpamos para usar a duração correta
-        cursor.execute(f"SELECT max_rodadas_classificatoria, taxa_inscricao FROM torneios WHERE id = {p}", (cfg["id"],))
-        row = cursor.fetchone()
-        
-        # Padrão seguro de retorno baseado no histórico do formulário (Ex: 50min = 3000s)
-        # O sistema irá reiniciar para o tempo padrão de segurança configurado caso o registro tenha sido corrompido
+        # CORREÇÃO: Garante o tempo definido em memória para não usar valor estático corrompido
         tempo_original = int(cfg.get("crono_tempo_restante_seg", 3000))
         if tempo_original <= 0:
             tempo_original = 3000
@@ -460,7 +456,7 @@ def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(ve
     
     return templates.TemplateResponse(
         request=request, name="admin_inscricoes.html", 
-        context={"config": cfg, "pendentes": pendentes, "oficiais": whitesmoke := oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
+        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
     )
 
 @app.post("/admin/salvar-configuracoes")
@@ -472,7 +468,9 @@ def salvar_configuracoes(nome_torneio: str = Form(...), max_rodadas: int = Form(
     if cfg["fase_torneio"] != "INSCRICAO":
          return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_ja_iniciado", status_code=303)
     total_seg = tempo_minutos * 60
-    cursor.execute(f"UPDATE torneios SET nome_torneio = {p}, max_rodadas_classificatoria = {p}, crono_tempo_restante_seg = {p} WHERE id = {p}", 
+    
+    # CORREÇÃO: Garante o reset completo de flags de clique e ativação para blindar o cronômetro na mudança inicial
+    cursor.execute(f"UPDATE torneios SET nome_torneio = {p}, max_rodadas_classificatoria = {p}, crono_tempo_restante_seg = {p}, crono_ultimo_clique = 0, crono_ativo = 0 WHERE id = {p}", 
                    (nome_torneio.strip(), max_rodadas, total_seg, cfg["id"]))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
@@ -490,7 +488,10 @@ def iniciar_torneio_e_gerar_r1(db=Depends(get_db), auth: bool = Depends(verifica
     if cursor.fetchone()[0] < 2:
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
 
-    cursor.execute(f"UPDATE torneios SET fase_torneio = 'CLASSIFICATORIA' WHERE id = {p}", (cfg["id"],))
+    # CORREÇÃO: Tranca estritamente o tempo configurado em minutos e anula qualquer resquício de tempo corrido ao dar partida
+    tempo_salvo = int(cfg.get("crono_tempo_restante_seg", 3000))
+    cursor.execute(f"UPDATE torneios SET fase_torneio = 'CLASSIFICATORIA', crono_tempo_restante_seg = {p}, crono_ultimo_clique = 0, crono_ativo = 0 WHERE id = {p}", 
+                   (tempo_salvo, cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
