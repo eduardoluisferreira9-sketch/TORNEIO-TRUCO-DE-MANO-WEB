@@ -18,6 +18,7 @@ TEMPLATES_PUBLICO_DIR = os.path.join(BASE_DIR, "sistema_publico", "templates")
 
 app = FastAPI(title="Painel de Controle do Administrador - Truco Cego")
 templates = Jinja2Templates(directory=[TEMPLATES_DIR, TEMPLATES_PUBLICO_DIR])
+templates.env.globals.update(chr=chr)
 
 UPLOAD_DIR = os.path.join(BASE_DIR, "static", "comprovantes")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
