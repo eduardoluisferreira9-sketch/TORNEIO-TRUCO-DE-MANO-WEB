@@ -238,29 +238,26 @@ def atualizar_e_obter_cronometro(db):
         except (TypeError, ValueError):
             ultimo_clique = agora
 
-        # Se o ultimo_clique for 0 ou inválido, força ser o momento atual para não quebrar o cálculo
+        # Se o último clique for inválido ou zero, ajusta para o momento atual
         if ultimo_clique <= 0:
             ultimo_clique = agora
 
         decorrido = agora - ultimo_clique
         
-        if decorrido < 0: 
-            decorrido = 0
+        if decorrido > 0:
+            tempo_restante_atual = int(config.get("crono_tempo_restante_seg", 3000))
+            novo_tempo = max(0, tempo_restante_atual - decorrido)
+            ativo = 1 if novo_tempo > 0 else 0
             
-        # CORREÇÃO: Sempre atualizamos o banco se o tempo estiver ativo, 
-        # para garantir que o 'crono_ultimo_clique' acompanhe o 'agora' passo a passo
-        tempo_restante_atual = int(config.get("crono_tempo_restante_seg", 0))
-        novo_tempo = max(0, tempo_restante_atual - decorrido)
-        ativo = 1 if novo_tempo > 0 else 0
-        
-        cursor.execute(
-            f'UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p}, crono_ativo = {p} WHERE id = {p}', 
-            (novo_tempo, agora, ativo, config["id"])
-        )
-        db.commit()
-        
-        config["crono_tempo_restante_seg"] = novo_tempo
-        config["crono_ativo"] = ativo
+            # Atualiza o tempo E o momento do clique atualizado para o próximo segundo
+            cursor.execute(
+                f'UPDATE torneios SET crono_tempo_restante_seg = {p}, crono_ultimo_clique = {p}, crono_ativo = {p} WHERE id = {p}', 
+                (novo_tempo, agora, ativo, config["id"])
+            )
+            db.commit()
+            
+            config["crono_tempo_restante_seg"] = novo_tempo
+            config["crono_ativo"] = ativo
             
     return config
 
@@ -614,9 +611,9 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
             VALUES ({p}, {p}, {p}, {p}, NULL, {p}, 'FOLGA - GANHOU PONTOS', '2x0', 3, 0, 72, 0, {p})
         """, (cfg["id"], proxima_rodada, mesa, atleta_folga['id'], atleta_folga['nome'], atleta_folga['id']))
                            
-    # BUG FIXED: Mantém o tempo restante dinâmico definido na configuração (sem forçar 3000)
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
-    db.commit()
+    # OPÇÃO A: Descobre o tempo atual que estava na tela e reseta para o início da nova rodada
+    tempo_atual_segundos = int(cfg.get("crono_tempo_restante_seg", 3000))
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (tempo_atual_segundos, cfg["id"],))
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.post("/admin/disparar-matamata")
@@ -667,9 +664,9 @@ def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = D
             INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})
         ''', (cfg["id"], fase_id, idx, a1["id"], a2["id"], a1["nome"], a2["nome"]))
         
-    # BUG FIXED: Preserva o tempo configurado pelo painel
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
-    db.commit()
+    # OPÇÃO A: Garante o tempo integral configurado para o início do Mata-Mata
+    tempo_atual_segundos = int(cfg.get("crono_tempo_restante_seg", 3000))
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (tempo_atual_segundos, cfg["id"],))
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.post("/admin/avancar-matamata")
@@ -695,8 +692,9 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     if fase_atual == -4:
         return RedirectResponse(url="/admin-painel/admin/podio", status_code=303)
 
-    # BUG FIXED: Evita resetar para 3000 segundos arbitrariamente
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0 WHERE id = {p}", (cfg["id"],))
+    # OPÇÃO A: Reinicia o tempo para a nova fase do Mata-Mata
+    tempo_atual_segundos = int(cfg.get("crono_tempo_restante_seg", 3000))
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_ultimo_clique = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (tempo_atual_segundos, cfg["id"],))
     proxima_fase = fase_atual - 1
     
     if fase_atual in [-1, -2]:
