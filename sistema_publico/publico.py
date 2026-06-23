@@ -1,238 +1,258 @@
-import os
-import sqlite3
-import time
-import shutil
-from fastapi import FastAPI, Request, Depends, Form, UploadFile, File, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-
-# 📁 CAMINHOS AJUSTADOS: Aponta para a pasta templates DENTRO de sistema_publico
-CORRENTE_DIR = os.path.dirname(os.path.abspath(__file__)) # Pasta 'sistema_publico'
-BASE_DIR = os.path.dirname(CORRENTE_DIR)                  # Raiz do projeto (onde está o .db)
-
-DB_FILE = os.path.join(BASE_DIR, "torneio.db")
-TEMPLATES_DIR = os.path.join(CORRENTE_DIR, "templates")    # templates interna
-UPLOAD_DIR = os.path.join(BASE_DIR, "static", "comprovantes")
-
-app = FastAPI(title="App de Acompanhamento Público - Truco Cego")
-templates = Jinja2Templates(directory=TEMPLATES_DIR)
-
-# Habilita CORS (Essencial para quando virar Aplicativo Mobile)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-def get_db():
-    # check_same_thread=False adicionado para evitar erros de concorrência
-    conn = sqlite3.connect(DB_FILE, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-def obter_ranking_publico(cursor):
-    cursor.execute("SELECT id, nome FROM atletas WHERE status = 'APROVADO'")
-    todos_atletas = cursor.fetchall()
-    lista_classificacao = []
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscrição Online - Torneio de Truco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    for atleta in todos_atletas:
-        atleta_id = atleta["id"]
-        
-        # 🛡️ BLINDAGEM DE COLUNAS: Tenta ler em Português, se falhar tenta em Inglês
-        try:
-            cursor.execute("SELECT COALESCE(SUM(sets1), 0) as s_pro, COALESCE(SUM(tentos1), 0) as t_pro, COALESCE(SUM(tentos2), 0) as t_contra, COALESCE(SUM(flores1), 0) as fl FROM confrontos WHERE atleta1_id = ? AND rodada > 0 AND vencedor_id IS NOT NULL", (atleta_id,))
-            p1 = cursor.fetchone()
-            cursor.execute("SELECT COALESCE(SUM(sets2), 0) as s_pro, COALESCE(SUM(tentos2), 0) as t_pro, COALESCE(SUM(tentos1), 0) as t_contra, COALESCE(SUM(flores2), 0) as fl FROM confrontos WHERE atleta2_id = ? AND rodada > 0 AND vencedor_id IS NOT NULL", (atleta_id,))
-            p2 = cursor.fetchone()
-        except sqlite3.OperationalError:
-            cursor.execute("SELECT COALESCE(SUM(sets1), 0) as s_pro, COALESCE(SUM(tentos1), 0) as t_pro, COALESCE(SUM(tentos2), 0) as t_contra, COALESCE(SUM(flores1), 0) as fl FROM confrontos WHERE athlete1_id = ? AND rodada > 0 AND vencedor_id IS NOT NULL", (atleta_id,))
-            p1 = cursor.fetchone()
-            cursor.execute("SELECT COALESCE(SUM(sets2), 0) as s_pro, COALESCE(SUM(tentos2), 0) as t_pro, COALESCE(SUM(tentos1), 0) as t_contra, COALESCE(SUM(flores2), 0) as fl FROM confrontos WHERE athlete2_id = ? AND rodada > 0 AND vencedor_id IS NOT NULL", (atleta_id,))
-            p2 = cursor.fetchone()
-            
-        cursor.execute("SELECT COUNT(*) FROM confrontos WHERE vencedor_id = ? AND rodada > 0", (atleta_id,))
-        vitorias = cursor.fetchone()[0]
-        
-        tentos_pro = p1["t_pro"] + p2["t_pro"]
-        tentos_contra = p1["t_contra"] + p2["t_contra"]
-        lista_classificacao.append({
-            "nome": atleta["nome"], "vitorias": vitorias, "saldo_tentos": tentos_pro - tentos_contra
-        })
-        
-    lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["saldo_tentos"]))
-    return lista_classificacao
-
-@app.get("/", response_class=HTMLResponse)
-def rota_telao(request: Request, db: sqlite3.Connection = Depends(get_db)):
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM config LIMIT 1")
-    cfg = dict(cursor.fetchone())
-    return templates.TemplateResponse(request=request, name="publico_telao.html", context={"config": cfg})
-
-# 🚀 ROTA PÚBLICA: EXIBIR PÁGINA DE INSCRIÇÃO
-@app.get("/inscrever", response_class=HTMLResponse)
-def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get_db)):
-    cursor = db.cursor()
-    cursor.execute("SELECT nome_torneio, taxa_inscricao FROM config LIMIT 1")
-    cfg_db = cursor.fetchone()
-    
-    # Busca entidades distintas cadastradas para alimentar o formulário
-    cursor.execute("SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' ORDER BY entidade ASC")
-    entidades = [row["entidade"] for row in cursor.fetchall()]
-    
-    taxa_val = cfg_db["taxa_inscricao"] if cfg_db else 0.0
-    taxa_formatada = f"{taxa_val:.2f}".replace('.', ',')
-
-    return templates.TemplateResponse(
-        request=request, 
-        name="inscricao_atleta.html", 
-        context={
-            "config_taxa": taxa_formatada, 
-            "entidades": entidades
+    <style>
+        :root {
+            --bg-principal: #0d2e1b;
+            --bg-cards: #092113;
+            --ouro: #d4af37;
+            --ouro-brilhante: #f3e5ab;
+            --texto-claro: #ffffff; 
+            --texto-subtil: #bdc3c7; 
+            --verde-sucesso: #1e8449;
         }
-    )
 
-# 📥 ROTA PÚBLICA CORRIGIDA: Processa a inscrição com segurança no SQLite
-@app.post("/inscrever")
-def processar_inscricao_atleta(
-    nome: str = Form(...),
-    entidade: str = Form(...),
-    whatsapp: str = Form(...),
-    comprovante: UploadFile = File(...),
-    db: sqlite3.Connection = Depends(get_db)
-):
-    if not comprovante.filename:
-        raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
-    
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-    extensao = os.path.splitext(comprovante.filename)[1]
-    nome_seguro = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
-    nome_arquivo = f"comprovante_{nome_seguro}_{int(time.time())}{extensao}"
-    caminho_final = os.path.join(UPLOAD_DIR, nome_arquivo)
-    
-    with open(caminho_final, "wb") as buffer:
-        shutil.copyfileobj(comprovante.file, buffer)
-        
-    cursor = db.cursor()
-    cursor.execute('''
-        INSERT INTO atletas (nome, entidade, whatsapp, status) 
-        VALUES (?, ?, ?, 'PENDENTE')
-    ''', (nome.strip(), entidade.strip().upper(), whatsapp.strip()))
-    db.commit()
-    
-    return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
+        body { 
+            background: var(--bg-principal); 
+            color: var(--texto-claro); 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
+            background-size: 100% 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-@app.get("/api/publico/dados")
-def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM config LIMIT 1")
-    cfg = dict(cursor.fetchone())
-    
-    # 1. Atualiza o cronômetro na memória e sincroniza no Banco de Dados
-    if cfg["crono_ativo"] == 1:
-        agora = time.time()
-        decorrido = int(agora - cfg["crono_ultimo_clique"])
-        if decorrido > 0:
-            novo_tempo = max(0, cfg["crono_tempo_restante_seg"] - decorrido)
-            cfg["crono_tempo_restante_seg"] = novo_tempo
-            cfg["crono_ultimo_clique"] = agora
+        .container-inscricao {
+            background: var(--bg-cards);
+            width: 100%;
+            max-width: 500px;
+            margin: 20px;
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid var(--ouro);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            box-sizing: border-box;
+        }
+
+        .header-inscricao {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-inscricao h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--ouro);
+            font-size: 1.8rem;
+            margin: 0 0 10px 0;
+            text-shadow: 0px 3px 6px rgba(0,0,0,0.9);
+            letter-spacing: 1px;
+            border-bottom: 2px double var(--ouro);
+            padding-bottom: 15px;
+        }
+
+        .taxa-badge {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--ouro);
+            color: var(--ouro-brilhante);
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--texto-subtil);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: var(--ouro);
+            outline: none;
+            box-shadow: 0 0 10px rgba(212,175,55,0.2);
+        }
+
+        /* customização do campo de upload */
+        .file-wrapper {
+            position: relative;
+            background: rgba(0,0,0,0.5);
+            border: 2px dashed rgba(212, 175, 55, 0.4);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .file-wrapper:hover {
+            border-color: var(--ouro);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .file-wrapper input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label-text {
+            font-size: 0.9rem;
+            color: var(--texto-subtil);
+            font-weight: 600;
+        }
+
+        .file-label-text i {
+            font-size: 1.8rem;
+            color: var(--ouro);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .btn-enviar {
+            background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); 
+            color: #111; 
+            font-family: 'Cinzel', serif; 
+            font-weight: 800; 
+            border: none; 
+            padding: 15px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            width: 100%; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            text-transform: uppercase; 
+            font-size: 0.95rem;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5); 
+            letter-spacing: 1px;
+            transition: 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-enviar:hover { 
+            background: linear-gradient(135deg, var(--ouro-brilhante) 0%, var(--ouro) 100%); 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px rgba(212,175,55,0.4); 
+        }
+
+        /* Alertas de Sucesso */
+        .alerta-sucesso {
+            background: rgba(30, 132, 73, 0.2);
+            border: 1px solid var(--verde-sucesso);
+            color: #2ecc71;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-inscricao">
+        <div class="header-inscricao">
+            <h1>Ficha de Inscrição</h1>
+            <div class="taxa-badge">
+                <i class="fas fa-ticket-alt"></i> Valor da Inscrição: R$ {{ config_taxa }}
+            </div>
+        </div>
+
+        <div id="msg-sucesso" class="alerta-sucesso" style="display: none;">
+            <i class="fas fa-circle-check"></i> Inscrição enviada com sucesso!<br>
+            Aguarde a aprovação da organização do torneio.
+        </div>
+
+        <form action="/inscrever" method="POST" enctype="multipart/form-data">
             
-            # SALVA NO BANCO para a próxima requisição pegar o tempo certo decrescente
-            cursor.execute(
-                "UPDATE config SET crono_tempo_restante_seg = ?, crono_ultimo_clique = ?", 
-                (novo_tempo, agora)
-            )
-            db.commit()
-            
-    # 2. Formata o tempo para "MM:SS" ou detecta "Sem Tempo" / "Falta"
-    tempo_rodada_atual = cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 0
-    
-    if cfg["crono_tempo_restante_seg"] <= 0 and cfg["crono_ativo"] == 1:
-        tempo_formatado = "AGORA TUDO É FALTA!"
-    elif tempo_rodada_atual == 0:
-        tempo_formatado = "Sem Tempo"
-    else:
-        mins = cfg["crono_tempo_restante_seg"] // 60
-        segs = cfg["crono_tempo_restante_seg"] % 60
-        tempo_formatado = f"{mins:02d}:{segs:02d}"
+            <div class="form-group">
+                <label for="inp_nome">Nome Completo do Atleta</label>
+                <input type="text" id="inp_nome" name="nome" class="input-field" placeholder="Ex: João Silva" required>
+            </div>
 
-    # 3. Mapeamento e Identificação Precisa da Fase Atual
-    fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA")
-    
-    mapeamento_rodadas = {
-        "OITAVAS": -1,
-        "QUARTAS": -2,
-        "SEMIFINAL": -3,
-        "FINAL": -4
-    }
-    
-    if fase_status == "CLASSIFICATORIA":
-        # Na classificatória, pegamos a maior rodada positiva que existe
-        cursor.execute("SELECT rodada FROM confrontos WHERE rodada > 0 ORDER BY id DESC LIMIT 1")
-        row_r = cursor.fetchone()
-        rodada_atual = row_r["rodada"] if row_r else 1
-        nome_fase = "Grande Final" if fase_status == "FINAL" else "Fase Classificatória"
-        detalhe_fase = f"{rodada_atual}ª Rodada"
-    else:
-        # No mata-mata, o número da rodada é definido pela fase oficial do admin
-        rodada_atual = mapeamento_rodadas.get(fase_status, 0)
-        detalhe_fase = "Mata-Mata"
-        if fase_status == "OITAVAS": nome_fase = "Oitavas de Final"
-        elif fase_status == "QUARTAS": nome_fase = "Quartas de Final"
-        elif fase_status == "SEMIFINAL": nome_fase = "Semifinal"
-        elif fase_status == "FINAL": 
-            nome_fase = "Grande Final"
-            detalhe_fase = "Finais"
-        else: 
-            nome_fase = "Inscrições Abertas"
-            detalhe_fase = "--"
+            <div class="form-group">
+                <label for="inp_entidade">CTG / Entidade / Piquete</label>
+                <input type="text" id="inp_entidade" name="entidade" class="input-field" placeholder="Ex: CTG SENTINELA DOS PAMPAS" list="lista-entidades" required>
+                <datalist id="lista-entidades">
+                    {% for ent in entidades %}
+                        <option value="{{ ent }}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
 
-    # 4. Busca os Confrontos e injeta o nome individual de cada mesa dinamicamente
-    confrontos = []
-    if rodada_atual != 0:
-        cursor.execute("SELECT * FROM confrontos WHERE rodada = ? ORDER BY mesa ASC", (rodada_atual,))
-        linhas_confrontos = cursor.fetchall()
-        
-        for row in linhas_confrontos:
-            dados_jogo = dict(row)
-            # Regra cirúrgica para a rodada final (-4) separar os nomes das mesas em andamento
-            if rodada_atual == -4:
-                if dados_jogo["mesa"] == 1:
-                    dados_jogo["fase_mesa_nome"] = "Grande Final"
-                elif dados_jogo["mesa"] == 2:
-                    dados_jogo["fase_mesa_nome"] = "Disputa de 3º Lugar"
-                else:
-                    dados_jogo["fase_mesa_nome"] = "Final"
-            else:
-                dados_jogo["fase_mesa_nome"] = "Eliminatória" if rodada_atual < 0 else f"{rodada_atual}ª Rodada"
-                
-            confrontos.append(dados_jogo)
+            <div class="form-group">
+                <label for="inp_whatsapp">WhatsApp para Contato</label>
+                <input type="tel" id="inp_whatsapp" name="whatsapp" class="input-field" placeholder="(54) 99999-0000" required>
+            </div>
 
-    # 5. Busca Total de Atletas Aprovados (Corrige o "-- Atletas" na tela)
-    cursor.execute("SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO'")
-    total_atletas = cursor.fetchone()[0]
+            <div class="form-group">
+                <label>Comprovante de Pagamento (PIX)</label>
+                <div class="file-wrapper">
+                    <input type="file" id="inp_comprovante" name="comprovante" accept="image/*,application/pdf" onchange="mostrarNomeArquivo(this)" required>
+                    <span class="file-label-text" id="file-text">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        Clique para anexar o Comprovante (Imagem ou PDF)
+                    </span>
+                </div>
+            </div>
 
-    ranking = []
-    if fase_status != "INSCRICAO":
-        ranking = obter_ranking_publico(cursor)[:5]
+            <button type="submit" class="btn-enviar">
+                <i class="fas fa-paper-plane"></i> Enviar Inscrição
+            </button>
+        </form>
+    </div>
 
-    return JSONResponse({
-        "fase_torneio": fase_status, 
-        "nome_fase": nome_fase, 
-        "detalhe_fase": detalhe_fase,
-        "tempo": tempo_formatado,
-        "crono_ativo": cfg["crono_ativo"], 
-        "confrontos": confrontos, 
-        "ranking": ranking,
-        "total_atletas": f"{total_atletas} Atletas",
-        
-        # Sincronização direta das configurações gravadas unificadas no DB
-        "tempo_rodada": tempo_rodada_atual,
-        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("max_rodadas") or 5
-    })
+    <script>
+        // Função simples para mostrar o nome do arquivo anexado na caixa de upload
+        function mostrarNomeArquivo(input) {
+            const label = document.getElementById('file-text');
+            if (input.files && input.files.length > 0) {
+                label.innerHTML = `<i class="fas fa-file-circle-check" style="color: #2ecc71;"></i> <strong>Arquivo pronto:</strong><br>${input.files[0].name}`;
+            }
+        }
+
+        // Verifica se a URL contém '?sucesso=true' para exibir a caixa verde de confirmação
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('sucesso') === 'true') {
+                document.getElementById('msg-sucesso').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
