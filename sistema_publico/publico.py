@@ -217,11 +217,13 @@ def api_dados_publicos(db=Depends(get_db)):
     return JSONResponse({
         "fase_torneio": cfg["fase_torneio"], 
         "nome_fase": nome_fase, 
-        "tempo": tempo_formatado,
+        "tempo": tempo_formatated, # mantenha a variável de tempo formatado do seu código
         "crono_ativo": cfg.get("crono_ativo", 0), 
         "confrontos": confrontos, 
         "ranking": ranking,
-        # Tenta mapear variantes comuns do banco
-        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or cfg.get("config_tempo") or cfg.get("duracao") or 30,
-        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("total_rodadas") or cfg.get("qtd_rodadas") or cfg.get("rodadas") or 5
+        # 🕵️‍♂️ LINHA DE DIAGNÓSTICO: Envia todas as colunas do banco para o navegador ver
+        "config_completa": cfg,
+        
+        "tempo_rodada": cfg.get("duracao_rodada") or cfg.get("tempo_rodada") or 30,
+        "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("total_rodadas") or 5
     })
