@@ -524,8 +524,18 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     tempo_formatado = f"{mins:02d}:{segs:02d}"
 
     return templates.TemplateResponse(
-        request=request, name="admin_jogos.html", 
-        context={"config": cfg, "rodada": rodada_atual, "confrontos": confrontos, "rodada_concluida": rodada_concluida, "tempo_formatado": tempo_formatado, "aba_ativa": "jogos"}
+        request=request, 
+        name="admin_jogos.html", 
+        context={
+            "config": cfg, 
+            "torneio": cfg,  
+            "rodada": rodada_atual, 
+            "fase_atual_rodada": rodada_atual,  
+            "confrontos": confrontos, 
+            "rodada_concluida": rodada_concluida, 
+            "tempo_formatado": tempo_formatado, 
+            "aba_ativa": "jogos"
+        }
     )
 
 @app.post("/admin/gerar-rodada")
