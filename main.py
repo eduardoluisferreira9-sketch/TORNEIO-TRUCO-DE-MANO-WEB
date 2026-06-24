@@ -3,7 +3,8 @@ import sys
 import time
 import random
 import shutil
-import json  # <--- ADICIONADO AQUI PARA O FILTRO FUNCIONAR
+import json
+
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, UploadFile, File
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -21,16 +22,13 @@ app = FastAPI(title="Painel de Controle do Administrador - Truco Cego")
 templates = Jinja2Templates(directory=[TEMPLATES_DIR, TEMPLATES_PUBLICO_DIR])
 templates.env.globals.update(chr=chr)
 
-# ---------------------------------------------------------
-# NOVO: FILTRO ESCAPEJS PARA COMPATIBILIDADE COM JINJA2
-# ---------------------------------------------------------
+# --- FILTRO ESCAPEJS PARA COMPATIBILIDADE COM JINJA2 ---
 def escapejs_filter(val):
     if not val:
         return ""
     return json.dumps(str(val))[1:-1]
 
 templates.env.filters["escapejs"] = escapejs_filter
-# ---------------------------------------------------------
 
 UPLOAD_DIR = os.path.join(BASE_DIR, "static", "comprovantes")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -91,7 +89,6 @@ def init_db():
             );
         ''')
         
-        # 💥 COLOQUE ESSAS LINHAS DE MIGRAÇÃO EXCLUSIVAS DO POSTGRES AQUI:
         cursor.execute("ALTER TABLE torneios ADD COLUMN IF NOT EXISTS crono_ativo INTEGER DEFAULT 0;")
         cursor.execute("ALTER TABLE torneios ADD COLUMN IF NOT EXISTS crono_fim_ms BIGINT DEFAULT 0;")
         cursor.execute("ALTER TABLE torneios ADD COLUMN IF NOT EXISTS crono_tempo_restante_seg INTEGER DEFAULT 3000;")
@@ -223,6 +220,7 @@ def init_db():
         ''')
         conn.commit()
         conn.close()
+
 try:
     init_db()
 except Exception as e:
@@ -246,11 +244,9 @@ def obtener_torneio_ativo(cursor):
     if not torneio:
         return None
 
-    # Se o cursor já retornar um dicionário (por configuração do driver), apenas retorna
     if isinstance(torneio, dict):
         return torneio
 
-    # Caso retorne uma tupla, monta o dicionário dinamicamente usando os nomes das colunas
     colunas = [col[0] for col in cursor.description]
     return dict(zip(colunas, torneio))
 
@@ -264,7 +260,6 @@ def atualizar_e_obter_cronometro(db):
         fim_ms = int(config["crono_fim_ms"])
         
         if agora_ms >= fim_ms:
-            # Tempo esgotado
             cursor.execute(
                 f'UPDATE torneios SET crono_tempo_restante_seg = 0, crono_ativo = 0 WHERE id = {p}', 
                 (config["id"],)
@@ -273,7 +268,6 @@ def atualizar_e_obter_cronometro(db):
             config["crono_tempo_restante_seg"] = 0
             config["crono_ativo"] = 0
         else:
-            # Calcula dinamicamente o tempo restante sem gravar no banco
             restante_seg = int((fim_ms - agora_ms) / 1000)
             config["crono_tempo_restante_seg"] = max(0, restante_seg)
             
@@ -328,16 +322,18 @@ def tela_inscricao_atleta(request: Request, db=Depends(get_db)):
     cfg_db = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     
-    cursor.execute(f"SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY entidade ASC", (cfg_db["id"],))
-    entities_rows = cursor.fetchall()
-    entidades = [row["entidade"] for row in entities_rows]
+    entidades = []
+    if cfg_db:
+        cursor.execute(f"SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY entidade ASC", (cfg_db["id"],))
+        entities_rows = cursor.fetchall()
+        entidades = [row["entidade"] for row in entities_rows]
     
     taxa_val = cfg_db["taxa_inscricao"] if cfg_db else 0.0
     taxa_formatada = f"{taxa_val:.2f}".replace('.', ',')
 
     return templates.TemplateResponse(
         request=request, name="inscricao_atleta.html", 
-        context={"config_taxa": taxa_formatada, "entidades": entidades}
+        context={"config_taxa": taxa_formatada, "entidades": entidades, "config": cfg_db}
     )
 
 @app.post("/inscrever")
@@ -443,7 +439,7 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", (restante_seg, cfg["id"]))
         
     elif acao == "reiniciar":
-        tempo_original = 3000  # Padrão fallback seguro
+        tempo_original = 3000  
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", 
                        (tempo_original, cfg["id"]))
         
@@ -533,16 +529,16 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
         else:
             confrontos.append(dict(row))
 
-    cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
+    # Aliasing 'as total' para evitar quebra de chaves string entre SQLite e Postgres
+    cursor.execute(f"SELECT COUNT(*) as total FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
     res_concluida = cursor.fetchone()
-    qtd_pendentes = res_concluida["COUNT(*)"] if isinstance(res_concluida, dict) else res_concluida[0]
+    qtd_pendentes = res_concluida["total"] if isinstance(res_concluida, dict) else res_concluida[0]
     rodada_concluida = (qtd_pendentes == 0) if confrontos else False
 
     mins = cfg["crono_tempo_restante_seg"] // 60
     segs = cfg["crono_tempo_restante_seg"] % 60
     tempo_formatado = f"{mins:02d}:{segs:02d}"
 
-    # Retorno corrigido fornecendo explicitamente 'torneio' e 'fase_atual_rodada' que o HTML exige
     return templates.TemplateResponse(
         request=request, 
         name="admin_jogos.html", 
@@ -1089,9 +1085,11 @@ def pagina_telao_publico(request: Request, db=Depends(get_db)):
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
-    cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
-    row_r = cursor.fetchone()
-    rodada_atual = row_r["rodada"] if row_r else 1
+    rodada_atual = 1
+    if cfg:
+        cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
+        row_r = cursor.fetchone()
+        rodada_atual = row_r["rodada"] if row_r else 1
     return templates.TemplateResponse(request=request, name="telao.html", context={"config": cfg, "rodada": rodada_atual})
 
 @app.get("/api/publico/dados")
@@ -1210,16 +1208,17 @@ async def salvar_inscricao_externa(
     db=Depends(get_db)
 ):
     cursor = db.cursor()
-    cfg = obtener_torneio_ativo(cursor)
+    cfg = obtener_torneio_ativo(cursor)  # Corrigido de er_torneio_ativo para obtener_torneio_ativo
     p = "%s" if DATABASE_URL else "?"
     
     ent_final = entidade if entidade else ctg
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
+    # Corrigido o nome da coluna para "entidade" em vez de "entity"
     cursor.execute(f'''
-        INSERT INTO atletas (torneio_id, nome, entity, status) 
-        VALUES ({p}, {p}, {p}, 'PENDENTE')
-    ''', (cfg["id"], nome.strip().upper(), entidade_limpa))
+        INSERT INTO atletas (torneio_id, nome, entidade, status, whatsapp) 
+        VALUES ({p}, {p}, {p}, 'PENDENTE', {p})
+    ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
     db.commit()
     
     return RedirectResponse(url="/admin-painel/inscricao?sucesso=true", status_code=303)
