@@ -238,10 +238,21 @@ def verificar_admin(request: Request):
 def obtener_torneio_ativo(cursor):
     cursor.execute("SELECT * FROM torneios WHERE fase_torneio != 'CONCLUIDO' ORDER BY id DESC LIMIT 1")
     torneio = cursor.fetchone()
+    
     if not torneio:
         cursor.execute("SELECT * FROM torneios ORDER BY id DESC LIMIT 1")
         torneio = cursor.fetchone()
-    return dict(torneio)
+        
+    if not torneio:
+        return None
+
+    # Se o cursor já retornar um dicionário (por configuração do driver), apenas retorna
+    if isinstance(torneio, dict):
+        return torneio
+
+    # Caso retorne uma tupla, monta o dicionário dinamicamente usando os nomes das colunas
+    colunas = [col[0] for col in cursor.description]
+    return dict(zip(colunas, torneio))
 
 def atualizar_e_obter_cronometro(db):
     cursor = db.cursor()
