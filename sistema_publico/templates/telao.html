@@ -4,25 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telão - Torneio de Truco Cego</title>
+    <!-- Importação das Fontes Oficiais do Torneio -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* --- Identidade Visual Alinhada: Tradicionalista & Imponente --- */
+        /* --- Identidade Visual Alinhada: Sua Paleta Oficial --- */
         :root {
-            --bg-principal: #0b150e;       /* Verde crioulo profundo (fundo) */
-            --bg-card: #122217;            /* Recinto das mesas ligeiramente mais claro */
-            --borda-fosca: #1d3525;        /* Divisórias discretas de campo */
-            --verde-lider: #2ecc71;        /* Destaque suave de quem está na frente */
-            --borda-ouro: #c5a059;         /* Dourado envelhecido oficial */
-            --dourado-brilhante: #fcf3cf;  /* Tipografia dourada em evidência */
-            --vermelho-pampa: #990000;     /* Vermelho das bandeiras e alertas críticos */
-            --vermelho-alerta: #e74c3c;    /* Alertas secundários */
-            --texto-claro: #f4f6f4;        /* Fonte principal limpa */
-            --texto-mutado: #8fa495;       /* Subtítulos e descrições secundárias */
-            --madeira-bronze: #cd7f32;     /* Bronze oficial */
-            --plata-prata: #bdc3c7;        /* Prata oficial */
+            --bg-principal: #0b2512; 
+            --bg-card: #071a0c;      
+            --borda-ouro: #d4af37;   
+            --dourado-brilhante: #f3cf5d;
+            --texto-claro: #ffffff;
+            --texto-mutado: #a8c3af; 
+            --sucesso: #2ecc71;
+            --danger: #ff4757;
+            --madeira: #8d6e63; /* Cor do 4º colocado */
+            
+            /* Auxiliares de Pódio mantendo a harmonia */
+            --plata-prata: #bdc3c7;
+            --madeira-bronze: #cd7f32;
         }
 
         body {
@@ -48,10 +50,10 @@
             margin-bottom: 25px;
             display: inline-flex;
             gap: 12px;
-            border: 1px solid var(--borda-fosca);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .btn-admin {
-            background: #172d1f;
+            background: var(--bg-card);
             color: var(--borda-ouro);
             border: 1px solid var(--borda-ouro);
             padding: 6px 14px;
@@ -65,17 +67,17 @@
         .btn-admin:hover {
             background: var(--borda-ouro);
             color: #000;
-            box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
         .btn-admin.btn-reset {
-            border-color: var(--vermelho-alerta);
-            color: var(--vermelho-alerta);
-            background: rgba(231, 76, 60, 0.05);
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(255, 71, 87, 0.05);
         }
         .btn-admin.btn-reset:hover {
-            background: var(--vermelho-alerta);
+            background: var(--danger);
             color: #fff;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
         }
 
         /* --- Banner de Alerta Absoluto (Tudo é falta) --- */
@@ -86,12 +88,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 5, 5, 0.95);
+            background: rgba(5, 15, 8, 0.96);
             z-index: 9999;
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 15px solid var(--vermelho-pampa);
+            border: 15px solid var(--danger);
             box-sizing: border-box;
             animation: pulseBorda 1.5s infinite alternate;
         }
@@ -103,7 +105,7 @@
             text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
         .alerta-falta-conteudo h2 span {
-            color: var(--vermelho-alerta);
+            color: var(--danger);
         }
         .alerta-falta-conteudo p {
             color: var(--texto-mutado);
@@ -118,7 +120,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--borda-fosca);
+            border-bottom: 2px solid var(--bg-card);
             padding-bottom: 20px;
             margin-bottom: 25px;
         }
@@ -136,7 +138,7 @@
             border: 2px solid var(--borda-ouro);
             padding: 10px 30px;
             border-radius: 4px;
-            background: #060b07;
+            background: var(--bg-card);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
         }
         .cronometro-digital {
@@ -157,8 +159,7 @@
             background: var(--bg-card);
             padding: 18px;
             border-radius: 4px;
-            border: 1px solid var(--borda-fosca);
-            border-top: 3px solid var(--borda-ouro);
+            border: 1px solid var(--borda-ouro);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .info-rotulo {
@@ -183,11 +184,11 @@
         }
         .secao-titulo {
             font-size: 1.5rem;
-            border-bottom: 2px solid var(--borda-fosca);
+            border-bottom: 2px solid var(--borda-ouro);
             padding-bottom: 12px;
             margin-top: 0;
             margin-bottom: 25px;
-            color: var(--borda-ouro);
+            color: var(--dourado-brilhante);
             font-weight: bold;
             text-transform: uppercase;
         }
@@ -200,7 +201,7 @@
         }
         .card-jogo {
             background: var(--bg-card);
-            border: 1px solid var(--borda-fosca);
+            border: 1px solid var(--borda-ouro);
             border-radius: 4px;
             padding: 18px;
             position: relative;
@@ -223,13 +224,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #0a130d;
+            background: rgba(0, 0, 0, 0.3);
             padding: 12px 14px;
             border-radius: 4px;
             border: 1px solid rgba(255,255,255,0.02);
         }
         .atleta-box.lider-mesa {
-            border-left: 4px solid var(--verde-lider);
+            border-left: 4px solid var(--sucesso);
             background: rgba(46, 204, 113, 0.04);
         }
         .atleta-linha { 
@@ -242,10 +243,10 @@
             font-weight: bold; 
             font-size: 1rem;
             color: var(--borda-ouro); 
-            background: #040705;
+            background: #000;
             padding: 4px 10px;
             border-radius: 2px;
-            border: 1px solid var(--borda-fosca);
+            border: 1px solid rgba(214, 175, 55, 0.2);
         }
         .vs-tag { 
             text-align: center; 
@@ -261,10 +262,10 @@
 
         /* --- Painel Lateral de Classificação --- */
         .ranking-container {
-            background: #0a120e;
+            background: var(--bg-card);
             padding: 22px;
             border-radius: 4px;
-            border: 1px solid var(--borda-fosca);
+            border: 1px solid var(--borda-ouro);
             box-shadow: 0 6px 15px rgba(0,0,0,0.6);
         }
         .tabela-ranking {
@@ -274,7 +275,7 @@
         .tabela-ranking th, .tabela-ranking td {
             padding: 14px;
             text-align: left;
-            border-bottom: 1px solid var(--borda-fosca);
+            border-bottom: 1px solid rgba(214, 175, 55, 0.1);
         }
         .tabela-ranking th { 
             color: var(--texto-mutado); 
@@ -290,22 +291,22 @@
             font-size: 1.1rem;
         }
         .badge-vitorias { 
-            background: #040705; 
+            background: #000; 
             color: var(--texto-claro);
             padding: 5px 12px; 
             border-radius: 4px; 
             font-size: 0.85rem; 
             font-weight: bold;
-            border: 1px solid var(--borda-fosca); 
+            border: 1px solid rgba(214, 175, 55, 0.2); 
         }
 
         /* --- Pódio e Cerimonial Premium --- */
         .podio-wrapper {
-            background: linear-gradient(180deg, var(--bg-card) 0%, #050a06 100%);
+            background: linear-gradient(180deg, var(--bg-card) 0%, #030a04 100%);
             padding: 45px;
             border-radius: 4px;
             border: 2px solid var(--borda-ouro);
-            box-shadow: 0 0 30px rgba(197, 160, 89, 0.15);
+            box-shadow: 0 0 30px rgba(214, 175, 55, 0.15);
         }
         .podio-titulo {
             text-align: center;
@@ -323,7 +324,7 @@
             margin-top: 50px;
         }
         .podio-card {
-            background: #080e0a;
+            background: rgba(0,0,0,0.4);
             border-radius: 4px;
             padding: 30px;
             text-align: center;
@@ -332,7 +333,7 @@
             justify-content: space-between;
             box-shadow: 0 12px 30px rgba(0,0,0,0.7);
         }
-        .podio-card.ouro { border: 3px solid var(--borda-ouro); height: 320px; width: 310px; order: 2; background: linear-gradient(180deg, #1d1b11 0%, #080e0a 100%); }
+        .podio-card.ouro { border: 3px solid var(--borda-ouro); height: 320px; width: 310px; order: 2; background: linear-gradient(180deg, rgba(214,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%); }
         .podio-card.prata { border: 2px solid var(--plata-prata); height: 260px; width: 270px; order: 1; }
         .podio-card.bronze { border: 2px solid var(--madeira-bronze); height: 230px; width: 270px; order: 3; }
         
@@ -348,8 +349,8 @@
         }
 
         @keyframes pulseBorda {
-            from { border-color: var(--vermelho-pampa); box-shadow: inset 0 0 50px rgba(153,0,0,0.6); }
-            to { border-color: var(--vermelho-alerta); box-shadow: inset 0 0 20px rgba(153,0,0,0.3); }
+            from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
+            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
         }
     </style>
 </head>
@@ -363,7 +364,7 @@
     <div id="alerta-falta" class="alerta-falta-banner">
         <div class="alerta-falta-conteudo">
             <h2>⚠️ TEMPO ESGOTADO!</h2>
-            <h2>AGORA TUDO É <span>FALTA!</span></h2>
+            <h2>AGORA TUDO É <span>FAIXA / FALTA!</span></h2>
             <p>Fechem as vazas e concluam a jogada imediatamente.</p>
         </div>
     </div>
@@ -533,11 +534,10 @@
                 }
 
                 if (telaPrincipal) {
-                    /* Estilização interna injetada reformulada para seguir o padrão Tradicionalista */
                     telaPrincipal.innerHTML = `
                         <div class="podio-wrapper">
                             <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
-                            <div style="text-align:center; color:var(--texto-mutado); margin-bottom:45px; font-style:italic; font-size:1.1rem;">O pódio oficial da edição está consolidado nos pergaminhos da arena!</div>
+                            <div style="text-align:center; color:var(--texto-mutado); margin-bottom:45px; font-style:italic; font-size:1.1rem;">O pódio de honra da arena está consolidado!</div>
                             
                             <div class="podio-flex">
                                 <div class="podio-card prata">
@@ -551,7 +551,7 @@
                                 <div class="podio-card ouro">
                                     <div>
                                         <div class="podio-medalha">👑</div>
-                                        <div class="podio-rotulo-lugar" style="color:var(--borda-ouro)">GRANDE CAMPEÃO</div>
+                                        <div class="podio-rotulo-lugar" style="color:var(--dourado-brilhante)">GRANDE CAMPEÃO</div>
                                     </div>
                                     <div class="podio-nome" style="font-size: 1.6rem; color: var(--dourado-brilhante); font-family:'Cinzel', serif;">${p1}</div>
                                 </div>
@@ -564,16 +564,16 @@
                                     <div class="podio-nome">${p3}</div>
                                 </div>
 
-                                <div class="podio-card" style="border: 1px solid var(--borda-fosca); height: 200px; width: 250px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div class="podio-card" style="border: 2px solid var(--madeira); height: 200px; width: 250px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>
                                         <div class="podio-medalha" style="font-size: 2.2rem;">🏅</div>
-                                        <div class="podio-rotulo-lugar">4º Colocado</div>
+                                        <div class="podio-rotulo-lugar" style="color: var(--madeira);">4º Colocado</div>
                                     </div>
                                     <div class="podio-nome" style="color: #bbb; font-size: 1.1rem;">${p4}</div>
                                 </div>
                             </div>
 
-                            <div class="painel-rei-flores" style="border: 2px dashed var(--borda-ouro); background: linear-gradient(130deg, rgba(197,160,89,0.08), rgba(0,0,0,0)); padding: 25px; border-radius: 4px; text-align: center; max-width: 650px; margin: 50px auto 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                            <div class="painel-rei-flores" style="border: 2px dashed var(--borda-ouro); background: linear-gradient(130deg, rgba(214,175,55,0.08), rgba(0,0,0,0)); padding: 25px; border-radius: 4px; text-align: center; max-width: 650px; margin: 50px auto 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                                 <div style="color: var(--borda-ouro); font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: bold; margin-bottom: 6px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
                                 <div style="color: var(--texto-mutado); font-size: 0.95rem; margin-bottom: 12px;">O maior cantador de flores da rodada:</div>
                                 <div style="color: #ffffff; font-size: 1.9rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 12px;">${reiDasFloresNome.toUpperCase()}</div>
@@ -659,11 +659,11 @@
                 alertaElement.style.display = 'none';
             } else {
                 cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
-                cronoElement.parentElement.style.boxShadow = '0 0 15px rgba(197, 160, 89, 0.2)';
+                cronoElement.parentElement.style.boxShadow = '0 0 15px rgba(214, 175, 55, 0.2)';
                 
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
                     cronoElement.innerText = "00:00";
-                    cronoElement.style.color = 'var(--vermelho-alerta)';
+                    cronoElement.style.color = 'var(--danger)';
                     alertaElement.style.display = 'flex';
                 } else {
                     cronoElement.innerText = tempoFormatado;
@@ -711,7 +711,7 @@
                             } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar") {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
                             } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
-                                textoTagMesa = `Mesa ${jogo.mesa} — <span style="color:var(--borda-ouro); font-weight:bold;">SEMIFINAL</span>`;
+                                textoTagMesa = `Mesa ${jogo.mesa} — <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
                             } else if (jogo.fase_mesa_nome) {
                                 textoTagMesa = `Mesa ${jogo.mesa} — ${jogo.fase_mesa_nome}`;
                             }
