@@ -28,7 +28,6 @@ app.add_middleware(
 )
 
 def get_db():
-    # check_same_thread=False adicionado para evitar erros de concorrência
     conn = sqlite3.connect(DB_FILE, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     try:
@@ -68,6 +67,34 @@ def obter_ranking_publico(cursor):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["saldo_tentos"]))
     return lista_classificacao
 
+def obter_rei_das_flores_atual(cursor):
+    """Calcula quem é o líder atual do Rei das Flores somando rodadas classificatórias e eliminatórias"""
+    cursor.execute("SELECT id, nome FROM atletas WHERE status = 'APROVADO'")
+    atletas = cursor.fetchall()
+    
+    lider_nome = "Nenhum"
+    max_flores = 0
+    
+    for atleta in atletas:
+        atleta_id = atleta["id"]
+        try:
+            cursor.execute("SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = ?", (atleta_id,))
+            f1 = cursor.fetchone()[0]
+            cursor.execute("SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = ?", (atleta_id,))
+            f2 = cursor.fetchone()[0]
+        except sqlite3.OperationalError:
+            cursor.execute("SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE athlete1_id = ?", (atleta_id,))
+            f1 = cursor.fetchone()[0]
+            cursor.execute("SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE athlete2_id = ?", (atleta_id,))
+            f2 = cursor.fetchone()[0]
+            
+        total_flores = f1 + f2
+        if total_flores > max_flores:
+            max_flores = total_flores
+            lider_nome = atleta["nome"]
+            
+    return {"nome": lider_nome, "flores": max_flores}
+
 @app.get("/", response_class=HTMLResponse)
 def rota_telao(request: Request, db: sqlite3.Connection = Depends(get_db)):
     cursor = db.cursor()
@@ -75,21 +102,18 @@ def rota_telao(request: Request, db: sqlite3.Connection = Depends(get_db)):
     cfg = dict(cursor.fetchone())
     return templates.TemplateResponse(request=request, name="publico_telao.html", context={"config": cfg})
 
-# 🚀 ROTA PÚBLICA: EXIBIR PÁGINA DE INSCRIÇÃO
 @app.get("/inscrever", response_class=HTMLResponse)
 def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get_db)):
     cursor = db.cursor()
     cursor.execute("SELECT nome_torneio, taxa_inscricao FROM config LIMIT 1")
     cfg_db = cursor.fetchone()
     
-    # Busca entidades distintas cadastradas para alimentar o formulário
     cursor.execute("SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' ORDER BY entidade ASC")
     entidades = [row["entidade"] for row in cursor.fetchall()]
     
     taxa_val = cfg_db["taxa_inscricao"] if cfg_db else 0.0
     taxa_formatada = f"{taxa_val:.2f}".replace('.', ',')
 
-    # Alinhado com o nome do arquivo enviado por você
     return templates.TemplateResponse(
         request=request, 
         name="inscricao_atleta.html", 
@@ -99,7 +123,6 @@ def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get
         }
     )
 
-# 📥 ROTA PÚBLICA PROCESSAR FORMULÁRIO (Mapeamento direto com os inputs do HTML)
 @app.post("/inscrever")
 def processar_inscricao_atleta(
     nome: str = Form(...),
@@ -122,7 +145,7 @@ def processar_inscricao_atleta(
         
     cursor = db.cursor()
     cursor.execute('''
-        INSERT INTO atletas (nome, entidade, whatsapp, status) 
+        INSERT INTO atletas (nome, entity, whatsapp, status) 
         VALUES (?, ?, ?, 'PENDENTE')
     ''', (nome.strip(), entidade.strip().upper(), whatsapp.strip()))
     db.commit()
@@ -135,7 +158,7 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
     cursor.execute("SELECT * FROM config LIMIT 1")
     cfg = dict(cursor.fetchone())
     
-    # 1. Atualiza o cronômetro na memória e sincroniza no Banco de Dados
+    # 1. Cronômetro em memória
     if cfg["crono_ativo"] == 1:
         agora = time.time()
         decorrido = int(agora - cfg["crono_ultimo_clique"])
@@ -144,16 +167,13 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
             cfg["crono_tempo_restante_seg"] = novo_tempo
             cfg["crono_ultimo_clique"] = agora
             
-            # SALVA NO BANCO para a próxima requisição pegar o tempo certo decrescente
             cursor.execute(
                 "UPDATE config SET crono_tempo_restante_seg = ?, crono_ultimo_clique = ?", 
                 (novo_tempo, agora)
             )
             db.commit()
             
-    # 2. Formata o tempo para "MM:SS" ou detecta "Sem Tempo" / "Falta"
     tempo_rodada_atual = cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 0
-    
     if cfg["crono_tempo_restante_seg"] <= 0 and cfg["crono_ativo"] == 1:
         tempo_formatado = "AGORA TUDO É FALTA!"
     elif tempo_rodada_atual == 0:
@@ -163,38 +183,39 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         segs = cfg["crono_tempo_restante_seg"] % 60
         tempo_formatado = f"{mins:02d}:{segs:02d}"
 
-    # 3. Mapeamento e Identificação Precisa da Fase Atual
-    fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA")
+    # 2. Tratamento Cirúrgico de Fase (Macro) e Andamento (Micro)
+    fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA").upper()
     
     mapeamento_rodadas = {
-        "OITAVAS": -1,
+        "16AVOS": -16,
+        "OITAVAS": -1, # Conforme mapeamento original do banco do usuário
         "QUARTAS": -2,
         "SEMIFINAL": -3,
         "FINAL": -4
     }
     
     if fase_status == "CLASSIFICATORIA":
-        # Na classificatória, pegamos a maior rodada positiva que existe
         cursor.execute("SELECT rodada FROM confrontos WHERE rodada > 0 ORDER BY id DESC LIMIT 1")
         row_r = cursor.fetchone()
         rodada_atual = row_r["rodada"] if row_r else 1
-        nome_fase = "Fase Classificatória"
-        detalhe_fase = f"{rodada_atual}ª Rodada"
+        nome_fase = "Classificatória"
+        detalhe_fase = f"Rodada {rodada_atual}"
     else:
-        # No mata-mata, o número da rodada é definido pela fase oficial do admin
         rodada_atual = mapeamento_rodadas.get(fase_status, 0)
-        detalhe_fase = "Mata-Mata"
-        if fase_status == "OITAVAS": nome_fase = "Oitavas de Final"
-        elif fase_status == "QUARTAS": nome_fase = "Quartas de Final"
-        elif fase_status == "SEMIFINAL": nome_fase = "Semifinal"
+        nome_fase = "Eliminatória"
+        
+        if fase_status == "16AVOS": detalhe_fase = "16 avos de Final"
+        elif fase_status == "OITAVAS": detalhe_fase = "Oitavas de Final"
+        elif fase_status == "QUARTAS": detalhe_fase = "Quartas de Final"
+        elif fase_status == "SEMIFINAL": detalhe_fase = "Semifinal"
         elif fase_status == "FINAL": 
-            nome_fase = "Grande Final"
-            detalhe_fase = "Finais"
-        else: 
+            nome_fase = "Finais"
+            detalhe_fase = "Grande Final"
+        else:
             nome_fase = "Inscrições Abertas"
             detalhe_fase = "--"
 
-    # 4. Busca os Confrontos e injeta o nome individual de cada mesa dinamicamente
+    # 3. Busca de Confrontos Corrigida para buscar tanto positivos quanto negativos
     confrontos = []
     if rodada_atual != 0:
         cursor.execute("SELECT * FROM confrontos WHERE rodada = ? ORDER BY mesa ASC", (rodada_atual,))
@@ -202,7 +223,6 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         
         for row in linhas_confrontos:
             dados_jogo = dict(row)
-            # Regra cirúrgica para a rodada final (-4) separar os nomes das mesas em andamento
             if rodada_atual == -4:
                 if dados_jogo["mesa"] == 1:
                     dados_jogo["fase_mesa_nome"] = "Grande Final"
@@ -211,13 +231,15 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
                 else:
                     dados_jogo["fase_mesa_nome"] = "Final"
             else:
-                dados_jogo["fase_mesa_nome"] = "Eliminatória" if rodada_atual < 0 else f"{rodada_atual}ª Rodada"
+                dados_jogo["fase_mesa_nome"] = detalhe_fase
                 
             confrontos.append(dados_jogo)
 
-    # 5. Busca Total de Atletas Aprovados (Corrige o "-- Atletas" na tela)
+    # 4. Totalizadores e Líder de Flores
     cursor.execute("SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO'")
     total_atletas = cursor.fetchone()[0]
+    
+    rei_flores = obter_rei_das_flores_atual(cursor)
 
     ranking = []
     if fase_status != "INSCRICAO":
@@ -231,9 +253,7 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         "crono_ativo": cfg["crono_ativo"], 
         "confrontos": confrontos, 
         "ranking": ranking,
-        "total_atletas": f"{total_atletas} Atletas",
-        
-        # Sincronização direta das configurações gravadas unificadas no DB
-        "tempo_rodada": tempo_rodada_atual,
+        "total_atletas": total_atletas,
+        "rei_flores_atual": rei_flores,
         "max_rodadas": cfg.get("max_rodadas_classificatoria") or cfg.get("max_rodadas") or 5
     })
