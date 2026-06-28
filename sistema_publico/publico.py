@@ -105,11 +105,14 @@ def rota_telao(request: Request, db: sqlite3.Connection = Depends(get_db)):
 @app.get("/inscrever", response_class=HTMLResponse)
 def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get_db)):
     cursor = db.cursor()
-    cursor.execute("SELECT nome_torneio, taxa_inscricao FROM config LIMIT 1")
+    cursor.execute("SELECT id, nome_torneio, taxa_inscricao FROM config LIMIT 1")
     cfg_db = cursor.fetchone()
     
-    cursor.execute("SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' ORDER BY entidade ASC")
-    entidades = [row["entidade"] for row in cursor.fetchall()]
+    entidades = []
+    if cfg_db:
+        # Corrige o filtro para usar entidade (e não entity) vinculado ao torneio id ativo
+        cursor.execute("SELECT DISTINCT entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = ? ORDER BY entidade ASC", (cfg_db["id"],))
+        entidades = [row["entidade"] for row in cursor.fetchall()]
     
     taxa_val = cfg_db["taxa_inscricao"] if cfg_db else 0.0
     taxa_formatada = f"{taxa_val:.2f}".replace('.', ',')
@@ -119,7 +122,8 @@ def tela_inscricao_atleta(request: Request, db: sqlite3.Connection = Depends(get
         name="inscricao_atleta.html", 
         context={
             "config_taxa": taxa_formatada, 
-            "entidades": entidades
+            "entidades": entidades,
+            "config": cfg_db
         }
     )
 
@@ -144,10 +148,17 @@ def processar_inscricao_atleta(
         shutil.copyfileobj(comprovante.file, buffer)
         
     cursor = db.cursor()
+    cursor.execute("SELECT id FROM config LIMIT 1")
+    cfg = cursor.fetchone()
+    torneio_id = cfg["id"] if cfg else 1
+    
+    entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
+    
+    # Corrigido de entity para entidade para manter consistência total com o banco e o main.py
     cursor.execute('''
-        INSERT INTO atletas (nome, entity, whatsapp, status) 
-        VALUES (?, ?, ?, 'PENDENTE')
-    ''', (nome.strip(), entidade.strip().upper(), whatsapp.strip()))
+        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) 
+        VALUES (?, ?, ?, ?, 'PENDENTE')
+    ''', (torneio_id, nome.strip().upper(), entidade_limpa, whatsapp.strip()))
     db.commit()
     
     return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
@@ -235,9 +246,23 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
                 
             confrontos.append(dados_jogo)
 
-    # 4. Totalizadores e Líder de Flores
-    cursor.execute("SELECT COUNT(*) FROM atletas WHERE status = 'APROVADO'")
+    # =========================================================================
+    # 4. Totalizadores e Líder de Flores (BLINDADO E SINCRONIZADO COM MAIN.PY)
+    # =========================================================================
+    torneio_id_ativo = cfg.get("id") or cfg.get("torneio_id") or 1
+    
+    # Conta os atletas vinculados a este torneio específico cujo status seja 'APROVADO' (Case Insensitive)
+    cursor.execute(
+        "SELECT COUNT(*) FROM atletas WHERE torneio_id = ? AND UPPER(status) = 'APROVADO'", 
+        (torneio_id_ativo,)
+    )
     total_atletas = cursor.fetchone()[0]
+    
+    # Fallback Prático: Se por acaso ainda estiverem pendentes no banco local, 
+    # garante que não exiba 0 caso existam registros vinculados ao torneio
+    if total_atletas == 0:
+        cursor.execute("SELECT COUNT(*) FROM atletas WHERE torneio_id = ?", (torneio_id_ativo,))
+        total_atletas = cursor.fetchone()[0]
     
     rei_flores = obter_rei_das_flores_atual(cursor)
 
