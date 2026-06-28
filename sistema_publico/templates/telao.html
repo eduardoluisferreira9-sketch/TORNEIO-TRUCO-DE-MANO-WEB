@@ -206,10 +206,9 @@
             min-height: 0; 
         }
 
-        /* --- O SEGREDO: Grid de Confrontos Auto-Ajustável e Fluido --- */
+        /* --- Grid de Confrontos Auto-Ajustável e Fluido --- */
         .grid-jogos {
             display: grid;
-            /* Calcula colunas dependendo do espaço, mas expande na vertical dinamicamente */
             grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); 
             gap: 10px;
             align-content: flex-start;
@@ -223,7 +222,7 @@
             background: var(--bg-card);
             border: 1px solid var(--borda-ouro);
             border-radius: 4px;
-            padding: 8px 10px; /* Reduzido para economizar espaço vertical */
+            padding: 8px 10px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
@@ -246,7 +245,7 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(0, 0, 0, 0.4);
-            padding: 6px 10px; /* Padding interno menor */
+            padding: 6px 10px; 
             border-radius: 4px;
         }
         .atleta-box.lider-mesa {
@@ -277,7 +276,7 @@
 
         .atleta-linha { 
             font-weight: 600; 
-            font-size: 0.9rem; /* Leve redução de fonte */
+            font-size: 0.9rem; 
             color: #fff;
             white-space: nowrap;
             overflow: hidden;
@@ -318,7 +317,7 @@
             flex-grow: 1;
         }
         .tabela-ranking th, .tabela-ranking td {
-            padding: 8px 6px; /* Diminuído para evitar transbordo */
+            padding: 8px 6px; 
             text-align: left;
         }
         .tabela-ranking th { 
@@ -352,7 +351,7 @@
         .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-size: 0.75rem; }
         .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-size: 0.75rem; }
 
-        /* --- Pódio e Cerimonial Premium (Permanece Intacto se ativo) --- */
+        /* --- Pódio e Cerimonial Premium --- */
         .podio-wrapper {
             background: linear-gradient(180deg, rgba(7, 26, 12, 0.95) 0%, #030a04 100%);
             padding: 25px;
@@ -446,7 +445,7 @@
         </div>
     </div>
 
-    <script>
+<script>
     let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
     let ultimoEstadoJogosStr = "";
     let ultimoEstadoRankingStr = "";
@@ -676,9 +675,9 @@
                                     <th style="text-align: left;">Atleta</th>
                                     <th style="text-align: right;">Vitórias</th>
                                 </tr>
-                            </thead>
+                            </table>
                             <tbody id="tabela-ranking-corpo"></tbody>
-                        </table>
+                        </div>
                     </div>
                 `;
             }
