@@ -301,7 +301,7 @@
             margin: 0;
         }
 
-        /* --- Painel Lateral Otimizado --- */
+        /* --- Painel Lateral com Rolagem Automática --- */
         .ranking-container {
             border: 1px solid var(--borda-ouro);
             background: rgba(4, 15, 7, 0.4);
@@ -310,15 +310,21 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
+            height: 100%;
+            box-sizing: border-box;
         }
+        
+        /* Box intermediário que esconde o estouro do conteúdo e fixa o tamanho */
+        .ranking-scroller-box {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            margin-top: 5px;
+        }
+
         .tabela-ranking {
             width: 100%;
             border-collapse: collapse;
-            flex-grow: 1;
-        }
-        .tabela-ranking th, .tabela-ranking td {
-            padding: 8px 6px; 
-            text-align: left;
         }
         .tabela-ranking th { 
             color: var(--texto-mutado); 
@@ -326,10 +332,24 @@
             font-size: 0.65rem; 
             font-weight: 700;
             border-bottom: 1px solid var(--borda-ouro);
+            padding: 8px 6px;
+            position: sticky;
+            top: 0;
+            background: #06190c; /* Garante que o fundo do header cubra os nomes que sobem */
+            z-index: 2;
         }
+        
+        /* Container que receberá o efeito de subir e descer */
+        .ranking-marquise-body {
+            display: table-row-group;
+            position: relative;
+            top: 0;
+        }
+
         .tabela-ranking td {
             border-bottom: 1px solid rgba(214, 175, 55, 0.1);
             font-size: 0.85rem;
+            padding: 8px 6px;
         }
         .posicao-num { 
             width: 35px; 
@@ -345,6 +365,12 @@
             font-size: 0.75rem; 
             font-weight: bold;
             border: 1px solid rgba(214, 175, 55, 0.1); 
+        }
+
+        /* Destaque sutil para o G4 na tabela lateral */
+        tr.top-atleta td.posicao-num {
+            color: var(--dourado-brilhante);
+            text-shadow: 0 0 5px rgba(243, 207, 93, 0.3);
         }
 
         /* Badges de Finais */
@@ -374,6 +400,13 @@
         @keyframes pulseBorda {
             from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
             to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
+        }
+
+        /* Animação de Scroll Vertical Contínuo (Mesa de Bilhar / Telão de Estádio) */
+        @keyframes autoScrollRanking {
+            0%, 10% { transform: translateY(0); }
+            45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
+            90%, 100% { transform: translateY(0); }
         }
     </style>
 </head>
@@ -429,19 +462,21 @@
 
         <div class="ranking-container">
             <div class="secao-titulo-container">
-                <h2 class="secao-titulo">Top 5 Líderes</h2>
+                <h2 class="secao-titulo">Classificação Geral</h2>
                 <div class="secao-linha"></div>
             </div>
-            <table class="tabela-ranking">
-                <thead>
-                    <tr>
-                        <th style="text-align: left;">Pos</th>
-                        <th style="text-align: left;">Atleta</th>
-                        <th style="text-align: right;">Vitórias</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-ranking-corpo"></tbody>
-            </table>
+            <div class="ranking-scroller-box" id="ranking-box-container">
+                <table class="tabela-ranking">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Pos</th>
+                            <th style="text-align: left;">Atleta</th>
+                            <th style="text-align: right;">Vitórias</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-ranking-corpo" class="ranking-marquise-body"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -462,13 +497,10 @@
         window.location.reload();
     }
 
-    // Função que recalcula dinamicamente os tamanhos baseado na quantidade de mesas
     function ajustarTamanhoDosCards(totalMesas) {
         const grid = document.getElementById('container-jogos');
         if (!grid) return;
 
-        // Pega todos os cards injetados na tela
-        const cards = grid.querySelectorAll('.card-jogo');
         const atletaLinhas = grid.querySelectorAll('.atleta-linha');
         const atletaBoxes = grid.querySelectorAll('.atleta-box');
 
@@ -476,7 +508,6 @@
         let paddingBox = "6px 10px";
         let minWidthGrid = "290px";
 
-        // Aplica reduções agressivas se houver sobrecarga de mesas no telão
         if (totalMesas > 12) {
             fontSizeCard = "0.75rem";
             paddingBox = "4px 8px";
@@ -488,9 +519,29 @@
         }
 
         grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
-
         atletaLinhas.forEach(el => el.style.fontSize = fontSizeCard);
         atletaBoxes.forEach(el => el.style.padding = paddingBox);
+    }
+
+    // Calcula dinamicamente se a tabela passa da altura máxima permitida e ativa o scroll suave
+    function gerenciarScrollDoRanking() {
+        const container = document.getElementById('ranking-box-container');
+        const body = document.getElementById('tabela-ranking-corpo');
+        if (!container || !body) return;
+
+        const alturaDisponivel = container.clientHeight;
+        const alturaTabela = body.scrollHeight;
+
+        // Se a tabela for maior que o espaço físico da coluna lateral da TV
+        if (alturaTabela > alturaDisponivel) {
+            const distanciaScroll = alturaTabela - alturaDisponivel + 20; 
+            body.style.setProperty('--scroll-distancia', `-${distanciaScroll}px`);
+            // Aplica a animação fluida de ida e volta (20 segundos por ciclo completo para leitura confortável)
+            body.style.animation = "autoScrollRanking 20s linear infinite alternate";
+        } else {
+            body.style.animation = "none";
+            body.style.transform = "translateY(0)";
+        }
     }
 
     async function atualizarTelao() {
@@ -665,18 +716,20 @@
                     </div>
                     <div class="ranking-container">
                         <div class="secao-titulo-container">
-                            <h2 class="secao-titulo">Top 5 Líderes</h2>
+                            <h2 class="secao-titulo">Classificação Geral</h2>
                             <div class="secao-linha"></div>
                         </div>
-                        <table class="tabela-ranking">
-                            <thead>
-                                <tr>
-                                    <th style="text-align: left;">Pos</th>
-                                    <th style="text-align: left;">Atleta</th>
-                                    <th style="text-align: right;">Vitórias</th>
-                                </tr>
+                        <div class="ranking-scroller-box" id="ranking-box-container">
+                            <table class="tabela-ranking">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left;">Pos</th>
+                                        <th style="text-align: left;">Atleta</th>
+                                        <th style="text-align: right;">Vitórias</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-ranking-corpo" class="ranking-marquise-body"></tbody>
                             </table>
-                            <tbody id="tabela-ranking-corpo"></tbody>
                         </div>
                     </div>
                 `;
@@ -837,25 +890,28 @@
                             containerJogos.appendChild(card);
                         });
 
-                        // Executa o cálculo dinâmico de redimensionamento imediatamente após renderizar
                         ajustarTamanhoDosCards(totalConfrontosAtuais);
                     }
                 }
             }
 
-            // --- RENDERIZAÇÃO DO RANKING (TOP 5) ---
+            // --- RENDERIZAÇÃO DA CLASSIFICAÇÃO COMPLETA ---
             const tableBody = document.getElementById('tabela-ranking-corpo');
             if (tableBody) {
-                const top5Data = data.ranking ? data.ranking.slice(0, 5) : [];
-                const signatureAtualRanking = JSON.stringify(top5Data);
+                // Removemos o `.slice(0, 5)` para trazer todo mundo que estiver no JSON da API
+                const rankingCompletoData = data.ranking ? data.ranking : [];
+                const signatureAtualRanking = JSON.stringify(rankingCompletoData);
 
                 if (signatureAtualRanking !== ultimoEstadoRankingStr) {
                     ultimoEstadoRankingStr = signatureAtualRanking; 
                     tableBody.innerHTML = '';
                     
-                    if (top5Data.length > 0) {
-                        top5Data.forEach((player, index) => {
+                    if (rankingCompletoData.length > 0) {
+                        rankingCompletoData.forEach((player, index) => {
                             const row = document.createElement('tr');
+                            // Adiciona classe de destaque visual se for do topo da tabela (Top 4 da semifinal)
+                            if (index < 4) row.className = 'top-atleta';
+
                             row.innerHTML = `
                                 <td class="posicao-num">${index + 1}º</td>
                                 <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
@@ -863,6 +919,9 @@
                             `;
                             tableBody.appendChild(row);
                         });
+                        
+                        // Recalcula as dimensões físicas da tabela e ativa a rolagem se necessário
+                        setTimeout(gerenciarScrollDoRanking, 100);
                     } else {
                         tableBody.innerHTML = `<tr><td colspan="3" style="color: var(--texto-mutado); text-align: center; font-style: italic; padding: 20px 0;">Nenhum atleta listado.</td></tr>`;
                     }
@@ -876,6 +935,9 @@
 
     atualizarTelao();
     setInterval(atualizarTelao, 3000);
+    
+    // Garante o recalculo da rolagem caso o navegador mude de tamanho/resolução
+    window.addEventListener('resize', gerenciarScrollDoRanking);
 </script>
 </body>
 </html>
