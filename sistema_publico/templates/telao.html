@@ -680,7 +680,14 @@
 
             const elAtletas = document.getElementById('info-total-atletas');
             if (elAtletas) {
-                const qtdAtletas = data.total_atletas || data.inscritos || data.atletas_confirmados || data.total_jogadores || 0;
+                // 1. Tenta obter o dado de propriedades numéricas diretas da API
+                let qtdAtletas = data.total_atletas || data.inscritos || data.atletas_confirmados || data.total_jogadores || 0;
+    
+                // 2. Se a API retornou 0 mas a lista de ranking possui dados, adota o tamanho do ranking como real
+                if (Number(qtdAtletas) === 0 && data.ranking && data.ranking.length > 0) {
+                    qtdAtletas = data.ranking.length;
+                }
+    
                 elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
             
