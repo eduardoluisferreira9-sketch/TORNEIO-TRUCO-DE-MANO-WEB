@@ -94,7 +94,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 15px solid var(--danger);
+            border: 1px solid var(--danger);
             box-sizing: border-box;
             animation: pulseBorda 1.5s infinite alternate;
         }
@@ -246,11 +246,34 @@
             background: rgba(0, 0, 0, 0.4);
             padding: 12px 14px;
             border-radius: 4px;
+            transition: background-color 0.3s ease, border 0.3s ease;
         }
         .atleta-box.lider-mesa {
             border-left: 4px solid var(--sucesso);
             background: rgba(46, 204, 113, 0.04);
         }
+        
+        /* --- ESTILOS DE FINALIZAÇÃO (ESTILO ADMIN) --- */
+        .atleta-box.vencedor-card {
+            background-color: rgba(4, 35, 15, 0.85) !important;
+            border-left: 5px solid #2ecc71 !important;
+        }
+        .atleta-box.vencedor-card .atleta-linha {
+            color: #2ecc71 !important;
+            font-weight: bold;
+        }
+        .atleta-box.perdedor-card {
+            background-color: rgba(35, 10, 10, 0.6) !important;
+            border-left: 5px solid #e74c3c !important;
+            opacity: 0.65;
+        }
+        .atleta-box.perdedor-card .atleta-linha {
+            color: #e74c3c !important;
+        }
+        .vs-espacador-oculto {
+            height: 6px;
+        }
+
         .atleta-linha { 
             font-weight: 600; 
             font-size: 1.1rem;
@@ -742,8 +765,51 @@
                             const p1Str = `${f1}S | ${t1}T | ${fa1}F`;
                             const p2Str = `${f2}S | ${t2}T | ${fa2}F`;
                             
-                            const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
-                            const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
+                            // Determina se o jogo está finalizado
+                            const statusMesa = jogo.status ? jogo.status.toUpperCase() : 'ANDAMENTO';
+                            const partidaConcluida = (statusMesa === 'FINALIZADO' || statusMesa === 'CONCLUIDO' || jogo.encerrado === true || jogo.vencedor_id !== null);
+
+                            // Lógica para definir vencedor e perdedor
+                            let classeJ1 = "";
+                            let classeJ2 = "";
+                            let prefixoJ1 = "";
+                            let prefixoJ2 = "";
+
+                            if (partidaConcluida) {
+                                const idVencedor = jogo.vencedor_id;
+                                const idAtleta1 = jogo.atleta1_id || jogo.athlete1_id;
+                                const idAtleta2 = jogo.atleta2_id || jogo.athlete2_id;
+
+                                let j1Ganhou = false;
+                                let j2Ganhou = false;
+
+                                if (idVencedor !== null && idVencedor !== undefined) {
+                                    j1Ganhou = (idVencedor == idAtleta1);
+                                    j2Ganhou = (idVencedor == idAtleta2);
+                                } else {
+                                    // Fallback baseado nos placares de sets/tentos
+                                    j1Ganhou = (f1 > f2) || (f1 === f2 && t1 > t2);
+                                    j2Ganhou = (f2 > f1) || (f1 === f2 && t2 > t1);
+                                }
+
+                                if (j1Ganhou) {
+                                    classeJ1 = "vencedor-card";
+                                    prefixoJ1 = "👑 ";
+                                    classeJ2 = "perdedor-card";
+                                    prefixoJ2 = "👤 ";
+                                } else if (j2Ganhou) {
+                                    classeJ1 = "perdedor-card";
+                                    prefixoJ1 = "👤 ";
+                                    classeJ2 = "vencedor-card";
+                                    prefixoJ2 = "👑 ";
+                                }
+                            } else {
+                                // Se o jogo estiver em andamento, mantém o indicador sutil de liderança atual
+                                const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
+                                const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
+                                if (j1Lider) classeJ1 = "lider-mesa";
+                                if (j2Lider) classeJ2 = "lider-mesa";
+                            }
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
@@ -761,13 +827,13 @@
                             card.innerHTML = `
                                 <div class="mesa-tag">${textoTagMesa}</div>
                                 <div class="confronto-flex">
-                                    <div class="atleta-box ${j1Lider ? 'lider-mesa' : ''}">
-                                        <span class="atleta-linha">${jogo.atleta1_nome}</span>
+                                    <div class="atleta-box ${classeJ1}">
+                                        <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
                                         <span class="placar-tag">${p1Str}</span>
                                     </div>
-                                    <div class="vs-tag">VS</div>
-                                    <div class="atleta-box ${j2Lider ? 'lider-mesa' : ''}">
-                                        <span class="atleta-linha">${advNome}</span>
+                                    ${partidaConcluida ? '<div class="vs-espacador-oculto"></div>' : '<div class="vs-tag">VS</div>'}
+                                    <div class="atleta-box ${classeJ2}">
+                                        <span class="atleta-linha">${prefixoJ2}${advNome}</span>
                                         <span class="placar-tag">${p2Str}</span>
                                     </div>
                                 </div>
