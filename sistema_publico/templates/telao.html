@@ -670,12 +670,9 @@
 
             const elMax = document.getElementById('info-max-rodadas');
             if (elMax) {
-                const maxRodadas = data.max_rodadas || data.total_rodadas || data.limite_rodadas || (data.configuracao ? data.configuracao.max_rodadas : null);
-                if (data.fase_torneio === "CLASSIFICATORIA" || !data.fase_torneio || Number(data.fase_atual) >= 0) {
-                    elMax.innerText = maxRodadas ? `${maxRodadas} Rodadas Max` : "Configurando...";
-                } else {
-                    elMax.innerText = "Chaveamento M.M";
-                }
+                // Conta dinamicamente a quantidade de confrontos ativos na rodada
+                const qtdMesas = data.confrontos ? data.confrontos.length : 0;
+                elMax.innerText = `${qtdMesas} Mesas`;
             }
 
             const elAtletas = document.getElementById('info-total-atletas');
