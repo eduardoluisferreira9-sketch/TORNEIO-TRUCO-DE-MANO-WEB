@@ -874,7 +874,7 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 2 AND torneio_id = {p}", (cfg["id"],))
     jogo_terceiro = cursor.fetchone()
 
-    if not juego_final or not juego_terceiro:
+    if not jogo_final or not jogo_terceiro:
         return RedirectResponse(url="/admin-painel/admin/jogos?erro=finais_nao_geradas", status_code=303)
 
     campeao = jogo_final["atleta1_nome"] if jogo_final["vencedor_id"] == jogo_final["atleta1_id"] else jogo_final["atleta2_nome"]
