@@ -439,7 +439,8 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", (restante_seg, cfg["id"]))
         
     elif acao == "reiniciar":
-        tempo_original = 3000  
+        # Puxa dinamicamente a configuração salva para redefinir o cronômetro
+        tempo_original = int(cfg.get("crono_tempo_restante_seg", 3000))
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", 
                        (tempo_original, cfg["id"]))
         
@@ -529,7 +530,6 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
         else:
             confrontos.append(dict(row))
 
-    # Aliasing 'as total' para evitar quebra de chaves string entre SQLite e Postgres
     cursor.execute(f"SELECT COUNT(*) as total FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
     res_concluida = cursor.fetchone()
     qtd_pendentes = res_concluida["total"] if isinstance(res_concluida, dict) else res_concluida[0]
@@ -859,7 +859,7 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
     cursor.execute(f"SELECT * FROM confrontos WHERE rodada = -4 AND mesa = 2 AND torneio_id = {p}", (cfg["id"],))
     jogo_terceiro = cursor.fetchone()
 
-    if not jogo_final or not jogo_terceiro:
+    if not juego_final or not juego_terceiro:
         return RedirectResponse(url="/admin-painel/admin/jogos?erro=finais_nao_geradas", status_code=303)
 
     campeao = jogo_final["atleta1_nome"] if jogo_final["vencedor_id"] == jogo_final["atleta1_id"] else jogo_final["atleta2_nome"]
@@ -939,14 +939,14 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO',
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
                 taxa_inscricao REAL DEFAULT 5.00,
-                crono_tempo_restante_seg INTEGER DEFAULT 1800,
+                crono_tempo_restante_seg INTEGER DEFAULT 3000,
                 crono_ativo INTEGER DEFAULT 0,
                 crono_fim_ms BIGINT DEFAULT 0
             );
         ''')
         cursor.execute('''
             INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 1800, 'INSCRICAO', 0);
+            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0);
         ''')
         cursor.execute('''
             CREATE TABLE atletas (
@@ -999,14 +999,14 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 fase_torneio TEXT DEFAULT 'INSCRICAO',
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
                 taxa_inscricao REAL DEFAULT 5.00,
-                crono_tempo_restante_seg INTEGER DEFAULT 1800,
+                crono_tempo_restante_seg INTEGER DEFAULT 3000,
                 crono_ativo INTEGER DEFAULT 0,
                 crono_fim_ms INTEGER DEFAULT 0
             )
         ''')
         cursor.execute('''
             INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 1800, 'INSCRICAO', 0)
+            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0)
         ''')
         cursor.execute('''
             CREATE TABLE atletas (
@@ -1208,13 +1208,12 @@ async def salvar_inscricao_externa(
     db=Depends(get_db)
 ):
     cursor = db.cursor()
-    cfg = obtener_torneio_ativo(cursor)  # Corrigido de er_torneio_ativo para obtener_torneio_ativo
+    cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     
     ent_final = entidade if entidade else ctg
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     
-    # Corrigido o nome da coluna para "entidade" em vez de "entity"
     cursor.execute(f'''
         INSERT INTO atletas (torneio_id, nome, entidade, status, whatsapp) 
         VALUES ({p}, {p}, {p}, 'PENDENTE', {p})
@@ -1228,4 +1227,4 @@ async def redirecionar_links_antigos(request: Request, exc: Exception):
     url_path = request.url.path
     if url_path.startswith("/admin") or url_path == "/login" or url_path == "/logout":
         return RedirectResponse(url=f"/admin-painel{url_path}", status_code=303)
-    return HTMLResponse(content="Página não encontrada no Painel", status_code=404)
+    return HTMLResponse(content="Página não encontrada no Panel", status_code=404)
