@@ -87,6 +87,23 @@
         .input-num:disabled { background: #000; color: #555; border-color: #222; }
         label { display: block; margin: 15px 0 6px 0; font-size: 0.8rem; color: var(--texto-subtil); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
+        /* Estilo customizado para o seletor inline de tempo das rodadas */
+        .wrapper-tempo-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        .wrapper-tempo-inline label { margin: 0; color: var(--ouro-brilhante); font-size: 0.75rem; font-family: 'Montserrat', sans-serif; }
+        .wrapper-tempo-inline input {
+            width: 60px; padding: 6px; background: #000; border: 1px solid var(--ouro); 
+            color: #fff; border-radius: 4px; text-align: center; font-weight: bold; font-size: 0.85rem;
+        }
+
         @media print {
             @page { margin: 0; }
             body * { visibility: hidden; }
@@ -154,16 +171,28 @@
                 {% endif %}
 
                 {% if not confrontos %}
-                    <form action="/admin-painel/admin/gerar-rodada" method="POST">
+                    <form action="/admin-painel/admin/gerar-rodada" method="POST" style="display: inline-flex; align-items: center;">
+                        <div class="wrapper-tempo-inline">
+                            <label for="tempo_minutos">Tempo (min):</label>
+                            <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
+                        </div>
                         <button type="submit" style="background: var(--verde-sucesso); color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🎲 Sortear Partidas da 1ª Rodada</button>
                     </form>
                 {% elif rodada_concluida %}
                     {% if rodada < 0 %}
-                        <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');">
+                        <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');" style="display: inline-flex; align-items: center;">
+                            <div class="wrapper-tempo-inline">
+                                <label for="tempo_minutos">Tempo (min):</label>
+                                <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
+                            </div>
                             <button type="submit" style="background: #e67e22; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔥 Avançar Fase Eliminatória ⏭</button>
                         </form>
                     {% else %}
-                        <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');">
+                        <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');" style="display: inline-flex; align-items: center;">
+                            <div class="wrapper-tempo-inline">
+                                <label for="tempo_minutos">Tempo (min):</label>
+                                <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
+                            </div>
                             <button type="submit" style="background: #007bff; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">⏭ Fechar Rodada & Gerar Próxima</button>
                         </form>
                     {% endif %}
@@ -336,7 +365,7 @@
             return `${r}ª RODADA`;
         }
 
-function gerarHtmlCupom(mesaNum, j1, j2) {
+        function gerarHtmlCupom(mesaNum, j1, j2) {
             const nomeTorneio = document.getElementById('nome-torneio-global')?.innerText.replace('🏆 ', '') || "TORNEIO DE TRUCO";
             const rodadaTexto = obterTextoRodada();
             let identificacaoMesa = `MESA ${mesaNum}`;
@@ -435,9 +464,8 @@ function gerarHtmlCupom(mesaNum, j1, j2) {
             document.getElementById('btn_atleta1').classList.toggle('active', idx === 1);
             document.getElementById('btn_atleta2').classList.toggle('active', idx === 2);
             
-            // Força a revalidação imediata do formato se já tiver sido clicado antes
             if(document.getElementById('m_tipo_placar').value) {
-                selecionarFormato(document.getElementById('m_tipo_placar').value);
+                selecionadoFormato(document.getElementById('m_tipo_placar').value);
             }
         }
 
@@ -482,7 +510,6 @@ function gerarHtmlCupom(mesaNum, j1, j2) {
             if(!v_id) { alert("Selecione o vencedor!"); return false; }
             if(!fmt) { alert("Selecione o formato (2x0 ou 2x1)!"); return false; }
 
-            // Proteção idêntica às restrições do backend
             if (fmt === '2x1') {
                 if (selecionadoIdx === 1 && t1 <= t2) {
                     alert("No formato 2x1, os tentos do Vencedor (Atleta 1) precisam ser maiores que os do perdedor!");
@@ -494,7 +521,6 @@ function gerarHtmlCupom(mesaNum, j1, j2) {
                 }
             }
 
-            // Habilita os campos no final da validação para garantir que os valores entrem no POST payload
             document.getElementById('inp_t1').disabled = false;
             document.getElementById('inp_t2').disabled = false;
             return true;
