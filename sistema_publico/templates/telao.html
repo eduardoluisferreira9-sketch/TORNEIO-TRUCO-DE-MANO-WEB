@@ -24,7 +24,6 @@
             --madeira-bronze: #cd7f32;
         }
 
-        /* Força o layout a ocupar exatamente a altura da TV/Monitor e remove o scroll global */
         html, body {
             height: 100%;
             margin: 0;
@@ -48,7 +47,6 @@
             letter-spacing: 1px;
         }
 
-        /* --- Painel Admin Ocultável/Discreto --- */
         .painel-admin-secreto {
             background: rgba(0, 0, 0, 0.4);
             padding: 6px 12px;
@@ -85,7 +83,6 @@
             color: #fff;
         }
 
-        /* --- Banner de Alerta Absoluto --- */
         .alerta-falta-banner {
             display: none;
             position: fixed;
@@ -103,7 +100,6 @@
             animation: pulseBorda 1.5s infinite alternate;
         }
 
-        /* --- Cabeçalho Otimizado (Menor consumo de espaço vertical) --- */
         .header-telao {
             display: flex;
             justify-content: space-between;
@@ -133,7 +129,6 @@
             color: var(--dourado-brilhante);
         }
 
-        /* --- Painel Superior Reduzido --- */
         .painel-infos {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -169,7 +164,6 @@
             color: var(--dourado-brilhante);
         }
 
-        /* --- Estrutura de Títulos --- */
         .secao-titulo-container {
             display: flex;
             align-items: center;
@@ -190,23 +184,26 @@
             background: var(--borda-ouro);
         }
 
-        /* --- Container Principal Dinâmico --- */
+        /* --- Container Principal Adaptável --- */
         .container-telao {
             display: grid;
-            grid-template-columns: 2.5fr 1fr;
+            grid-template-columns: 2.5fr 1fr; /* Padrão: Classificação na lateral */
             gap: 20px;
             flex-grow: 1; 
-            min-height: 0; /* Essencial para sub-containers flexíveis respeitarem o limite da tela */
+            min-height: 0; 
         }
 
-        /* Coluna da Esquerda (Mesas) */
+        /* Classe injetada via JavaScript quando entra no mata-mata */
+        .container-telao.modo-mata-mata {
+            grid-template-columns: 1fr !important; /* Remove a coluna lateral expandindo as mesas */
+        }
+
         .coluna-mesas {
             display: flex;
             flex-direction: column;
             min-height: 0; 
         }
 
-        /* --- Grid de Confrontos Auto-Ajustável e Fluido --- */
         .grid-jogos {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); 
@@ -214,10 +211,9 @@
             align-content: flex-start;
             flex-grow: 1;
             min-height: 0;
-            overflow: hidden; /* Remove rolagem interna */
+            overflow: hidden; 
         }
 
-        /* --- Cards Compactados Inteligentes --- */
         .card-jogo {
             background: var(--bg-card);
             border: 1px solid var(--borda-ouro);
@@ -228,6 +224,7 @@
             flex-direction: column;
             justify-content: center;
             min-height: 0;
+            transition: all 0.3s ease;
         }
         .mesa-tag {
             font-weight: bold;
@@ -253,7 +250,6 @@
             background: rgba(46, 204, 113, 0.02);
         }
         
-        /* Finalizações */
         .atleta-box.vencedor-card {
             background-color: rgba(4, 35, 15, 0.85) !important;
             border-left: 4px solid #2ecc71 !important;
@@ -280,7 +276,7 @@
             color: #fff;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* Evita que nomes gigantes quebrem o card */
+            text-overflow: ellipsis; 
             max-width: 65%;
         }
         .placar-tag { 
@@ -301,7 +297,7 @@
             margin: 0;
         }
 
-        /* --- Painel Lateral com Rolagem Automática --- */
+        /* --- Painel Lateral do Ranking --- */
         .ranking-container {
             border: 1px solid var(--borda-ouro);
             background: rgba(4, 15, 7, 0.4);
@@ -314,7 +310,6 @@
             box-sizing: border-box;
         }
         
-        /* Box intermediário que esconde o estouro do conteúdo e fixa o tamanho */
         .ranking-scroller-box {
             flex-grow: 1;
             overflow: hidden;
@@ -335,11 +330,10 @@
             padding: 8px 6px;
             position: sticky;
             top: 0;
-            background: #06190c; /* Garante que o fundo do header cubra os nomes que sobem */
+            background: #06190c; 
             z-index: 2;
         }
         
-        /* Container que receberá o efeito de subir e descer */
         .ranking-marquise-body {
             display: table-row-group;
             position: relative;
@@ -367,17 +361,15 @@
             border: 1px solid rgba(214, 175, 55, 0.1); 
         }
 
-        /* Destaque sutil para o G4 na tabela lateral */
         tr.top-atleta td.posicao-num {
             color: var(--dourado-brilhante);
             text-shadow: 0 0 5px rgba(243, 207, 93, 0.3);
         }
 
-        /* Badges de Finais */
-        .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-size: 0.75rem; }
-        .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-size: 0.75rem; }
+        .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 3px 8px; border-radius: 2px; font-weight: bold; font-size: 0.85rem; }
+        .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 3px 8px; border-radius: 2px; font-weight: bold; font-size: 0.85rem; }
 
-        /* --- Pódio e Cerimonial Premium --- */
+        /* --- Pódio Premium --- */
         .podio-wrapper {
             background: linear-gradient(180deg, rgba(7, 26, 12, 0.95) 0%, #030a04 100%);
             padding: 25px;
@@ -402,7 +394,6 @@
             to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
         }
 
-        /* Animação de Scroll Vertical Contínuo (Mesa de Bilhar / Telão de Estádio) */
         @keyframes autoScrollRanking {
             0%, 10% { transform: translateY(0); }
             45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
@@ -442,8 +433,8 @@
             <div id="info-detalhe-fase" class="info-valor">---</div>
         </div>
         <div class="info-item">
-            <div class="info-rotulo">Mesas Ativas</div>
-            <div id="info-max-rodadas" class="info-valor">0 Mesas</div>
+            <div class="info-max-rodadas" style="display:none;"></div> <div class="info-rotulo">Mesas Decisivas</div>
+            <div id="info-mesas-ativas-rotulo" class="info-valor">0 Mesas</div>
         </div>
         <div class="info-item">
             <div class="info-rotulo">Inscritos Confirmados</div>
@@ -454,13 +445,13 @@
     <div id="conteudo-principal-telao" class="container-telao">
         <div class="coluna-mesas">
             <div class="secao-titulo-container">
-                <h2 class="secao-titulo">Mesas em Andamento</h2>
+                <h2 class="secao-titulo" id="titulo-secao-jogos">Mesas em Andamento</h2>
                 <div class="secao-linha"></div>
             </div>
             <div id="container-jogos" class="grid-jogos"></div>
         </div>
 
-        <div class="ranking-container">
+        <div class="ranking-container" id="coluna-ranking-lateral">
             <div class="secao-titulo-container">
                 <h2 class="secao-titulo">Classificação Geral</h2>
                 <div class="secao-linha"></div>
@@ -497,25 +488,39 @@
         window.location.reload();
     }
 
-    function ajustarTamanhoDosCards(totalMesas) {
+    // Gerencia o tamanho dos cards dependendo da fase (Mata-mata ganha destaque gigante)
+    function ajustarTamanhoDosCards(totalMesas, ehMataMata) {
         const grid = document.getElementById('container-jogos');
         if (!grid) return;
 
         const atletaLinhas = grid.querySelectorAll('.atleta-linha');
         const atletaBoxes = grid.querySelectorAll('.atleta-box');
+        const tagsMesa = grid.querySelectorAll('.mesa-tag');
 
         let fontSizeCard = "0.9rem";
         let paddingBox = "6px 10px";
         let minWidthGrid = "290px";
 
-        if (totalMesas > 12) {
-            fontSizeCard = "0.75rem";
-            paddingBox = "4px 8px";
-            minWidthGrid = "220px";
-        } else if (totalMesas > 8) {
-            fontSizeCard = "0.82rem";
-            paddingBox = "5px 10px";
-            minWidthGrid = "250px";
+        if (ehMataMata) {
+            // Layout Premium para as finais (Cards Grandes)
+            fontSizeCard = "1.25rem";
+            paddingBox = "14px 18px";
+            minWidthGrid = "450px"; 
+            
+            tagsMesa.forEach(tag => tag.style.fontSize = "1.1rem");
+            grid.style.gap = "18px";
+        } else {
+            // Layout compacto padrão para a fase de grupos
+            if (totalMesas > 12) {
+                fontSizeCard = "0.75rem";
+                paddingBox = "4px 8px";
+                minWidthGrid = "220px";
+            } else if (totalMesas > 8) {
+                fontSizeCard = "0.82rem";
+                paddingBox = "5px 10px";
+                minWidthGrid = "250px";
+            }
+            grid.style.gap = "10px";
         }
 
         grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
@@ -523,7 +528,6 @@
         atletaBoxes.forEach(el => el.style.padding = paddingBox);
     }
 
-    // Calcula dinamicamente se a tabela passa da altura máxima permitida e ativa o scroll suave
     function gerenciarScrollDoRanking() {
         const container = document.getElementById('ranking-box-container');
         const body = document.getElementById('tabela-ranking-corpo');
@@ -532,11 +536,9 @@
         const alturaDisponivel = container.clientHeight;
         const alturaTabela = body.scrollHeight;
 
-        // Se a tabela for maior que o espaço físico da coluna lateral da TV
         if (alturaTabela > alturaDisponivel) {
             const distanciaScroll = alturaTabela - alturaDisponivel + 20; 
             body.style.setProperty('--scroll-distancia', `-${distanciaScroll}px`);
-            // Aplica a animação fluida de ida e volta (20 segundos por ciclo completo para leitura confortável)
             body.style.animation = "autoScrollRanking 20s linear infinite alternate";
         } else {
             body.style.animation = "none";
@@ -553,14 +555,18 @@
 
             const statusFase = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
             const nomeFaseStr = data.nome_fase ? data.nome_fase.toUpperCase() : "";
+            const faseRaw = Number(data.fase_atual);
             
+            // Verificação se está em fase eliminatória mata-mata
+            const ehMataMataAtivo = (faseRaw === -1 || faseRaw === -4 || nomeFaseStr.includes("MATA") || nomeFaseStr.includes("ELIMINATOR") || nomeFaseStr.includes("FINAL") || statusFase === "MATA_MATA");
+
             const exibirCerimonial = podioForcadoManualmente || 
                                      statusFase === "ENCERRADO" || 
                                      statusFase === "CONCLUIDO" || 
                                      statusFase === "FINALIZADO" ||
                                      nomeFaseStr.includes("ENCERRADO") || 
                                      nomeFaseStr.includes("CONCLUÍDO") ||
-                                     Number(data.fase_atual) === -12;
+                                     faseRaw === -12;
 
             if (exibirCerimonial) {
                 ultimoEstadoJogosStr = "";
@@ -573,9 +579,7 @@
                 let reiDasFloresNome = "---";
                 let qtdFloresTotal = 0;
 
-                const isMataMataFinal = Number(data.fase_atual) === -1 || nomeFaseStr.includes("FINAL") || statusFase === "FINAL" || statusFase === "MATA_MATA";
-
-                if (isMataMataFinal && data.confrontos && data.confrontos.length > 0) {
+                if (data.confrontos && data.confrontos.length > 0) {
                     const jogoFinal = data.confrontos.find(j => Number(j.fase_mesa) === -2 || Number(j.mesa) === 1);
                     if (jogoFinal) {
                         const t1 = Number(jogoFinal.tentos1 || 0);
@@ -626,11 +630,6 @@
                     if (p2 === "---") p2 = data.podio.vice || data.podio.p2 || "---";
                     if (p3 === "---") p3 = data.podio.terceiro || data.podio.p3 || "---";
                     if (p4 === "---") p4 = data.podio.quarto || data.podio.p4 || "---";
-                } else if (data.ranking && data.ranking.length > 0 && p1 === "---") {
-                    p1 = data.ranking[0]?.nome || "---";
-                    p2 = data.ranking[1]?.nome || "---";
-                    p3 = data.ranking[2]?.nome || "---";
-                    p4 = data.ranking[3]?.nome || "---";
                 }
 
                 if (p1 !== "---" && p1 !== "") {
@@ -702,60 +701,43 @@
                 return;
             }
 
-            // --- FLUXO NORMAL (RODADAS ATIVAS) ---
+            // --- CONTROLE DE ALTERAÇÃO DO LAYOUT (CLASSIFICATÓRIA VS MATA-MATA) ---
             const telaPrincipal = document.getElementById('conteudo-principal-telao');
-            if (telaPrincipal && !document.getElementById('container-jogos')) {
-                telaPrincipal.style.gridTemplateColumns = "2.5fr 1fr";
-                telaPrincipal.innerHTML = `
-                    <div class="coluna-mesas">
-                        <div class="secao-titulo-container">
-                            <h2 class="secao-titulo">Mesas em Andamento</h2>
-                            <div class="secao-linha"></div>
-                        </div>
-                        <div id="container-jogos" class="grid-jogos"></div>
-                    </div>
-                    <div class="ranking-container">
-                        <div class="secao-titulo-container">
-                            <h2 class="secao-titulo">Classificação Geral</h2>
-                            <div class="secao-linha"></div>
-                        </div>
-                        <div class="ranking-scroller-box" id="ranking-box-container">
-                            <table class="tabela-ranking">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align: left;">Pos</th>
-                                        <th style="text-align: left;">Atleta</th>
-                                        <th style="text-align: right;">Vitórias</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabela-ranking-corpo" class="ranking-marquise-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
+            const rankingLateral = document.getElementById('coluna-ranking-lateral');
+            const tituloJogos = document.getElementById('titulo-secao-jogos');
+
+            if (telaPrincipal) {
+                if (ehMataMataAtivo) {
+                    // Ativa modo tela cheia para eliminatórias
+                    telaPrincipal.classList.add('modo-mata-mata');
+                    if (rankingLateral) rankingLateral.style.display = 'none';
+                    if (tituloJogos) tituloJogos.innerText = "Confrontos Eliminatórios";
+                } else {
+                    // Volta para o modo padrão com ranking lateral
+                    telaPrincipal.classList.remove('modo-mata-mata');
+                    if (rankingLateral) rankingLateral.style.display = 'flex';
+                    if (tituloJogos) tituloJogos.innerText = "Mesas em Andamento";
+                }
             }
 
+            // Atualiza labels de Fase
             if (document.getElementById('info-fase')) {
-                const faseRaw = Number(data.fase_atual);
                 let nomeExibicaoFase = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
                 if (faseRaw === -1) nomeExibicaoFase = "Mata-Mata Final";
                 if (faseRaw === -4) nomeExibicaoFase = "Semifinal";
-                document.getElementById('info-fase').innerText = nomeExibicaoFase;
+                document.getElementById('info-fase').innerText = nomeExibicaoFase.toUpperCase();
             }
 
             if (document.getElementById('info-detalhe-fase')) {
                 let andamentoTexto = data.detalhe_fase || data.andamento || data.status_rodada;
                 const faseTexto = document.getElementById('info-fase').innerText.toUpperCase();
                 if (andamentoTexto && andamentoTexto.toUpperCase() === faseTexto || (andamentoTexto && andamentoTexto.replace(/\D/g,'') === faseTexto.replace(/\D/g,''))) {
-                    andamentoTexto = "Em Andamento"; 
-                }
-                if (!andamentoTexto && (data.rodada_atual || data.rodada)) {
-                    andamentoTexto = `Rodada ${data.rodada_atual || data.rodada}`;
+                    andamentoTexto = ehMataMataAtivo ? "Jogos Decisivos" : "Em Andamento"; 
                 }
                 document.getElementById('info-detalhe-fase').innerText = andamentoTexto || "Em andamento";
             }
 
-            const elMax = document.getElementById('info-max-rodadas');
+            const elMax = document.getElementById('info-mesas-ativas-rotulo');
             let totalConfrontosAtuais = 0;
             if (elMax) {
                 totalConfrontosAtuais = data.confrontos ? data.confrontos.length : 0;
@@ -764,13 +746,12 @@
 
             const elAtletas = document.getElementById('info-total-atletas');
             if (elAtletas) {
-                let qtdAtletas = data.total_atletas || data.inscritos || data.atletas_confirmados || data.total_jogadores || 0;
-                if (Number(qtdAtletas) === 0 && data.ranking && data.ranking.length > 0) {
-                    qtdAtletas = data.ranking.length;
-                }
+                let qtdAtletas = data.total_atletas || data.inscritos || data.total_jogadores || 0;
+                if (Number(qtdAtletas) === 0 && data.ranking) qtdAtletas = data.ranking.length;
                 elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
             
+            // --- CRONÔMETRO ---
             const tempoFormatado = data.tempo || "00:00";
             const cronoAtivo = data.crono_ativo === 1;
             const cronoElement = document.getElementById('cronometro');
@@ -780,12 +761,9 @@
                 cronoElement.innerText = tempoFormatado;
                 cronoElement.style.color = '#555555';
                 cronoElement.parentElement.style.borderColor = '#444444';
-                cronoElement.parentElement.style.boxShadow = 'none';
                 alertaElement.style.display = 'none';
             } else {
                 cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
-                cronoElement.parentElement.style.boxShadow = '0 0 15px rgba(214, 175, 55, 0.2)';
-                
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
                     cronoElement.innerText = "00:00";
                     cronoElement.style.color = 'var(--danger)';
@@ -797,7 +775,7 @@
                 }
             }
 
-            // --- RENDERIZAÇÃO DOS CONFRONTOS ---
+            // --- RENDERIZAÇÃO DOS CONFRONTOS ELIMINATÓRIOS ---
             const containerJogos = document.getElementById('container-jogos');
             if (containerJogos) {
                 const signatureAtualJogos = JSON.stringify(data.confrontos || []);
@@ -807,12 +785,12 @@
                     containerJogos.innerHTML = '';
                     
                     if (!data.confrontos || data.confrontos.length === 0) {
-                        containerJogos.innerHTML = `<div style="color: var(--texto-mutado); font-style: italic; padding: 10px;">Nenhum confronto ativo. Aguardando rodada...</div>`;
+                        containerJogos.innerHTML = `<div style="color: var(--texto-mutado); font-style: italic; padding: 10px;">Nenhum confronto ativo. Aguardando chaves...</div>`;
                     } else {
                         data.confrontos.forEach(jogo => {
                             const card = document.createElement('div');
                             card.className = 'card-jogo';
-                            const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA - GANHOU PONTOS";
+                            const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA / W.O.";
                             
                             const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
                             const t1 = jogo.tentos1 || 0;
@@ -848,9 +826,9 @@
 
                                 if (j1Ganhou) {
                                     classeJ1 = "vencedor-card"; prefixoJ1 = "👑 ";
-                                    classeJ2 = "perdedor-card"; prefixoJ2 = "👤 ";
+                                    classeJ2 = "perdedor-card"; prefixoJ2 = "❌ ";
                                 } else if (j2Ganhou) {
-                                    classeJ1 = "perdedor-card"; prefixoJ1 = "👤 ";
+                                    classeJ1 = "perdedor-card"; prefixoJ1 = "❌ ";
                                     classeJ2 = "vencedor-card"; prefixoJ2 = "👑 ";
                                 }
                             } else {
@@ -863,24 +841,26 @@
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
 
-                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final") {
+                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || String(jogo.mesa) === "1" && ehMataMataAtivo) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar") {
+                            } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais === 2) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
                             } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
-                                textoTagMesa = `Mesa ${jogo.mesa} — <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
+                                textoTagMesa = `🏆 <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
                             } else if (jogo.fase_mesa_nome) {
-                                textoTagMesa = `Mesa ${jogo.mesa} — ${jogo.fase_mesa_nome}`;
+                                textoTagMesa = `💥 ${jogo.fase_mesa_nome.toUpperCase()}`;
+                            } else {
+                                textoTagMesa = `⚔️ MESA ${jogo.mesa} - ELIMINATÓRIA`;
                             }
 
                             card.innerHTML = `
-                                <div class="mesa-tag">${textoTagMesa}</div>
+                                <div class="mesa-tag" style="margin-bottom: 8px;">${textoTagMesa}</div>
                                 <div class="confronto-flex">
                                     <div class="atleta-box ${classeJ1}">
                                         <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
                                         <span class="placar-tag">${p1Str}</span>
                                     </div>
-                                    ${partidaConcluida ? '<div class="vs-espacador-oculto"></div>' : '<div class="vs-tag">VS</div>'}
+                                    ${partidaConcluida ? '<div class="vs-espacador-oculto"></div>' : '<div class="vs-tag" style="padding: 2px 0;">VS</div>'}
                                     <div class="atleta-box ${classeJ2}">
                                         <span class="atleta-linha">${prefixoJ2}${advNome}</span>
                                         <span class="placar-tag">${p2Str}</span>
@@ -890,40 +870,34 @@
                             containerJogos.appendChild(card);
                         });
 
-                        ajustarTamanhoDosCards(totalConfrontosAtuais);
+                        ajustarTamanhoDosCards(totalConfrontosAtuais, ehMataMataAtivo);
                     }
                 }
             }
 
-            // --- RENDERIZAÇÃO DA CLASSIFICAÇÃO COMPLETA ---
-            const tableBody = document.getElementById('tabela-ranking-corpo');
-            if (tableBody) {
-                // Removemos o `.slice(0, 5)` para trazer todo mundo que estiver no JSON da API
+            // --- RENDERIZAÇÃO SEGUNDA COLUNA (APENAS SE NÃO FOR MATA MATA) ---
+            if (!ehMataMataAtivo && tableBody) {
                 const rankingCompletoData = data.ranking ? data.ranking : [];
                 const signatureAtualRanking = JSON.stringify(rankingCompletoData);
 
                 if (signatureAtualRanking !== ultimoEstadoRankingStr) {
                     ultimoEstadoRankingStr = signatureAtualRanking; 
-                    tableBody.innerHTML = '';
-                    
-                    if (rankingCompletoData.length > 0) {
-                        rankingCompletoData.forEach((player, index) => {
-                            const row = document.createElement('tr');
-                            // Adiciona classe de destaque visual se for do topo da tabela (Top 4 da semifinal)
-                            if (index < 4) row.className = 'top-atleta';
-
-                            row.innerHTML = `
-                                <td class="posicao-num">${index + 1}º</td>
-                                <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
-                                <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                        
-                        // Recalcula as dimensões físicas da tabela e ativa a rolagem se necessário
-                        setTimeout(gerenciarScrollDoRanking, 100);
-                    } else {
-                        tableBody.innerHTML = `<tr><td colspan="3" style="color: var(--texto-mutado); text-align: center; font-style: italic; padding: 20px 0;">Nenhum atleta listado.</td></tr>`;
+                    const tableBody = document.getElementById('tabela-ranking-corpo');
+                    if (tableBody) {
+                        tableBody.innerHTML = '';
+                        if (rankingCompletoData.length > 0) {
+                            rankingCompletoData.forEach((player, index) => {
+                                const row = document.createElement('tr');
+                                if (index < 4) row.className = 'top-atleta';
+                                row.innerHTML = `
+                                    <td class="posicao-num">${index + 1}º</td>
+                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
+                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
+                                `;
+                                tableBody.appendChild(row);
+                            });
+                            setTimeout(gerenciarScrollDoRanking, 100);
+                        }
                     }
                 }
             }
@@ -935,9 +909,6 @@
 
     atualizarTelao();
     setInterval(atualizarTelao, 3000);
-    
-    // Garante o recalculo da rolagem caso o navegador mude de tamanho/resolução
-    window.addEventListener('resize', gerenciarScrollDoRanking);
 </script>
 </body>
 </html>
