@@ -217,7 +217,7 @@
         /* --- Mudança Dinâmica para o Combate Final --- */
         .grid-jogos.layout-super-finais {
             grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 20px !important;
+            gap: 25px !important;
             align-content: stretch !important; 
             height: 85% !important;
         }
@@ -235,12 +235,22 @@
             transition: all 0.3s ease;
         }
 
-        .grid-jogos.layout-super-finais .card-jogo {
+        /* Envoltórios das Finais: Fundo e bordas temáticas espessas */
+        .grid-jogos.layout-super-finais .card-jogo-ouro {
             padding: 25px 20px !important;
             justify-content: space-around !important; 
-            background: linear-gradient(145deg, rgba(4, 25, 12, 0.85) 0%, rgba(2, 10, 5, 0.95) 100%);
-            border-width: 2px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            background: linear-gradient(135deg, rgba(35, 28, 5, 0.9) 0%, rgba(15, 12, 2, 0.95) 100%);
+            border: 3px solid #f3cf5d !important;
+            box-shadow: 0 0 25px rgba(243, 207, 93, 0.25);
+            animation: brilhoOuro Ouro 2s infinite alternate;
+        }
+
+        .grid-jogos.layout-super-finais .card-jogo-bronze {
+            padding: 25px 20px !important;
+            justify-content: space-around !important; 
+            background: linear-gradient(135deg, rgba(30, 18, 8, 0.9) 0%, rgba(15, 8, 3, 0.95) 100%);
+            border: 3px solid #cd7f32 !important;
+            box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
         }
 
         .mesa-tag {
@@ -256,7 +266,7 @@
         }
         
         .grid-jogos.layout-super-finais .confronto-flex {
-            gap: 15px !important; 
+            gap: 20px !important; 
         }
 
         .atleta-box {
@@ -268,9 +278,19 @@
             border-radius: 4px;
         }
         
-        .grid-jogos.layout-super-finais .atleta-box {
+        /* Cores Vivas para as Caixas de Atletas nas Finais */
+        .grid-jogos.layout-super-finais .card-jogo-ouro .atleta-box {
             padding: 22px 25px !important;
             border-radius: 6px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .grid-jogos.layout-super-finais .card-jogo-bronze .atleta-box {
+            padding: 22px 25px !important;
+            border-radius: 6px;
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.25) 0%, rgba(205, 127, 50, 0.05) 100%);
+            border: 1px solid rgba(205, 127, 50, 0.4);
         }
 
         .atleta-box.lider-mesa {
@@ -278,18 +298,22 @@
             background: rgba(46, 204, 113, 0.02);
         }
         
+        /* Estilos de Vencedor/Perdedor mantidos com alto contraste */
         .atleta-box.vencedor-card {
-            background-color: rgba(4, 35, 15, 0.85) !important;
+            background: linear-gradient(90deg, rgba(46, 204, 113, 0.35) 0%, rgba(4, 35, 15, 0.9) 100%) !important;
             border-left: 6px solid #2ecc71 !important;
+            border-top: 1px solid rgba(46, 204, 113, 0.5) !important;
+            border-bottom: 1px solid rgba(46, 204, 113, 0.5) !important;
         }
         .atleta-box.vencedor-card .atleta-linha {
             color: #2ecc71 !important;
             font-weight: bold;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
         }
         .atleta-box.perdedor-card {
-            background-color: rgba(35, 10, 10, 0.6) !important;
+            background: rgba(20, 5, 5, 0.6) !important;
             border-left: 6px solid #e74c3c !important;
-            opacity: 0.5;
+            opacity: 0.4;
         }
         .atleta-box.perdedor-card .atleta-linha {
             color: #e74c3c !important;
@@ -321,7 +345,19 @@
         .grid-jogos.layout-super-finais .placar-tag {
             font-size: 1.4rem !important;
             padding: 6px 14px !important;
-            border: 1px solid rgba(214, 175, 55, 0.3);
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff !important;
+        }
+        
+        .grid-jogos.layout-super-finais .card-jogo-ouro .placar-tag {
+            border-color: var(--dourado-brilhante);
+            color: var(--dourado-brilhante) !important;
+        }
+
+        .grid-jogos.layout-super-finais .card-jogo-bronze .placar-tag {
+            border-color: #ff9f43;
+            color: #ff9f43 !important;
         }
 
         .vs-tag { 
@@ -333,9 +369,10 @@
         }
         
         .grid-jogos.layout-super-finais .vs-tag {
-            font-size: 1.1rem !important;
-            color: var(--borda-ouro);
-            opacity: 0.5;
+            font-size: 1.2rem !important;
+            color: #ffffff;
+            font-style: italic;
+            opacity: 0.3;
         }
 
         /* --- Painel Lateral do Ranking --- */
@@ -407,8 +444,8 @@
             text-shadow: 0 0 5px rgba(243, 207, 93, 0.3);
         }
 
-        .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
-        .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
+        .badge-final-ouro { background: #f3cf5d; color: #000; padding: 6px 16px; border-radius: 3px; font-weight: 900; font-size: 1.2rem; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .badge-final-bronze { background: #cd7f32; color: #fff; padding: 6px 16px; border-radius: 3px; font-weight: 900; font-size: 1.2rem; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
 
         /* --- Pódio Premium --- */
         .podio-wrapper {
@@ -436,9 +473,14 @@
         }
 
         @keyframes autoScrollRanking {
-            0%, 10; { transform: translateY(0); }
+            0%, 10% { transform: translateY(0); }
             45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
             90%, 100% { transform: translateY(0); }
+        }
+
+        @keyframes brilhoOuro {
+            from { border-color: #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+            to { border-color: #fff3cc; box-shadow: 0 0 30px rgba(243, 207, 93, 0.45); }
         }
     </style>
 </head>
@@ -541,7 +583,7 @@
         if (ehMataMata && totalMesas <= 2) {
             grid.classList.add('layout-super-finais');
             atletaLinhas.forEach(el => {
-                el.style.fontSize = "1.9rem";
+                el.style.fontSize = "2.1rem"; // Leitura massiva a distância
                 el.style.fontWeight = "800";
                 el.style.maxWidth = "70%";
             });
@@ -834,7 +876,7 @@
                     } else {
                         data.confrontos.forEach(jogo => {
                             const card = document.createElement('div');
-                            card.className = 'card-jogo';
+                            
                             const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA / W.O.";
                             
                             const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
@@ -885,11 +927,16 @@
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
+                            
+                            let classeCardEspecifica = "card-jogo";
 
+                            // Identificação das duas mesas para aplicar as novas cores heráldicas
                             if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo)) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                                classeCardEspecifica = "card-jogo card-jogo-ouro";
                             } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                                classeCardEspecifica = "card-jogo card-jogo-bronze";
                             } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
                                 textoTagMesa = `🏆 <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
                             } else if (jogo.fase_mesa_nome) {
@@ -898,8 +945,9 @@
                                 textoTagMesa = `⚔️ MESA ${jogo.mesa} - ELIMINATÓRIA`;
                             }
 
+                            card.className = classeCardEspecifica;
                             card.innerHTML = `
-                                <div class="mesa-tag" style="margin-bottom: 12px;">${textoTagMesa}</div>
+                                <div class="mesa-tag" style="margin-bottom: 12px; text-align: center;">${textoTagMesa}</div>
                                 <div class="confronto-flex">
                                     <div class="atleta-box ${classeJ1}">
                                         <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
