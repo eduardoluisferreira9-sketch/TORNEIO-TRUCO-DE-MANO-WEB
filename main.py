@@ -439,8 +439,8 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", (restante_seg, cfg["id"]))
         
     elif acao == "reiniciar":
-        # Puxa dinamicamente a configuração salva para redefinir o cronômetro
-        tempo_original = int(cfg.get("crono_tempo_restante_seg", 3000))
+        # Procura a última alteração ou mantém o tempo que já estava registrado como padrão da rodada
+        tempo_original = int(cfg.get("crono_tempo_restante_seg", 1800))
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", 
                        (tempo_original, cfg["id"]))
         
@@ -556,7 +556,7 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
 
 @app.post("/admin/gerar-rodada")
 @app.post("/admin-painel/admin/gerar-rodada")
-def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def gerar_rodada_admin(tempo_minutos: int = Form(None), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
@@ -641,18 +641,20 @@ def gerar_rodada_admin(db=Depends(get_db), auth: bool = Depends(verificar_admin)
             INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome, tipo_placar, sets1, sets2, tentos1, tentos2, vencedor_id) 
             VALUES ({p}, {p}, {p}, {p}, NULL, {p}, 'FOLGA - GANHOU PONTOS', '2x0', 3, 0, 72, 0, {p})
         """, (cfg["id"], proxima_rodada, mesa, atleta_folga['id'], atleta_folga['nome'], atleta_folga['id']))
-                           
-    tempo_atual_segundos = int(cfg.get("crono_tempo_restante_seg", 3000))
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (tempo_atual_segundos, cfg["id"],))
+    
+    # Se o admin selecionou um tempo no input, aplica. Senão, mantém o tempo padrão.
+    novo_tempo_seg = (tempo_minutos * 60) if tempo_minutos else int(cfg.get("crono_tempo_restante_seg", 1800))
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo_seg, cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.post("/admin/disparar-matamata")
 @app.post("/admin-painel/admin/disparar-matamata")
-def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def disparar_matamata(corte: int = Form(...), tempo_minutos: int = Form(None), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
+    
     cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
     r_atual = cursor.fetchone()[0]
     if r_atual > 0:
@@ -695,14 +697,14 @@ def disparar_matamata(corte: int = Form(...), db=Depends(get_db), auth: bool = D
             INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})
         ''', (cfg["id"], fase_id, idx, a1["id"], a2["id"], a1["nome"], a2["nome"]))
         
-    tempo_atual_segundos = int(cfg.get("crono_tempo_restante_seg", 3000))
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (tempo_atual_segundos, cfg["id"],))
+    novo_tempo_seg = (tempo_minutos * 60) if tempo_minutos else int(cfg.get("crono_tempo_restante_seg", 1800))
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo_seg, cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
 @app.post("/admin/avancar-matamata")
 @app.post("/admin-painel/admin/avancar-matamata")
-def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def avancar_matamata(tempo_minutos: int = Form(None), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
@@ -723,8 +725,6 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     if fase_atual == -4:
         return RedirectResponse(url="/admin-painel/admin/podio", status_code=303)
 
-    tempo_atual_segundos = int(cfg.get("crono_tempo_restante_seg", 3000))
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (tempo_atual_segundos, cfg["id"],))
     proxima_fase = fase_atual - 1
     
     if fase_atual in [-1, -2]:
@@ -762,6 +762,8 @@ def avancar_matamata(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
         cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, -4, 1, {p}, {p}, {p}, {p})', (cfg["id"], v1_id, v2_id, v1_nome, v2_nome))
         cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, -4, 2, {p}, {p}, {p}, {p})', (cfg["id"], p1_id, p2_id, p1_nome, p2_nome))
         
+    novo_tempo_seg = (tempo_minutos * 60) if tempo_minutos else int(cfg.get("crono_tempo_restante_seg", 1800))
+    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo_seg, cfg["id"],))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
 
