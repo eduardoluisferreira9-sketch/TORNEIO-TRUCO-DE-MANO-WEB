@@ -419,7 +419,12 @@ def api_cronometro(db=Depends(get_db)):
 
 @app.post("/admin/cronometro/controle")
 @app.post("/admin-painel/admin/cronometro/controle")
-def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def controle_cronometro(
+    acao: str = Form(...), 
+    tempo_minutos: int = Form(None),  # <--- CAPTURA O VALOR QUE O SEU BOTÃO ENVIA
+    db=Depends(get_db), 
+    auth: bool = Depends(verificar_admin)
+):
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
@@ -439,10 +444,18 @@ def controle_cronometro(acao: str = Form(...), db=Depends(get_db), auth: bool = 
         cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", (restante_seg, cfg["id"]))
         
     elif acao == "reiniciar":
-        # Procura a última alteração ou mantém o tempo que já estava registrado como padrão da rodada
-        tempo_original = int(cfg.get("crono_tempo_restante_seg", 1800))
-        cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", 
-                       (tempo_original, cfg["id"]))
+        # CORREÇÃO CRÍTICA: Se o novo botão mandou os minutos, calcula o novo tempo em segundos.
+        # Caso contrário, mantém o tempo que já estava registrado no banco.
+        if tempo_minutos is not None:
+            novo_tempo_seg = int(tempo_minutos) * 60
+        else:
+            novo_tempo_seg = int(cfg.get("crono_tempo_restante_seg", 1800))
+            
+        # Grava os novos segundos na memória física do banco de dados, limpa o contador de milissegundos e para o cronômetro
+        cursor.execute(
+            f"UPDATE torneios SET crono_ativo = 0, crono_tempo_restante_seg = {p}, crono_fim_ms = 0 WHERE id = {p}", 
+            (novo_tempo_seg, cfg["id"])
+        )
         
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
