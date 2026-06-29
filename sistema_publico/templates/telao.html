@@ -216,9 +216,9 @@
 
         /* --- Mudança Dinâmica para o Combate Final --- */
         .grid-jogos.layout-super-finais {
-            grid-template-columns: repeat(2, 1fr) !important; /* Força 2 colunas perfeitas de 50% da tela */
+            grid-template-columns: repeat(2, 1fr) !important; 
             gap: 20px !important;
-            align-content: stretch !important; /* Faz os cards esticarem para preencher o fundo da tela */
+            align-content: stretch !important; 
             height: 85% !important;
         }
 
@@ -235,10 +235,9 @@
             transition: all 0.3s ease;
         }
 
-        /* Expansão física do Card no modo finalíssima */
         .grid-jogos.layout-super-finais .card-jogo {
             padding: 25px 20px !important;
-            justify-content: space-around !important; /* Distribui os nomes simetricamente */
+            justify-content: space-around !important; 
             background: linear-gradient(145deg, rgba(4, 25, 12, 0.85) 0%, rgba(2, 10, 5, 0.95) 100%);
             border-width: 2px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
@@ -257,7 +256,7 @@
         }
         
         .grid-jogos.layout-super-finais .confronto-flex {
-            gap: 15px !important; /* Aumenta espaço entre os adversários */
+            gap: 15px !important; 
         }
 
         .atleta-box {
@@ -269,7 +268,6 @@
             border-radius: 4px;
         }
         
-        /* Box de atletas gigante na final */
         .grid-jogos.layout-super-finais .atleta-box {
             padding: 22px 25px !important;
             border-radius: 6px;
@@ -320,7 +318,6 @@
             white-space: nowrap;
         }
 
-        /* Placar gigante para leitura em TV distante */
         .grid-jogos.layout-super-finais .placar-tag {
             font-size: 1.4rem !important;
             padding: 6px 14px !important;
@@ -439,7 +436,7 @@
         }
 
         @keyframes autoScrollRanking {
-            0%, 10% { transform: translateY(0); }
+            0%, 10; { transform: translateY(0); }
             45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
             90%, 100% { transform: translateY(0); }
         }
@@ -533,7 +530,6 @@
         window.location.reload();
     }
 
-    // Gerencia o tamanho de forma inteligente para preencher a tela inteira
     function ajustarTamanhoDosCards(totalMesas, ehMataMata) {
         const grid = document.getElementById('container-jogos');
         if (!grid) return;
@@ -542,11 +538,8 @@
         const atletaBoxes = grid.querySelectorAll('.atleta-box');
         const tagsMesa = grid.querySelectorAll('.mesa-tag');
 
-        // Se for a Grande Final + 3º Lugar (Exatamente 2 mesas ou menos)
         if (ehMataMata && totalMesas <= 2) {
             grid.classList.add('layout-super-finais');
-            
-            // Fontes gigantescas para ocupar o monitor
             atletaLinhas.forEach(el => {
                 el.style.fontSize = "1.9rem";
                 el.style.fontWeight = "800";
@@ -556,7 +549,6 @@
             return; 
         }
 
-        // Caso contrário, limpa o modo super finais e aplica regras padrão
         grid.classList.remove('layout-super-finais');
         grid.style.gap = "10px";
 
@@ -626,11 +618,12 @@
                                      nomeFaseStr.includes("CONCLUÍDO") ||
                                      faseRaw === -12;
 
+            const telaPrincipal = document.getElementById('conteudo-principal-telao');
+
             if (exibirCerimonial) {
                 ultimoEstadoJogosStr = "";
                 ultimoEstadoRankingStr = "";
 
-                const telaPrincipal = document.getElementById('conteudo-principal-telao');
                 if (telaPrincipal) telaPrincipal.style.gridTemplateColumns = "1fr"; 
 
                 let p1 = "---", p2 = "---", p3 = "---", p4 = "---";
@@ -759,7 +752,6 @@
                 return;
             }
 
-            const telaPrincipal = document.getElementById('conteudo-principal-telao');
             const rankingLateral = document.getElementById('coluna-ranking-lateral');
             const tituloJogos = document.getElementById('titulo-secao-jogos');
 
@@ -894,9 +886,9 @@
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
 
-                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || String(jogo.mesa) === "1" && ehMataMataAtivo) {
+                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo)) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2) {
+                            } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
                             } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
                                 textoTagMesa = `🏆 <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
@@ -929,7 +921,7 @@
             }
 
             // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
-            if (!ehMataMataAtivo && tableBody) {
+            if (!ehMataMataAtivo) {
                 const rankingCompletoData = data.ranking ? data.ranking : [];
                 const signatureAtualRanking = JSON.stringify(rankingCompletoData);
 
@@ -946,7 +938,7 @@
                                     <td class="posicao-num">${index + 1}º</td>
                                     <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
                                     <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
-                                ];
+                                `;
                                 tableBody.appendChild(row);
                             });
                             setTimeout(gerenciarScrollDoRanking, 100);
