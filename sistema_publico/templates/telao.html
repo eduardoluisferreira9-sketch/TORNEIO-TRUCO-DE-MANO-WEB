@@ -3,84 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telão - Torneio de Truco Cego</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+    <title>Torneio de Truco Cego - Telão Oficial</title>
     <style>
-        /* --- Identidade Visual Alinhada --- */
+        /* ==========================================================================
+           1. VARIÁVEIS, CORES HERÁLDICAS E CONFIGURAÇÕES GERAIS
+           ========================================================================== */
         :root {
-            --bg-feltro: radial-gradient(circle, #0e3118 0%, #05160a 100%); 
-            --bg-card: rgba(4, 15, 7, 0.65); 
-            --borda-ouro: #d4af37;   
-            --dourado-brilhante: #f3cf5d;
+            --fundo-principal: #0b0c10;
+            --fundo-card: #1f2833;
+            --fundo-card-ouro: linear-gradient(135deg, #1c1a12 0%, #2a2415 100%);
+            --fundo-card-bronze: linear-gradient(135deg, #1a1512 0%, #261d18 100%);
+            --dourado-brilhante: #f5b041;
+            --borda-ouro: #d6af37;
+            --borda-bronze: #cd7f32;
+            --bronze-brilhante: #e59866;
             --texto-claro: #ffffff;
-            --texto-mutado: #a8c3af; 
+            --texto-mutado: #95a5a6;
             --sucesso: #2ecc71;
-            --danger: #ff4757;
-            --madeira: #8d6e63; 
-            --plata-prata: #bdc3c7;
-            --madeira-bronze: #cd7f32;
+            --danger: #e74c3c;
+            --madeira: #a0522d;
         }
 
-        html, body {
-            height: 100%;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            overflow: hidden; 
-            box-sizing: border-box;
         }
 
         body {
-            background: var(--bg-feltro);
-            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--fundo-principal);
             color: var(--texto-claro);
-            font-family: 'Montserrat', sans-serif;
-            padding: 15px 20px;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
+            padding: 20px;
         }
 
-        h1, h2, h3, .podio-titulo, .mesa-tag {
-            font-family: 'Cinzel', serif;
-            letter-spacing: 1px;
-        }
-
+        /* ==========================================================================
+           2. PAINEL ADMINISTRATIVO SECRETO E DE ALERTAS
+           ========================================================================== */
         .painel-admin-secreto {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 6px 12px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background-color: #111;
+            padding: 10px;
             border-radius: 6px;
-            margin-bottom: 10px;
-            display: inline-flex;
-            gap: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            align-self: flex-start;
-            flex-shrink: 0;
+            border: 1px solid #333;
         }
+
         .btn-admin {
-            background: #071a0c;
-            color: var(--borda-ouro);
-            border: 1px solid var(--borda-ouro);
-            padding: 4px 10px;
+            background-color: #34495e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: bold;
-            transition: 0.2s;
+            transition: background 0.2s;
         }
+
         .btn-admin:hover {
-            background: var(--borda-ouro);
-            color: #000;
+            background-color: #415b76;
         }
+
         .btn-admin.btn-reset {
-            border-color: var(--danger);
-            color: var(--danger);
-            background: rgba(255, 71, 87, 0.05);
+            background-color: #7f8c8d;
         }
+
         .btn-admin.btn-reset:hover {
-            background: var(--danger);
-            color: #fff;
+            background-color: #95a5a6;
         }
 
         .alerta-falta-banner {
@@ -90,397 +81,453 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 15, 8, 0.96);
+            background-color: rgba(0, 0, 0, 0.9);
             z-index: 9999;
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 1px solid var(--danger);
-            box-sizing: border-box;
-            animation: pulseBorda 1.5s infinite alternate;
         }
 
+        .alerta-falta-conteudo {
+            background-color: #1c1c1c;
+            padding: 40px;
+            border: 5px solid var(--danger);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.5);
+            animation: pulse-danger 1.5s infinite;
+        }
+
+        .alerta-falta-conteudo h2 {
+            font-size: 3rem;
+            color: var(--danger);
+            margin-bottom: 15px;
+        }
+
+        .alerta-falta-conteudo h2 span {
+            color: #fff;
+            background-color: var(--danger);
+            padding: 0 10px;
+        }
+
+        @keyframes pulse-danger {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==========================================================================
+           3. CABEÇALHO DO TELÃO E CRONÔMETRO (AJUSTADO E DESTACADO)
+           ========================================================================== */
         .header-telao {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--borda-ouro);
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-            flex-shrink: 0;
+            background-color: #15202b;
+            padding: 10px 30px;
+            border-radius: 8px;
+            border-bottom: 4px solid var(--dourado-brilhante);
+            margin-bottom: 20px;
+            height: 110px; /* Altura fixa para alinhar o cronômetro gigante */
         }
-        .header-telao h1 {
-            margin: 0;
-            font-size: 1.8rem;
+
+        #nome-torneio {
+            font-size: 2.5rem;
             font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        #nome-torneio span {
             color: var(--dourado-brilhante);
         }
-        .header-telao h1 span { color: #ffffff; }
+
         .cronometro-container {
-            border: 2px solid var(--borda-ouro);
-            padding: 4px 15px;
-            border-radius: 4px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        .cronometro-digital {
-            font-size: 2rem;
-            font-family: monospace;
-            font-weight: bold;
-            color: var(--dourado-brilhante);
-        }
-
-        .painel-infos {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border: 1px solid var(--borda-ouro);
-            border-radius: 5px;
-            background: rgba(0, 0, 0, 0.2);
-            margin-bottom: 15px;
-            flex-shrink: 0;
-        }
-        .info-item {
-            padding: 8px 15px;
-            position: relative;
-        }
-        .info-item:not(:last-child)::after {
-            content: "";
-            position: absolute;
-            right: 0;
-            top: 15%;
-            height: 70%;
-            width: 1px;
-            background: rgba(212, 175, 55, 0.25);
-        }
-        .info-rotulo {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: var(--texto-mutado);
-            margin-bottom: 2px;
-            font-weight: 600;
-        }
-        .info-valor {
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: var(--dourado-brilhante);
-        }
-
-        .secao-titulo-container {
+            background-color: #000;
+            padding: 0 35px;
+            border-radius: 6px;
+            border: 3px solid var(--borda-ouro);
+            align-self: stretch; /* Ocupa toda a altura do cabeçalho */
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .secao-titulo {
-            font-size: 1.05rem;
-            color: var(--dourado-brilhante);
-            font-weight: bold;
-            text-transform: uppercase;
-            margin: 0;
-            white-space: nowrap;
-        }
-        .secao-linha {
-            flex-grow: 1;
-            height: 1px;
-            background: var(--borda-ouro);
+            justify-content: center;
+            min-width: 220px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 0 10px rgba(245, 176, 65, 0.2);
+            transition: all 0.3s ease;
         }
 
-        /* --- Container Principal Adaptável --- */
+        .cronometro-digital {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 4.5rem; /* Aumento expressivo do tamanho do relógio */
+            font-weight: 900;
+            color: var(--dourado-brilhante);
+            text-shadow: 0 0 15px rgba(245, 176, 65, 0.6); /* Brilho neon dourado */
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Efeito piscante para quando o bicho pegar (Tempo Esgotado) */
+        @keyframes pulse-vermelho-crono {
+            0% { text-shadow: 0 0 10px rgba(231, 76, 60, 0.5); opacity: 0.8; }
+            50% { text-shadow: 0 0 25px rgba(231, 76, 60, 1); opacity: 1; }
+            100% { text-shadow: 0 0 10px rgba(231, 76, 60, 0.5); opacity: 0.8; }
+        }
+
+        /* ==========================================================================
+           4. CARD DE INFORMAÇÕES GERAIS DA FASE
+           ========================================================================== */
+        .painel-infos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            background-color: #1f2833;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #45f3ff;
+            text-align: center;
+        }
+
+        .info-rotulo {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--texto-mutado);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-valor {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        /* ==========================================================================
+           5. CONTAINER PRINCIPAL E CHAVES DE JOGOS (GRID)
+           ========================================================================== */
         .container-telao {
             display: grid;
-            grid-template-columns: 2.5fr 1fr; 
-            gap: 20px;
-            flex-grow: 1; 
-            min-height: 0; 
+            grid-template-columns: 2.2fr 1fr;
+            gap: 25px;
+            align-items: start;
+            transition: all 0.3s ease;
         }
 
         .container-telao.modo-mata-mata {
-            grid-template-columns: 1fr !important; 
+            grid-template-columns: 1fr;
         }
 
-        .coluna-mesas {
-            display: flex;
-            flex-direction: column;
-            min-height: 0; 
-            height: 100%;
+        .secao-titulo-container {
+            margin-bottom: 15px;
+        }
+
+        .secao-titulo {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            color: #45f3ff;
+        }
+
+        .secao-linha {
+            height: 2px;
+            background: linear-gradient(90deg, #45f3ff, transparent);
+            width: 100%;
         }
 
         .grid-jogos {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
             gap: 10px;
-            align-content: flex-start;
-            flex-grow: 1;
-            min-height: 0;
-            overflow: hidden; 
         }
 
-        /* --- Mudança Dinâmica para o Combate Final --- */
-        .grid-jogos.layout-super-finais {
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 25px !important;
-            align-content: stretch !important; 
-            height: 85% !important;
+        .layout-super-finais {
+            grid-template-columns: 1fr !important;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .card-jogo {
-            background: var(--bg-card);
-            border: 1px solid var(--borda-ouro);
-            border-radius: 4px;
-            padding: 8px 10px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 0;
-            transition: all 0.3s ease;
+            background-color: var(--fundo-card);
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #2f3e46;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
         }
 
-        /* Envoltórios das Finais: Fundo e bordas temáticas espessas */
-        .grid-jogos.layout-super-finais .card-jogo-ouro {
-            padding: 25px 20px !important;
-            justify-content: space-around !important; 
-            background: linear-gradient(135deg, rgba(35, 28, 5, 0.9) 0%, rgba(15, 12, 2, 0.95) 100%);
-            border: 3px solid #f3cf5d !important;
-            box-shadow: 0 0 25px rgba(243, 207, 93, 0.25);
-            animation: brilhoOuro Ouro 2s infinite alternate;
+        .card-jogo-ouro {
+            background: var(--fundo-card-ouro);
+            border: 2px solid var(--borda-ouro);
+            box-shadow: 0 0 15px rgba(214, 175, 55, 0.2);
         }
 
-        .grid-jogos.layout-super-finais .card-jogo-bronze {
-            padding: 25px 20px !important;
-            justify-content: space-around !important; 
-            background: linear-gradient(135deg, rgba(30, 18, 8, 0.9) 0%, rgba(15, 8, 3, 0.95) 100%);
-            border: 3px solid #cd7f32 !important;
-            box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+        .card-jogo-bronze {
+            background: var(--fundo-card-bronze);
+            border: 2px solid var(--borda-bronze);
+            box-shadow: 0 0 15px rgba(205, 127, 50, 0.2);
         }
 
         .mesa-tag {
             font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-            color: var(--dourado-brilhante);
+            font-size: 0.95rem;
+            color: var(--texto-mutado);
         }
+
+        .badge-final-ouro {
+            color: var(--dourado-brilhante);
+            font-weight: 900;
+            text-shadow: 0 0 5px rgba(245, 176, 65, 0.5);
+        }
+
+        .badge-final-bronze {
+            color: var(--bronze-brilhante);
+            font-weight: 900;
+            text-shadow: 0 0 5px rgba(229, 152, 102, 0.5);
+        }
+
         .confronto-flex {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-        }
-        
-        .grid-jogos.layout-super-finais .confronto-flex {
-            gap: 20px !important; 
+            gap: 6px;
+            position: relative;
         }
 
         .atleta-box {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 6px 10px; 
+            background-color: #15202b;
+            padding: 6px 10px;
             border-radius: 4px;
-        }
-        
-        /* Cores Vivas para as Caixas de Atletas nas Finais */
-        .grid-jogos.layout-super-finais .card-jogo-ouro .atleta-box {
-            padding: 22px 25px !important;
-            border-radius: 6px;
-            background: linear-gradient(90deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.05) 100%);
-            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-left: 3px solid #7f8c8d;
         }
 
-        .grid-jogos.layout-super-finais .card-jogo-bronze .atleta-box {
-            padding: 22px 25px !important;
-            border-radius: 6px;
-            background: linear-gradient(90deg, rgba(205, 127, 50, 0.25) 0%, rgba(205, 127, 50, 0.05) 100%);
-            border: 1px solid rgba(205, 127, 50, 0.4);
-        }
-
-        .atleta-box.lider-mesa {
-            border-left: 3px solid var(--sucesso);
-            background: rgba(46, 204, 113, 0.02);
-        }
-        
-        /* Estilos de Vencedor/Perdedor mantidos com alto contraste */
-        .atleta-box.vencedor-card {
-            background: linear-gradient(90deg, rgba(46, 204, 113, 0.35) 0%, rgba(4, 35, 15, 0.9) 100%) !important;
-            border-left: 6px solid #2ecc71 !important;
-            border-top: 1px solid rgba(46, 204, 113, 0.5) !important;
-            border-bottom: 1px solid rgba(46, 204, 113, 0.5) !important;
-        }
-        .atleta-box.vencedor-card .atleta-linha {
-            color: #2ecc71 !important;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
-        }
-        .atleta-box.perdedor-card {
-            background: rgba(20, 5, 5, 0.6) !important;
-            border-left: 6px solid #e74c3c !important;
-            opacity: 0.4;
-        }
-        .atleta-box.perdedor-card .atleta-linha {
-            color: #e74c3c !important;
-        }
-        .vs-espacador-oculto {
-            height: 2px;
-        }
-
-        .atleta-linha { 
-            font-weight: 600; 
-            font-size: 0.9rem; 
-            color: #fff;
+        .atleta-linha {
+            font-size: 0.9rem;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; 
+            text-overflow: ellipsis;
             max-width: 65%;
         }
-        .placar-tag { 
-            font-family: monospace; 
-            font-weight: bold; 
-            font-size: 0.8rem;
-            color: var(--borda-ouro); 
-            background: #000;
+
+        .placar-tag {
+            font-family: monospace;
+            font-weight: bold;
+            background-color: #0b0c10;
             padding: 2px 6px;
-            border-radius: 2px;
-            white-space: nowrap;
+            border-radius: 3px;
+            font-size: 0.85rem;
         }
 
-        .grid-jogos.layout-super-finais .placar-tag {
-            font-size: 1.4rem !important;
-            padding: 6px 14px !important;
-            background: #000000;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff !important;
-        }
-        
-        .grid-jogos.layout-super-finais .card-jogo-ouro .placar-tag {
-            border-color: var(--dourado-brilhante);
-            color: var(--dourado-brilhante) !important;
-        }
-
-        .grid-jogos.layout-super-finais .card-jogo-bronze .placar-tag {
-            border-color: #ff9f43;
-            color: #ff9f43 !important;
+        .vs-tag {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #e74c3c;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 1px 4px;
+            border-radius: 3px;
+            z-index: 2;
+            display: none;
         }
 
-        .vs-tag { 
-            text-align: center; 
-            font-size: 0.7rem; 
-            color: var(--texto-mutado); 
-            font-weight: bold; 
-            margin: 0;
-        }
-        
-        .grid-jogos.layout-super-finais .vs-tag {
-            font-size: 1.2rem !important;
-            color: #ffffff;
-            font-style: italic;
-            opacity: 0.3;
+        .vs-espacador-oculto {
+            height: 0px;
         }
 
-        /* --- Painel Lateral do Ranking --- */
+        .lider-mesa {
+            border-left-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .vencedor-card {
+            border-left-color: var(--sucesso);
+            background-color: rgba(46, 204, 113, 0.15);
+        }
+
+        .vencedor-card .atleta-linha {
+            color: var(--sucesso);
+            font-weight: bold;
+        }
+
+        .perdedor-card {
+            border-left-color: var(--danger);
+            opacity: 0.6;
+        }
+
+        /* ==========================================================================
+           6. SEÇÃO LATERAL DO RANKING
+           ========================================================================== */
         .ranking-container {
-            border: 1px solid var(--borda-ouro);
-            background: rgba(4, 15, 7, 0.4);
-            border-radius: 5px;
-            padding: 12px;
             display: flex;
             flex-direction: column;
-            min-height: 0;
-            height: 100%;
-            box-sizing: border-box;
+            background-color: #15202b;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #2f3e46;
+            height: 65vh;
         }
-        
+
         .ranking-scroller-box {
-            flex-grow: 1;
+            flex: 1;
             overflow: hidden;
             position: relative;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         .tabela-ranking {
             width: 100%;
             border-collapse: collapse;
         }
-        .tabela-ranking th { 
-            color: var(--texto-mutado); 
-            text-transform: uppercase; 
-            font-size: 0.65rem; 
-            font-weight: 700;
-            border-bottom: 1px solid var(--borda-ouro);
-            padding: 8px 6px;
-            position: sticky;
-            top: 0;
-            background: #06190c; 
-            z-index: 2;
+
+        .tabela-ranking th {
+            padding: 8px 5px;
+            color: var(--texto-mutado);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #2f3e46;
         }
-        
+
         .ranking-marquise-body {
             display: table-row-group;
-            position: relative;
+            position: absolute;
+            width: 100%;
             top: 0;
+            left: 0;
+        }
+
+        .tabela-ranking tr {
+            border-bottom: 1px solid #1f2833;
         }
 
         .tabela-ranking td {
-            border-bottom: 1px solid rgba(214, 175, 55, 0.1);
-            font-size: 0.85rem;
-            padding: 8px 6px;
-        }
-        .posicao-num { 
-            width: 35px; 
-            font-weight: bold; 
-            color: var(--borda-ouro); 
+            padding: 10px 5px;
             font-size: 0.95rem;
         }
-        .badge-vitorias { 
-            background: #000; 
-            color: var(--texto-claro);
-            padding: 3px 8px; 
-            border-radius: 4px; 
-            font-size: 0.75rem; 
+
+        .posicao-num {
             font-weight: bold;
-            border: 1px solid rgba(214, 175, 55, 0.1); 
-        }
-
-        tr.top-atleta td.posicao-num {
             color: var(--dourado-brilhante);
-            text-shadow: 0 0 5px rgba(243, 207, 93, 0.3);
+            width: 40px;
         }
 
-        .badge-final-ouro { background: #f3cf5d; color: #000; padding: 6px 16px; border-radius: 3px; font-weight: 900; font-size: 1.2rem; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        .badge-final-bronze { background: #cd7f32; color: #fff; padding: 6px 16px; border-radius: 3px; font-weight: 900; font-size: 1.2rem; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-
-        /* --- Pódio Premium --- */
-        .podio-wrapper {
-            background: linear-gradient(180deg, rgba(7, 26, 12, 0.95) 0%, #030a04 100%);
-            padding: 25px;
-            border-radius: 4px;
-            border: 2px solid var(--borda-ouro);
-            height: 100%;
-            box-sizing: border-box;
-            overflow-y: auto; 
+        .top-atleta {
+            background-color: rgba(245, 176, 65, 0.03);
         }
-        .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
-        .podio-flex { display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-top: 20px; }
-        .podio-card { background: rgba(0,0,0,0.4); border-radius: 4px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-        .podio-card.ouro { border: 3px solid var(--borda-ouro); height: 240px; width: 240px; order: 2; }
-        .podio-card.prata { border: 2px solid var(--plata-prata); height: 200px; width: 210px; order: 1; }
-        .podio-card.bronze { border: 2px solid var(--madeira-bronze); height: 180px; width: 210px; order: 3; }
-        .podio-medalha { font-size: 2.2rem; margin-bottom: 5px; }
-        .podio-rotulo-lugar { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--texto-mutado); }
-        .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
 
-        @keyframes pulseBorda {
-            from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
-            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
+        .badge-vitorias {
+            background-color: #27ae60;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
 
         @keyframes autoScrollRanking {
-            0%, 10% { transform: translateY(0); }
-            45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
-            90%, 100% { transform: translateY(0); }
+            0% { transform: translateY(0); }
+            10% { transform: translateY(0); }
+            90% { transform: translateY(var(--scroll-distancia)); }
+            100% { transform: translateY(var(--scroll-distancia)); }
         }
 
-        @keyframes brilhoOuro {
-            from { border-color: #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
-            to { border-color: #fff3cc; box-shadow: 0 0 30px rgba(243, 207, 93, 0.45); }
+        /* ==========================================================================
+           7. ESTRUTURA DO PÓDIO DA CERIMÔNIA DE PREMIAÇÃO
+           ========================================================================== */
+        .podio-wrapper {
+            background: linear-gradient(180deg, #1a2536 0%, #0b0c10 100%);
+            border: 3px double var(--borda-ouro);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .podio-titulo {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--dourado-brilhante);
+            text-shadow: 0 2px 10px rgba(245, 176, 65, 0.4);
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .podio-flex {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .podio-card {
+            background-color: #15202b;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s;
+        }
+
+        .podio-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .podio-medalha {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .podio-rotulo-lugar {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--texto-mutado);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .podio-nome {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-top: 15px;
+            word-wrap: break-word;
+        }
+
+        .podio-card.ouro {
+            border: 3px solid var(--borda-ouro);
+            height: 240px;
+            width: 250px;
+            background: linear-gradient(135deg, #2c2414 0%, #15202b 100%);
+            order: 2;
+        }
+        .podio-card.ouro .podio-medalha { font-size: 3.5rem; }
+
+        .podio-card.prata {
+            border: 2px solid #bdc3c7;
+            height: 200px;
+            width: 220px;
+            order: 1;
+        }
+
+        .podio-card.bronze {
+            border: 2px solid var(--borda-bronze);
+            height: 180px;
+            width: 210px;
+            order: 3;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
@@ -501,7 +548,7 @@
 
     <div class="header-telao">
         <h1 id="nome-torneio">TORNEIO DE TRUCO <span>CEGO</span></h1>
-        <div class="cronometro-container">
+        <div class="cronometro-container" id="cronometro-box">
             <div id="cronometro" class="cronometro-digital">00:00</div>
         </div>
     </div>
@@ -516,7 +563,6 @@
             <div id="info-detalhe-fase" class="info-valor">---</div>
         </div>
         <div class="info-item">
-            <div class="info-max-rodadas" style="display:none;"></div> 
             <div class="info-rotulo">Mesas Decisivas</div>
             <div id="info-mesas-ativas-rotulo" class="info-valor">0 Mesas</div>
         </div>
@@ -527,6 +573,7 @@
     </div>
 
     <div id="conteudo-principal-telao" class="container-telao">
+        
         <div class="coluna-mesas">
             <div class="secao-titulo-container">
                 <h2 class="secao-titulo" id="titulo-secao-jogos">Mesas em Andamento</h2>
@@ -583,7 +630,7 @@
         if (ehMataMata && totalMesas <= 2) {
             grid.classList.add('layout-super-finais');
             atletaLinhas.forEach(el => {
-                el.style.fontSize = "2.1rem"; // Leitura massiva a distância
+                el.style.fontSize = "2.1rem"; 
                 el.style.fontWeight = "800";
                 el.style.maxWidth = "70%";
             });
@@ -662,6 +709,7 @@
 
             const telaPrincipal = document.getElementById('conteudo-principal-telao');
 
+            // --- RENDERIZAÇÃO DA CERIMÔNIA DE PREMIAÇÃO ---
             if (exibirCerimonial) {
                 ultimoEstadoJogosStr = "";
                 ultimoEstadoRankingStr = "";
@@ -741,7 +789,6 @@
                         <div class="podio-wrapper">
                             <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
                             <div style="text-align:center; color:var(--texto-mutado); margin-bottom:15px; font-style:italic; font-size:1rem;">O pódio de honra da arena está consolidado!</div>
-                            
                             <div class="podio-flex">
                                 <div class="podio-card prata">
                                     <div>
@@ -750,7 +797,6 @@
                                     </div>
                                     <div class="podio-nome">${p2}</div>
                                 </div>
-
                                 <div class="podio-card ouro">
                                     <div>
                                         <div class="podio-medalha">👑</div>
@@ -758,7 +804,6 @@
                                     </div>
                                     <div class="podio-nome" style="font-size: 1.3rem; color: var(--dourado-brilhante); font-family:'Cinzel', serif;">${p1}</div>
                                 </div>
-
                                 <div class="podio-card bronze">
                                     <div>
                                         <div class="podio-medalha">🥉</div>
@@ -766,7 +811,6 @@
                                     </div>
                                     <div class="podio-nome">${p3}</div>
                                 </div>
-
                                 <div class="podio-card" style="border: 2px solid var(--madeira); height: 160px; width: 200px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>
                                         <div class="podio-medalha" style="font-size: 1.8rem;">🏅</div>
@@ -775,7 +819,6 @@
                                     <div class="podio-nome" style="color: #bbb; font-size: 0.95rem;">${p4}</div>
                                 </div>
                             </div>
-
                             <div class="painel-rei-flores" style="border: 2px dashed var(--borda-ouro); background: linear-gradient(130deg, rgba(214,175,55,0.08), rgba(0,0,0,0)); padding: 15px; border-radius: 4px; text-align: center; max-width: 550px; margin: 30px auto 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                                 <div style="color: var(--borda-ouro); font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
                                 <div style="color: var(--texto-mutado); font-size: 0.85rem; margin-bottom: 8px;">O maior cantador de flores da rodada:</div>
@@ -794,6 +837,7 @@
                 return;
             }
 
+            // --- CONFIGURAÇÕES DE VISIBILIDADE DAS SEÇÕES ---
             const rankingLateral = document.getElementById('coluna-ranking-lateral');
             const tituloJogos = document.getElementById('titulo-secao-jogos');
 
@@ -839,30 +883,40 @@
                 elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
             
-            const tempoFormatado = data.tempo || "00:00";
+            // ==========================================================================
+            // LOGICA DO CRONÔMETRO DESTACADO COM GLOW
+            // ==========================================================================
+            const tempoFormatado = data.tempo ? String(data.tempo).trim() : "00:00";
             const cronoAtivo = data.crono_ativo === 1;
             const cronoElement = document.getElementById('cronometro');
+            const cronoBox = document.getElementById('cronometro-box');
             const alertaElement = document.getElementById('alerta-falta');
             
             if (!cronoAtivo) {
                 cronoElement.innerText = tempoFormatado;
                 cronoElement.style.color = '#555555';
-                cronoElement.parentElement.style.borderColor = '#444444';
-                alertaElement.style.display = 'none';
+                cronoElement.style.textShadow = 'none';
+                cronoElement.style.animation = 'none';
+                if (cronoBox) cronoBox.style.borderColor = '#444444';
+                if (alertaElement) alertaElement.style.display = 'none';
             } else {
-                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
-                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
+                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00" || tempoFormatado.includes("FALTA")) {
                     cronoElement.innerText = "00:00";
                     cronoElement.style.color = 'var(--danger)';
-                    alertaElement.style.display = 'flex';
+                    cronoElement.style.animation = 'pulse-vermelho-crono 1s infinite';
+                    if (cronoBox) cronoBox.style.borderColor = 'var(--danger)';
+                    if (alertaElement) alertaElement.style.display = 'flex';
                 } else {
                     cronoElement.innerText = tempoFormatado;
                     cronoElement.style.color = 'var(--dourado-brilhante)';
-                    alertaElement.style.display = 'none';
+                    cronoElement.style.textShadow = '0 0 15px rgba(245, 176, 65, 0.6)';
+                    cronoElement.style.animation = 'none';
+                    if (cronoBox) cronoBox.style.borderColor = 'var(--borda-ouro)';
+                    if (alertaElement) alertaElement.style.display = 'none';
                 }
             }
 
-            // --- RENDERIZAÇÃO DOS CONFRONTOS ---
+            // --- RENDERIZAÇÃO DOS CARDS DE CONFRONTO ---
             const containerJogos = document.getElementById('container-jogos');
             if (containerJogos) {
                 const signatureAtualJogos = JSON.stringify(data.confrontos || []);
@@ -876,7 +930,6 @@
                     } else {
                         data.confrontos.forEach(jogo => {
                             const card = document.createElement('div');
-                            
                             const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA / W.O.";
                             
                             const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
@@ -927,10 +980,8 @@
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
-                            
                             let classeCardEspecifica = "card-jogo";
 
-                            // Identificação das duas mesas para aplicar as novas cores heráldicas
                             if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo)) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
                                 classeCardEspecifica = "card-jogo card-jogo-ouro";
@@ -968,7 +1019,7 @@
                 }
             }
 
-            // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
+            // --- TABELA LATERAL DE RANKING ---
             if (!ehMataMataAtivo) {
                 const rankingCompletoData = data.ranking ? data.ranking : [];
                 const signatureAtualRanking = JSON.stringify(rankingCompletoData);
