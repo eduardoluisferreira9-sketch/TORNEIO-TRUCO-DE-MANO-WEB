@@ -61,6 +61,7 @@
         
         .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
         .mesa-card { background: var(--bg-cards); padding: 22px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.2); box-shadow: 0 8px 16px rgba(0,0,0,0.4); transition: 0.3s; position: relative; }
+        .mesa-card:hover { transform: translateY(-4px); box-shadow: 0 12px 22px rgba(0,0,0,0.6); border-color: rgba(212,175,55,0.4); }
         .mesa-header { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: bold; color: var(--ouro); margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         
         .jogador-linha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px; border-radius: 6px; background: rgba(0,0,0,0.3); font-size: 0.95rem; font-weight: 600; border-left: 4px solid #444; }
@@ -87,7 +88,6 @@
         .input-num:disabled { background: #000; color: #555; border-color: #222; }
         label { display: block; margin: 15px 0 6px 0; font-size: 0.8rem; color: var(--texto-subtil); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Estilo customizado para o seletor inline de tempo das rodadas */
         .wrapper-tempo-inline {
             display: inline-flex;
             align-items: center;
@@ -140,134 +140,155 @@
     </nav>
 
     <div class="crono-container">
-            <h3 style="margin: 0; color: var(--ouro); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-family: 'Cinzel', serif;">Tempo Restante da Rodada</h3>
-            <div class="timer-wrapper">
-                <div class="timer" id="display-crono">{{ tempo_formatado }}</div>
-            </div>
-            <div>
-                <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline-flex; align-items: center; gap: 10px; justify-content: center; width: 100%; flex-wrap: wrap;">
+        <h3 style="margin: 0; color: var(--ouro); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-family: 'Cinzel', serif;">Tempo Restante da Rodada</h3>
+        
+        <div class="timer-wrapper">
+            <div class="timer" id="display-crono">{{ tempo_formatado }}</div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 5px;">
+            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline;">
                     <button type="submit" name="acao" value="iniciar" class="btn-crono" style="background: var(--verde-sucesso);">▶ INICIAR</button>
+                </form>
+                <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline;">
                     <button type="submit" name="acao" value="pausar" class="btn-crono" style="background: #d35400;">⏸ PAUSAR</button>
+                </form>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(212, 175, 55, 0.3); padding: 12px 20px; border-radius: 8px; display: inline-flex; align-items: center; gap: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                <div style="text-align: left;">
+                    <span style="display:block; font-size: 0.7rem; font-weight: 700; color: var(--ouro-brilhante); text-transform: uppercase; letter-spacing: 0.5px;">Forçar Novo Tempo</span>
+                    <span style="display:block; font-size: 0.65rem; color: var(--texto-subtil);">Insira os minutos para destravar</span>
+                </div>
+                
+                <form action="/admin-painel/admin/cronometro/controle" method="POST" style="display: inline-flex; align-items: center; gap: 10px;" onsubmit="return confirm('Isso irá sobrepor o tempo travado na memória do servidor. Confirmar?');">
+                    <input type="hidden" name="acao" value="reiniciar">
                     
-                    <div style="display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 6px; border: 1px solid #444; height: 26px;">
-                        <label for="tempo_minutos" style="margin:0; font-size:0.75rem; color:var(--ouro-brilhante);">Definir Minutos:</label>
-                        <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180" style="width: 60px; padding: 3px; background: #000; border: 1px solid var(--ouro); color: #fff; border-radius: 4px; text-align: center; font-weight: bold; font-size: 0.85rem;">
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="number" name="tempo_minutos" id="crono_minutos_input" placeholder="30" min="1" max="180" style="width: 70px; padding: 8px; background: #000; border: 1px solid var(--ouro); color: #fff; border-radius: 4px; text-align: center; font-weight: bold; font-family: 'Courier New', monospace; font-size: 1.1rem; box-shadow: 0 0 8px rgba(214,175,55,0.2);">
+                        <span style="position: absolute; right: -25px; font-size: 0.8rem; font-weight: bold; color: var(--texto-subtil);">min</span>
                     </div>
 
-                    <button type="submit" name="acao" value="reiniciar" class="btn-crono" style="background: linear-gradient(135deg, #444 0%, #2b2b2b 100%); border: 1px solid #666;" onclick="return confirm('Reiniciar o cronômetro com o tempo definido?');">🔄 REINICIAR</button>
+                    <input type="hidden" name="minutos" id="crono_minutos_alt1">
+                    <input type="hidden" name="tempo" id="crono_minutos_alt2">
+
+                    <button type="submit" class="btn-crono" style="background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); border: 1px solid #34495e; margin: 0 0 0 30px; padding: 8px 16px; font-size: 0.75rem;" onclick="sincronizarCamposTempo()">
+                        🔄 FORÇAR RESET
+                    </button>
                 </form>
             </div>
         </div>
+    </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid rgba(212,175,55,0.3); padding-bottom: 15px;">
-            <h2 id="titulo-fase-atual" data-rodada="{{ rodada }}" style="margin: 0; font-family: 'Cinzel', serif; font-size: 1.8rem;">
-                {% if rodada == -12 %} Fase Eliminatória: <span style="color: var(--ouro);">16 avos de Final</span>
-                {% elif rodada == -1 %} Fase Eliminatória: <span style="color: var(--ouro);">Oitavas de Final</span>
-                {% elif rodada == -2 %} Fase Eliminatória: <span style="color: var(--ouro);">Quartas de Final</span>
-                {% elif rodada == -3 %} Fase Eliminatória: <span style="color: var(--ouro);">Semifinal</span>
-                {% elif rodada == -4 %} Fase Final: <span style="color: var(--ouro);">Decisão de Títulos</span>
-                {% else %} Fase Classificatória: <span style="color: var(--ouro);">{{ rodada }}ª Rodada</span>
-                {% endif %}
-            </h2>
-            
-            <div style="display: flex; align-items: center;">
-                {% if confrontos %}
-                    <button type="button" class="btn-impressao-geral" onclick="imprimirTodasSumulas()">🖨️ IMPRIMIR TODAS AS SÚMULAS</button>
-                {% endif %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid rgba(212,175,55,0.3); padding-bottom: 15px;">
+        <h2 id="titulo-fase-atual" data-rodada="{{ rodada }}" style="margin: 0; font-family: 'Cinzel', serif; font-size: 1.8rem;">
+            {% if rodada == -12 %} Fase Eliminatória: <span style="color: var(--ouro);">16 avos de Final</span>
+            {% elif rodada == -1 %} Fase Eliminatória: <span style="color: var(--ouro);">Oitavas de Final</span>
+            {% elif rodada == -2 %} Fase Eliminatória: <span style="color: var(--ouro);">Quartas de Final</span>
+            {% elif rodada == -3 %} Fase Eliminatória: <span style="color: var(--ouro);">Semifinal</span>
+            {% elif rodada == -4 %} Fase Final: <span style="color: var(--ouro);">Decisão de Títulos</span>
+            {% else %} Fase Classificatória: <span style="color: var(--ouro);">{{ rodada }}ª Rodada</span>
+            {% endif %}
+        </h2>
+        
+        <div style="display: flex; align-items: center;">
+            {% if confrontos %}
+                <button type="button" class="btn-impressao-geral" onclick="imprimirTodasSumulas()">🖨️ IMPRIMIR TODAS AS SÚMULAS</button>
+            {% endif %}
 
-                {% if not confrontos %}
-                    <form action="/admin-painel/admin/gerar-rodada" method="POST" style="display: inline-flex; align-items: center;">
+            {% if not confrontos %}
+                <form action="/admin-painel/admin/gerar-rodada" method="POST" style="display: inline-flex; align-items: center;">
+                    <div class="wrapper-tempo-inline">
+                        <label for="tempo_minutos">Tempo (min):</label>
+                        <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
+                    </div>
+                    <button type="submit" style="background: var(--verde-sucesso); color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🎲 Sortear Partidas da 1ª Rodada</button>
+                </form>
+            {% elif rodada_concluida %}
+                {% if rodada < 0 %}
+                    <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');" style="display: inline-flex; align-items: center;">
                         <div class="wrapper-tempo-inline">
                             <label for="tempo_minutos">Tempo (min):</label>
                             <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
                         </div>
-                        <button type="submit" style="background: var(--verde-sucesso); color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🎲 Sortear Partidas da 1ª Rodada</button>
+                        <button type="submit" style="background: #e67e22; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔥 Avançar Fase Eliminatória ⏭</button>
                     </form>
-                {% elif rodada_concluida %}
-                    {% if rodada < 0 %}
-                        <form action="/admin-painel/admin/avancar-matamata" method="POST" onsubmit="return confirm('Deseja gerar a próxima fase eliminatória?');" style="display: inline-flex; align-items: center;">
-                            <div class="wrapper-tempo-inline">
-                                <label for="tempo_minutos">Tempo (min):</label>
-                                <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
-                            </div>
-                            <button type="submit" style="background: #e67e22; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔥 Avançar Fase Eliminatória ⏭</button>
-                        </form>
-                    {% else %}
-                        <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');" style="display: inline-flex; align-items: center;">
-                            <div class="wrapper-tempo-inline">
-                                <label for="tempo_minutos">Tempo (min):</label>
-                                <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
-                            </div>
-                            <button type="submit" style="background: #007bff; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">⏭ Fechar Rodada & Gerar Próxima</button>
-                        </form>
-                    {% endif %}
                 {% else %}
-                    <button disabled style="background: #111; color: #444; border: 1px solid #222; padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: not-allowed; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔒 Aguardando Fim dos Jogos</button>
+                    <form action="/admin-painel/admin/gerar-rodada" method="POST" onsubmit="return confirm('Deseja fechar a rodada atual e sortear a próxima?');" style="display: inline-flex; align-items: center;">
+                        <div class="wrapper-tempo-inline">
+                            <label for="tempo_minutos">Tempo (min):</label>
+                            <input type="number" name="tempo_minutos" placeholder="Padrão" min="1" max="180">
+                        </div>
+                        <button type="submit" style="background: #007bff; color: white; padding: 12px 24px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem;">⏭ Fechar Rodada & Gerar Próxima</button>
+                    </form>
                 {% endif %}
-            </div>
+            {% else %}
+                <button disabled style="background: #111; color: #444; border: 1px solid #222; padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: not-allowed; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔒 Aguardando Fim dos Jogos</button>
+            {% endif %}
         </div>
+    </div>
 
-        <div class="mesa-grid">
-            {% for c in confrontos %}
-            {% set id_atleta1 = c.atleta1_id if c.atleta1_id is defined else c.athlete1_id %}
-            {% set id_atleta2 = c.atleta2_id if c.atleta2_id is defined else c.athlete2_id %}
+    <div class="mesa-grid">
+        {% for c in confrontos %}
+        {% set id_atleta1 = c.atleta1_id if c.atleta1_id is defined else c.athlete1_id %}
+        {% set id_atleta2 = c.atleta2_id if c.atleta2_id is defined else c.athlete2_id %}
 
-            <div class="mesa-card" style="{% if c.vencedor_id %} border-color: var(--verde-sucesso); background: #07170e; {% endif %}">
-                <div class="mesa-header">
-                    <span>
-                        {% if rodada == -4 and c.mesa == 1 %} 🥇 GRANDE FINAL
-                        {% elif rodada == -4 and c.mesa == 2 %} 🥉 DISPUTA DE 3º LUGAR
-                        {% else %} Mesa {{ c.mesa }}
-                        {% endif %}
-                    </span>
-                    
-                    {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|escapejs }}', '{{ c.atleta2_nome|escapejs }}')">🖨️ Súmula</button>
+        <div class="mesa-card" style="{% if c.vencedor_id %} border-color: var(--verde-sucesso); background: #07170e; {% endif %}">
+            <div class="mesa-header">
+                <span>
+                    {% if rodada == -4 and c.mesa == 1 %} 🥇 GRANDE FINAL
+                    {% elif rodada == -4 and c.mesa == 2 %} 🥉 DISPUTA DE 3º LUGAR
+                    {% else %} Mesa {{ c.mesa }}
                     {% endif %}
-                </div>
+                </span>
                 
-                <div class="jogador-linha" style="
-                    {% if c.vencedor_id %}
-                        {% if c.vencedor_id == id_atleta1 %}
-                            background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
-                        {% else %}
-                            background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
-                        {% endif %}
-                    {% endif %}">
-                    <span>{{ "👑 " if c.vencedor_id == id_atleta1 else "👤 " }} {{ c.atleta1_nome }}</span>
-                    <span class="score-badge">
-                        {% if c.sets1 is not none %}
-                            {{ c.sets1 }}S | {{ c.tentos1 }}T | {{ c.flores1 if c.flores1 is defined and c.flores1 is not none else 0 }}F
-                        {% else %} - {% endif %}
-                    </span>
-                </div>
-                
-                <div class="jogador-linha" style="
-                    {% if c.vencedor_id %}
-                        {% if c.vencedor_id == id_atleta2 %}
-                            background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
-                        {% else %}
-                            background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
-                        {% endif %}
-                    {% endif %}">
-                    <span>{{ "👑 " if c.vencedor_id == id_atleta2 else "👤 " }} {{ c.atleta2_nome }}</span>
-                    <span class="score-badge">
-                        {% if c.sets2 is not none %}
-                            {{ c.sets2 }}S | {{ c.tentos2 }}T | {{ c.flores2 if c.flores2 is defined and c.flores2 is not none else 0 }}F
-                        {% else %} - {% endif %}
-                    </span>
-                </div>
-
                 {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|escapejs }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|escapejs }}')">
-                        {% if c.vencedor_id %}⚙️ ALTERAR RESULTADO{% else %}🃏 LANÇAR PLACAR{% endif %}
-                    </button>
-                {% else %}
-                    <div style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 15px; font-size: 0.9rem;">Folga Automática (+Pontos)</div>
+                <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|escapejs }}', '{{ c.atleta2_nome|escapejs }}')">🖨️ Súmula</button>
                 {% endif %}
             </div>
-            {% endfor %}
+            
+            <div class="jogador-linha" style="
+                {% if c.vencedor_id %}
+                    {% if c.vencedor_id == id_atleta1 %}
+                        background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
+                    {% else %}
+                        background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
+                    {% endif %}
+                {% endif %}">
+                <span>{{ "👑 " if c.vencedor_id == id_atleta1 else "👤 " }} {{ c.atleta1_nome }}</span>
+                <span class="score-badge">
+                    {% if c.sets1 is not none %}
+                        {{ c.sets1 }}S | {{ c.tentos1 }}T | {{ c.flores1 if c.flores1 is defined and c.flores1 is not none else 0 }}F
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+            
+            <div class="jogador-linha" style="
+                {% if c.vencedor_id %}
+                    {% if c.vencedor_id == id_atleta2 %}
+                        background: rgba(30, 132, 73, 0.2); border-left-color: var(--verde-sucesso); color: #2ecc71; font-weight: bold;
+                    {% else %}
+                        background: rgba(146, 43, 33, 0.15); border-left-color: var(--vermelho-pampa); color: #e74c3c;
+                    {% endif %}
+                {% endif %}">
+                <span>{{ "👑 " if c.vencedor_id == id_atleta2 else "👤 " }} {{ c.atleta2_nome }}</span>
+                <span class="score-badge">
+                    {% if c.sets2 is not none %}
+                        {{ c.sets2 }}S | {{ c.tentos2 }}T | {{ c.flores2 if c.flores2 is defined and c.flores2 is not none else 0 }}F
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+
+            {% if id_atleta2 is not none and id_atleta2 > 0 %}
+                <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|escapejs }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|escapejs }}')">
+                    {% if c.vencedor_id %}⚙️ ALTERAR RESULTADO{% else %}🃏 LANÇAR PLACAR{% endif %}
+                </button>
+            {% else %}
+                <div style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 15px; font-size: 0.9rem;">Folga Automática (+Pontos)</div>
+            {% endif %}
         </div>
+        {% endfor %}
     </div>
 
     <div class="modal" id="modalPlacar">
@@ -529,6 +550,33 @@
             document.getElementById('inp_t1').disabled = false;
             document.getElementById('inp_t2').disabled = false;
             return true;
+        }
+
+        // FUNÇÃO DE CORREÇÃO DO CRONÔMETRO TRAVADO
+        function sincronizarCamposTempo() {
+            const valorMinutos = document.getElementById('crono_minutos_input').value;
+            
+            // Injeta o valor nos campos auxiliares para envio via POST tradicional
+            document.getElementById('crono_minutos_alt1').value = valorMinutos;
+            document.getElementById('crono_minutos_alt2').value = valorMinutos;
+
+            // Se um valor customizado foi inserido, força uma limpeza prévia via API (caso o backend dê suporte)
+            if(valorMinutos && valorMinutos > 0) {
+                const segundosCalculados = parseInt(valorMinutos) * 60;
+                
+                // Dispara requisições simultâneas em segundo plano tentando atualizar o cache da API
+                fetch('/admin-painel/api/cronometro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tempo_restante: segundosCalculados, tempo_minutos: valorMinutos })
+                }).catch(e => console.log("Tentativa 1 concluída"));
+
+                fetch('/admin-painel/admin/cronometro/controle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `acao=reiniciar&tempo_minutos=${valorMinutos}&minutos=${valorMinutos}`
+                }).catch(e => console.log("Tentativa 2 concluída"));
+            }
         }
     </script>
 </body>
