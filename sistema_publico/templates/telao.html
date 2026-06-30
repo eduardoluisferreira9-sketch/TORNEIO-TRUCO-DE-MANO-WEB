@@ -100,12 +100,13 @@
             animation: pulseBorda 1.5s infinite alternate;
         }
 
+        /* --- Header Otimizado para Cronômetro Gigante --- */
         .header-telao {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--borda-ouro);
-            padding-bottom: 8px;
+            padding-bottom: 12px;
             margin-bottom: 10px;
             flex-shrink: 0;
         }
@@ -119,16 +120,20 @@
         
         .cronometro-container {
             border: 2px solid var(--borda-ouro);
-            padding: 4px 20px;
-            border-radius: 4px;
-            background: rgba(0, 0, 0, 0.6);
+            padding: 6px 30px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .cronometro-digital {
-            font-size: 2.4rem; /* Otimizado para maior visibilidade em arenas */
-            font-family: monospace;
-            font-weight: bold;
+            font-size: 5rem; /* TAMANHO MAXIMIZADO */
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
             color: var(--dourado-brilhante);
-            line-height: 1;
+            line-height: 0.9;
+            letter-spacing: -2px;
         }
 
         .painel-infos {
