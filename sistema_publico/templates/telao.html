@@ -100,23 +100,30 @@
             animation: pulseBorda 1.5s infinite alternate;
         }
 
-        /* --- Header Otimizado para Cronômetro Gigante --- */
+        /* --- Header Otimizado para Título e Cronômetro Gigantes --- */
         .header-telao {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--borda-ouro);
-            padding-bottom: 12px;
+            padding-bottom: 15px; 
             margin-bottom: 10px;
             flex-shrink: 0;
+            gap: 20px;
         }
         .header-telao h1 {
             margin: 0;
-            font-size: 1.8rem;
-            font-weight: 800;
+            font-size: 3.5rem; /* DESTAQUE MÁXIMO DO TORNEIO */
+            font-weight: 900;
             color: var(--dourado-brilhante);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(243, 207, 93, 0.2); 
+            line-height: 1;
+            white-space: nowrap;
         }
-        .header-telao h1 span { color: #ffffff; }
+        .header-telao h1 span { 
+            color: #ffffff; 
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        }
         
         .cronometro-container {
             border: 2px solid var(--borda-ouro);
@@ -126,9 +133,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         .cronometro-digital {
-            font-size: 5rem; /* TAMANHO MAXIMIZADO */
+            font-size: 5rem; /* CRONÔMETRO MAXIMIZADO */
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
