@@ -18,7 +18,7 @@
             --texto-claro: #ffffff;
             --texto-mutado: #a8c3af; 
             --sucesso: #2ecc71;
-            --danger: #ff4757;
+            --danger: #ff1a1a; /* Forçado vermelho mais vivo */
             --madeira: #8d6e63; 
             --plata-prata: #bdc3c7;
             --madeira-bronze: #cd7f32;
@@ -83,6 +83,7 @@
             color: #fff;
         }
 
+        /* Modificado o banner inteiro para acompanhar o vermelho caso ele apareça */
         .alerta-falta-banner {
             display: none;
             position: fixed;
@@ -95,9 +96,16 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 1px solid var(--danger);
+            border: 2px solid var(--danger);
             box-sizing: border-box;
             animation: pulseBorda 1.5s infinite alternate;
+        }
+        .alerta-falta-banner h2 {
+            color: var(--danger) !important;
+            font-size: 3rem;
+        }
+        .alerta-falta-banner h2 span {
+            color: #fff !important;
         }
 
         /* --- Header Otimizado para Título e Cronômetro Gigantes --- */
@@ -134,14 +142,17 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: border-color 0.2s ease;
         }
         .cronometro-digital {
             font-size: 3.3rem; 
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Cinzel', 'Courier New', Courier, monospace; /* Permitindo Cinzel caso venha texto por extenso */
             font-weight: 900;
             color: var(--dourado-brilhante);
             line-height: 1;
             letter-spacing: -1px;
+            transition: color 0.2s ease;
+            text-transform: uppercase;
         }
 
         .painel-infos {
@@ -474,7 +485,7 @@
 
     <div class="header-telao">
         <h1 id="nome-torneio">TORNEIO DE TRUCO <span>CEGO</span></h1>
-        <div class="cronometro-container">
+        <div class="cronometro-container" id="caixa-cronometro">
             <div id="cronometro" class="cronometro-digital">00:00</div>
         </div>
     </div>
@@ -812,27 +823,32 @@
                 elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
             
-            const tempoFormatado = data.tempo || "00:00";
+            const tempoFormatado = data.tempo ? data.tempo.trim() : "00:00";
             const cronoAtivo = data.crono_ativo === 1;
             const cronoElement = document.getElementById('cronometro');
+            const caixaCronoElement = document.getElementById('caixa-cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
-            // --- BLOCO DO CRONÔMETRO ATUALIZADO ---
+            // --- ATUALIZAÇÃO REFORÇADA COM PROP-STYLE DIRECT (IGNORA CACHE E CLASSES ANTERIORES) ---
             if (!cronoAtivo) {
                 cronoElement.innerText = tempoFormatado;
-                cronoElement.style.color = '#555555';
-                cronoElement.parentElement.style.borderColor = '#444444';
+                cronoElement.style.setProperty('color', '#555555', 'important');
+                caixaCronoElement.style.setProperty('border-color', '#444444', 'important');
                 alertaElement.style.display = 'none';
             } else {
-                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
+                // Checagem se o texto contém "FALTA", "00:00" ou "ESGOTADO" para garantir a captura
+                if (tempoFormatado.includes("FALTA") || tempoFormatado === "00:00" || tempoFormatado.includes("ESGOTADO")) {
                     cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--danger)'; // Texto em vermelho vivo
-                    cronoElement.parentElement.style.borderColor = 'var(--danger)'; // Caixa em vermelho vivo
+                    
+                    // Força via JavaScript o Vermelho vivo diretamente na árvore do DOM
+                    cronoElement.style.setProperty('color', '#ff1a1a', 'important'); 
+                    caixaCronoElement.style.setProperty('border-color', '#ff1a1a', 'important'); 
+                    
                     alertaElement.style.display = 'flex';
                 } else {
                     cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--dourado-brilhante)';
-                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
+                    cronoElement.style.setProperty('color', 'var(--dourado-brilhante)', 'important');
+                    caixaCronoElement.style.setProperty('border-color', 'var(--borda-ouro)', 'important');
                     alertaElement.style.display = 'none';
                 }
             }
