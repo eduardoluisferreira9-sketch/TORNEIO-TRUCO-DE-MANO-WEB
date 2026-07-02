@@ -134,14 +134,19 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            min-width: 200px;
+            max-width: 100%;
+            transition: all 0.3s ease;
         }
         .cronometro-digital {
-            font-size: 5rem; /* CRONÔMETRO MAXIMIZADO */
+            font-size: clamp(1.8rem, 4.5vw, 5rem); /* Tamanho responsivo: não corta se virar texto largo */
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
             line-height: 0.9;
-            letter-spacing: -2px;
+            letter-spacing: -1px;
+            white-space: nowrap;
+            text-align: center;
         }
 
         .painel-infos {
