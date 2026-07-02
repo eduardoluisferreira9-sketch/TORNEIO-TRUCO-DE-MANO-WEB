@@ -113,7 +113,7 @@
         }
         .header-telao h1 {
             margin: 0;
-            font-size: 2.5rem; /* DESTAQUE MÁXIMO DO TORNEIO */
+            font-size: 3.5rem; /* DESTAQUE MÁXIMO DO TORNEIO */
             font-weight: 900;
             color: var(--dourado-brilhante);
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(243, 207, 93, 0.2); 
@@ -127,42 +127,21 @@
         
         .cronometro-container {
             border: 2px solid var(--borda-ouro);
-            padding: 4px 15px;          /* Reduzido o espaçamento interno horizontal */
+            padding: 6px 30px;
             border-radius: 6px;
             background: rgba(0, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            width: 160px;               /* Largura fixa e controlada para não crescer */
-            transition: all 0.3s ease;
         }
         .cronometro-digital {
-            font-size: 2.2rem;          /* Tamanho fixo e menor em vez do clamp gigante */
+            font-size: 5rem; /* CRONÔMETRO MAXIMIZADO */
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
             line-height: 0.9;
-            letter-spacing: -1px;
-            white-space: nowrap;
-            text-align: center;
-        }
-
-        /* --- Estado Crítico: Caixa Inteira Vermelha e Texto Branco --- */
-        /* Garante que se a classe 'alerta-ativo' surgir, a CAIXA vira vermelha */
-        .cronometro-container.alerta-ativo,
-        .cronometro-container:has(.alerta-ativo) {
-            background: #ff1f1f !important;        /* Fundo vermelho vivo na caixa */
-            border-color: #ffffff !important;      /* Borda branca para destacar */
-            box-shadow: 0 0 15px rgba(255, 31, 31, 0.7);
-        }
-
-        /* Garante que o TEXTO fique branco e pulse dentro da caixa vermelha */
-        .cronometro-container.alerta-ativo .cronometro-digital,
-        .cronometro-container:has(.alerta-ativo) .cronometro-digital {
-            color: #ffffff !important;             /* Texto branco para dar leitura perfeita */
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            animation: pulsarCronometro 1s ease-in-out infinite alternate;
+            letter-spacing: -2px;
         }
 
         .painel-infos {
@@ -466,15 +445,9 @@
         .podio-rotulo-lugar { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--texto-mutado); }
         .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
 
-        /* --- Animações --- */
         @keyframes pulseBorda {
             from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
             to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
-        }
-
-        @keyframes pulsarCronometro {
-            from { transform: scale(1); opacity: 1; }
-            to { transform: scale(1.03); opacity: 0.85; }
         }
 
         @keyframes autoScrollRanking {
@@ -791,7 +764,6 @@
                 document.getElementById('info-fase').innerText = "🏁 ENCERRADO";
                 document.getElementById('info-detalhe-fase').innerText = "Torneio Concluído";
                 document.getElementById('cronometro').innerText = "--:--";
-                document.getElementById('cronometro').classList.remove('alerta-ativo');
                 return;
             }
 
@@ -849,18 +821,16 @@
                 cronoElement.innerText = tempoFormatado;
                 cronoElement.style.color = '#555555';
                 cronoElement.parentElement.style.borderColor = '#444444';
-                cronoElement.classList.remove('alerta-ativo');
                 alertaElement.style.display = 'none';
             } else {
                 cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
                     cronoElement.innerText = "00:00";
-                    cronoElement.classList.add('alerta-ativo');
+                    cronoElement.style.color = 'var(--danger)';
                     alertaElement.style.display = 'flex';
                 } else {
                     cronoElement.innerText = tempoFormatado;
                     cronoElement.style.color = 'var(--dourado-brilhante)';
-                    cronoElement.classList.remove('alerta-ativo');
                     alertaElement.style.display = 'none';
                 }
             }
