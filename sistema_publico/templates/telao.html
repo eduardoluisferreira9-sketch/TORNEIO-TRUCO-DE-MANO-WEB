@@ -127,19 +127,18 @@
         
         .cronometro-container {
             border: 2px solid var(--borda-ouro);
-            padding: 6px 30px;
+            padding: 4px 15px;          /* Reduzido o espaçamento interno horizontal */
             border-radius: 6px;
             background: rgba(0, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            min-width: 200px;
-            max-width: 100%;
+            width: 160px;               /* Largura fixa e controlada para não crescer */
             transition: all 0.3s ease;
         }
         .cronometro-digital {
-            font-size: clamp(2rem, 5vw, 5.5rem); /* Otimização Responsiva */
+            font-size: 2.2rem;          /* Tamanho fixo e menor em vez do clamp gigante */
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
@@ -149,10 +148,20 @@
             text-align: center;
         }
 
-        /* Estado Crítico: Tempo Esgotado / Falta */
-        .cronometro-digital.alerta-ativo {
-            color: #ff3838 !important;
-            text-shadow: 0 0 15px rgba(255, 56, 56, 0.6);
+        /* --- Estado Crítico: Caixa Inteira Vermelha e Texto Branco --- */
+        /* Garante que se a classe 'alerta-ativo' surgir, a CAIXA vira vermelha */
+        .cronometro-container.alerta-ativo,
+        .cronometro-container:has(.alerta-ativo) {
+            background: #ff1f1f !important;        /* Fundo vermelho vivo na caixa */
+            border-color: #ffffff !important;      /* Borda branca para destacar */
+            box-shadow: 0 0 15px rgba(255, 31, 31, 0.7);
+        }
+
+        /* Garante que o TEXTO fique branco e pulse dentro da caixa vermelha */
+        .cronometro-container.alerta-ativo .cronometro-digital,
+        .cronometro-container:has(.alerta-ativo) .cronometro-digital {
+            color: #ffffff !important;             /* Texto branco para dar leitura perfeita */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             animation: pulsarCronometro 1s ease-in-out infinite alternate;
         }
 
