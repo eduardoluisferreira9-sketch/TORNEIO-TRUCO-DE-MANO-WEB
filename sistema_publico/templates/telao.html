@@ -394,6 +394,7 @@
             display: table-row-group;
             position: relative;
             top: 0;
+            will-change: transform;
         }
 
         .tabela-ranking td {
@@ -654,7 +655,7 @@
                         const idA1 = jogoFinal.atleta1_id || jogoFinal.athlete1_id;
 
                         if (vId || t1 > 0 || t2 > 0) {
-                            if (vId == idA1 || t1 > t2) {
+                            if (vId === idA1 || t1 > t2) {
                                 p1 = jogoFinal.atleta1_nome || "---";
                                 p2 = jogoFinal.atleta2_nome || "---";
                             } else {
@@ -675,7 +676,7 @@
                         const idA1 = jogoBronze.atleta1_id || jogoBronze.athlete1_id;
 
                         if (vId || t1 > 0 || t2 > 0) {
-                            if (vId == idA1 || t1 > t2) {
+                            if (vId === idA1 || t1 > t2) {
                                 p3 = jogoBronze.atleta1_nome || "---";
                                 p4 = jogoBronze.atleta2_nome || "---";
                             } else {
@@ -877,8 +878,8 @@
                                 let j1Ganhou = false; let j2Ganhou = false;
 
                                 if (idVencedor !== null && idVencedor !== undefined) {
-                                    j1Ganhou = (idVencedor == idAtleta1);
-                                    j2Ganhou = (idVencedor == idAtleta2);
+                                    j1Ganhou = (Number(idVencedor) === Number(idAtleta1));
+                                    j2Ganhou = (Number(idVencedor) === Number(idAtleta2));
                                 } else {
                                     j1Ganhou = (f1 > f2) || (f1 === f2 && t1 > t2);
                                     j2Ganhou = (f2 > f1) || (f1 === f2 && t2 > t1);
@@ -951,8 +952,8 @@
                                 if (index < 4) row.className = 'top-atleta';
                                 row.innerHTML = `
                                     <td class="posicao-num">${index + 1}º</td>
-                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
-                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
+                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome || '---'}</td>
+                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias || 0} V</span></td>
                                 `;
                                 tableBody.appendChild(row);
                             });
