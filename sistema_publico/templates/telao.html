@@ -479,14 +479,6 @@
         <button class="btn-admin btn-reset" onclick="liberarTelaoManual()">🔄 Voltar para Mesas</button>
     </div>
 
-    <div id="alerta-falta" class="alerta-falta-banner">
-        <div class="alerta-falta-conteudo">
-            <h2>⚠️ TEMPO ESGOTADO!</h2>
-            <h2>AGORA TUDO É <span>FAIXA / FALTA!</span></h2>
-            <p style="font-size: 1.5rem;">Fechem as vazas e concluam a jogada imediatamente.</p>
-        </div>
-    </div>
-
     <div class="header-telao">
         <h1 id="nome-torneio">TORNEIO DE TRUCO <span>CEGO</span></h1>
         <div class="cronometro-container" id="caixa-cronometro">
@@ -833,33 +825,40 @@
             const caixaCronoElement = document.getElementById('caixa-cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
-        // --- BLOCO DO CRONÔMETRO REORGANIZADO (PRIORIDADE AO VERMELHO) ---
+        // --- NOVO BLOCO DO CRONÔMETRO (SEM BANNER E COM FORÇA NO VERMELHO) ---
+        const tempoFormatado = data.tempo ? data.tempo.trim() : "00:00";
+        const cronoAtivo = data.crono_ativo === 1;
+        const cronoElement = document.getElementById('cronometro');
+        const caixaCronoElement = document.getElementById('caixa-cronometro');
 
-        // REGRA 1 (SUPREMA): Se o texto indicar fim de tempo, força o Vermelho e abre o Banner imediatamente!
+        // REGRA 1: Se o tempo esgotou (Texto contém FALTA, ESGOTADO ou é 00:00)
         if (tempoFormatado.includes("FALTA") || tempoFormatado === "00:00" || tempoFormatado.includes("ESGOTADO")) {
     
-            cronoElement.innerHTML = tempoFormatado;
-            const textoLimpo = cronoElement.innerText || cronoElement.textContent;
-            cronoElement.textContent = textoLimpo; 
+            cronoElement.textContent = tempoFormatado; // Injeta o texto puro ("AGORA TUDO É FALTA!")
     
+            // Força o Vermelho Vivo diretamente no elemento e na borda da caixa, ignorando qualquer outra regra
             cronoElement.style.setProperty('color', '#ff1a1a', 'important'); 
-            caixaCronoElement.style.setProperty('border-color', '#ff1a1a', 'important'); 
-    
-            if (alertaElement) alertaElement.style.display = 'flex';
+            if (caixaCronoElement) {
+                caixaCronoElement.style.setProperty('border-color', '#ff1a1a', 'important');
+            }
 
-        // REGRA 2: Se o tempo NÃO acabou, mas o cronômetro foi pausado ou desativado pelo Admin
+        // REGRA 2: Se o cronômetro foi pausado/desativado pelo Admin (Jogo normal parado)
         } else if (!cronoAtivo) {
+    
             cronoElement.textContent = tempoFormatado;
-            cronoElement.style.setProperty('color', '#555555', 'important'); // Cinza discreto de pausa
-            caixaCronoElement.style.setProperty('border-color', '#444444', 'important');
-            if (alertaElement) alertaElement.style.display = 'none';
+            cronoElement.style.setProperty('color', '#555555', 'important'); // Cinza padrão de pausa
+            if (caixaCronoElement) {
+                caixaCronoElement.style.setProperty('border-color', '#444444', 'important');
+            }
 
-        // REGRA 3: Jogo rolando normal (Contagem regressiva padrão)
+        // REGRA 3: Jogo rolando normal (Contagem regressiva em minutos)
         } else {
+    
             cronoElement.textContent = tempoFormatado;
-            cronoElement.style.setProperty('color', 'var(--dourado-brilhante)', 'important');
-            caixaCronoElement.style.setProperty('border-color', 'var(--borda-ouro)', 'important');
-            if (alertaElement) alertaElement.style.display = 'none';
+            cronoElement.style.setProperty('color', 'var(--dourado-brilhante)', 'important'); // Dourado padrão do torneio
+            if (caixaCronoElement) {
+                caixaCronoElement.style.setProperty('border-color', 'var(--borda-ouro)', 'important');
+            }
         }
 
             // --- RENDERIZAÇÃO DOS CONFRONTOS ---
