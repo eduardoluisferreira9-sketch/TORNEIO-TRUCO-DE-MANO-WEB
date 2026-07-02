@@ -18,7 +18,7 @@
             --texto-claro: #ffffff;
             --texto-mutado: #a8c3af; 
             --sucesso: #2ecc71;
-            --danger: #ff1a1a; /* Forçado vermelho mais vivo */
+            --danger: #ff1a1a !important; /* Forçando o vermelho master */
             --madeira: #8d6e63; 
             --plata-prata: #bdc3c7;
             --madeira-bronze: #cd7f32;
@@ -74,16 +74,15 @@
             color: #000;
         }
         .btn-admin.btn-reset {
-            border-color: var(--danger);
-            color: var(--danger);
+            border-color: #ff1a1a;
+            color: #ff1a1a;
             background: rgba(255, 71, 87, 0.05);
         }
         .btn-admin.btn-reset:hover {
-            background: var(--danger);
+            background: #ff1a1a;
             color: #fff;
         }
 
-        /* Modificado o banner inteiro para acompanhar o vermelho caso ele apareça */
         .alerta-falta-banner {
             display: none;
             position: fixed;
@@ -96,12 +95,12 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 2px solid var(--danger);
+            border: 2px solid #ff1a1a;
             box-sizing: border-box;
             animation: pulseBorda 1.5s infinite alternate;
         }
         .alerta-falta-banner h2 {
-            color: var(--danger) !important;
+            color: #ff1a1a !important;
             font-size: 3rem;
         }
         .alerta-falta-banner h2 span {
@@ -146,13 +145,18 @@
         }
         .cronometro-digital {
             font-size: 3.3rem; 
-            font-family: 'Cinzel', 'Courier New', Courier, monospace; /* Permitindo Cinzel caso venha texto por extenso */
+            font-family: 'Cinzel', 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
             line-height: 1;
             letter-spacing: -1px;
             transition: color 0.2s ease;
             text-transform: uppercase;
+        }
+
+        /* Força qualquer elemento interno clonado/injetado no cronômetro a ser vermelho */
+        .cronometro-digital *, .cronometro-digital span {
+            color: #ff1a1a !important;
         }
 
         .painel-infos {
@@ -457,8 +461,8 @@
         .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
 
         @keyframes pulseBorda {
-            from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
-            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
+            from { border-color: #ff1a1a; box-shadow: inset 0 0 50px rgba(255, 10, 10, 0.4); }
+            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 10, 10, 0.2); }
         }
 
         @keyframes autoScrollRanking {
@@ -829,18 +833,23 @@
             const caixaCronoElement = document.getElementById('caixa-cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
-            // --- ATUALIZAÇÃO REFORÇADA COM PROP-STYLE DIRECT (IGNORA CACHE E CLASSES ANTERIORES) ---
+            // --- BLOCO DO CRONÔMETRO ANTIDOTO ANTI-SERVIDORES ---
             if (!cronoAtivo) {
                 cronoElement.innerText = tempoFormatado;
                 cronoElement.style.setProperty('color', '#555555', 'important');
                 caixaCronoElement.style.setProperty('border-color', '#444444', 'important');
                 alertaElement.style.display = 'none';
             } else {
-                // Checagem se o texto contém "FALTA", "00:00" ou "ESGOTADO" para garantir a captura
                 if (tempoFormatado.includes("FALTA") || tempoFormatado === "00:00" || tempoFormatado.includes("ESGOTADO")) {
-                    cronoElement.innerText = tempoFormatado;
                     
-                    // Força via JavaScript o Vermelho vivo diretamente na árvore do DOM
+                    // PASSO CRÍTICO: Primeiro inserimos o dado brutão no elemento
+                    cronoElement.innerHTML = tempoFormatado;
+                    
+                    // PASSO SEGUNDO: Forçamos a limpeza de tags injetadas ocultas (anulando o backend)
+                    const textoLimpo = cronoElement.innerText || cronoElement.textContent;
+                    cronoElement.textContent = textoLimpo; 
+                    
+                    // PASSO TERCEIRO: Aplicamos as cores soberanas
                     cronoElement.style.setProperty('color', '#ff1a1a', 'important'); 
                     caixaCronoElement.style.setProperty('border-color', '#ff1a1a', 'important'); 
                     
@@ -953,7 +962,7 @@
                 }
             }
 
-            // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
+            // --- RENDERIZAÇÃO SEGUNDA COLUNA ---
             if (!ehMataMataAtivo) {
                 const rankingCompletoData = data.ranking ? data.ranking : [];
                 const signatureAtualRanking = JSON.stringify(rankingCompletoData);
