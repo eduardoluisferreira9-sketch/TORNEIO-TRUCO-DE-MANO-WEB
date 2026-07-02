@@ -817,23 +817,27 @@
             const cronoElement = document.getElementById('cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
-            // --- BLOCO ATUALIZADO DO CRONÔMETRO (CORREÇÃO DE CORES) ---
+            // --- BLOCO ATUALIZADO DO CRONÔMETRO (BORDA E TEXTO) ---
             if (!cronoAtivo) {
-                cronoElement.parentElement.style.borderColor = '#444444';
-                alertaElement.style.display = 'none';
-
-                if (tempoFormatado.includes('<span')) {
-                    cronoElement.innerHTML = tempoFormatado;
-                    cronoElement.style.color = ''; 
-                } else if (tempoFormatado === "AGORA TUDO É FALTA!") {
+                if (tempoFormatado === "AGORA TUDO É FALTA!") {
+                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; // Borda dourada mesmo pausado
                     cronoElement.innerText = tempoFormatado;
                     cronoElement.style.color = 'var(--danger)'; // Vermelho vivo
+                    alertaElement.style.display = 'none'; // Esconde o modal gigante do meio se estiver pausado
                 } else {
-                    cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = '#e0e0e0'; // Branco fosco/cinza bem claro legível
+                    cronoElement.parentElement.style.borderColor = '#444444'; // Borda escura normal
+                    alertaElement.style.display = 'none';
+
+                    if (tempoFormatado.includes('<span')) {
+                        cronoElement.innerHTML = tempoFormatado;
+                        cronoElement.style.color = ''; 
+                    } else {
+                        cronoElement.innerText = tempoFormatado;
+                        cronoElement.style.color = '#e0e0e0'; // Branco fosco legível
+                    }
                 }
             } else {
-                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
+                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; // Borda dourada com ele ativo
                 
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
                     cronoElement.innerText = tempoFormatado;
