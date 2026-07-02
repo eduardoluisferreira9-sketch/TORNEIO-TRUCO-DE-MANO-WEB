@@ -83,24 +83,54 @@
             color: #fff;
         }
 
+        /* CORREÇÃO DA FIGURA 1 -> FIGURA 2: Visual Premium de Alerta Neon */
         .alerta-falta-banner {
-            display: none;
+            display: none; /* Controlado dinamicamente via JS */
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 15, 8, 0.96);
+            background: #000000 !important; /* Fundo preto absoluto igual à Fig 2 */
             z-index: 9999;
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 1px solid var(--danger);
+            border: 3px solid var(--borda-ouro) !important; /* Borda dourada do telão */
             box-sizing: border-box;
             animation: pulseBordaNeon 1.5s infinite alternate;
         }
 
-        /* --- Header Otimizado para Título e Cronômetro Gigantes --- */
+        .alerta-falta-conteudo {
+            padding: 40px;
+        }
+
+        .alerta-falta-conteudo h2 {
+            color: #ff2222 !important; /* Vermelho vivo da Fig 2 */
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            font-size: 3.8rem; /* Tamanho grande de impacto */
+            margin: 10px 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            /* Efeito luminoso neon nas letras */
+            text-shadow: 0 0 15px rgba(255, 34, 34, 0.7), 0 0 30px rgba(255, 34, 34, 0.4);
+            filter: drop-shadow(0 0 10px rgba(255, 235, 59, 0.6)); /* Faz o triângulo brilhar em amarelo */
+        }
+
+        .alerta-falta-conteudo h2 span {
+            color: #ff2222 !important;
+            text-shadow: 0 0 15px rgba(255, 34, 34, 0.8);
+        }
+
+        .alerta-falta-conteudo p {
+            color: #aaaaaa !important; /* Cinza claro elegante */
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* --- Header Otimizado para Título e Cronômetro Ajustado --- */
         .header-telao {
             display: flex;
             justify-content: space-between;
@@ -113,7 +143,7 @@
         }
         .header-telao h1 {
             margin: 0;
-            font-size: 2.8rem; /* DESTAQUE MÁXIMO DO TORNEIO */
+            font-size: 2.8rem;
             font-weight: 900;
             color: var(--dourado-brilhante);
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(243, 207, 93, 0.2); 
@@ -125,9 +155,10 @@
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
         }
         
+        /* CORREÇÃO DO TAMANHO DO CRONÔMETRO */
         .cronometro-container {
             border: 2px solid var(--borda-ouro);
-            padding: 6px 30px;
+            padding: 6px 20px; /* Reduzido levemente para harmonizar */
             border-radius: 6px;
             background: rgba(0, 0, 0, 0.8);
             display: flex;
@@ -136,7 +167,7 @@
             flex-shrink: 0;
         }
         .cronometro-digital {
-            font-size: 3.3rem; /* CRONÔMETRO MAXIMIZADO */
+            font-size: 3.3rem; /* Tamanho reduzido para não estourar o container */
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
@@ -199,7 +230,6 @@
             background: var(--borda-ouro);
         }
 
-        /* --- Container Principal Adaptável --- */
         .container-telao {
             display: grid;
             grid-template-columns: 2.5fr 1fr; 
@@ -229,7 +259,6 @@
             overflow: hidden; 
         }
 
-        /* --- Mudança Dinâmica para o Combate Final --- */
         .grid-jogos.layout-super-finais {
             grid-template-columns: repeat(2, 1fr) !important; 
             gap: 20px !important;
@@ -353,7 +382,6 @@
             opacity: 0.5;
         }
 
-        /* --- Painel Lateral do Ranking --- */
         .ranking-container {
             border: 1px solid var(--borda-ouro);
             background: rgba(4, 15, 7, 0.4);
@@ -425,7 +453,6 @@
         .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
         .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
 
-        /* --- Pódio Premium --- */
         .podio-wrapper {
             background: linear-gradient(180deg, rgba(7, 26, 12, 0.95) 0%, #030a04 100%);
             padding: 25px;
@@ -445,9 +472,14 @@
         .podio-rotulo-lugar { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--texto-mutado); }
         .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
 
-        @keyframes pulseBorda {
-            from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
-            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
+        /* Animação pulsante da borda da tela com aura vermelha sutil */
+        @keyframes pulseBordaNeon {
+            from {
+                box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.25), 0 0 20px rgba(255, 0, 0, 0.15);
+            }
+            to {
+                box-shadow: inset 0 0 60px rgba(255, 0, 0, 0.5), 0 0 35px rgba(255, 0, 0, 0.3);
+            }
         }
 
         @keyframes autoScrollRanking {
@@ -563,6 +595,21 @@
             tagsMesa.forEach(tag => tag.style.fontSize = "1.4rem");
             return; 
         }
+    }
+
+    /* Lembrete para o seu script de requisição (fetch) dentro de atualizarTelao():
+       Garanta que a validação do tempo chame o banner usando 'flex', assim:
+       
+       if (cronoAtivo && (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00")) {
+           document.getElementById('alerta-falta').style.display = 'flex';
+           document.getElementById('cronometro').innerText = "00:00";
+       } else {
+           document.getElementById('alerta-falta').style.display = 'none';
+       }
+    */
+</script>
+</body>
+</html>
 
         grid.classList.remove('layout-super-finais');
         grid.style.gap = "10px";
