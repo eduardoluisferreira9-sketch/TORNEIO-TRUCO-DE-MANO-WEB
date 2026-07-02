@@ -113,7 +113,7 @@
         }
         .header-telao h1 {
             margin: 0;
-            font-size: 2.8rem; /* DESTAQUE MÁXIMO DO TORNEIO */
+            font-size: 2.8rem; 
             font-weight: 900;
             color: var(--dourado-brilhante);
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(243, 207, 93, 0.2); 
@@ -136,7 +136,7 @@
             flex-shrink: 0;
         }
         .cronometro-digital {
-            font-size: 3.3rem; /* CRONÔMETRO MAXIMIZADO */
+            font-size: 3.3rem; 
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
@@ -229,7 +229,6 @@
             overflow: hidden; 
         }
 
-        /* --- Mudança Dinâmica para o Combate Final --- */
         .grid-jogos.layout-super-finais {
             grid-template-columns: repeat(2, 1fr) !important; 
             gap: 20px !important;
@@ -818,20 +817,22 @@
             const cronoElement = document.getElementById('cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
+            // --- BLOCO DO CRONÔMETRO ATUALIZADO ---
             if (!cronoAtivo) {
                 cronoElement.innerText = tempoFormatado;
                 cronoElement.style.color = '#555555';
                 cronoElement.parentElement.style.borderColor = '#444444';
                 alertaElement.style.display = 'none';
             } else {
-                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
-                    cronoElement.innerText = "00:00";
-                    cronoElement.style.color = 'var(--danger)';
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = 'var(--danger)'; // Texto em vermelho vivo
+                    cronoElement.parentElement.style.borderColor = 'var(--danger)'; // Caixa em vermelho vivo
                     alertaElement.style.display = 'flex';
                 } else {
                     cronoElement.innerText = tempoFormatado;
                     cronoElement.style.color = 'var(--dourado-brilhante)';
+                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
                     alertaElement.style.display = 'none';
                 }
             }
