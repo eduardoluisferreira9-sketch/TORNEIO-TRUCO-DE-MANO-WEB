@@ -528,7 +528,7 @@
         </div>
     </div>
 
-    <script>
+  <script>
     let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
     let ultimoEstadoJogosStr = "";
     let ultimoEstadoRankingStr = "";
@@ -817,32 +817,35 @@
             const cronoElement = document.getElementById('cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
-            // --- BLOCO CORRIGIDO DO CRONÔMETRO ---
+            // --- BLOCO ATUALIZADO DO CRONÔMETRO (CORREÇÃO DE CORES) ---
             if (!cronoAtivo) {
-                // Se contiver tags HTML enviadas pelo Python, injeta corretamente
-                if (tempoFormatado.includes('<span')) {
-                    cronoElement.innerHTML = tempoFormatado;
-                    cronoElement.style.color = ''; // Deixa o span interno mandar na cor
-                } else {
-                    cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = '#a8c3af'; // Mudado para o verde-mutado elegante em vez daquele cinza apagado
-                }
                 cronoElement.parentElement.style.borderColor = '#444444';
                 alertaElement.style.display = 'none';
+
+                if (tempoFormatado.includes('<span')) {
+                    cronoElement.innerHTML = tempoFormatado;
+                    cronoElement.style.color = ''; 
+                } else if (tempoFormatado === "AGORA TUDO É FALTA!") {
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = 'var(--danger)'; // Vermelho vivo
+                } else {
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = '#e0e0e0'; // Branco fosco/cinza bem claro legível
+                }
             } else {
                 cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
+                
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
-                    cronoElement.innerText = "00:00";
-                    cronoElement.style.color = 'var(--danger)';
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = 'var(--danger)'; // Vermelho de atenção total
                     alertaElement.style.display = 'flex';
                 } else {
-                    // Se o Python mandar HTML com o cronômetro ativo, respeita as tags
                     if (tempoFormatado.includes('<span')) {
                         cronoElement.innerHTML = tempoFormatado;
                         cronoElement.style.color = '';
                     } else {
                         cronoElement.innerText = tempoFormatado;
-                        cronoElement.style.color = 'var(--dourado-brilhante)';
+                        cronoElement.style.color = 'var(--dourado-brilhante)'; // Dourado padrão
                     }
                     alertaElement.style.display = 'none';
                 }
