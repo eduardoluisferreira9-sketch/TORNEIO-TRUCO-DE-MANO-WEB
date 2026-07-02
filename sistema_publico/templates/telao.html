@@ -18,7 +18,7 @@
             --texto-claro: #ffffff;
             --texto-mutado: #a8c3af; 
             --sucesso: #2ecc71;
-            --danger: #ff1a1a !important; /* Forçando o vermelho master */
+            --danger: #ff4757;
             --madeira: #8d6e63; 
             --plata-prata: #bdc3c7;
             --madeira-bronze: #cd7f32;
@@ -74,12 +74,12 @@
             color: #000;
         }
         .btn-admin.btn-reset {
-            border-color: #ff1a1a;
-            color: #ff1a1a;
+            border-color: var(--danger);
+            color: var(--danger);
             background: rgba(255, 71, 87, 0.05);
         }
         .btn-admin.btn-reset:hover {
-            background: #ff1a1a;
+            background: var(--danger);
             color: #fff;
         }
 
@@ -95,16 +95,9 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 2px solid #ff1a1a;
+            border: 1px solid var(--danger);
             box-sizing: border-box;
             animation: pulseBorda 1.5s infinite alternate;
-        }
-        .alerta-falta-banner h2 {
-            color: #ff1a1a !important;
-            font-size: 3rem;
-        }
-        .alerta-falta-banner h2 span {
-            color: #fff !important;
         }
 
         /* --- Header Otimizado para Título e Cronômetro Gigantes --- */
@@ -120,7 +113,7 @@
         }
         .header-telao h1 {
             margin: 0;
-            font-size: 2.8rem; 
+            font-size: 2.8rem; /* DESTAQUE MÁXIMO DO TORNEIO */
             font-weight: 900;
             color: var(--dourado-brilhante);
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(243, 207, 93, 0.2); 
@@ -141,22 +134,14 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: border-color 0.2s ease;
         }
         .cronometro-digital {
-            font-size: 3.3rem; 
-            font-family: 'Cinzel', 'Courier New', Courier, monospace;
+            font-size: 3.3rem; /* CRONÔMETRO MAXIMIZADO */
+            font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             color: var(--dourado-brilhante);
             line-height: 1;
             letter-spacing: -1px;
-            transition: color 0.2s ease;
-            text-transform: uppercase;
-        }
-
-        /* Força qualquer elemento interno clonado/injetado no cronômetro a ser vermelho */
-        .cronometro-digital *, .cronometro-digital span {
-            color: #ff1a1a !important;
         }
 
         .painel-infos {
@@ -244,6 +229,7 @@
             overflow: hidden; 
         }
 
+        /* --- Mudança Dinâmica para o Combate Final --- */
         .grid-jogos.layout-super-finais {
             grid-template-columns: repeat(2, 1fr) !important; 
             gap: 20px !important;
@@ -408,7 +394,6 @@
             display: table-row-group;
             position: relative;
             top: 0;
-            will-change: transform;
         }
 
         .tabela-ranking td {
@@ -461,8 +446,8 @@
         .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
 
         @keyframes pulseBorda {
-            from { border-color: #ff1a1a; box-shadow: inset 0 0 50px rgba(255, 10, 10, 0.4); }
-            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 10, 10, 0.2); }
+            from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
+            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
         }
 
         @keyframes autoScrollRanking {
@@ -479,9 +464,17 @@
         <button class="btn-admin btn-reset" onclick="liberarTelaoManual()">🔄 Voltar para Mesas</button>
     </div>
 
+    <div id="alerta-falta" class="alerta-falta-banner">
+        <div class="alerta-falta-conteudo">
+            <h2>⚠️ TEMPO ESGOTADO!</h2>
+            <h2>AGORA TUDO É <span>FAIXA / FALTA!</span></h2>
+            <p style="font-size: 1.5rem;">Fechem as vazas e concluam a jogada imediatamente.</p>
+        </div>
+    </div>
+
     <div class="header-telao">
         <h1 id="nome-torneio">TORNEIO DE TRUCO <span>CEGO</span></h1>
-        <div class="cronometro-container" id="caixa-cronometro">
+        <div class="cronometro-container">
             <div id="cronometro" class="cronometro-digital">00:00</div>
         </div>
     </div>
@@ -661,7 +654,7 @@
                         const idA1 = jogoFinal.atleta1_id || jogoFinal.athlete1_id;
 
                         if (vId || t1 > 0 || t2 > 0) {
-                            if (vId === idA1 || t1 > t2) {
+                            if (vId == idA1 || t1 > t2) {
                                 p1 = jogoFinal.atleta1_nome || "---";
                                 p2 = jogoFinal.atleta2_nome || "---";
                             } else {
@@ -682,7 +675,7 @@
                         const idA1 = jogoBronze.atleta1_id || jogoBronze.athlete1_id;
 
                         if (vId || t1 > 0 || t2 > 0) {
-                            if (vId === idA1 || t1 > t2) {
+                            if (vId == idA1 || t1 > t2) {
                                 p3 = jogoBronze.atleta1_nome || "---";
                                 p4 = jogoBronze.atleta2_nome || "---";
                             } else {
@@ -819,47 +812,28 @@
                 elAtletas.innerText = `${qtdAtletas} Atletas`;
             }
             
-            const tempoFormatado = data.tempo ? data.tempo.trim() : "00:00";
+            const tempoFormatado = data.tempo || "00:00";
             const cronoAtivo = data.crono_ativo === 1;
             const cronoElement = document.getElementById('cronometro');
-            const caixaCronoElement = document.getElementById('caixa-cronometro');
             const alertaElement = document.getElementById('alerta-falta');
             
-        // --- NOVO BLOCO DO CRONÔMETRO (SEM BANNER E COM FORÇA NO VERMELHO) ---
-        const tempoFormatado = data.tempo ? data.tempo.trim() : "00:00";
-        const cronoAtivo = data.crono_ativo === 1;
-        const cronoElement = document.getElementById('cronometro');
-        const caixaCronoElement = document.getElementById('caixa-cronometro');
-
-        // REGRA 1: Se o tempo esgotou (Texto contém FALTA, ESGOTADO ou é 00:00)
-        if (tempoFormatado.includes("FALTA") || tempoFormatado === "00:00" || tempoFormatado.includes("ESGOTADO")) {
-    
-            cronoElement.textContent = tempoFormatado; // Injeta o texto puro ("AGORA TUDO É FALTA!")
-    
-            // Força o Vermelho Vivo diretamente no elemento e na borda da caixa, ignorando qualquer outra regra
-            cronoElement.style.setProperty('color', '#ff1a1a', 'important'); 
-            if (caixaCronoElement) {
-                caixaCronoElement.style.setProperty('border-color', '#ff1a1a', 'important');
+            if (!cronoAtivo) {
+                cronoElement.innerText = tempoFormatado;
+                cronoElement.style.color = '#555555';
+                cronoElement.parentElement.style.borderColor = '#444444';
+                alertaElement.style.display = 'none';
+            } else {
+                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)';
+                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
+                    cronoElement.innerText = "00:00";
+                    cronoElement.style.color = 'var(--danger)';
+                    alertaElement.style.display = 'flex';
+                } else {
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = 'var(--dourado-brilhante)';
+                    alertaElement.style.display = 'none';
+                }
             }
-
-        // REGRA 2: Se o cronômetro foi pausado/desativado pelo Admin (Jogo normal parado)
-        } else if (!cronoAtivo) {
-    
-            cronoElement.textContent = tempoFormatado;
-            cronoElement.style.setProperty('color', '#555555', 'important'); // Cinza padrão de pausa
-            if (caixaCronoElement) {
-                caixaCronoElement.style.setProperty('border-color', '#444444', 'important');
-            }
-
-        // REGRA 3: Jogo rolando normal (Contagem regressiva em minutos)
-        } else {
-    
-            cronoElement.textContent = tempoFormatado;
-            cronoElement.style.setProperty('color', 'var(--dourado-brilhante)', 'important'); // Dourado padrão do torneio
-            if (caixaCronoElement) {
-                caixaCronoElement.style.setProperty('border-color', 'var(--borda-ouro)', 'important');
-            }
-        }
 
             // --- RENDERIZAÇÃO DOS CONFRONTOS ---
             const containerJogos = document.getElementById('container-jogos');
@@ -903,8 +877,8 @@
                                 let j1Ganhou = false; let j2Ganhou = false;
 
                                 if (idVencedor !== null && idVencedor !== undefined) {
-                                    j1Ganhou = (Number(idVencedor) === Number(idAtleta1));
-                                    j2Ganhou = (Number(idVencedor) === Number(idAtleta2));
+                                    j1Ganhou = (idVencedor == idAtleta1);
+                                    j2Ganhou = (idVencedor == idAtleta2);
                                 } else {
                                     j1Ganhou = (f1 > f2) || (f1 === f2 && t1 > t2);
                                     j2Ganhou = (f2 > f1) || (f1 === f2 && t2 > t1);
@@ -961,7 +935,7 @@
                 }
             }
 
-            // --- RENDERIZAÇÃO SEGUNDA COLUNA ---
+            // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
             if (!ehMataMataAtivo) {
                 const rankingCompletoData = data.ranking ? data.ranking : [];
                 const signatureAtualRanking = JSON.stringify(rankingCompletoData);
@@ -977,8 +951,8 @@
                                 if (index < 4) row.className = 'top-atleta';
                                 row.innerHTML = `
                                     <td class="posicao-num">${index + 1}º</td>
-                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome || '---'}</td>
-                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias || 0} V</span></td>
+                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
+                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
                                 `;
                                 tableBody.appendChild(row);
                             });
