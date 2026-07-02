@@ -184,19 +184,27 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
             )
             db.commit()
             
+    fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA").upper()
     tempo_rodada_atual = cfg.get("tempo_rodada") or cfg.get("duracao_rodada") or 0
-    if cfg["crono_tempo_restante_seg"] <= 0 and cfg["crono_ativo"] == 1:
-        tempo_formatado = "AGORA TUDO É FALTA!"
-    elif tempo_rodada_atual == 0:
+    forcar_crono_ativo = cfg["crono_ativo"]
+
+    # Cálculo padrão do formato MM:SS
+    if tempo_rodada_atual == 0:
         tempo_formatado = "Sem Tempo"
     else:
         mins = cfg["crono_tempo_restante_seg"] // 60
         segs = cfg["crono_tempo_restante_seg"] % 60
         tempo_formatado = f"{mins:02d}:{segs:02d}"
 
+    # --- ADAPTAÇÃO IDÊNTICA AO MAIN.PY COM INTEGRALIZAÇÃO ANTI-CINZA ---
+    if cfg["crono_ativo"] == 0 and cfg["crono_tempo_restante_seg"] == 0 and fase_status != "INSCRICAO":
+        tempo_formatado = "AGORA TUDO É FALTA!"
+        forcar_crono_ativo = 1  # Força o HTML a entrar na regra de execução (Evitando o estilo #555555)
+    elif cfg["crono_tempo_restante_seg"] <= 0 and cfg["crono_ativo"] == 1:
+        tempo_formatado = "AGORA TUDO É FALTA!"
+        forcar_crono_ativo = 1
+
     # 2. Tratamento Cirúrgico de Fase (Macro) e Andamento (Micro)
-    fase_status = cfg.get("fase_torneio", "CLASSIFICATORIA").upper()
-    
     mapeamento_rodadas = {
         "16AVOS": -16,
         "OITAVAS": -1, # Conforme mapeamento original do banco do usuário
@@ -275,7 +283,7 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         "nome_fase": nome_fase, 
         "detalhe_fase": detalhe_fase,
         "tempo": tempo_formatado,
-        "crono_ativo": cfg["crono_ativo"], 
+        "crono_ativo": forcar_crono_ativo,  # Retorna a variável modificada para forçar o destaque visual
         "confrontos": confrontos, 
         "ranking": ranking,
         "total_atletas": total_atletas,
