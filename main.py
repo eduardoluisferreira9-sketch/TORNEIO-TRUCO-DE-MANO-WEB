@@ -346,12 +346,14 @@ async def processar_inscricao_atleta(
     if not comprovante.filename:
         raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
     
-    # 🌟 LER O ARQUIVO E CONVERTER DIRETAMENTE PARA BASE64 (STRING DE TEXTO)
+    # 🌟 LER O ARQUIVO ASSINCRONAMENTE
     conteudo_arquivo = await comprovante.read()
     tipo_conteudo = comprovante.content_type  # Ex: image/png ou image/jpeg
+    
+    # Converte os bytes da imagem para uma string Base64 limpa
     base64_encoded = base64.b64encode(conteudo_arquivo).decode("utf-8")
     
-    # Criamos o formato exato que o navegador web entende nativamente na tag <a> ou <img>
+    # Monta a URL no formato "data URI" que o navegador web lê nativamente
     url_comprovante = f"data:{tipo_conteudo};base64,{base64_encoded}"
     
     cursor = db.cursor()
@@ -359,14 +361,14 @@ async def processar_inscricao_atleta(
     entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
-    # 🌟 SALVA A STRING BASE64 DIRETO NA COLUNA 'comprovante_url'
+    # 🌟 SALVA DIRETO NA COLUNA DO BANCO DE DADOS
     cursor.execute(f'''
         INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, comprovante_url, status) 
         VALUES ({p}, {p}, {p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip(), url_comprovante))
     db.commit()
     
-    return RedirectResponse(url="/admin-painel/inscrever?sucesso=true", status_code=303)
+    return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
 
 @app.get("/login", response_class=HTMLResponse)
 @app.get("/admin-painel/login", response_class=HTMLResponse)
