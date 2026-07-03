@@ -122,11 +122,11 @@
 
         /* TABELAS */
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 15px; }
-        th, td { padding: 16px; text-align: left; }
+        th, td { padding: 16px; text-align: left; vertical-align: middle; }
         th { background: #050d08; color: var(--ouro); font-family: 'Cinzel', serif; font-size: 0.9rem; border-bottom: 2px solid var(--ouro); text-transform: uppercase; letter-spacing: 1px; }
         td { background: rgba(0,0,0,0.25); border-top: 1px solid rgba(212,175,55,0.05); border-bottom: 1px solid rgba(212,175,55,0.05); color: var(--texto-claro); font-weight: 600; }
         tr td:first-child { border-left: 1px solid rgba(212,175,55,0.05); border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-        tr td:last-child { border-right: 1px solid rgba(212,175,55,0.05); border-top-right-radius: 8px; border-bottom-right-radius: 8px; text-align: right;}
+        tr td:last-child { border-right: 1px solid rgba(212,175,55,0.05); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
         /* MENU LATERAL - ABAS PURIFICADAS */
         .nav-links { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
@@ -265,9 +265,9 @@
                         <tbody>
                             {% for p in pendentes %}
                             <tr>
-                                <td class="align-middle">{{ p.nome }}</td>
-                                <td class="align-middle">{{ p.entidade }}</td>
-                                <td style="text-align: center;" class="align-middle">
+                                <td>{{ p.nome }}</td>
+                                <td>{{ p.entidade }}</td>
+                                <td style="text-align: center;">
                                     {% if p.comprovante_url %}
                                         <a href="{{ p.comprovante_url }}" target="_blank" class="btn btn-info" style="font-size: 0.75rem; padding: 6px 12px; width: auto; font-family: 'Montserrat', sans-serif;">
                                             <i class="fas fa-receipt"></i> Ver Pix
@@ -276,11 +276,11 @@
                                         <span style="color: var(--texto-subtil); font-style: italic; font-size: 0.8rem;">Sem foto</span>
                                     {% endif %}
                                 </td>
-                                <td style="text-align: right;" class="align-middle">
+                                <td style="text-align: right;">
                                     <form action="/admin-painel/admin/acao-atleta" method="POST" style="display:inline-block; margin:0;">
                                         <input type="hidden" name="id_atleta" value="{{ p.id }}">
                                         <button type="submit" name="acao" value="aprovar" style="background:var(--verde-sucesso); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem;"><i class="fas fa-check"></i> Aceitar</button>
-                                        <button type="submit" name="acao" value="recusar" style="background:var(--vermelho-pampa); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem; margin-left:5px;"><i class="fas fa-xmark"></i> Golar</button>
+                                        <button type="submit" name="acao" value="recusar" style="background:var(--vermelho-pampa); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem; margin-left:5px;"><i class="fas fa-xmark"></i> Rejeitar</button>
                                     </form>
                                 </td>
                             </tr>
