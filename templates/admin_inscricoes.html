@@ -14,6 +14,7 @@
             --ouro-brilhante: #f3e5ab;
             --vermelho-pampa: #922b21; 
             --verde-sucesso: #1e8449; 
+            --azul-info: #17a2b8; /* Cor para o botão de ver pix */
             --texto-claro: #ffffff; 
             --texto-subtil: #bdc3c7; 
             --texto-escuro: #111;
@@ -115,6 +116,9 @@
 
         .btn-success { background: linear-gradient(135deg, var(--verde-sucesso) 0%, #0e4827 100%); color: white; }
         .btn-success:hover { background: linear-gradient(135deg, #27ae60 0%, var(--verde-sucesso) 100%); box-shadow: 0 10px 20px rgba(30,132,73,0.4); }
+
+        .btn-info { background: linear-gradient(135deg, var(--azul-info) 0%, #117a8b 100%); color: white; }
+        .btn-info:hover { background: linear-gradient(135deg, #138496 0%, var(--azul-info) 100%); box-shadow: 0 6px 12px rgba(23,162,184,0.4); }
 
         /* TABELAS */
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 15px; }
@@ -251,14 +255,28 @@
                     <h3 style="color:#e67e22; margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"><i class="fas fa-hourglass-half"></i> Pedindo Entrada (Web)</h3>
                     <table>
                         <thead>
-                            <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Ação</th></tr>
+                            <tr>
+                                <th>Atleta</th>
+                                <th>Entidade</th>
+                                <th style="text-align: center;">Comprovante</th>
+                                <th style="text-align: right;">Ação</th>
+                            </tr>
                         </thead>
                         <tbody>
                             {% for p in pendentes %}
                             <tr>
-                                <td>{{ p.nome }}</td>
-                                <td>{{ p.entidade }}</td>
-                                <td style="text-align: right;">
+                                <td class="align-middle">{{ p.nome }}</td>
+                                <td class="align-middle">{{ p.entidade }}</td>
+                                <td style="text-align: center;" class="align-middle">
+                                    {% if p.comprovante_url %}
+                                        <a href="{{ p.comprovante_url }}" target="_blank" class="btn btn-info" style="font-size: 0.75rem; padding: 6px 12px; width: auto; font-family: 'Montserrat', sans-serif;">
+                                            <i class="fas fa-receipt"></i> Ver Pix
+                                        </a>
+                                    {% else %}
+                                        <span style="color: var(--texto-subtil); font-style: italic; font-size: 0.8rem;">Sem foto</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;" class="align-middle">
                                     <form action="/admin-painel/admin/acao-atleta" method="POST" style="display:inline-block; margin:0;">
                                         <input type="hidden" name="id_atleta" value="{{ p.id }}">
                                         <button type="submit" name="acao" value="aprovar" style="background:var(--verde-sucesso); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem;"><i class="fas fa-check"></i> Aceitar</button>
@@ -267,7 +285,7 @@
                                 </td>
                             </tr>
                             {% else %}
-                            <tr><td colspan="3" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhuma cancela aberta no momento.</td></tr>
+                            <tr><td colspan="4" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhuma cancela aberta no momento.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
