@@ -80,7 +80,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS torneios (
                 id SERIAL PRIMARY KEY,
                 nome_torneio VARCHAR(255) DEFAULT 'Torneio de Truco Cego',
-                taxa_inscricao REAL DEFAULT 0.0,
+                taxa_inscricao REAL DEFAULT 45.0,
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
                 crono_tempo_restante_seg INTEGER DEFAULT 3000,
                 crono_ativo INTEGER DEFAULT 0,
@@ -97,7 +97,7 @@ def init_db():
         if cursor.fetchone()[0] == 0:
             cursor.execute('''
                 INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-                VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0);
+                VALUES ('Torneio de Truco Cego', 45.00, 5, 3000, 'INSCRICAO', 0);
             ''')
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS atletas (
@@ -158,7 +158,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS torneios (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
-                taxa_inscricao REAL DEFAULT 0.0,
+                taxa_inscricao REAL DEFAULT 45.0,
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
                 crono_tempo_restante_seg INTEGER DEFAULT 3000,
                 crono_ativo INTEGER DEFAULT 0,
@@ -170,7 +170,7 @@ def init_db():
         if cursor.fetchone()[0] == 0:
             cursor.execute('''
                 INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-                VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0)
+                VALUES ('Torneio de Truco Cego', 45.00, 5, 3000, 'INSCRICAO', 0)
             ''')
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS atletas (
@@ -488,7 +488,8 @@ def salvar_configuracoes(nome_torneio: str = Form(...), max_rodadas: int = Form(
          return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_ja_iniciado", status_code=303)
     total_seg = tempo_minutos * 60
     
-    cursor.execute(f"UPDATE torneios SET nome_torneio = {p}, max_rodadas_classificatoria = {p}, crono_tempo_restante_seg = {p}, crono_fim_ms = 0, crono_ativo = 0 WHERE id = {p}", 
+    # ⚙️ CORREÇÃO DEFINITIVA: Inserida a coluna taxa_inscricao recebendo o seu novo valor padrão
+    cursor.execute(f"UPDATE torneios SET nome_torneio = {p}, max_rodadas_classificatoria = {p}, crono_tempo_restante_seg = {p}, crono_fim_ms = 0, crono_ativo = 0, taxa_inscricao = 45.00 WHERE id = {p}", 
                    (nome_torneio.strip(), max_rodadas, total_seg, cfg["id"]))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
@@ -921,8 +922,8 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     
     cursor.execute(f'''
         INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-        VALUES ({p}, {p}, {p}, {p}, 'INSCRICAO', 0)
-    ''', (novo_nome_sugerido, cfg["taxa_inscricao"], cfg["max_rodadas_classificatoria"], cfg["crono_tempo_restante_seg"]))
+        VALUES ({p}, 45.00, {p}, {p}, 'INSCRICAO', 0)
+        ''', (novo_nome_sugerido, cfg["max_rodadas_classificatoria"], ...))
     
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/historico?sucesso=torneio_imortalizado", status_code=303)
@@ -953,7 +954,7 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 nome_torneio VARCHAR(255) DEFAULT 'Torneio de Truco Cego',
                 fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO',
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
-                taxa_inscricao REAL DEFAULT 5.00,
+                taxa_inscricao REAL DEFAULT 45.00,
                 crono_tempo_restante_seg INTEGER DEFAULT 3000,
                 crono_ativo INTEGER DEFAULT 0,
                 crono_fim_ms BIGINT DEFAULT 0
@@ -961,7 +962,7 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
         ''')
         cursor.execute('''
             INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0);
+            VALUES ('Torneio de Truco Cego', 45.00, 5, 3000, 'INSCRICAO', 0);
         ''')
         cursor.execute('''
             CREATE TABLE atletas (
@@ -1013,7 +1014,7 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
                 fase_torneio TEXT DEFAULT 'INSCRICAO',
                 max_rodadas_classificatoria INTEGER DEFAULT 5,
-                taxa_inscricao REAL DEFAULT 5.00,
+                taxa_inscricao REAL DEFAULT 45.00,
                 crono_tempo_restante_seg INTEGER DEFAULT 3000,
                 crono_ativo INTEGER DEFAULT 0,
                 crono_fim_ms INTEGER DEFAULT 0
@@ -1021,7 +1022,7 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
         ''')
         cursor.execute('''
             INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-            VALUES ('Torneio de Truco Cego', 5.00, 5, 3000, 'INSCRICAO', 0)
+            VALUES ('Torneio de Truco Cego', 45.00, 5, 3000, 'INSCRICAO', 0)
         ''')
         cursor.execute('''
             CREATE TABLE atletas (
