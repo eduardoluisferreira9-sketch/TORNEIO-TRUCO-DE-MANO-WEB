@@ -15,7 +15,7 @@ DB_FILE = os.path.join(BASE_DIR, "torneio.db")
 TEMPLATES_DIR = os.path.join(CORRENTE_DIR, "templates")    # templates interna
 UPLOAD_DIR = os.path.join(BASE_DIR, "static", "comprovantes")
 
-app = FastAPI(title="App de Acompanhamento Público - Truco Cego")
+app = FastAPI(title="App de Acompanhamento Público - Truco Cego")@app.post("/inscrever")@app.post("/inscrever")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # Habilita CORS (Essencial para quando virar Aplicativo Mobile)
@@ -139,7 +139,7 @@ def processar_inscricao_atleta(
         raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
     
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    extensao = os.path.splitext(comprovante.filename)[1]
+    extensao = os.path.splitext(comprovante.filename)[1].lower() # .lower() evita problemas com .PNG/.JPG maiúsculos
     nome_seguro = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
     nome_arquivo = f"comprovante_{nome_seguro}_{int(time.time())}{extensao}"
     caminho_final = os.path.join(UPLOAD_DIR, nome_arquivo)
@@ -154,11 +154,14 @@ def processar_inscricao_atleta(
     
     entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
     
-    # Corrigido de entity para entidade para manter consistência total com o banco e o main.py
+    # URL relativa que aponta para a pasta static configurada no seu sistema
+    url_comprovante = f"/static/comprovantes/{nome_arquivo}"
+    
+    # 🌟 CORREÇÃO: Adicionada a coluna comprovante_url no INSERT para salvar o caminho no banco!
     cursor.execute('''
-        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) 
-        VALUES (?, ?, ?, ?, 'PENDENTE')
-    ''', (torneio_id, nome.strip().upper(), entidade_limpa, whatsapp.strip()))
+        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, comprovante_url, status) 
+        VALUES (?, ?, ?, ?, ?, 'PENDENTE')
+    ''', (torneio_id, nome.strip().upper(), entidade_limpa, whatsapp.strip(), url_comprovante))
     db.commit()
     
     return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
