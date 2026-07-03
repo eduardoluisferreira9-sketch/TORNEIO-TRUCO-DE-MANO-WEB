@@ -346,28 +346,40 @@ async def processar_inscricao_atleta(
     if not comprovante.filename:
         raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
     
-    # 🌟 LER O ARQUIVO ASSINCRONAMENTE
+    # 🌟 SEGURANÇA CONTRA LIMPEZA DO RENDER: Garante que a pasta existe
+    PASTA_SALVAR = "static/comprovantes"
+    if not os.path.exists(PASTA_SALVAR):
+        os.makedirs(PASTA_SALVAR, exist_ok=True)
+        
+    # Extrai a extensão da imagem enviada (.jpg, .png, etc)
+    extensao = os.path.splitext(comprovante.filename)[1]
+    
+    # Limpa o whatsapp para virar um nome de arquivo seguro (sem parênteses ou traços)
+    whats_limpo = "".join(c for c in whatsapp if c.isdigit())
+    nome_arquivo_salvo = f"pix_{whats_limpo}{extensao}"
+    caminho_completo = os.path.join(PASTA_SALVAR, nome_arquivo_salvo)
+    
+    # 🌟 SALVA O ARQUIVO FÍSICO NA PASTA DO SERVIDOR
     conteudo_arquivo = await comprovante.read()
-    tipo_conteudo = comprovante.content_type  # Ex: image/png ou image/jpeg
-    
-    # Converte os bytes da imagem para uma string Base64 limpa
-    base64_encoded = base64.b64encode(conteudo_arquivo).decode("utf-8")
-    
-    # Monta a URL no formato "data URI" que o navegador web lê nativamente
-    url_comprovante = f"data:{tipo_conteudo};base64,{base64_encoded}"
+    with open(caminho_completo, "wb") as f:
+        f.write(conteudo_arquivo)
+        
+    # Guarda no banco apenas o link relativo da foto
+    url_comprovante = f"/static/comprovantes/{nome_arquivo_salvo}"
     
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
-    # 🌟 SALVA DIRETO NA COLUNA DO BANCO DE DADOS
+    # Grava no Supabase
     cursor.execute(f'''
         INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, comprovante_url, status) 
         VALUES ({p}, {p}, {p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip(), url_comprovante))
     db.commit()
     
+    # Redireciona de volta para a inscrição mostrando a mensagem verde de sucesso
     return RedirectResponse(url="/inscrever?sucesso=true", status_code=303)
 
 @app.get("/login", response_class=HTMLResponse)
