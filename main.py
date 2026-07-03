@@ -4,6 +4,7 @@ import time
 import random
 import shutil
 import json
+import base64
 
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, UploadFile, File
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
@@ -345,28 +346,26 @@ async def processar_inscricao_atleta(
     if not comprovante.filename:
         raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
     
-    extensao = os.path.splitext(comprovante.filename)[1].lower() # .lower() garante estabilidade
-    nome_seguro = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
-    nome_arquivo = f"comprovante_{nome_seguro}_{int(time.time())}{extensao}"
-    caminho_final = os.path.join(UPLOAD_DIR, nome_arquivo)
+    # 🌟 LER O ARQUIVO E CONVERTER DIRETAMENTE PARA BASE64 (STRING DE TEXTO)
+    conteudo_arquivo = await comprovante.read()
+    tipo_conteudo = comprovante.content_type  # Ex: image/png ou image/jpeg
+    base64_encoded = base64.b64encode(conteudo_arquivo).decode("utf-8")
     
-    with open(caminho_final, "wb") as buffer:
-        shutil.copyfileobj(comprovante.file, buffer)
-        
+    # Criamos o formato exato que o navegador web entende nativamente na tag <a> ou <img>
+    url_comprovante = f"data:{tipo_conteudo};base64,{base64_encoded}"
+    
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
-    # URL estática para carregar o arquivo na tela
-    url_comprovante = f"/static/comprovantes/{nome_arquivo}"
-    
-    # 🌟 CORREÇÃO: Inserida a coluna comprovante_url no comando SQL
+    # 🌟 SALVA A STRING BASE64 DIRETO NA COLUNA 'comprovante_url'
     cursor.execute(f'''
         INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, comprovante_url, status) 
         VALUES ({p}, {p}, {p}, {p}, {p}, 'PENDENTE')
     ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip(), url_comprovante))
     db.commit()
+    
     return RedirectResponse(url="/admin-painel/inscrever?sucesso=true", status_code=303)
 
 @app.get("/login", response_class=HTMLResponse)
