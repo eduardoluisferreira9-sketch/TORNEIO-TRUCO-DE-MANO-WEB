@@ -971,7 +971,8 @@ def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)
                 nome VARCHAR(255) NOT NULL,
                 entidade VARCHAR(255) DEFAULT 'AVULSO',
                 whatsapp VARCHAR(50),
-                status VARCHAR(50) DEFAULT 'PENDENTE'
+                status VARCHAR(50) DEFAULT 'PENDENTE',
+                comprovante_url VARCHAR(500) DEFAULT NULL
             );
         ''')
         cursor.execute('''
@@ -1229,11 +1230,36 @@ async def salvar_inscricao_externa(
     
     ent_final = entidade if entidade else ctg
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
+    nome_atleta_limpo = nome.strip().upper()
     
+    # 📁 LÓGICA PARA SALVAR O COMPROVANTE
+    comprovante_url = None
+    if comprovante and comprovante.filename:
+        # Define a pasta onde os arquivos vão ficar guardados
+        pasta_destino = os.path.join("static", "comprovantes")
+        if not os.path.exists(pasta_destino):
+            os.makedirs(pasta_destino, exist_ok=True)
+            
+        # Pega a extensão do arquivo (.jpg, .png, etc)
+        _, extensao = os.path.splitext(comprovante.filename)
+        
+        # Gera um nome único: ANO_MES_DIA_HORA_NOME.extensao
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        nome_arquivo_seguro = f"{timestamp}_{nome_atleta_limpo.replace(' ', '_')}{extensao}"
+        caminho_completo = os.path.join(pasta_destino, nome_arquivo_seguro)
+        
+        # Salva o arquivo fisicamente no servidor web
+        with open(caminho_completo, "wb") as f:
+            f.write(await comprovante.read())
+            
+        # Guarda o caminho web que o navegador vai usar para exibir a foto
+        comprovante_url = f"/static/comprovantes/{nome_arquivo_seguro}"
+
+    # 💾 GRAVAÇÃO NO BANCO DE DADOS (Incluindo a coluna comprovante_url)
     cursor.execute(f'''
-        INSERT INTO atletas (torneio_id, nome, entidade, status, whatsapp) 
-        VALUES ({p}, {p}, {p}, 'PENDENTE', {p})
-    ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
+        INSERT INTO atletas (torneio_id, nome, entidade, status, whatsapp, comprovante_url) 
+        VALUES ({p}, {p}, {p}, 'PENDENTE', {p}, {p})
+    ''', (cfg["id"], nome_atleta_limpo, entidade_limpa, whatsapp.strip(), comprovante_url))
     db.commit()
     
     return RedirectResponse(url="/admin-painel/inscricao?sucesso=true", status_code=303)
