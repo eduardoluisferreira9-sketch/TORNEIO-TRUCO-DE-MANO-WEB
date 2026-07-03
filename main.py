@@ -345,7 +345,7 @@ async def processar_inscricao_atleta(
     if not comprovante.filename:
         raise HTTPException(status_code=400, detail="O envio do comprovante é obrigatório.")
     
-    extensao = os.path.splitext(comprovante.filename)[1]
+    extensao = os.path.splitext(comprovante.filename)[1].lower() # .lower() garante estabilidade
     nome_seguro = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
     nome_arquivo = f"comprovante_{nome_seguro}_{int(time.time())}{extensao}"
     caminho_final = os.path.join(UPLOAD_DIR, nome_arquivo)
@@ -358,9 +358,14 @@ async def processar_inscricao_atleta(
     entidade_limpa = entidade.strip().upper() if entidade.strip() else "AVULSO"
     p = "%s" if DATABASE_URL else "?"
     
+    # URL estática para carregar o arquivo na tela
+    url_comprovante = f"/static/comprovantes/{nome_arquivo}"
+    
+    # 🌟 CORREÇÃO: Inserida a coluna comprovante_url no comando SQL
     cursor.execute(f'''
-        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, status) VALUES ({p}, {p}, {p}, {p}, 'PENDENTE')
-    ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip()))
+        INSERT INTO atletas (torneio_id, nome, entidade, whatsapp, comprovante_url, status) 
+        VALUES ({p}, {p}, {p}, {p}, {p}, 'PENDENTE')
+    ''', (cfg["id"], nome.strip().upper(), entidade_limpa, whatsapp.strip(), url_comprovante))
     db.commit()
     return RedirectResponse(url="/admin-painel/inscrever?sucesso=true", status_code=303)
 
