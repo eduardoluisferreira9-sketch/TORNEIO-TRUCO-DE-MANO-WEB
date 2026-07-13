@@ -27,7 +27,6 @@
             padding: 0;
         }
 
-        /* Nav padronizada conforme as outras telas administrativas */
         nav { 
             background: #090f0a; 
             padding: 15px 30px; 
@@ -98,6 +97,16 @@
             font-weight: 600;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
+
+        /* Responsividade para telas móveis */
+        @media (max-width: 768px) {
+            nav { display: block; text-align: center; }
+            .nav-brand, .nav-container-links { display: block; text-align: center; width: 100%; }
+            .nav-container-links { margin-top: 15px; }
+            .nav-link { margin: 5px 2px; padding: 6px 10px; font-size: 0.7rem; }
+            .container { padding: 20px; }
+            .grid-historico { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -120,7 +129,8 @@
         <p style="color: var(--texto-subtil); font-weight: 600; margin-top: 0; margin-bottom: 40px; font-size: 0.95rem;">Aqui repousam as lendas que conquistaram a glória eterna nas arenas passadas.</p>
 
         <div class="grid-historico">
-            {% for h in galeria %}
+            <!-- Modificado para evitar quebras caso venha como None do backend -->
+            {% for h in galeria | default([]) %}
             <div class="card-historico">
                 <h3 class="edicao-titulo">🏅 {{ h.nome_torneio }}</h3>
                 
