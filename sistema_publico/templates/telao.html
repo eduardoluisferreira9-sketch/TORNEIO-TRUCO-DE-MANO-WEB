@@ -920,12 +920,22 @@
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
+                            const nomeFaseMesaOficial = jogo.fase_mesa_nome ? jogo.fase_mesa_nome.toUpperCase() : "";
 
-                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
+                            // 1. Se o banco/API já mandou um nome específico para a mesa, respeitamos primeiro
+                            if (nomeFaseMesaOficial.includes("SEMIFINAL") || statusFase.includes("SEMIFINAL") || nomeFaseStr.includes("SEMIFINAL")) {
+                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL ${jogo.mesa}</span>`;
+                            } else if (idMesaEspecial === -2 || nomeFaseMesaOficial.includes("GRANDE FINAL") || nomeFaseMesaOficial === "FINAL") {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
+                            } else if (idMesaEspecial === -3 || nomeFaseMesaOficial.includes("TERCEIRO") || nomeFaseMesaOficial.includes("3º") || nomeFaseMesaOficial.includes("BRONZE")) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
-                            } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
+                            } 
+                            // 2. Se não veio nome oficial da API, fazemos o fallback inteligente por ID ou número da mesa
+                            else if (idMesaEspecial === -2 || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
+                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                            } else if (idMesaEspecial === -3 || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
+                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                            } else if (idMesaEspecial === -4) {
                                 textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL</span>`;
                             } else if (jogo.fase_mesa_nome) {
                                 textoTagMesa = `💥 ${jogo.fase_mesa_nome.toUpperCase()}`;
