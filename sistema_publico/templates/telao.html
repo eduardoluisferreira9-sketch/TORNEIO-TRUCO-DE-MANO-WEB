@@ -528,7 +528,7 @@
         </div>
     </div>
 
-  <script>
+<script>
     let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
     let ultimoEstadoJogosStr = "";
     let ultimoEstadoRankingStr = "";
@@ -921,13 +921,12 @@
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
 
-                            // CORREÇÃO: "Mesa 1" só vira "Grande Final" se houver, no máximo, 2 mesas ativas na rodada eliminatória.
                             if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
                             } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
                             } else if (idMesaEspecial === -4 || jogo.fase_mesa_nome === "Semifinal") {
-                                textoTagMesa = `🏆 <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
+                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL</span>`;
                             } else if (jogo.fase_mesa_nome) {
                                 textoTagMesa = `💥 ${jogo.fase_mesa_nome.toUpperCase()}`;
                             } else if (ehMataMataAtivo) {
@@ -991,7 +990,5 @@
     }
 
     atualizarTelao();
-    setInterval(atualizarTelao, 3000);
-</script>
     setInterval(atualizarTelao, 3000);
 </script>
