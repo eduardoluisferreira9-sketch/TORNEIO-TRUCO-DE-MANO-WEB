@@ -245,6 +245,8 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
         
         for row in linhas_confrontos:
             dados_jogo = dict(row)
+            
+            # --- CORREÇÃO CIRÚRGICA DOS TÍTULOS DE MESA NO MATA-MATA ---
             if rodada_atual == -4:
                 if dados_jogo["mesa"] == 1:
                     dados_jogo["fase_mesa_nome"] = "Grande Final"
@@ -252,6 +254,9 @@ def api_dados_publicos(db: sqlite3.Connection = Depends(get_db)):
                     dados_jogo["fase_mesa_nome"] = "Disputa de 3º Lugar"
                 else:
                     dados_jogo["fase_mesa_nome"] = "Final"
+            elif rodada_atual == -3:
+                # Garante que na Semifinal as mesas tragam seus nomes corretos e isolados
+                dados_jogo["fase_mesa_nome"] = f"Semifinal - Mesa {dados_jogo['mesa']}"
             else:
                 dados_jogo["fase_mesa_nome"] = detalhe_fase
                 
