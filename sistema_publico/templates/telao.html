@@ -820,12 +820,12 @@
             // --- BLOCO ATUALIZADO DO CRONÔMETRO (BORDA E TEXTO) ---
             if (!cronoAtivo) {
                 if (tempoFormatado === "AGORA TUDO É FALTA!") {
-                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; // Borda dourada mesmo pausado
+                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; 
                     cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--danger)'; // Vermelho vivo
-                    alertaElement.style.display = 'none'; // Esconde o modal gigante do meio se estiver pausado
+                    cronoElement.style.color = 'var(--danger)'; 
+                    alertaElement.style.display = 'none'; 
                 } else {
-                    cronoElement.parentElement.style.borderColor = '#444444'; // Borda escura normal
+                    cronoElement.parentElement.style.borderColor = '#444444'; 
                     alertaElement.style.display = 'none';
 
                     if (tempoFormatado.includes('<span')) {
@@ -833,15 +833,15 @@
                         cronoElement.style.color = ''; 
                     } else {
                         cronoElement.innerText = tempoFormatado;
-                        cronoElement.style.color = '#e0e0e0'; // Branco fosco legível
+                        cronoElement.style.color = '#e0e0e0'; 
                     }
                 }
             } else {
-                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; // Borda dourada com ele ativo
+                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; 
                 
                 if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
                     cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--danger)'; // Vermelho de atenção total
+                    cronoElement.style.color = 'var(--danger)'; 
                     alertaElement.style.display = 'flex';
                 } else {
                     if (tempoFormatado.includes('<span')) {
@@ -849,7 +849,7 @@
                         cronoElement.style.color = '';
                     } else {
                         cronoElement.innerText = tempoFormatado;
-                        cronoElement.style.color = 'var(--dourado-brilhante)'; // Dourado padrão
+                        cronoElement.style.color = 'var(--dourado-brilhante)'; 
                     }
                     alertaElement.style.display = 'none';
                 }
@@ -921,7 +921,8 @@
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
                             const idMesaEspecial = Number(jogo.fase_mesa);
 
-                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo)) {
+                            // CORREÇÃO: "Mesa 1" só vira "Grande Final" se houver, no máximo, 2 mesas ativas na rodada eliminatória.
+                            if (idMesaEspecial === -2 || jogo.fase_mesa_nome === "Grande Final" || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
                             } else if (idMesaEspecial === -3 || jogo.fase_mesa_nome === "Disputa de 3º Lugar" || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
@@ -929,8 +930,10 @@
                                 textoTagMesa = `🏆 <span style="color:var(--dourado-brilhante); font-weight:bold;">SEMIFINAL</span>`;
                             } else if (jogo.fase_mesa_nome) {
                                 textoTagMesa = `💥 ${jogo.fase_mesa_nome.toUpperCase()}`;
-                            } else {
+                            } else if (ehMataMataAtivo) {
                                 textoTagMesa = `⚔️ MESA ${jogo.mesa} - ELIMINATÓRIA`;
+                            } else {
+                                textoTagMesa = `MESA ${jogo.mesa}`;
                             }
 
                             card.innerHTML = `
@@ -988,5 +991,7 @@
     }
 
     atualizarTelao();
+    setInterval(atualizarTelao, 3000);
+</script>
     setInterval(atualizarTelao, 3000);
 </script>
