@@ -938,10 +938,13 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     
     novo_nome_sugerido = f"Torneio de Truco Cego - Edição {cfg['id'] + 1}"
     
+    # Define o tempo padrão para o próximo torneio (recupera o atual ou seta 3000 segundos por padrão)
+    tempo_restante_novo = cfg.get("crono_tempo_restante_seg", 3000) if cfg else 3000
+    
     cursor.execute(f'''
         INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
         VALUES ({p}, 45.00, {p}, {p}, 'INSCRICAO', 0)
-        ''', (novo_nome_sugerido, cfg["max_rodadas_classificatoria"], ...))
+        ''', (novo_nome_sugerido, cfg["max_rodadas_classificatoria"], tempo_restante_novo))
     
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/historico?sucesso=torneio_imortalizado", status_code=303)
@@ -1131,7 +1134,7 @@ def pagina_telao_publico(request: Request, db=Depends(get_db)):
 @app.get("/admin-painel/api/publico/dados")
 def api_dados_publicos_telao(db=Depends(get_db)):
     cursor = db.cursor()
-    cfg = atualizar_e_obter_cronometro(db) # Garante sincronia de tempo
+    cfg = atualizar_e_obter_cronometro(db) 
     p = "%s" if DATABASE_URL else "?"
     
     cursor.execute(f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1", (cfg["id"],))
@@ -1250,30 +1253,23 @@ async def salvar_inscricao_externa(
     entidade_limpa = ent_final.strip().upper() if (ent_final and ent_final.strip()) else "AVULSO"
     nome_atleta_limpo = nome.strip().upper()
     
-    # 📁 LÓGICA PARA SALVAR O COMPROVANTE
     comprovante_url = None
     if comprovante and comprovante.filename:
-        # Define a pasta onde os arquivos vão ficar guardados
         pasta_destino = os.path.join("static", "comprovantes")
         if not os.path.exists(pasta_destino):
             os.makedirs(pasta_destino, exist_ok=True)
             
-        # Pega a extensão do arquivo (.jpg, .png, etc)
         _, extensao = os.path.splitext(comprovante.filename)
         
-        # Gera um nome único: ANO_MES_DIA_HORA_NOME.extensao
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         nome_arquivo_seguro = f"{timestamp}_{nome_atleta_limpo.replace(' ', '_')}{extensao}"
         caminho_completo = os.path.join(pasta_destino, nome_arquivo_seguro)
         
-        # Salva o arquivo fisicamente no servidor web
         with open(caminho_completo, "wb") as f:
             f.write(await comprovante.read())
             
-        # Guarda o caminho web que o navegador vai usar para exibir a foto
         comprovante_url = f"/static/comprovantes/{nome_arquivo_seguro}"
 
-    # 💾 GRAVAÇÃO NO BANCO DE DADOS (Incluindo a coluna comprovante_url)
     cursor.execute(f'''
         INSERT INTO atletas (torneio_id, nome, entidade, status, whatsapp, comprovante_url) 
         VALUES ({p}, {p}, {p}, 'PENDENTE', {p}, {p})
