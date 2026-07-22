@@ -455,6 +455,78 @@
             45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
             90%, 100% { transform: translateY(0); }
         }
+
+        /* --- ESTILO DO BANNER DO DESENVOLVEDOR --- */
+        .card-desenvolvedor {
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid var(--borda-ouro);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dev-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dev-info h3 {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--dourado-brilhante);
+            font-weight: bold;
+        }
+
+        .dev-info p {
+            margin: 2px 0 0 0;
+            font-size: 0.7rem;
+            color: var(--texto-mutado);
+        }
+
+        .dev-botoes {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .btn-dev {
+            flex: 1;
+            text-align: center;
+            padding: 5px 8px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.2s;
+            display: inline-block;
+        }
+
+        .btn-dev-comprar {
+            background-color: #27ae60;
+            color: #fff;
+            border: 1px solid #2ecc71;
+        }
+
+        .btn-dev-comprar:hover {
+            background-color: #2ecc71;
+            color: #000;
+        }
+
+        .btn-dev-patrocinar {
+            background-color: transparent;
+            color: var(--borda-ouro);
+            border: 1px solid var(--borda-ouro);
+        }
+
+        .btn-dev-patrocinar:hover {
+            background-color: var(--borda-ouro);
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -525,9 +597,31 @@
                     <tbody id="tabela-ranking-corpo" class="ranking-marquise-body"></tbody>
                 </table>
             </div>
+
+            <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
+            <div class="card-desenvolvedor">
+                <div class="dev-topo">
+                    <div class="dev-info">
+                        <h3>💻 Sistema de Telão Digital</h3>
+                        <p>Desenvolvido por <strong>Eduardo Luis Ferreira</strong></p>
+                    </div>
+                </div>
+                <div class="dev-botoes">
+                    <!-- Substitua o número abaixo (DDI + DDD + Telefone) -->
+                    <a href="https://wa.me/5554991410550?text=Olá!%20Gostaria%20de%20comprar/licenciar%20o%20sistema%20de%20Telão." target="_blank" class="btn-dev btn-dev-comprar">
+                        📱 Adquirir Sistema
+                    </a>
+                    <!-- Substitua pelo seu e-mail -->
+                    <a href="mailto:eduardoluisferreira9@gmail.com?subject=Patrocinio%20no%20Telao" class="btn-dev btn-dev-patrocinar">
+                        🤝 Patrocinar
+                    </a>
+                </div>
+            </div>
+            <!-- ======================================================================= -->
+
         </div>
     </div>
-
+    
 <script>
     let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
     let ultimoEstadoJogosStr = "";
