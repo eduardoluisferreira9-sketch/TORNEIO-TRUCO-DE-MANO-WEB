@@ -1,11 +1,14 @@
 // =========================================
-// PUBLICIDADE V1
+// PUBLICIDADE V1.2
 // =========================================
 
 const publicidade = [
     {
         titulo: "💻 Sistema de Telão Digital",
+
         texto: "Desenvolvido por <strong>Eduardo Luis Ferreira</strong>",
+
+        logo: "",
 
         botoes: `
             <a href="https://wa.me/5554991410550?text=Olá! Gostaria de adquirir o sistema."
@@ -24,7 +27,13 @@ const publicidade = [
 
     {
         titulo: "🏆 PATROCINADOR MASTER",
-        texto: "<strong>SUPERMERCADO CENTRAL</strong><br>Patrocinador Oficial",
+
+        texto: `
+            <strong>SUPERMERCADO CENTRAL</strong><br>
+            Patrocinador Oficial
+        `,
+
+        logo: "/static/patrocinadores/mercado-central.png",
 
         botoes: `
             <a href="#"
@@ -45,17 +54,38 @@ let indice = 0;
 
 function atualizarPublicidade() {
 
-    const bloco = document.getElementById("publicidade-info");
+    const topo = document.getElementById("publicidade-info");
+    const logo = document.getElementById("publicidade-logo");
+    const texto = document.getElementById("publicidade-texto");
     const botoes = document.getElementById("publicidade-botoes");
-    
-    if (!bloco || !botoes) return;
 
-    bloco.innerHTML = `
-        <h3>${publicidade[indice].titulo}</h3>
-        <p>${publicidade[indice].texto}</p>
+    if (!topo || !logo || !texto || !botoes) return;
+
+    const item = publicidade[indice];
+
+    // Atualiza texto
+    texto.innerHTML = `
+        <h3>${item.titulo}</h3>
+        <p>${item.texto}</p>
     `;
 
-botoes.innerHTML = publicidade[indice].botoes;
+    // Atualiza logo
+    if (item.logo && item.logo.trim() !== "") {
+
+        logo.innerHTML = `
+            <img src="${item.logo}"
+                 alt="Logo"
+                 style="max-height:70px; max-width:180px;">
+        `;
+
+    } else {
+
+        logo.innerHTML = "";
+
+    }
+
+    // Atualiza botões
+    botoes.innerHTML = item.botoes;
 
     indice++;
 
