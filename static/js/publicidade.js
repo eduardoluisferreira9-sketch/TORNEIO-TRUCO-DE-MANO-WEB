@@ -33,7 +33,7 @@ const publicidade = [
             Patrocinador Oficial
         `,
 
-        logo: "/static/patrocinadores/mercado-central.png",
+        logo: "/static/patrocinadores/mercado-central.jpg",
 
         botoes: `
             <a href="#"
