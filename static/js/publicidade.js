@@ -1,67 +1,42 @@
-// ===============================
-// PUBLICIDADE V1.0
-// ===============================
+// =========================================
+// PUBLICIDADE V1
+// =========================================
 
 const publicidade = [
     {
         titulo: "💻 Sistema de Telão Digital",
-        texto: "Desenvolvido por Eduardo Luis Ferreira",
-        botao1: {
-            texto: "📱 Adquirir Sistema",
-            link: "https://wa.me/5554991410550?text=Olá!%20Gostaria%20de%20comprar/licenciar%20o%20sistema%20de%20Telão."
-        },
-        botao2: {
-            texto: "🤝 Quero Patrocinar",
-            link: "https://wa.me/5554991410550?text=Olá!%20Gostaria%20de%20informações%20sobre%20cotas%20de%20patrocínio%20no%20Telão."
-        }
+        texto: "Desenvolvido por <strong>Eduardo Luis Ferreira</strong>"
     },
-
     {
         titulo: "🏆 PATROCINADOR MASTER",
-        texto: "Sua empresa pode aparecer aqui.",
-        botao1: {
-            texto: "⭐ Mercado Central",
-            link: "#"
-        },
-        botao2: {
-            texto: "📞 Seja Patrocinador",
-            link: "https://wa.me/5554991410550"
-        }
+        texto: "<strong>Sua empresa pode anunciar aqui.</strong>"
     }
 ];
 
-let indicePublicidade = 0;
+let indice = 0;
 
-function trocarPublicidade() {
+function atualizarPublicidade() {
 
-    const titulo = document.querySelector(".dev-info h3");
-    const texto = document.querySelector(".dev-info p");
+    const bloco = document.getElementById("publicidade-info");
 
-    const botoes = document.querySelectorAll(".dev-botoes a");
+    if (!bloco) return;
 
-    if (!titulo || !texto || botoes.length < 2) return;
+    bloco.innerHTML = `
+        <h3>${publicidade[indice].titulo}</h3>
+        <p>${publicidade[indice].texto}</p>
+    `;
 
-    const atual = publicidade[indicePublicidade];
+    indice++;
 
-    titulo.innerHTML = atual.titulo;
-    texto.innerHTML = atual.texto;
-
-    botoes[0].innerHTML = atual.botao1.texto;
-    botoes[0].href = atual.botao1.link;
-
-    botoes[1].innerHTML = atual.botao2.texto;
-    botoes[1].href = atual.botao2.link;
-
-    indicePublicidade++;
-
-    if (indicePublicidade >= publicidade.length)
-        indicePublicidade = 0;
+    if (indice >= publicidade.length) {
+        indice = 0;
+    }
 }
 
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
 
-    trocarPublicidade();
+    atualizarPublicidade();
 
-    setInterval(trocarPublicidade, 8000);
+    setInterval(atualizarPublicidade, 8000);
 
 });
