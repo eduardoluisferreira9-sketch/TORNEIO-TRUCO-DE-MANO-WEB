@@ -1,144 +1,67 @@
-/*
-=====================================================
+// ===============================
+// PUBLICIDADE V1.0
+// ===============================
 
- MÓDULO DE PUBLICIDADE
- Sistema de Telão - Truco de Mano
-
- Desenvolvido para ser independente do telão.
-
-=====================================================
-*/
-
-class Publicidade{
-
-    constructor(){
-
-        this.patrocinadores=[];
-
-        this.indice=0;
-
-        this.tempoTroca=8000;
-
-        this.container=null;
-
-    }
-
-    iniciar(){
-
-        this.criarBanner();
-
-        this.carregar();
-
-        this.renderizar();
-
-        this.iniciarRotacao();
-
-    }
-
-    criarBanner(){
-
-        this.container=document.createElement("div");
-
-        this.container.id="publicidade-master";
-
-        document.body.appendChild(this.container);
-
-    }
-
-    carregar(){
-
-        this.patrocinadores=[
-
-            {
-
-                nome:"Sistema de Telão",
-
-                subtitulo:"Desenvolvido por Eduardo Luis Ferreira",
-
-                logo:"",
-
-                tipo:"sistema"
-
-            }
-
-        ];
-
-    }
-
-    renderizar(){
-
-        if(this.patrocinadores.length===0){
-
-            this.container.style.display="none";
-
-            return;
-
+const publicidade = [
+    {
+        titulo: "💻 Sistema de Telão Digital",
+        texto: "Desenvolvido por Eduardo Luis Ferreira",
+        botao1: {
+            texto: "📱 Adquirir Sistema",
+            link: "https://wa.me/5554991410550?text=Olá!%20Gostaria%20de%20comprar/licenciar%20o%20sistema%20de%20Telão."
+        },
+        botao2: {
+            texto: "🤝 Quero Patrocinar",
+            link: "https://wa.me/5554991410550?text=Olá!%20Gostaria%20de%20informações%20sobre%20cotas%20de%20patrocínio%20no%20Telão."
         }
+    },
 
-        const patrocinador=this.patrocinadores[this.indice];
-
-        this.container.innerHTML=`
-
-            <div class="pub-card">
-
-                <div class="pub-titulo">
-
-                    ${patrocinador.nome}
-
-                </div>
-
-                <div class="pub-logo">
-
-                    ${
-                        patrocinador.logo
-                        ? `<img src="${patrocinador.logo}">`
-                        : "💻"
-                    }
-
-                </div>
-
-                <div class="pub-subtitulo">
-
-                    ${patrocinador.subtitulo}
-
-                </div>
-
-            </div>
-
-        `;
-
-    }
-
-    proximo(){
-
-        this.indice++;
-
-        if(this.indice>=this.patrocinadores.length){
-
-            this.indice=0;
-
+    {
+        titulo: "🏆 PATROCINADOR MASTER",
+        texto: "Sua empresa pode aparecer aqui.",
+        botao1: {
+            texto: "⭐ Mercado Central",
+            link: "#"
+        },
+        botao2: {
+            texto: "📞 Seja Patrocinador",
+            link: "https://wa.me/5554991410550"
         }
-
-        this.renderizar();
-
     }
+];
 
-    iniciarRotacao(){
+let indicePublicidade = 0;
 
-        setInterval(()=>{
+function trocarPublicidade() {
 
-            this.proximo();
+    const titulo = document.querySelector(".dev-info h3");
+    const texto = document.querySelector(".dev-info p");
 
-        },this.tempoTroca);
+    const botoes = document.querySelectorAll(".dev-botoes a");
 
-    }
+    if (!titulo || !texto || botoes.length < 2) return;
 
+    const atual = publicidade[indicePublicidade];
+
+    titulo.innerHTML = atual.titulo;
+    texto.innerHTML = atual.texto;
+
+    botoes[0].innerHTML = atual.botao1.texto;
+    botoes[0].href = atual.botao1.link;
+
+    botoes[1].innerHTML = atual.botao2.texto;
+    botoes[1].href = atual.botao2.link;
+
+    indicePublicidade++;
+
+    if (indicePublicidade >= publicidade.length)
+        indicePublicidade = 0;
 }
 
-window.addEventListener("load",()=>{
+window.addEventListener("load", () => {
 
-    const publicidade=new Publicidade();
+    trocarPublicidade();
 
-    publicidade.iniciar();
+    setInterval(trocarPublicidade, 8000);
 
 });
