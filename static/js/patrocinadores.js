@@ -4,9 +4,12 @@
 
 const patrocinadores = [
 
-    // Sistema
+    // =====================================================
+    // SISTEMA
+    // =====================================================
     {
         tipo: "sistema",
+        prioridade: 0,
 
         titulo: "💻 Sistema de Telão Digital",
 
@@ -29,9 +32,12 @@ const patrocinadores = [
         tempo: 8
     },
 
-    // Patrocinador
+    // =====================================================
+    // PATROCINADOR MASTER
+    // =====================================================
     {
         tipo: "master",
+        prioridade: 1,
 
         titulo: "🏆 PATROCINADOR MASTER",
 
@@ -53,29 +59,33 @@ const patrocinadores = [
 
         tempo: 8
     },
-    
-     {
+
+    // =====================================================
+    // PATROCINADOR OURO
+    // =====================================================
+    {
         tipo: "ouro",
+        prioridade: 2,
 
-         titulo: "🥇 PATROCINADOR OURO",
+        titulo: "🥇 PATROCINADOR OURO",
 
-         nome: "POSTO AVENIDA",
+        nome: "POSTO AVENIDA",
 
         slogan: "Seu combustível de confiança",
-    
+
         logo: "/static/patrocinadores/posto-avenida.jpg",
 
-          botao1: {
+        botao1: {
             texto: "📍 Localização",
             link: "https://maps.google.com"
         },
 
-            botao2: {
-             texto: "📞 WhatsApp",
-             link: "https://wa.me/5554991410550"
-         },
+        botao2: {
+            texto: "📞 WhatsApp",
+            link: "https://wa.me/5554991410550"
+        },
 
         tempo: 8
-     }
-    
- ];
+    }
+
+];
