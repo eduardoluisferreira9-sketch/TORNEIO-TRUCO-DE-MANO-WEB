@@ -759,43 +759,37 @@
                
             <div class="rodape-publicidade">
 
-               <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
+             <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
 
-                <div class="card-desenvolvedor">
+             <div class="card-desenvolvedor">
 
-                    <div class="dev-topo" id="publicidade-info">
+                <div id="publicidade-info" class="publicidade-grid">
 
+                    <div class="col-categoria">
                         <h3 id="publicidade-titulo">
                             💻 Sistema de Telão Digital
                         </h3>
+                    </div>
 
+                    <div class="col-logo">
                         <div id="publicidade-logo"></div>
+                    </div>
 
+                    <div class="col-texto">
                         <div id="publicidade-texto">
                             Desenvolvido por <strong>Eduardo Luis Ferreira</strong>
                         </div>
-
                     </div>
 
-                    <div class="dev-botoes" id="publicidade-botoes">
-
-                        <a href="#"
-                           class="btn-dev btn-dev-comprar">
-                            📱 Adquirir Sistema
-                        </a>
-
-                        <a href="#"
-                           class="btn-dev btn-dev-patrocinar">
-                            🤝 Quero Patrocinar
-                        </a>
-
+                    <div id="publicidade-botoes" class="col-botoes">
+                        <!-- Os botões serão inseridos pelo JavaScript -->
                     </div>
 
                 </div>
 
-                <!-- ======================================================================= -->
-              
             </div>
+
+            <!-- ======================================================================= -->
                 
 <script>
     let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
