@@ -48,12 +48,12 @@ const patrocinadores = [
         logo: "/static/patrocinadores/mercado-central.jpg",
 
         botao1: {
-            texto: "🌐 Conheça",
+            texto: "Conheça",
             link: "#"
         },
 
         botao2: {
-            texto: "💬 WhatsApp",
+            texto: "WhatsApp",
             link: "https://wa.me/5554991410550"
         },
 
