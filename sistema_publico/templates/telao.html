@@ -456,9 +456,9 @@
             90%, 100% { transform: translateY(0); }
         }
 
-        /* ==========================================================
-            PUBLICIDADE / PATROCINADORES
-           ========================================================== */
+       /* ==========================================================
+       PUBLICIDADE / PATROCINADORES
+       ========================================================== */
 
         .card-desenvolvedor{
 
@@ -468,51 +468,73 @@
 
             border-radius:6px;
 
-            padding:8px 18px;
+            padding:10px 18px;
 
-        box-sizing:border-box;
+            box-sizing:border-box;
 
         }
 
-        .dev-topo{
+        /* ==========================================================
+           GRID PRINCIPAL
+           ========================================================== */
+
+        .publicidade-grid{
 
             display:grid;
 
-            grid-template-columns:330px 120px minmax(0,1fr);
-    
+            grid-template-columns:15% 20% 35% 15% 15%;
+
             align-items:center;
 
-            gap:24px;
+            gap:18px;
 
-            min-height:70px;
+            min-height:90px;
 
         }
 
-        /* ---------------- TÍTULO ---------------- */
+        /* ==========================================================
+           CATEGORIA
+           ========================================================== */
+
+        .col-categoria{
+
+            display:flex;
+
+            align-items:center;
+
+        }
 
         #publicidade-titulo{
 
             margin:0;
 
-            font-size:1rem;
+            font-size:1.05rem;
 
             font-weight:700;
 
             color:var(--dourado-brilhante);
 
-            text-align:left;
-
             white-space:nowrap;
 
         }
 
-        /* ---------------- LOGO ---------------- */
+        /* ==========================================================
+           LOGO
+           ========================================================== */
+
+        .col-logo{
+
+            display:flex;
+
+            justify-content:center;
+
+        }
 
         #publicidade-logo{
 
-            width:110px;
+            width:170px;
 
-            height:64px;
+            height:90px;
 
             display:flex;
 
@@ -529,18 +551,28 @@
             overflow:hidden;
 
         }
-        
+
         #publicidade-logo img{
 
-            max-width:90%;
+            max-width:94%;
 
-            max-height:90%;
+            max-height:94%;
 
             object-fit:contain;
 
         }
 
-        /* ---------------- TEXTO ---------------- */
+        /* ==========================================================
+           TEXTO
+           ========================================================== */
+
+        .col-texto{
+
+            display:flex;
+    
+            align-items:center;
+
+        }
 
         #publicidade-texto{
 
@@ -552,69 +584,61 @@
 
             color:var(--texto-mutado);
 
-            line-height:1.15;
-
-            overflow:hidden;
-
+            line-height:1.25;
+    
         }
 
         #publicidade-texto strong{
 
-            font-size:1.55rem;
+            font-size:2rem;
 
             font-weight:700;
-        
+
             color:#ffffff;
 
-            margin-bottom:2px;
-
-            white-space:nowrap;
-
-            overflow:hidden;
-
-            text-overflow:ellipsis;
+            margin-bottom:6px;
 
         }
 
-       #publicidade-texto span{
+        #publicidade-texto span{
 
-            font-size:.95rem;
+            font-size:1rem;
 
-            color:#cfcfcf;
+            color:#d5d5d5;
 
-            white-space:nowrap;
+        }
 
-            overflow:hidden;
+        /* ==========================================================
+           BOTÕES
+           ========================================================== */
 
-            text-overflow:ellipsis;
-        
-        /* ---------------- BOTÕES ---------------- */
+        .col-botoes{
 
-        .dev-botoes{
+            display:grid;
 
-            display:flex;
+            grid-template-columns:1fr 1fr;
 
-            gap:8px;
-
-            margin-top:8px;
+            gap:12px;
 
         }
 
         .btn-dev{
 
-            flex:1;
-    
-            padding:6px 10px;
-        
-            border-radius:4px;
+            display:flex;
 
-            text-align:center;
+            justify-content:center;
+
+            align-items:center;
+
+            height:54px;
 
             text-decoration:none;
 
-            font-size:.82rem;
+            font-size:.95rem;
 
             font-weight:700;
+
+            border-radius:6px;
 
             transition:.25s;
 
@@ -683,8 +707,9 @@
                 transform .35s ease;
 
         }
-       
+        
         </style>
+    
 </head>
 <body>
 
