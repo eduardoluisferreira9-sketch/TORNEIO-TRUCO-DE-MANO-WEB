@@ -52,6 +52,30 @@ const patrocinadores = [
         },
 
         tempo: 8
-    }
+    },
+    
+     {
+        tipo: "ouro",
 
-];
+         titulo: "🥇 PATROCINADOR OURO",
+
+         nome: "POSTO AVENIDA",
+
+        slogan: "Seu combustível de confiança",
+    
+        logo: "/static/patrocinadores/posto-avenida.jpg",
+
+          botao1: {
+            texto: "📍 Localização",
+            link: "https://maps.google.com"
+        },
+
+            botao2: {
+             texto: "📞 WhatsApp",
+             link: "https://wa.me/5554991410550"
+         },
+
+        tempo: 8
+     }
+    
+ ];
