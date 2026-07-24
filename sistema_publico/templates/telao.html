@@ -630,29 +630,41 @@
 
             align-items:center;
 
-            height:54px;
+            gap:8px;
+
+            height:50px;
+
+            padding:0 14px;
 
             text-decoration:none;
 
-            font-size:.95rem;
+            font-size:.82rem;
 
-            font-weight:700;
+            font-weight:600;
 
-            border-radius:6px;
+            border-radius:8px;
 
             transition:.25s;
+
+            white-space:nowrap;
+
+            box-sizing:border-box;
 
         }
 
         .btn-dev-comprar{
 
-            background:#27ae60;
+            background:linear-gradient(
+                180deg,
+                #37c46b,
+                #28a85b
+            );
 
             color:#fff;
 
-            border:1px solid #2ecc71;
+            border:1px solid #53d487;
 
-        }
+}
 
         .btn-dev-comprar:hover{
 
@@ -664,9 +676,9 @@
 
         .btn-dev-patrocinar{
 
-            background:transparent;
+            background:rgba(0,0,0,.35);
 
-            color:var(--borda-ouro);
+            color:var(--dourado-brilhante);
 
             border:1px solid var(--borda-ouro);
 
@@ -677,6 +689,14 @@
             background:var(--borda-ouro);
 
             color:#000;
+
+        }
+
+        .btn-dev:hover{
+
+            transform:translateY(-2px);
+
+            box-shadow:0 0 10px rgba(212,175,55,.25);
 
         }
 
