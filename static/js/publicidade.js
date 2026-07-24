@@ -2,7 +2,7 @@
 // MOTOR DE PUBLICIDADE
 // =========================================
 
-let indice = 0;
+let publicidadeAtual = null;
 let timerPublicidade = null;
 
 // =========================================
@@ -17,14 +17,41 @@ const rotacao = {
     bronze: []
 };
 
+// Ponteiro de cada categoria
+const ponteiros = {
+    sistema: 0,
+    master: 0,
+    ouro: 0,
+    prata: 0,
+    bronze: 0
+};
+
+// Sequência de exibição
+const sequencia = [
+    "sistema",
+    "master",
+    "ouro",
+    "prata",
+    "bronze",
+    "ouro",
+    "prata",
+    "bronze",
+    "prata",
+    "bronze"
+];
+
+let indiceSequencia = 0;
+
+// =========================================
+// MONTA A ROTAÇÃO
+// =========================================
+
 function montarRotacao() {
 
-    // Limpa os grupos
     Object.keys(rotacao).forEach(chave => {
         rotacao[chave] = [];
     });
 
-    // Distribui os patrocinadores por categoria
     patrocinadores.forEach(item => {
 
         if (rotacao[item.tipo]) {
@@ -37,6 +64,66 @@ function montarRotacao() {
 
 }
 
+// =========================================
+// PRÓXIMO DA CATEGORIA
+// =========================================
+
+function obterProximoDaCategoria(tipo) {
+
+    const lista = rotacao[tipo];
+
+    if (!lista || lista.length === 0) {
+        return null;
+    }
+
+    const item = lista[ponteiros[tipo]];
+
+    ponteiros[tipo]++;
+
+    if (ponteiros[tipo] >= lista.length) {
+        ponteiros[tipo] = 0;
+    }
+
+    return item;
+
+}
+
+// =========================================
+// PRÓXIMA PUBLICIDADE
+// =========================================
+
+function obterProximaPublicidade() {
+
+    let tentativas = 0;
+
+    while (tentativas < sequencia.length) {
+
+        const tipo = sequencia[indiceSequencia];
+
+        indiceSequencia++;
+
+        if (indiceSequencia >= sequencia.length) {
+            indiceSequencia = 0;
+        }
+
+        const item = obterProximoDaCategoria(tipo);
+
+        if (item) {
+            return item;
+        }
+
+        tentativas++;
+
+    }
+
+    return patrocinadores[0];
+
+}
+
+// =========================================
+// RENDERIZAÇÃO
+// =========================================
+
 function renderizarPublicidade(item) {
 
     const titulo = document.getElementById("publicidade-titulo");
@@ -48,10 +135,8 @@ function renderizarPublicidade(item) {
         return;
     }
 
-    // Título
     titulo.textContent = item.titulo;
 
-    // Logo
     if (item.logo && item.logo.trim() !== "") {
 
         logo.innerHTML = `
@@ -64,13 +149,11 @@ function renderizarPublicidade(item) {
 
     }
 
-    // Texto
     texto.innerHTML = `
         <strong>${item.nome}</strong>
         ${item.slogan}
     `;
 
-    // Botões
     botoes.innerHTML = `
         <a href="${item.botao1.link}"
            target="_blank"
@@ -84,7 +167,12 @@ function renderizarPublicidade(item) {
             ${item.botao2.texto}
         </a>
     `;
+
 }
+
+// =========================================
+// TROCA PUBLICIDADE
+// =========================================
 
 function trocarPublicidade() {
 
@@ -97,16 +185,12 @@ function trocarPublicidade() {
 
     setTimeout(() => {
 
-        renderizarPublicidade(patrocinadores[indice]);
+        publicidadeAtual = obterProximaPublicidade();
+
+        renderizarPublicidade(publicidadeAtual);
 
         card.classList.remove("publicidade-fade-out");
         card.classList.add("publicidade-fade-in");
-
-        indice++;
-
-        if (indice >= patrocinadores.length) {
-            indice = 0;
-        }
 
         iniciarTimer();
 
@@ -114,24 +198,34 @@ function trocarPublicidade() {
 
 }
 
+// =========================================
+// TIMER
+// =========================================
+
 function iniciarTimer() {
 
     clearTimeout(timerPublicidade);
 
+    const tempo = publicidadeAtual?.tempo || 8;
+
     timerPublicidade = setTimeout(
         trocarPublicidade,
-        patrocinadores[indice].tempo * 1000
+        tempo * 1000
     );
 
 }
+
+// =========================================
+// INICIALIZAÇÃO
+// =========================================
 
 window.addEventListener("DOMContentLoaded", () => {
 
     montarRotacao();
 
-    renderizarPublicidade(patrocinadores[0]);
+    publicidadeAtual = obterProximaPublicidade();
 
-    indice = 1;
+    renderizarPublicidade(publicidadeAtual);
 
     const card = document.getElementById("publicidade-info");
 
