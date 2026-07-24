@@ -5,6 +5,38 @@
 let indice = 0;
 let timerPublicidade = null;
 
+// =========================================
+// MOTOR DE ROTAÇÃO
+// =========================================
+
+const rotacao = {
+    sistema: [],
+    master: [],
+    ouro: [],
+    prata: [],
+    bronze: []
+};
+
+function montarRotacao() {
+
+    // Limpa os grupos
+    Object.keys(rotacao).forEach(chave => {
+        rotacao[chave] = [];
+    });
+
+    // Distribui os patrocinadores por categoria
+    patrocinadores.forEach(item => {
+
+        if (rotacao[item.tipo]) {
+            rotacao[item.tipo].push(item);
+        }
+
+    });
+
+    console.log("Motor de rotação:", rotacao);
+
+}
+
 function renderizarPublicidade(item) {
 
     const titulo = document.getElementById("publicidade-titulo");
@@ -94,6 +126,8 @@ function iniciarTimer() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+
+    montarRotacao();
 
     renderizarPublicidade(patrocinadores[0]);
 
