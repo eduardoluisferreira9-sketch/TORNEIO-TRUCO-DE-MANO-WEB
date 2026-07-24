@@ -1,127 +1,110 @@
 // =========================================
-// PUBLICIDADE V1.3
+// MOTOR DE PUBLICIDADE
 // =========================================
 
-const publicidade = [
-    {
-        titulo: "💻 Sistema de Telão Digital",
-
-        texto: "Desenvolvido por <strong>Eduardo Luis Ferreira</strong>",
-
-        logo: "",
-
-        botoes: `
-            <a href="https://wa.me/5554991410550?text=Olá! Gostaria de adquirir o sistema."
-               target="_blank"
-               class="btn-dev btn-dev-comprar">
-                📱 Adquirir Sistema
-            </a>
-
-            <a href="https://wa.me/5554991410550?text=Olá! Gostaria de informações sobre patrocínio."
-               target="_blank"
-               class="btn-dev btn-dev-patrocinar">
-                🤝 Quero Patrocinar
-            </a>
-        `
-    },
-
-    {
-        titulo: "🏆 PATROCINADOR MASTER",
-
-        texto: `
-            <strong>SUPERMERCADO CENTRAL</strong>
-            Patrocinador Oficial
-        `,
-
-        logo: "/static/patrocinadores/mercado-central.jpg",
-
-        botoes: `
-            <a href="#"
-               class="btn-dev btn-dev-comprar">
-                🛒 Conheça
-            </a>
-
-            <a href="https://wa.me/5554991410550"
-               target="_blank"
-               class="btn-dev btn-dev-patrocinar">
-                📞 WhatsApp
-            </a>
-        `
-    }
-];
-
 let indice = 0;
+let timerPublicidade = null;
 
-function renderizarPublicidade(item){
+function renderizarPublicidade(item) {
 
-    const titulo  = document.getElementById("publicidade-titulo");
-    const logo    = document.getElementById("publicidade-logo");
-    const texto   = document.getElementById("publicidade-texto");
-    const botoes  = document.getElementById("publicidade-botoes");
-    const card    = document.getElementById("publicidade-info");
+    const titulo = document.getElementById("publicidade-titulo");
+    const logo = document.getElementById("publicidade-logo");
+    const texto = document.getElementById("publicidade-texto");
+    const botoes = document.getElementById("publicidade-botoes");
 
-    if(!titulo || !logo || !texto || !botoes || !card){
+    if (!titulo || !logo || !texto || !botoes) {
         return;
     }
 
+    // Título
     titulo.textContent = item.titulo;
 
-    texto.innerHTML = item.texto;
-
-    if(item.logo){
+    // Logo
+    if (item.logo && item.logo.trim() !== "") {
 
         logo.innerHTML = `
-            <img src="${item.logo}" alt="Logo do patrocinador">
+            <img src="${item.logo}" alt="${item.nome}">
         `;
 
-    }else{
+    } else {
 
         logo.innerHTML = "";
 
     }
 
-    botoes.innerHTML = item.botoes;
+    // Texto
+    texto.innerHTML = `
+        <strong>${item.nome}</strong>
+        ${item.slogan}
+    `;
 
+    // Botões
+    botoes.innerHTML = `
+        <a href="${item.botao1.link}"
+           target="_blank"
+           class="btn-dev btn-dev-comprar">
+            ${item.botao1.texto}
+        </a>
+
+        <a href="${item.botao2.link}"
+           target="_blank"
+           class="btn-dev btn-dev-patrocinar">
+            ${item.botao2.texto}
+        </a>
+    `;
 }
 
-function atualizarPublicidade(){
+function trocarPublicidade() {
 
     const card = document.getElementById("publicidade-info");
 
-    if(!card) return;
+    if (!card) return;
 
     card.classList.remove("publicidade-fade-in");
     card.classList.add("publicidade-fade-out");
 
     setTimeout(() => {
 
-        renderizarPublicidade(publicidade[indice]);
+        renderizarPublicidade(patrocinadores[indice]);
 
         card.classList.remove("publicidade-fade-out");
         card.classList.add("publicidade-fade-in");
 
         indice++;
 
-        if(indice >= publicidade.length){
+        if (indice >= patrocinadores.length) {
             indice = 0;
         }
 
-    },350);
+        iniciarTimer();
+
+    }, 350);
+
+}
+
+function iniciarTimer() {
+
+    clearTimeout(timerPublicidade);
+
+    timerPublicidade = setTimeout(
+        trocarPublicidade,
+        patrocinadores[indice].tempo * 1000
+    );
 
 }
 
 window.addEventListener("DOMContentLoaded", () => {
 
-    renderizarPublicidade(publicidade[0]);
+    renderizarPublicidade(patrocinadores[0]);
 
     indice = 1;
 
     const card = document.getElementById("publicidade-info");
 
-    if(card){
+    if (card) {
         card.classList.add("publicidade-fade-in");
     }
 
-    setInterval(atualizarPublicidade,8000);
+    iniciarTimer();
 
 });
