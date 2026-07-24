@@ -1,5 +1,5 @@
 // =========================================
-// PUBLICIDADE V1.2
+// PUBLICIDADE V1.3
 // =========================================
 
 const publicidade = [
@@ -29,7 +29,7 @@ const publicidade = [
         titulo: "🏆 PATROCINADOR MASTER",
 
         texto: `
-            <strong>SUPERMERCADO CENTRAL</strong><br>
+            <strong>SUPERMERCADO CENTRAL</strong>
             Patrocinador Oficial
         `,
 
@@ -52,52 +52,76 @@ const publicidade = [
 
 let indice = 0;
 
-function atualizarPublicidade() {
+function renderizarPublicidade(item){
 
-    const topo = document.getElementById("publicidade-info");
-    const logo = document.getElementById("publicidade-logo");
-    const texto = document.getElementById("publicidade-texto");
-    const botoes = document.getElementById("publicidade-botoes");
+    const titulo  = document.getElementById("publicidade-titulo");
+    const logo    = document.getElementById("publicidade-logo");
+    const texto   = document.getElementById("publicidade-texto");
+    const botoes  = document.getElementById("publicidade-botoes");
+    const card    = document.getElementById("publicidade-info");
 
-    if (!topo || !logo || !texto || !botoes) return;
+    if(!titulo || !logo || !texto || !botoes || !card){
+        return;
+    }
 
-    const item = publicidade[indice];
+    titulo.textContent = item.titulo;
 
-    // Atualiza texto
-    texto.innerHTML = `
-        <h3>${item.titulo}</h3>
-        <p>${item.texto}</p>
-    `;
+    texto.innerHTML = item.texto;
 
-    // Atualiza logo
-    if (item.logo && item.logo.trim() !== "") {
+    if(item.logo){
 
         logo.innerHTML = `
-            <img src="${item.logo}"
-                 alt="Logo"
-                 style="max-height:70px; max-width:180px;">
+            <img src="${item.logo}" alt="Logo do patrocinador">
         `;
 
-    } else {
+    }else{
 
         logo.innerHTML = "";
 
     }
 
-    // Atualiza botões
     botoes.innerHTML = item.botoes;
 
-    indice++;
+}
 
-    if (indice >= publicidade.length) {
-        indice = 0;
-    }
+function atualizarPublicidade(){
+
+    const card = document.getElementById("publicidade-info");
+
+    if(!card) return;
+
+    card.classList.remove("publicidade-fade-in");
+    card.classList.add("publicidade-fade-out");
+
+    setTimeout(() => {
+
+        renderizarPublicidade(publicidade[indice]);
+
+        card.classList.remove("publicidade-fade-out");
+        card.classList.add("publicidade-fade-in");
+
+        indice++;
+
+        if(indice >= publicidade.length){
+            indice = 0;
+        }
+
+    },350);
+
 }
 
 window.addEventListener("DOMContentLoaded", () => {
 
-    atualizarPublicidade();
+    renderizarPublicidade(publicidade[0]);
 
-    setInterval(atualizarPublicidade, 8000);
+    indice = 1;
+
+    const card = document.getElementById("publicidade-info");
+
+    if(card){
+        card.classList.add("publicidade-fade-in");
+    }
+
+    setInterval(atualizarPublicidade,8000);
 
 });
