@@ -457,7 +457,7 @@
         }
 
         /* ==========================================================
-           PUBLICIDADE / PATROCINADORES
+            PUBLICIDADE / PATROCINADORES
            ========================================================== */
 
         .card-desenvolvedor{
@@ -468,15 +468,9 @@
 
             border-radius:6px;
 
-            padding:10px 18px;
+            padding:8px 18px;
 
-            display:flex;
-
-            flex-direction:column;
-
-            gap:8px;
-
-            box-sizing:border-box;
+        box-sizing:border-box;
 
         }
 
@@ -484,11 +478,13 @@
 
             display:grid;
 
-            grid-template-columns:180px 110px 1fr;
+            grid-template-columns:160px 90px 1fr;
 
             align-items:center;
 
-            gap:18px;
+            gap:16px;
+
+            min-height:70px;
 
         }
 
@@ -498,7 +494,7 @@
 
             margin:0;
 
-            font-size:1.2rem;
+            font-size:1rem;
 
             font-weight:700;
 
@@ -506,15 +502,17 @@
 
             text-align:center;
 
+            white-space:nowrap;
+
         }
 
         /* ---------------- LOGO ---------------- */
 
         #publicidade-logo{
 
-            width:110px;
+            width:90px;
 
-            height:70px;
+            height:56px;
 
             display:flex;
 
@@ -528,13 +526,15 @@
 
             background:rgba(255,255,255,.04);
 
-        }
+            overflow:hidden;
 
+        }
+        
         #publicidade-logo img{
 
-            max-width:95%;
+            max-width:90%;
 
-            max-height:95%;
+            max-height:90%;
 
             object-fit:contain;
 
@@ -550,47 +550,67 @@
 
             justify-content:center;
 
-            text-align:left;
-
             color:var(--texto-mutado);
 
-            line-height:1.2;
+            line-height:1.15;
+
+            overflow:hidden;
 
         }
 
         #publicidade-texto strong{
 
-            font-size:1.6rem;
+            font-size:1.2rem;
 
-            color:#ffffff;
+            color:#fff;
 
-            margin-bottom:4px;
+            margin-bottom:2px;
+
+            white-space:nowrap;
+
+            overflow:hidden;
+
+            text-overflow:ellipsis;
 
         }
 
+        #publicidade-texto span{
+
+            font-size:.88rem;
+
+            white-space:nowrap;
+
+            overflow:hidden;
+
+            text-overflow:ellipsis;
+
+        }
+        
         /* ---------------- BOTÕES ---------------- */
 
         .dev-botoes{
 
             display:flex;
 
-            gap:10px;
+            gap:8px;
+
+            margin-top:8px;
 
         }
 
         .btn-dev{
 
             flex:1;
-
-            padding:8px 14px;
-
+    
+            padding:6px 10px;
+        
             border-radius:4px;
 
             text-align:center;
 
             text-decoration:none;
 
-            font-size:.9rem;
+            font-size:.82rem;
 
             font-weight:700;
 
