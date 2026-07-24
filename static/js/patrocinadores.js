@@ -39,7 +39,7 @@ const patrocinadores = [
         tipo: "master",
         prioridade: 1,
 
-        titulo: "🏆 PATROCINADOR MASTER",
+        titulo: "🏆 MASTER",
 
         nome: "SUPERMERCADO CENTRAL",
 
@@ -67,7 +67,7 @@ const patrocinadores = [
         tipo: "ouro",
         prioridade: 2,
 
-        titulo: "🥇 PATROCINADOR OURO",
+        titulo: "🥇 OURO",
 
         nome: "POSTO AVENIDA",
 
