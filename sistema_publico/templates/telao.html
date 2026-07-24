@@ -512,7 +512,7 @@
     
             grid-template-columns:1fr 1fr;
 
-            gap:10px;
+            gap:14px;
 
             padding-left:8px;
 
@@ -690,25 +690,29 @@
 
             align-items:center;
 
-            gap:8px;
+            height:46px;
 
-            height:50px;
-
-            padding:0 14px;
+            padding:0 18px;
 
             text-decoration:none;
 
-            font-size:.82rem;
+            font-size:.85rem;
 
-            font-weight:600;
+            font-weight:700;
 
-            border-radius:8px;
+            border-radius:10px;
 
-            transition:.25s;
+            letter-spacing:.3px;
 
             white-space:nowrap;
 
             box-sizing:border-box;
+
+            transition:
+                background .25s,
+                color .25s,
+                transform .20s,
+                box-shadow .20s;
 
         }
 
@@ -728,9 +732,9 @@
 
         .btn-dev-comprar:hover{
 
-            background:#2ecc71;
+            background:#40cb72;
 
-            color:#000;
+            color:#fff;
 
         }
 
@@ -746,17 +750,19 @@
 
         .btn-dev-patrocinar:hover{
 
-            background:var(--borda-ouro);
+            background:rgba(212,175,55,.12);
 
-            color:#000;
+            color:#fff;
+
+            border-color:var(--dourado-brilhante);
 
         }
 
         .btn-dev:hover{
 
-            transform:translateY(-2px);
+            transform:translateY(-1px);
 
-            box-shadow:0 0 10px rgba(212,175,55,.25);
+            box-shadow:0 4px 10px rgba(0,0,0,.25);
 
         }
 
