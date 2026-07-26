@@ -237,6 +237,22 @@
             height: 85% !important;
         }
 
+        /* ==========================================================
+           MODOS DA CLASSIFICATÓRIA
+           ========================================================== */
+
+        .grid-jogos.modo-normal{
+
+        }
+
+        .grid-jogos.modo-compacto{
+
+        }
+
+        .grid-jogos.modo-ultra{
+
+        }
+
         .card-jogo {
             background: var(--bg-card);
             border: 1px solid var(--borda-ouro);
@@ -956,8 +972,32 @@
             return; 
         }
 
-        grid.classList.remove('layout-super-finais');
+        grid.classList.remove(
+            'layout-super-finais',
+            'modo-normal',
+            'modo-compacto',
+            'modo-ultra'
+        );
+
         grid.style.gap = "10px";
+
+        if (!ehMataMata) {
+
+            if (totalMesas > 16) {
+
+                grid.classList.add('modo-ultra');
+
+            } else if (totalMesas > 10) {
+
+                grid.classList.add('modo-compacto');
+
+            } else {
+
+                grid.classList.add('modo-normal');
+
+            }
+
+        }
 
         let fontSizeCard = "0.9rem";
         let paddingBox = "6px 10px";
