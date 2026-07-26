@@ -1099,10 +1099,14 @@
             }
         }
 
-        grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
-        atletaLinhas.forEach(el => el.style.fontSize = fontSizeCard);
-        atletaBoxes.forEach(el => el.style.padding = paddingBox);
-    }
+        // O layout da fase classificatória agora é controlado pelo CSS.
+        // Mantemos estes ajustes apenas para o mata-mata.
+
+        if (ehMataMata) {
+            grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
+            atletaLinhas.forEach(el => el.style.fontSize = fontSizeCard);
+            atletaBoxes.forEach(el => el.style.padding = paddingBox);
+        }
 
     function gerenciarScrollDoRanking() {
         const container = document.getElementById('ranking-box-container');
