@@ -354,6 +354,16 @@
             display: none;
     
         }
+
+        .divisor-atletas{
+
+            height:1px;
+
+            background:rgba(212,175,55,.18);
+
+            margin:6px 0;
+
+        }
         
         .grid-jogos.layout-super-finais .vs-tag {
             font-size: 1.1rem !important;
@@ -1327,18 +1337,23 @@
                                 textoTagMesa = `MESA ${jogo.mesa}`;
                             }
 
-                            card.innerHTML = `
-                                <div class="mesa-tag" style="margin-bottom: 12px;">${textoTagMesa}</div>
+                           card.innerHTML = `
+                                <div class="mesa-tag">${textoTagMesa}</div>
+
                                 <div class="confronto-flex">
+
                                     <div class="atleta-box ${classeJ1}">
                                         <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
                                         <span class="placar-tag">${p1Str}</span>
                                     </div>
-                                    ${partidaConcluida ? '<div class="vs-espacador-oculto"></div>' : '<div class="vs-tag">VS</div>'}
+
+                                    <div class="divisor-atletas"></div>
+
                                     <div class="atleta-box ${classeJ2}">
                                         <span class="atleta-linha">${prefixoJ2}${advNome}</span>
                                         <span class="placar-tag">${p2Str}</span>
                                     </div>
+
                                 </div>
                             `;
                             containerJogos.appendChild(card);
