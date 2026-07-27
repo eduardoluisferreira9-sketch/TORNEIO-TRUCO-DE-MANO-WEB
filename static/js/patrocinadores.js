@@ -29,7 +29,7 @@ const patrocinadores = [
             link: "https://wa.me/5554991410550?text=Olá! Gostaria de informações sobre patrocínio."
         },
 
-        tempo: 8
+        tempo: 6
     },
 
     // =====================================================
@@ -57,7 +57,7 @@ const patrocinadores = [
             link: "https://wa.me/5554991410550"
         },
 
-        tempo: 8
+        tempo: 16
     },
 
     // =====================================================
@@ -85,7 +85,7 @@ const patrocinadores = [
             link: "https://wa.me/5554991410550"
         },
 
-        tempo: 8
+        tempo: 10
     }
 
 ];
