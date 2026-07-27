@@ -169,6 +169,30 @@
             0 0 5px rgba(212,175,55,.22);
 
         }
+
+        @keyframes brilhoTitulo{
+
+            0%,96%,100%{
+
+                filter:brightness(1);
+
+                text-shadow:
+                    0 3px 8px rgba(0,0,0,.60),
+                    0 0 12px rgba(243,207,93,.18);
+
+            }
+
+            98%{
+
+                filter:brightness(1.18);
+
+                text-shadow:
+                    0 3px 8px rgba(0,0,0,.60),
+                    0 0 28px rgba(243,207,93,.45);
+
+            }
+
+        }
         
            .header-telao h1 {
 
@@ -196,6 +220,8 @@
                 text-shadow:
                     0 3px 8px rgba(0,0,0,.60),
                     0 0 12px rgba(243,207,93,.18);
+
+               animation: brilhoTitulo 25s ease-in-out infinite;
 
             }
 
