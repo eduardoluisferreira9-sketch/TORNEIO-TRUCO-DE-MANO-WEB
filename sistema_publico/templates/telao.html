@@ -1153,6 +1153,30 @@
                 transform .45s ease;
 
         }
+
+        .publicidade-slide{
+
+            transition:
+                opacity .45s ease,
+                transform .45s ease;
+
+        }
+
+        .publicidade-slide.saindo{
+
+            opacity:0;
+
+            transform:translateX(-40px);
+
+        }
+
+        .publicidade-slide.entrando{
+
+            opacity:1;
+
+            transform:translateX(0);
+
+        }
         
             /* =========================================
                FERREIRA SISTEMAS
@@ -1356,15 +1380,25 @@
                 <div id="publicidade-info" class="publicidade-grid">
 
                     <div class="col-logo">
-                        <div id="publicidade-logo"></div>
+
+                        <div id="publicidade-logo-slide" class="publicidade-slide">
+
+                            <div id="publicidade-logo"></div>
+
+                        </div>
+
                     </div>
 
                     <div class="col-patrocinador">
 
-                        <div id="publicidade-texto"></div>
+                        <div id="publicidade-slide" class="publicidade-slide">
 
-                        <div id="publicidade-botoes" class="col-botoes">
-                            <!-- JavaScript -->
+                            <div id="publicidade-texto"></div>
+
+                            <div id="publicidade-botoes" class="col-botoes">
+                                <!-- JavaScript -->
+                            </div>
+
                         </div>
 
                     </div>
