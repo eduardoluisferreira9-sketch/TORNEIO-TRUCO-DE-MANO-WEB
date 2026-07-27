@@ -244,12 +244,13 @@ function renderizarPublicidade(item) {
 
 function trocarPublicidade() {
 
-    const card = document.getElementById("publicidade-info");
+    const logoSlide = document.getElementById("publicidade-logo-slide");
+    const conteudoSlide = document.getElementById("publicidade-slide");
 
-    if (!card) return;
+    if (!logoSlide || !conteudoSlide) return;
 
-    card.classList.remove("publicidade-fade-in");
-    card.classList.add("publicidade-fade-out");
+    logoSlide.classList.add("saindo");
+    conteudoSlide.classList.add("saindo");
 
     setTimeout(() => {
 
@@ -257,8 +258,8 @@ function trocarPublicidade() {
 
         if (!publicidadeAtual) {
 
-            card.classList.remove("publicidade-fade-out");
-            card.classList.add("publicidade-fade-in");
+            logoSlide.classList.remove("saindo");
+            conteudoSlide.classList.remove("saindo");
 
             iniciarTimer();
             return;
@@ -267,8 +268,18 @@ function trocarPublicidade() {
 
         renderizarPublicidade(publicidadeAtual);
 
-        card.classList.remove("publicidade-fade-out");
-        card.classList.add("publicidade-fade-in");
+        logoSlide.classList.remove("saindo");
+        conteudoSlide.classList.remove("saindo");
+
+        logoSlide.classList.add("entrando");
+        conteudoSlide.classList.add("entrando");
+
+        setTimeout(() => {
+
+            logoSlide.classList.remove("entrando");
+            conteudoSlide.classList.remove("entrando");
+
+        }, 450);
 
         iniciarTimer();
 
