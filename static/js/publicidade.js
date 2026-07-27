@@ -10,7 +10,6 @@ let timerPublicidade = null;
 // =========================================
 
 const rotacao = {
-    sistema: [],
     master: [],
     ouro: [],
     prata: [],
@@ -19,7 +18,6 @@ const rotacao = {
 
 // Ponteiro de cada categoria
 const ponteiros = {
-    sistema: 0,
     master: 0,
     ouro: 0,
     prata: 0,
@@ -28,7 +26,6 @@ const ponteiros = {
 
 // Sequência de exibição
 const sequencia = [
-    "sistema",
     "master",
     "ouro",
     "prata",
@@ -54,13 +51,14 @@ function montarRotacao() {
 
     patrocinadores.forEach(item => {
 
+        // Ignora a Ferreira Sistemas
+        if (item.tipo === "sistema") return;
+
         if (rotacao[item.tipo]) {
             rotacao[item.tipo].push(item);
         }
 
     });
-
-    console.log("Motor de rotação:", rotacao);
 
 }
 
@@ -116,7 +114,7 @@ function obterProximaPublicidade() {
 
     }
 
-    return patrocinadores[0];
+    return null;
 
 }
 
@@ -125,6 +123,8 @@ function obterProximaPublicidade() {
 // =========================================
 
 function renderizarPublicidade(item) {
+
+    if (!item) return;
 
     const titulo = document.getElementById("publicidade-titulo");
     const logo = document.getElementById("publicidade-logo");
@@ -137,22 +137,11 @@ function renderizarPublicidade(item) {
 
     titulo.textContent = item.titulo;
 
-    if (item.tipo === "sistema") {
-
-    logo.innerHTML = `
-        <div class="logo-ferreira">
-            <div class="logo-ef">
-                <span class="logo-e">E</span>
-                <span class="logo-f">F</span>
-            </div>
-        </div>
-    `;
-
-    } else if (item.logo && item.logo.trim() !== "") {
+    if (item.logo && item.logo.trim() !== "") {
 
         logo.innerHTML = `
             <img src="${item.logo}" alt="${item.nome}">
-    `    ;
+        `;
 
     } else {
 
@@ -160,68 +149,24 @@ function renderizarPublicidade(item) {
 
     }
 
-    // =====================================
-    // ASSINATURA FERREIRA SISTEMAS
-    // =====================================
+    texto.innerHTML = `
+        <strong>${item.nome}</strong>
+        <span>${item.slogan}</span>
+    `;
 
-    if (item.tipo === "sistema") {
+    botoes.innerHTML = `
+        <a href="${item.botao1.link}"
+           target="_blank"
+           class="btn-dev btn-dev-comprar">
+            ${item.botao1.texto}
+        </a>
 
-        texto.innerHTML = `
-            <div class="assinatura-dev">
-
-                <div class="assinatura-nome">
-                    ${item.nome}
-                </div>
-
-                <div class="assinatura-slogan">
-                    ${item.slogan}
-                </div>
-
-            </div>
-        `;
-
-        botoes.innerHTML = `
-            <a href="${item.botao1.link}"
-               target="_blank"
-               class="btn-dev btn-dev-comprar">
-                ${item.botao1.texto}
-            </a>
-
-            <a href="${item.botao2.link}"
-               target="_blank"
-               class="btn-dev btn-dev-patrocinar">
-                ${item.botao2.texto}
-            </a>
-        `;
-
-    }
-
-    // =====================================
-    // PATROCINADORES
-    // =====================================
-
-    else {
-
-        texto.innerHTML = `
-            <strong>${item.nome}</strong>
-            ${item.slogan}
-        `;
-
-        botoes.innerHTML = `
-            <a href="${item.botao1.link}"
-               target="_blank"
-               class="btn-dev btn-dev-comprar">
-                ${item.botao1.texto}
-            </a>
-
-            <a href="${item.botao2.link}"
-               target="_blank"
-               class="btn-dev btn-dev-patrocinar">
-                ${item.botao2.texto}
-            </a>
-        `;
-
-    }
+        <a href="${item.botao2.link}"
+           target="_blank"
+           class="btn-dev btn-dev-patrocinar">
+            ${item.botao2.texto}
+        </a>
+    `;
 
 }
 
@@ -241,6 +186,8 @@ function trocarPublicidade() {
     setTimeout(() => {
 
         publicidadeAtual = obterProximaPublicidade();
+
+        if (!publicidadeAtual) return;
 
         renderizarPublicidade(publicidadeAtual);
 
@@ -280,7 +227,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     publicidadeAtual = obterProximaPublicidade();
 
-    renderizarPublicidade(publicidadeAtual);
+    if (publicidadeAtual) {
+        renderizarPublicidade(publicidadeAtual);
+    }
 
     const card = document.getElementById("publicidade-info");
 
