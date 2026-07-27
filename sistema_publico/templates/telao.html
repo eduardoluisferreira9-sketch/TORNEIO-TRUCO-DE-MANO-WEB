@@ -212,55 +212,59 @@
 
             }
         
-        .cronometro-container {
+        .cronometro-container{
 
-            border: 2px solid var(--borda-ouro);
+            border:2px solid var(--borda-ouro);
+            border-radius:6px;
 
-            padding:6px 22px 8px;
+            background:rgba(0,0,0,.80);
 
-            border-radius: 6px;
-
-            background: rgba(0, 0, 0, 0.8);
+            padding:3px 18px 5px;
 
             display:flex;
             flex-direction:column;
 
-            align-items:center;
             justify-content:center;
-
+            align-items:center;
+        
             flex-shrink:0;
 
-            gap:4px;
+            min-width:210px;
 
+            line-height:1;
         }
 
         .cronometro-label{
 
-            font-size:.58rem;
+            font-size:.48rem;
 
             font-weight:700;
-    
-            letter-spacing:2px;
 
+            letter-spacing:1.8px;
+
+            color:rgba(243,207,93,.75);
+    
             text-transform:uppercase;
+
+            margin-bottom:1px;
+
+            line-height:1;
+        }
+
+        .cronometro-digital{
+
+            font-size:2.55rem;
+
+            font-family:'Courier New', monospace;
+
+            font-weight:900;
 
             color:var(--dourado-brilhante);
 
-            opacity:.72;
+            line-height:.95;
 
-            line-height:1;
+            letter-spacing:-1px;
 
-            user-select:none;
-
-        }
-        
-        .cronometro-digital {
-            font-size:2.8rem; /* CRONÔMETRO MAXIMIZADO */
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: 900;
-            color: var(--dourado-brilhante);
-            line-height: 1;
-            letter-spacing: -1px;
         }
 
         .painel-infos {
@@ -1259,15 +1263,8 @@
     <div class="header-telao">
         <h1 id="nome-torneio">TORNEIO DE TRUCO <span>CEGO</span></h1>
         <div class="cronometro-container">
-
-            <div class="cronometro-label">
-                TEMPO DA RODADA
-            </div>
-
-            <div id="cronometro" class="cronometro-digital">
-                00:00
-            </div>
-
+            <div class="cronometro-label">TEMPO DA RODADA</div>
+            <div id="cronometro" class="cronometro-digital">00:00</div>
         </div>
 
     <div class="painel-infos">
