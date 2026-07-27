@@ -612,8 +612,8 @@
         }
 
        /* ==========================================================
-       PUBLICIDADE / PATROCINADORES
-       ========================================================== */
+           PUBLICIDADE / PATROCINADORES
+           ========================================================== */
 
         .card-desenvolvedor{
 
@@ -627,23 +627,67 @@
 
             box-sizing:border-box;
 
-        }
+            display:flex;
 
-        /* ==========================================================
-           GRID PRINCIPAL
-           ========================================================== */
+            flex-direction:column;
+
+        }
 
         .publicidade-grid{
 
+            flex:1;
+
             display:grid;
+
             grid-template-columns:15% 13% 42% 15% 15%;
+
             align-items:center;
+
             gap:14px;
+
             min-height:90px;
 
         }
 
-       /* ==========================================================
+        .assinatura-sistema{
+
+            margin-top:8px;
+
+            padding-top:7px;
+
+            border-top:1px solid rgba(212,175,55,.15);
+
+            display:flex;
+
+            justify-content:center;
+
+            align-items:center;
+
+            gap:8px;
+
+            font-size:.72rem;
+
+            letter-spacing:.4px;
+
+            color:#9eb19e;
+
+        }
+
+        .assinatura-sistema strong{
+
+            color:var(--dourado-brilhante);
+
+            font-weight:700;
+
+        }
+
+        .assinatura-sistema span{
+
+            color:#7f907f;
+
+        }
+
+        /* ==========================================================
            SEPARADORES
            ========================================================== */
 
@@ -660,7 +704,7 @@
         .col-botoes{
 
             display:grid;
-    
+
             grid-template-columns:1fr 1fr;
 
             gap:14px;
