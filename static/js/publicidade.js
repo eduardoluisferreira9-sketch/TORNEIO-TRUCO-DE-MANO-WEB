@@ -191,16 +191,13 @@ function renderizarPublicidade(item) {
 
     if (!item) return;
 
-    const titulo = document.getElementById("publicidade-titulo");
     const logo = document.getElementById("publicidade-logo");
     const texto = document.getElementById("publicidade-texto");
     const botoes = document.getElementById("publicidade-botoes");
 
-    if (!titulo || !logo || !texto || !botoes) {
+    if (!logo || !texto || !botoes) {
         return;
     }
-
-    titulo.textContent = item.titulo;
 
     if (item.logo && item.logo.trim() !== "") {
 
