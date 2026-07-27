@@ -166,10 +166,6 @@ function renderizarPublicidade(item) {
         texto.innerHTML = `
             <div class="assinatura-dev">
 
-                <div class="assinatura-titulo">
-                    ${item.titulo}
-                </div>
-
                 <div class="assinatura-nome">
                     ${item.nome}
                 </div>
