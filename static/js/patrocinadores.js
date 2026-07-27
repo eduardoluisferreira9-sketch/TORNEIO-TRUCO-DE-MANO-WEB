@@ -11,11 +11,11 @@ const patrocinadores = [
         tipo: "sistema",
         prioridade: 0,
 
-        titulo: "💻 Sistema de Telão",
+        titulo: "DESENVOLVIDO POR",
 
-        nome: "Eduardo Luis Ferreira",
+        nome: "Ferreira Sistemas",
 
-        slogan: "Desenvolvido especialmente para torneios de Truco Cego",
+        slogan: "Tecnologia com propósito.",
 
         logo: "",
 
