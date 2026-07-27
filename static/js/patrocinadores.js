@@ -45,7 +45,7 @@ const patrocinadores = [
 
         slogan: "Patrocinador Oficial",
 
-        destaque: "🛒 Há mais de 30 anos atendendo nossa comunidade.",
+        mensagem: "🛒 Há mais de 30 anos atendendo nossa comunidade.",
 
         logo: "/static/patrocinadores/mercado-central.jpg",
 
@@ -75,7 +75,7 @@ const patrocinadores = [
 
         slogan: "Seu combustível de confiança",
 
-        destaque: "⛽ Combustível, conveniência e atendimento de qualidade.",
+        mensagem: "⛽ Combustível, conveniência e atendimento de qualidade.",
 
         logo: "/static/patrocinadores/posto-avenida.jpg",
 
