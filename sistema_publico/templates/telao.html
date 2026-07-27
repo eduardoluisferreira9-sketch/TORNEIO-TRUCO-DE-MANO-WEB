@@ -127,14 +127,48 @@
 
         /* --- Header Otimizado para Título e Cronômetro Gigantes --- */
         .header-telao {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--borda-ouro);
-            padding-bottom:8px; 
-            margin-bottom:6px;
-            flex-shrink: 0;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+
+            position:relative;
+
+            padding-bottom:10px;
+            margin-bottom:8px;
+
+            flex-shrink:0;
             gap:16px;
+
+            border-bottom:none;
+
+        }
+
+        .header-telao::after{
+
+            content:"";
+
+            position:absolute;
+
+            left:0;
+            right:0;
+            bottom:0;
+
+            bottom:1px;
+            height:2px;
+
+            background:linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(212,175,55,.20) 15%,
+                #d4af37 50%,
+                rgba(212,175,55,.20) 85%,
+                transparent 100%
+            );
+
+                box-shadow:
+                0 0 5px rgba(212,175,55,.28);
+
         }
         
            .header-telao h1 {
