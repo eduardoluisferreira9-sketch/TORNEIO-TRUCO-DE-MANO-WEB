@@ -75,7 +75,14 @@
             z-index:99999;
 
         }
-        
+
+        .painel-admin-secreto.visivel {
+
+            top: 0;
+            opacity: 1;
+
+        }
+                
         .btn-admin {
             background: #071a0c;
             color: var(--borda-ouro);
@@ -1805,6 +1812,37 @@
 
     atualizarTelao();
     setInterval(atualizarTelao, 3000);
+    
+    /* ============================
+       PAINEL ADMINISTRATIVO
+    ============================ */
+
+    const painelAdmin = document.querySelector(".painel-admin-secreto");
+
+    let timeoutPainel;
+
+    document.addEventListener("mousemove", (e) => {
+
+        if (e.clientY <= 20) {
+
+            painelAdmin.classList.add("visivel");
+
+            clearTimeout(timeoutPainel);
+
+        } else {
+
+            clearTimeout(timeoutPainel);
+
+            timeoutPainel = setTimeout(() => {
+
+                painelAdmin.classList.remove("visivel");
+
+            }, 1200);
+
+        }
+
+    });
+    
 </script>
 
 <script src="/static/js/patrocinadores.js"></script>
