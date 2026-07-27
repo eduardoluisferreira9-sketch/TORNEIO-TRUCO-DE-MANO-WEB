@@ -272,7 +272,7 @@ function trocarPublicidade() {
 
         iniciarTimer();
 
-    }, 550);
+    }, 450);
 
 }
 
