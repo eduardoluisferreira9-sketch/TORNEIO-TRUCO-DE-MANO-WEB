@@ -137,11 +137,19 @@ function renderizarPublicidade(item) {
 
     titulo.textContent = item.titulo;
 
-    if (item.logo && item.logo.trim() !== "") {
+    if (item.tipo === "sistema") {
+
+    logo.innerHTML = `
+        <div class="logo-ferreira">
+            <span class="logo-ef">EF</span>
+        </div>
+    `;
+
+    } else if (item.logo && item.logo.trim() !== "") {
 
         logo.innerHTML = `
             <img src="${item.logo}" alt="${item.nome}">
-        `;
+    `    ;
 
     } else {
 
