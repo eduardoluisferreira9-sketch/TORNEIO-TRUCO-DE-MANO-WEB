@@ -112,19 +112,48 @@
             flex-shrink: 0;
             gap:16px;
         }
-        .header-telao h1 {
-            margin: 0;
-            font-size:2.35rem; /* DESTAQUE MÁXIMO DO TORNEIO */
-            font-weight: 900;
-            color: var(--dourado-brilhante);
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(243, 207, 93, 0.2); 
-            line-height: 1;
-            white-space: nowrap;
-        }
-        .header-telao h1 span { 
-            color: #ffffff; 
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-        }
+        
+           .header-telao h1 {
+
+                margin: 0;
+
+                font-size: 2.35rem;
+                font-weight: 900;
+                line-height: 1;
+                white-space: nowrap;
+
+                background: linear-gradient(
+                    180deg,
+                    #fff8cf 0%,
+                    #f9e58d 18%,
+                    #f3cf5d 38%,
+                    #d4af37 58%,
+                    #b88a15 82%,
+                    #f8df7a 100%
+                );
+
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+
+                text-shadow:
+                    0 3px 8px rgba(0,0,0,.60),
+                    0 0 12px rgba(243,207,93,.18);
+
+            }
+
+            .header-telao h1 span{
+
+                background:none;
+
+                color:#ffffff;
+                -webkit-text-fill-color:#ffffff;
+
+                text-shadow:
+                    0 3px 8px rgba(0,0,0,.60),
+                    0 0 8px rgba(255,255,255,.08);
+
+            }
         
         .cronometro-container {
             border: 2px solid var(--borda-ouro);
