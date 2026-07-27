@@ -48,17 +48,34 @@
             letter-spacing: 1px;
         }
 
-        .painel-admin-secreto {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 6px 12px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            display: inline-flex;
-            gap: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            align-self: flex-start;
-            flex-shrink: 0;
+        .painel-admin-secreto{
+
+            position:fixed;
+
+            top:-70px;
+            left:20px;
+
+            display:flex;
+            gap:12px;
+
+            padding:8px 12px;
+
+            background:rgba(0,0,0,.88);
+            backdrop-filter:blur(8px);
+
+            border:1px solid rgba(212,175,55,.30);
+            border-radius:0 0 8px 8px;
+
+            transition:
+                top .30s ease,
+                opacity .30s ease;
+
+            opacity:0;
+
+            z-index:99999;
+
         }
+        
         .btn-admin {
             background: #071a0c;
             color: var(--borda-ouro);
