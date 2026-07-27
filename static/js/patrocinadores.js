@@ -45,6 +45,8 @@ const patrocinadores = [
 
         slogan: "Patrocinador Oficial",
 
+        destaque: "🛒 Há mais de 30 anos atendendo nossa comunidade.",
+
         logo: "/static/patrocinadores/mercado-central.jpg",
 
         botao1: {
@@ -72,6 +74,8 @@ const patrocinadores = [
         nome: "POSTO AVENIDA",
 
         slogan: "Seu combustível de confiança",
+
+        destaque: "⛽ Combustível, conveniência e atendimento de qualidade.",
 
         logo: "/static/patrocinadores/posto-avenida.jpg",
 
