@@ -219,7 +219,7 @@
             border:2px solid var(--borda-ouro);
             border-radius:6px;
 
-            padding:4px 22px;
+            padding:6px 22px 4px;
 
             background:rgba(0,0,0,.80);
 
@@ -230,20 +230,25 @@
             flex-shrink:0;
         }
 
-        .cronometro-container::before{
+        .cronometro-wrapper{
+            position:relative;
+            display:flex;
+            align-items:center;
+        }
 
-            content:"TEMPO DA RODADA";
+        .cronometro-tag{
 
             position:absolute;
 
-            top:-8px;
-
+            top:-10px;
             left:50%;
             transform:translateX(-50%);
 
-            padding:2px 6px;
+            z-index:10;
 
-            background:rgba(4,15,7,.95);
+            padding:2px 8px;
+
+            background:var(--bg-card);
 
             border:1px solid var(--borda-ouro);
 
@@ -258,6 +263,8 @@
             color:var(--dourado-brilhante);
 
             text-transform:uppercase;
+
+            white-space:nowrap;
 
             line-height:1;
 
@@ -1277,9 +1284,18 @@
             TORNEIO DE TRUCO <span>CEGO</span>
         </h1>
 
-        <div class="cronometro-container">
-            <div id="cronometro" class="cronometro-digital">00:00</div>
+        <div class="cronometro-wrapper">
+
+            <div class="cronometro-tag">
+                TEMPO DA RODADA
+            </div>
+
+            <div class="cronometro-container">
+                <div id="cronometro" class="cronometro-digital">00:00</div>
+            </div>
+
         </div>
+
     </div>
 
     <div class="painel-infos">
@@ -1384,6 +1400,12 @@
                         </div>
 
                     </div>
+
+                </div>
+
+             </div>
+
+          </div>
 
             <!-- ======================================================================= -->
                 
