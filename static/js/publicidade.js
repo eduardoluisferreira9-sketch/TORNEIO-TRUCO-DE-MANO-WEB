@@ -109,10 +109,18 @@ function montarRotacao() {
 
     // Embaralha cada categoria apenas uma vez
     Object.keys(rotacao).forEach(tipo => {
-        rotacao[tipo].sort(() => Math.random() - 0.5);
-    });
+
+    const lista = rotacao[tipo];
+
+        for (let i = lista.length - 1; i > 0; i--) {
+
+            const j = Math.floor(Math.random() * (i + 1));
+
+            [lista[i], lista[j]] = [lista[j], lista[i]];
+
+        }
     
-}
+    });
 
 // =========================================
 // PRÓXIMO DA CATEGORIA
