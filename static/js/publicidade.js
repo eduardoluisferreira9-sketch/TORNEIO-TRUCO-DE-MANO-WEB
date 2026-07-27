@@ -141,7 +141,10 @@ function renderizarPublicidade(item) {
 
     logo.innerHTML = `
         <div class="logo-ferreira">
-            <span class="logo-ef">EF</span>
+            <div class="logo-ef">
+                <span class="logo-e">E</span>
+                <span class="logo-f">F</span>
+            </div>
         </div>
     `;
 
