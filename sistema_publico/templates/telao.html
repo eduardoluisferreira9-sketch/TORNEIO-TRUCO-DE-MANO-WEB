@@ -214,43 +214,53 @@
         
         .cronometro-container{
 
+            position:relative;
+
             border:2px solid var(--borda-ouro);
             border-radius:6px;
 
+            padding:4px 22px;
+
             background:rgba(0,0,0,.80);
 
-            padding:3px 18px 5px;
-
             display:flex;
-            flex-direction:column;
-
             justify-content:center;
             align-items:center;
-        
+
             flex-shrink:0;
-
-            min-width:210px;
-
-            line-height:1;
         }
 
-        .cronometro-label{
+        .cronometro-container::before{
+
+            content:"TEMPO DA RODADA";
+
+            position:absolute;
+
+            top:-8px;
+            left:14px;
+
+            padding:2px 8px;
+
+            background:var(--verde-fundo);
+        
+            border:1px solid var(--borda-ouro);
+
+            border-radius:4px;
 
             font-size:.48rem;
 
             font-weight:700;
 
-            letter-spacing:1.8px;
+            letter-spacing:1px;
 
-            color:rgba(243,207,93,.75);
-    
+            color:var(--dourado-brilhante);
+
             text-transform:uppercase;
 
-            margin-bottom:1px;
-
             line-height:1;
-        }
 
+        }
+        
         .cronometro-digital{
 
             font-size:2.55rem;
@@ -1263,7 +1273,6 @@
     <div class="header-telao">
         <h1 id="nome-torneio">TORNEIO DE TRUCO <span>CEGO</span></h1>
         <div class="cronometro-container">
-            <div class="cronometro-label">TEMPO DA RODADA</div>
             <div id="cronometro" class="cronometro-digital">00:00</div>
         </div>
 
