@@ -212,8 +212,14 @@ function renderizarPublicidade(item) {
     }
 
     texto.innerHTML = `
-        <strong>${item.nome}</strong>
+         <strong>${item.nome}</strong>
         <span>${item.slogan}</span>
+
+        ${
+            item.mensagem
+                ? `<div class="publicidade-mensagem">${item.mensagem}</div>`
+                : ""
+        }
     `;
 
     botoes.innerHTML = `
