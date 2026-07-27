@@ -773,9 +773,19 @@
         }
 
         @keyframes autoScrollRanking {
-            0%, 10% { transform: translateY(0); }
-            45%, 55% { transform: translateY(var(--scroll-distancia, -50%)); }
-            90%, 100% { transform: translateY(0); }
+
+            0%,15%{
+                transform:translateY(0);
+            }
+
+            40%,60%{
+                transform:translateY(var(--scroll-distancia));
+            }
+
+            85%,100%{
+                transform:translateY(0);
+            }
+
         }
 
        /* ==========================================================
@@ -1553,7 +1563,7 @@
         if (alturaTabela > alturaDisponivel) {
             const distanciaScroll = alturaTabela - alturaDisponivel + 20; 
             body.style.setProperty('--scroll-distancia', `-${distanciaScroll}px`);
-            body.style.animation = "autoScrollRanking 20s linear infinite alternate";
+            body.style.animation = "autoScrollRanking 40s ease-in-out infinite alternate";
         } else {
             body.style.animation = "none";
             body.style.transform = "translateY(0)";
