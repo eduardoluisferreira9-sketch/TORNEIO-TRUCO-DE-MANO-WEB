@@ -11,7 +11,7 @@ const patrocinadores = [
         tipo: "sistema",
         prioridade: 0,
 
-        titulo: "💻 Sistema de Telão Digital",
+        titulo: "💻 Sistema de Telão",
 
         nome: "Eduardo Luis Ferreira",
 
