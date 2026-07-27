@@ -639,11 +639,11 @@
 
             display:grid;
 
-            grid-template-columns:170px 1fr 240px;
+            grid-template-columns:170px 1fr 210px;
+
+            gap:20px;
 
             align-items:center;
-
-            gap:22px;
 
             min-height:90px;
 
@@ -657,7 +657,7 @@
 
             justify-content:center;
 
-            height:100%;
+            align-items:flex-start;
 
         }
 
@@ -719,24 +719,11 @@
            SEPARADORES
            ========================================================== */
 
-       .col-logo,
-        .col-texto{
+       .col-logo{
 
             padding-right:10px;
 
             border-right:1px solid rgba(212,175,55,.18);
-
-        }
-
-        .col-botoes{
-
-            display:grid;
-
-            grid-template-columns:1fr 1fr;
-
-            gap:14px;
-
-            padding-left:8px;
 
         }
 
@@ -846,37 +833,38 @@
         .assinatura-dev{
 
             display:flex;
+
             flex-direction:column;
+
             justify-content:center;
 
+            gap:4px;
+
         }
 
-        .assinatura-nome{
+        .assinatura-dev span{
 
-            font-size:2rem;
-            font-weight:700;
-            color:#ffffff;
-            line-height:1.1;
-        
+            font-size:.75rem;
+
+            color:#9ea99e;
+
         }
 
-        .assinatura-slogan{
-
-            margin-top:6px;
+        .assinatura-dev strong{
 
             font-size:1.05rem;
 
-            color:#c8d2c8;
+            font-weight:700;
 
-            letter-spacing:.3px;
+            color:#ffffff;
 
         }
 
-        #publicidade-texto span{
+        .assinatura-dev small{
 
-            font-size:1rem;
+            font-size:.72rem;
 
-            color:#d5d5d5;
+            color:#7f907f;
 
         }
 
@@ -886,11 +874,13 @@
 
         .col-botoes{
 
-            display:grid;
+            display:flex;
 
-            grid-template-columns:1fr 1fr;
+            gap:10px;
 
-            gap:12px;
+            margin-top:10px;
+
+            flex-wrap:wrap;
 
         }
 
@@ -1151,9 +1141,9 @@
                
             <div class="rodape-publicidade">
 
-             <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
+            <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
 
-             <div class="card-desenvolvedor">
+            <div class="card-desenvolvedor">
 
                 <div id="publicidade-info" class="publicidade-grid">
 
@@ -1161,22 +1151,40 @@
                         <div id="publicidade-logo"></div>
                     </div>
 
-                    <div class="col-texto">
-                        <div id="publicidade-texto">
-                            Desenvolvido por <strong>Eduardo Luis Ferreira</strong>
+                    <div class="col-patrocinador">
+
+                        <div id="publicidade-texto"></div>
+
+                        <div id="publicidade-botoes" class="col-botoes">
+                            <!-- JavaScript -->
                         </div>
+
                     </div>
 
-                    <div id="publicidade-botoes" class="col-botoes">
-                        <!-- Os botões serão inseridos pelo JavaScript -->
+                    <div class="col-assinatura">
+
+                        <div class="assinatura-dev">
+
+                            <span>Desenvolvido por</span>
+
+                            <strong>Eduardo Luis Ferreira</strong>
+
+                            <small>Sistema de Telão</small>
+
+                        </div>
+
                     </div>
 
                 </div>
 
                 <div class="assinatura-sistema">
+
                     <span>Desenvolvido por</span>
+
                     <strong>Ferreira Sistemas</strong>
+
                     <span>• Tecnologia com propósito.</span>
+
                 </div>
 
             </div>
