@@ -149,24 +149,72 @@ function renderizarPublicidade(item) {
 
     }
 
-    texto.innerHTML = `
-        <strong>${item.nome}</strong>
-        ${item.slogan}
-    `;
+    // =====================================
+    // ASSINATURA FERREIRA SISTEMAS
+    // =====================================
 
-    botoes.innerHTML = `
-        <a href="${item.botao1.link}"
-           target="_blank"
-           class="btn-dev btn-dev-comprar">
-            ${item.botao1.texto}
-        </a>
+    if (item.tipo === "sistema") {
 
-        <a href="${item.botao2.link}"
-           target="_blank"
-           class="btn-dev btn-dev-patrocinar">
-            ${item.botao2.texto}
-        </a>
-    `;
+        texto.innerHTML = `
+            <div class="assinatura-dev">
+
+                <div class="assinatura-titulo">
+                    ${item.titulo}
+                </div>
+
+                <div class="assinatura-nome">
+                    ${item.nome}
+                </div>
+
+                <div class="assinatura-slogan">
+                    ${item.slogan}
+                </div>
+
+            </div>
+        `;
+
+        botoes.innerHTML = `
+            <a href="${item.botao1.link}"
+               target="_blank"
+               class="btn-dev btn-dev-comprar">
+                ${item.botao1.texto}
+            </a>
+
+            <a href="${item.botao2.link}"
+               target="_blank"
+               class="btn-dev btn-dev-patrocinar">
+                ${item.botao2.texto}
+            </a>
+        `;
+
+    }
+
+    // =====================================
+    // PATROCINADORES
+    // =====================================
+
+    else {
+
+        texto.innerHTML = `
+            <strong>${item.nome}</strong>
+            ${item.slogan}
+        `;
+
+        botoes.innerHTML = `
+            <a href="${item.botao1.link}"
+               target="_blank"
+               class="btn-dev btn-dev-comprar">
+                ${item.botao1.texto}
+            </a>
+
+            <a href="${item.botao2.link}"
+               target="_blank"
+               class="btn-dev btn-dev-patrocinar">
+                ${item.botao2.texto}
+            </a>
+        `;
+
+    }
 
 }
 
