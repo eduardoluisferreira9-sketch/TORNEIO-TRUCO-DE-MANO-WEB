@@ -1925,10 +1925,15 @@
                             const card = document.createElement('div');
                             card.className = 'card-jogo';
 
+                            const idMesaEspecial = Number(jogo.fase_mesa);
+                            const nomeFaseMesaOficial = jogo.fase_mesa_nome
+                                ? jogo.fase_mesa_nome.toUpperCase()
+                                : "";
+                            
                             if (faseRaw === -4) {
                                 card.classList.add('card-semifinal');
                             }
-
+                            
                             if (
                                 idMesaEspecial === -2 ||
                                 nomeFaseMesaOficial.includes("GRANDE FINAL") ||
@@ -1995,8 +2000,6 @@
                             }
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
-                            const idMesaEspecial = Number(jogo.fase_mesa);
-                            const nomeFaseMesaOficial = jogo.fase_mesa_nome ? jogo.fase_mesa_nome.toUpperCase() : "";
 
                             // 1. Se o banco/API já mandou um nome específico para a mesa, respeitamos primeiro
                             if (nomeFaseMesaOficial.includes("SEMIFINAL") || statusFase.includes("SEMIFINAL") || nomeFaseStr.includes("SEMIFINAL")) {
