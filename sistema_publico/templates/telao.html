@@ -595,14 +595,20 @@
 
             }
         
-        .grid-jogos.layout-super-finais .card-jogo {
-            height: 100%;
-            padding: 18px 20px !important;
-            justify-content: flex-start !important;
-            background: linear-gradient(145deg, rgba(4, 25, 12, 0.85) 0%, rgba(2, 10, 5, 0.95) 100%);
-            border-width: 2px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            
+        .grid-jogos.layout-super-finais {
+
+            grid-template-columns: repeat(2, 1fr) !important;
+
+            grid-template-rows: 1fr;
+
+            gap: 20px !important;
+
+            height: 100% !important;
+
+            align-content: stretch;
+    
+            align-items: stretch;
+
         }
 
         .mesa-tag{
