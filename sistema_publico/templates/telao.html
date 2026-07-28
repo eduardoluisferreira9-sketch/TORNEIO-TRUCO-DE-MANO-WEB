@@ -2652,44 +2652,6 @@
                 : "";
 
         botoes.innerHTML = "";
-                                    if (card.classList.contains("card-terceiro-lugar")) {
-                                classeMesa += " mesa-terceiro-lugar";
-                            }
-
-                            card.innerHTML = `
-                                <div class="${classeMesa}">${textoTagMesa}</div>
-
-                                <div class="confronto-flex">
-
-                                    <div class="atleta-box ${classeJ1}">
-                                        <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
-                                        <span class="placar-tag">${p1Str}</span>
-                                    </div>
-
-                                    <div class="divisor-atletas"></div>
-
-                                    <div class="atleta-box ${classeJ2}">
-                                        <span class="atleta-linha">${prefixoJ2}${advNome}</span>
-                                        <span class="placar-tag">${p2Str}</span>
-                                    </div>
-
-                                </div>
-                            `;
-
-                            containerJogos.appendChild(card);
-
-                        });
-
-                        ajustarTamanhoDosCards(
-                            totalConfrontosAtuais,
-                            ehMataMataAtivo
-                        );
-
-                    }
-
-                }
-
-            }
 
             // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
 
