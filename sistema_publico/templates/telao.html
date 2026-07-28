@@ -1,1479 +1,1500 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+    <!-- ==========================================================================
+         META
+         ========================================================================== -->
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Telão - Torneio de Truco Cego</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+
+    <link
+        rel="icon"
+        href="/static/favicon.ico"
+        type="image/x-icon"
+    >
+
+    <!-- ==========================================================================
+         FONTES
+         ========================================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@400;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
     <style>
-        /* --- Identidade Visual Alinhada --- */
-        :root {
-            --bg-feltro: radial-gradient(circle, #0e3118 0%, #05160a 100%); 
-            --bg-card: rgba(4, 15, 7, 0.65); 
-            --borda-ouro: #d4af37;   
-            --dourado-brilhante: #f3cf5d;
-            --texto-claro: #ffffff;
-            --texto-mutado: #a8c3af; 
-            --sucesso: #2ecc71;
-            --danger: #ff4757;
-            --madeira: #8d6e63; 
-            --plata-prata: #bdc3c7;
-            --madeira-bronze: #cd7f32;
+
+    /* ==========================================================================
+       VARIÁVEIS GLOBAIS
+       ========================================================================== */
+
+    :root {
+
+        --bg-feltro: radial-gradient(circle, #0e3118 0%, #05160a 100%);
+        --bg-card: rgba(4, 15, 7, 0.65);
+
+        --borda-ouro: #d4af37;
+        --dourado-brilhante: #f3cf5d;
+
+        --texto-claro: #ffffff;
+        --texto-mutado: #a8c3af;
+
+        --sucesso: #2ecc71;
+        --danger: #ff4757;
+
+        --madeira: #8d6e63;
+        --plata-prata: #bdc3c7;
+        --madeira-bronze: #cd7f32;
+
+    }
+
+    /* ==========================================================================
+       RESET
+       ========================================================================== */
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+
+        margin: 0;
+        padding: 0;
+
+        width: 100%;
+        height: 100%;
+
+        overflow: hidden;
+
+    }
+
+    /* ==========================================================================
+       BODY
+       ========================================================================== */
+
+    body {
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 15px 20px;
+
+        background: var(--bg-feltro);
+        background-attachment: fixed;
+
+        color: var(--texto-claro);
+
+        font-family: "Montserrat", sans-serif;
+
+    }
+
+    /* ==========================================================================
+       TIPOGRAFIA
+       ========================================================================== */
+
+    h1,
+    h2,
+    h3,
+    .podio-titulo,
+    .mesa-tag {
+
+        font-family: "Cinzel", serif;
+        letter-spacing: 1px;
+
+    }
+        /* ==========================================================================
+       PAINEL ADMINISTRATIVO
+       ========================================================================== */
+
+    .painel-admin-secreto {
+
+        position: fixed;
+        top: -70px;
+        left: 20px;
+
+        display: flex;
+        gap: 12px;
+
+        padding: 8px 12px;
+
+        background: rgba(0, 0, 0, 0.88);
+        backdrop-filter: blur(8px);
+
+        border: 1px solid rgba(212, 175, 55, 0.30);
+        border-radius: 0 0 8px 8px;
+
+        opacity: 0;
+
+        transition:
+            top .30s ease,
+            opacity .30s ease;
+
+        z-index: 99999;
+
+    }
+
+    .painel-admin-secreto.visivel {
+
+        top: 0;
+        opacity: 1;
+
+    }
+
+    .btn-admin {
+
+        padding: 4px 10px;
+
+        background: #071a0c;
+        color: var(--borda-ouro);
+
+        border: 1px solid var(--borda-ouro);
+        border-radius: 4px;
+
+        cursor: pointer;
+
+        font-size: .80rem;
+        font-weight: 700;
+
+        transition: .20s;
+
+    }
+
+    .btn-admin:hover {
+
+        background: var(--borda-ouro);
+        color: #000;
+
+    }
+
+    .btn-admin.btn-reset {
+
+        color: var(--danger);
+
+        background: rgba(255, 71, 87, .05);
+        border-color: var(--danger);
+
+    }
+
+    .btn-admin.btn-reset:hover {
+
+        background: var(--danger);
+        color: #fff;
+
+    }
+
+    /* ==========================================================================
+       ALERTA DE TEMPO ESGOTADO
+       ========================================================================== */
+
+    .alerta-falta-banner {
+
+        position: fixed;
+        inset: 0;
+
+        display: none;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+
+        box-sizing: border-box;
+
+        background: rgba(5, 15, 8, .96);
+
+        border: 1px solid var(--danger);
+
+        text-align: center;
+
+        animation: pulseBorda 1.5s infinite alternate;
+
+        z-index: 9999;
+
+    }
+
+    /* ==========================================================================
+       HEADER
+       ========================================================================== */
+
+    .header-telao {
+
+        position: relative;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 16px;
+
+        margin-bottom: 8px;
+        padding-bottom: 10px;
+
+        flex-shrink: 0;
+
+        border-bottom: none;
+
+    }
+
+    .header-telao::after {
+
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        right: 0;
+        bottom: 1px;
+
+        height: 3px;
+
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(212, 175, 55, .15) 10%,
+            #f3cf5d 50%,
+            rgba(212, 175, 55, .15) 90%,
+            transparent 100%
+        );
+
+        box-shadow:
+            0 0 5px rgba(212, 175, 55, .22);
+
+    }
+
+    /* ==========================================================================
+       ANIMAÇÃO DO TÍTULO
+       ========================================================================== */
+
+    @keyframes brilhoTitulo {
+
+        0%,
+        96%,
+        100% {
+
+            filter: brightness(1);
+
+            text-shadow:
+                0 3px 8px rgba(0, 0, 0, .60),
+                0 0 12px rgba(243, 207, 93, .18);
+
         }
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; 
-            box-sizing: border-box;
-        }
+        98% {
 
-        body {
-            background: var(--bg-feltro);
-            background-attachment: fixed;
-            color: var(--texto-claro);
-            font-family: 'Montserrat', sans-serif;
-            padding: 15px 20px;
-            display: flex;
-            flex-direction: column;
-        }
+            filter: brightness(1.18);
 
-        h1, h2, h3, .podio-titulo, .mesa-tag {
-            font-family: 'Cinzel', serif;
-            letter-spacing: 1px;
-        }
-
-        .painel-admin-secreto{
-
-            position:fixed;
-
-            top:-70px;
-            left:20px;
-
-            display:flex;
-            gap:12px;
-
-            padding:8px 12px;
-
-            background:rgba(0,0,0,.88);
-            backdrop-filter:blur(8px);
-
-            border:1px solid rgba(212,175,55,.30);
-            border-radius:0 0 8px 8px;
-
-            transition:
-                top .30s ease,
-                opacity .30s ease;
-
-            opacity:0;
-
-            z-index:99999;
+            text-shadow:
+                0 3px 8px rgba(0, 0, 0, .60),
+                0 0 28px rgba(243, 207, 93, .45);
 
         }
 
-        .painel-admin-secreto.visivel {
+    }
 
-            top: 0;
+    .header-telao h1 {
+
+        margin: 0;
+
+        white-space: nowrap;
+        line-height: 1;
+
+        font-size: 2.35rem;
+        font-weight: 900;
+
+        background: linear-gradient(
+            180deg,
+            #fff8cf 0%,
+            #f9e58d 18%,
+            #f3cf5d 38%,
+            #d4af37 58%,
+            #b88a15 82%,
+            #f8df7a 100%
+        );
+
+        background-clip: text;
+        -webkit-background-clip: text;
+
+        -webkit-text-fill-color: transparent;
+
+        text-shadow:
+            0 3px 8px rgba(0, 0, 0, .60),
+            0 0 12px rgba(243, 207, 93, .18);
+
+        animation: brilhoTitulo 25s ease-in-out infinite;
+
+    }
+
+    .header-telao h1 span {
+
+        background: none;
+
+        color: #fff;
+        -webkit-text-fill-color: #fff;
+
+        text-shadow:
+            0 3px 8px rgba(0, 0, 0, .60),
+            0 0 8px rgba(255, 255, 255, .08);
+
+    }
+        /* ==========================================================================
+       CRONÔMETRO
+       ========================================================================== */
+
+    .cronometro-wrapper {
+
+        position: relative;
+
+        display: flex;
+        align-items: center;
+
+    }
+
+    .cronometro-container {
+
+        position: relative;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        flex-shrink: 0;
+
+        padding: 6px 22px 4px;
+
+        background: rgba(0, 0, 0, .80);
+
+        border: 2px solid var(--borda-ouro);
+        border-radius: 6px;
+
+    }
+
+    .cronometro-tag {
+
+        position: absolute;
+
+        top: -10px;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        z-index: 10;
+
+        padding: 2px 8px;
+
+        background: var(--bg-card);
+
+        border: 1px solid var(--borda-ouro);
+        border-radius: 4px;
+
+        color: var(--dourado-brilhante);
+
+        font-size: .42rem;
+        font-weight: 700;
+        letter-spacing: .8px;
+        line-height: 1;
+
+        text-transform: uppercase;
+        white-space: nowrap;
+
+    }
+
+    .cronometro-digital {
+
+        color: var(--dourado-brilhante);
+
+        font-family: "Courier New", monospace;
+        font-size: 2.55rem;
+        font-weight: 900;
+
+        letter-spacing: -1px;
+        line-height: .95;
+
+    }
+
+    /* ==========================================================================
+       PAINEL DE INFORMAÇÕES
+       ========================================================================== */
+
+    .painel-infos {
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        margin-bottom: 15px;
+
+        flex-shrink: 0;
+
+        background: rgba(0, 0, 0, .20);
+
+        border: 1px solid var(--borda-ouro);
+        border-radius: 5px;
+
+    }
+
+    .info-item {
+
+        position: relative;
+
+        padding: 8px 15px;
+
+    }
+
+    .info-item:not(:last-child)::after {
+
+        content: "";
+
+        position: absolute;
+
+        top: 15%;
+        right: 0;
+
+        width: 1px;
+        height: 70%;
+
+        background: rgba(212, 175, 55, .25);
+
+    }
+
+    .info-rotulo {
+
+        margin-bottom: 2px;
+
+        color: var(--texto-mutado);
+
+        font-size: .65rem;
+        font-weight: 600;
+
+        text-transform: uppercase;
+
+    }
+
+    .info-valor {
+
+        color: var(--dourado-brilhante);
+
+        font-size: 1.05rem;
+        font-weight: 700;
+
+    }
+
+    /* ==========================================================================
+       TÍTULOS DAS SEÇÕES
+       ========================================================================== */
+
+    .secao-titulo-container {
+
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        margin-bottom: 12px;
+
+    }
+
+    .secao-titulo {
+
+        margin: 0;
+
+        color: var(--dourado-brilhante);
+
+        font-size: 1.05rem;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        white-space: nowrap;
+
+    }
+
+    .secao-linha {
+
+        flex-grow: 1;
+
+        height: 1px;
+
+        background: var(--borda-ouro);
+
+    }
+        /* ==========================================================================
+       CONTAINER PRINCIPAL
+       ========================================================================== */
+
+    .container-telao {
+
+        display: grid;
+        grid-template-columns: 2.9fr .8fr;
+
+        gap: 16px;
+
+        flex-grow: 1;
+
+        min-height: 0;
+
+    }
+
+    .container-telao.modo-mata-mata {
+
+        grid-template-columns: 1fr !important;
+
+    }
+
+    /* ==========================================================================
+       COLUNA DAS MESAS
+       ========================================================================== */
+
+    .coluna-mesas {
+
+        display: flex;
+        flex-direction: column;
+
+        min-height: 0;
+        height: 100%;
+
+    }
+
+    /* ==========================================================================
+       GRID DE JOGOS
+       ========================================================================== */
+
+    .grid-jogos {
+
+        display: grid;
+
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+        gap: 10px;
+
+        flex-grow: 1;
+
+        min-height: 0;
+
+        overflow: hidden;
+
+        align-content: flex-start;
+
+    }
+
+    /* ==========================================================================
+       MODOS DA CLASSIFICATÓRIA
+       ========================================================================== */
+
+    .grid-jogos.modo-normal {
+
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+
+    }
+
+    .grid-jogos.modo-normal .atleta-linha {
+
+        font-size: .90rem;
+
+    }
+
+    .grid-jogos.modo-normal .atleta-box {
+
+        padding: 6px 10px;
+
+    }
+
+    .grid-jogos.modo-compacto {
+
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+    }
+
+    .grid-jogos.modo-compacto .atleta-linha {
+
+        font-size: .82rem;
+
+    }
+
+    .grid-jogos.modo-compacto .atleta-box {
+
+        padding: 5px 10px;
+
+    }
+
+    .grid-jogos.modo-ultra {
+
+        grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+
+        gap: 8px;
+
+    }
+
+    .grid-jogos.modo-ultra .card-jogo {
+
+        padding: 5px 7px;
+
+    }
+
+    .grid-jogos.modo-ultra .mesa-tag {
+
+        margin-bottom: 2px;
+
+        font-size: .72rem;
+
+    }
+
+    .grid-jogos.modo-ultra .confronto-flex {
+
+        gap: 2px;
+
+    }
+
+    .grid-jogos.modo-ultra .atleta-box {
+
+        padding: 4px 7px;
+
+    }
+
+    .grid-jogos.modo-ultra .atleta-linha {
+
+        font-size: .72rem;
+
+    }
+
+    .grid-jogos.modo-ultra .placar-tag {
+
+        padding: 2px 5px;
+
+        font-size: .65rem;
+
+    }
+
+    .grid-jogos.modo-ultra .divisor-atletas {
+
+        margin: 3px 0;
+
+    }
+
+    /* ==========================================================================
+       CARD BASE
+       ========================================================================== */
+
+    .card-jogo {
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        min-height: 0;
+
+        padding: 6px 10px;
+
+        background: var(--bg-card);
+
+        border: 1px solid var(--borda-ouro);
+        border-radius: 4px;
+
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .30);
+
+        transition: all .30s ease;
+
+    }
+        .card-jogo:hover {
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 8px 18px rgba(0, 0, 0, .40),
+            0 0 10px rgba(212, 175, 55, .18);
+
+    }
+
+    /* ==========================================================================
+       CARDS ESPECIAIS
+       ========================================================================== */
+
+    .card-semifinal {
+
+        border-width: 2px;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(26, 35, 10, .92),
+                rgba(8, 15, 6, .92)
+            );
+
+        box-shadow:
+            0 0 10px rgba(212, 175, 55, .18);
+
+    }
+
+    .card-grande-final {
+
+        border: 2px solid #ffd700;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(46, 32, 0, .96),
+                rgba(15, 11, 2, .96)
+            );
+
+        box-shadow:
+            0 0 18px rgba(255, 215, 0, .35);
+
+        animation: brilhoGrandeFinal 2.8s ease-in-out infinite;
+
+    }
+
+    .card-terceiro-lugar {
+
+        border: 2px solid #cd7f32;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(47, 25, 8, .94),
+                rgba(18, 10, 3, .94)
+            );
+
+    }
+
+    @keyframes brilhoGrandeFinal {
+
+        0%,
+        100% {
+
+            box-shadow:
+                0 0 10px rgba(255, 215, 0, .22);
+
+        }
+
+        50% {
+
+            box-shadow:
+                0 0 28px rgba(255, 215, 0, .60);
+
+        }
+
+    }
+
+    /* ==========================================================================
+       IDENTIFICAÇÃO DA MESA
+       ========================================================================== */
+
+    .mesa-tag {
+
+        margin-bottom: 4px;
+
+        color: var(--dourado-brilhante);
+
+        text-align: center;
+
+        font-size: .82rem;
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+    }
+
+    .mesa-semifinal {
+
+        color: #ffe082;
+
+    }
+
+    .mesa-grande-final {
+
+        color: #ffd700;
+
+        text-shadow:
+            0 0 8px rgba(255, 215, 0, .45);
+
+    }
+
+    .mesa-terceiro-lugar {
+
+        color: #e0a96d;
+
+    }
+
+    /* ==========================================================================
+       CONFRONTO
+       ========================================================================== */
+
+    .confronto-flex {
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 4px;
+
+    }
+
+    .atleta-box {
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 6px 10px;
+
+        border-radius: 4px;
+
+        background:
+            rgba(255, 255, 255, .04);
+
+        transition:
+            background .20s ease,
+            border-color .20s ease;
+
+    }
+
+    .atleta-box.vencedor {
+
+        background:
+            rgba(46, 204, 113, .16);
+
+        border-left:
+            3px solid var(--sucesso);
+
+    }
+
+    .atleta-box.perdedor {
+
+        opacity: .78;
+
+    }
+
+    .atleta-linha {
+
+        flex: 1;
+
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        font-size: .86rem;
+        font-weight: 700;
+
+    }
+
+    .placar-tag {
+
+        min-width: 34px;
+
+        padding: 3px 7px;
+
+        border-radius: 3px;
+
+        background:
+            rgba(0, 0, 0, .45);
+
+        color:
+            var(--dourado-brilhante);
+
+        text-align: center;
+
+        font-size: .74rem;
+        font-weight: 800;
+
+    }
+
+    .divisor-atletas {
+
+        height: 1px;
+
+        margin: 4px 0;
+
+        background:
+            rgba(212, 175, 55, .18);
+
+    }
+        /* ==========================================================================
+       STATUS DA PARTIDA
+       ========================================================================== */
+
+    .status-partida {
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        margin-top: 6px;
+
+    }
+
+    .status-badge {
+
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        min-width: 110px;
+
+        padding: 3px 10px;
+
+        border-radius: 999px;
+
+        font-size: .68rem;
+        font-weight: 800;
+
+        letter-spacing: .5px;
+
+        text-transform: uppercase;
+
+    }
+
+    .status-aguardando {
+
+        background: rgba(255, 193, 7, .14);
+        color: #ffd54f;
+
+        border: 1px solid rgba(255, 193, 7, .35);
+
+    }
+
+    .status-andamento {
+
+        background: rgba(46, 204, 113, .15);
+        color: #7dffb0;
+
+        border: 1px solid rgba(46, 204, 113, .40);
+
+        animation: pulsarStatus 1.8s infinite;
+
+    }
+
+    .status-finalizado {
+
+        background: rgba(66, 165, 245, .16);
+        color: #90caf9;
+
+        border: 1px solid rgba(66, 165, 245, .35);
+
+    }
+
+    @keyframes pulsarStatus {
+
+        0%,
+        100% {
+
+            box-shadow: 0 0 0 rgba(46, 204, 113, 0);
+
+        }
+
+        50% {
+
+            box-shadow: 0 0 12px rgba(46, 204, 113, .45);
+
+        }
+
+    }
+
+    /* ==========================================================================
+       COLUNA DO RANKING
+       ========================================================================== */
+
+    .coluna-ranking {
+
+        display: flex;
+        flex-direction: column;
+
+        min-height: 0;
+        height: 100%;
+
+    }
+
+    .ranking-card {
+
+        display: flex;
+        flex-direction: column;
+
+        flex: 1;
+
+        min-height: 0;
+
+        background: var(--bg-card);
+
+        border: 1px solid var(--borda-ouro);
+        border-radius: 5px;
+
+        overflow: hidden;
+
+    }
+
+    .ranking-header {
+
+        padding: 10px 12px;
+
+        background: rgba(212, 175, 55, .10);
+
+        border-bottom: 1px solid rgba(212, 175, 55, .25);
+
+        text-align: center;
+
+    }
+
+    .ranking-header h2 {
+
+        margin: 0;
+
+        color: var(--dourado-brilhante);
+
+        font-size: 1rem;
+        font-weight: 800;
+
+        text-transform: uppercase;
+
+    }
+
+    .ranking-scroll {
+
+        flex: 1;
+
+        overflow: hidden;
+
+        position: relative;
+
+    }
+
+    .ranking-lista {
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 6px;
+
+        padding: 8px;
+
+        animation: rolagemRanking 38s linear infinite;
+
+    }
+
+    .ranking-scroll:hover .ranking-lista {
+
+        animation-play-state: paused;
+
+    }
+
+    @keyframes rolagemRanking {
+
+        0% {
+
+            transform: translateY(0);
+
+        }
+
+        100% {
+
+            transform: translateY(-50%);
+
+        }
+
+    }
+
+    .ranking-item {
+
+        display: grid;
+
+        grid-template-columns: 36px 1fr 52px;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 7px 8px;
+
+        border-radius: 4px;
+
+        background: rgba(255,255,255,.035);
+
+        transition: background .20s ease;
+
+    }
+
+    .ranking-item:hover {
+
+        background: rgba(255,255,255,.08);
+
+    }
+        .ranking-posicao {
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 28px;
+        height: 28px;
+
+        border-radius: 50%;
+
+        background: rgba(212, 175, 55, .12);
+
+        border: 1px solid rgba(212, 175, 55, .30);
+
+        color: var(--dourado-brilhante);
+
+        font-size: .78rem;
+        font-weight: 800;
+
+    }
+
+    .ranking-item:nth-child(1) .ranking-posicao {
+
+        background: rgba(255, 215, 0, .22);
+
+        border-color: rgba(255, 215, 0, .55);
+
+        color: #fff7c0;
+
+    }
+
+    .ranking-item:nth-child(2) .ranking-posicao {
+
+        background: rgba(189, 195, 199, .22);
+
+        border-color: rgba(189, 195, 199, .55);
+
+        color: #ecf0f1;
+
+    }
+
+    .ranking-item:nth-child(3) .ranking-posicao {
+
+        background: rgba(205, 127, 50, .22);
+
+        border-color: rgba(205, 127, 50, .55);
+
+        color: #ffd7ae;
+
+    }
+
+    .ranking-jogador {
+
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        font-size: .82rem;
+        font-weight: 700;
+
+    }
+
+    .ranking-pontos {
+
+        color: var(--dourado-brilhante);
+
+        text-align: right;
+
+        font-size: .82rem;
+        font-weight: 800;
+
+    }
+
+    /* ==========================================================================
+       PÓDIO
+       ========================================================================== */
+
+    .podio {
+
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+
+        gap: 12px;
+
+        margin-top: 12px;
+        padding: 10px 0 2px;
+
+    }
+
+    .podio-item {
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        min-width: 82px;
+
+    }
+
+    .podio-titulo {
+
+        margin-bottom: 6px;
+
+        color: var(--texto-claro);
+
+        font-size: .72rem;
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+    }
+
+    .podio-base {
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 82px;
+
+        border-radius: 5px 5px 0 0;
+
+        color: #fff;
+
+        font-size: .90rem;
+        font-weight: 800;
+
+    }
+
+    .podio-primeiro .podio-base {
+
+        height: 82px;
+
+        background: linear-gradient(
+            180deg,
+            #ffe082,
+            #d4af37
+        );
+
+        color: #222;
+
+    }
+
+    .podio-segundo .podio-base {
+
+        height: 62px;
+
+        background: linear-gradient(
+            180deg,
+            #e8ecef,
+            #aeb6bf
+        );
+
+        color: #222;
+
+    }
+
+    .podio-terceiro .podio-base {
+
+        height: 46px;
+
+        background: linear-gradient(
+            180deg,
+            #d8a06b,
+            #b56b2f
+        );
+
+    }
+
+    /* ==========================================================================
+       RODAPÉ
+       ========================================================================== */
+
+    .rodape {
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 20px;
+
+        margin-top: 10px;
+        padding-top: 8px;
+
+        flex-shrink: 0;
+
+        border-top: 1px solid rgba(212, 175, 55, .25);
+
+        font-size: .72rem;
+
+    }
+
+    .rodape-patrocinador {
+
+        flex: 1;
+
+        color: var(--texto-mutado);
+
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+    }
+
+    .rodape-assinatura {
+
+        flex-shrink: 0;
+
+        color: var(--dourado-brilhante);
+
+        font-weight: 700;
+
+        letter-spacing: .5px;
+
+    }
+        .rodape-patrocinador strong {
+
+        color: var(--dourado-brilhante);
+
+        font-weight: 700;
+
+    }
+
+    .rodape-assinatura strong {
+
+        color: #ffffff;
+
+    }
+
+    /* ==========================================================================
+       ANIMAÇÕES GERAIS
+       ========================================================================== */
+
+    @keyframes pulseBorda {
+
+        from {
+
+            box-shadow:
+                inset 0 0 0 rgba(255, 71, 87, .15),
+                0 0 12px rgba(255, 71, 87, .18);
+
+        }
+
+        to {
+
+            box-shadow:
+                inset 0 0 35px rgba(255, 71, 87, .25),
+                0 0 30px rgba(255, 71, 87, .45);
+
+        }
+
+    }
+
+    @keyframes fadeEntrada {
+
+        from {
+
+            opacity: 0;
+
+            transform:
+                translateY(8px);
+
+        }
+
+        to {
+
             opacity: 1;
 
-        }
-                
-        .btn-admin {
-            background: #071a0c;
-            color: var(--borda-ouro);
-            border: 1px solid var(--borda-ouro);
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .btn-admin:hover {
-            background: var(--borda-ouro);
-            color: #000;
-        }
-        .btn-admin.btn-reset {
-            border-color: var(--danger);
-            color: var(--danger);
-            background: rgba(255, 71, 87, 0.05);
-        }
-        .btn-admin.btn-reset:hover {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        .alerta-falta-banner {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 15, 8, 0.96);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border: 1px solid var(--danger);
-            box-sizing: border-box;
-            animation: pulseBorda 1.5s infinite alternate;
-        }
-
-        /* --- Header Otimizado para Título e Cronômetro Gigantes --- */
-        .header-telao {
-
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-
-            position:relative;
-
-            padding-bottom:10px;
-            margin-bottom:8px;
-
-            flex-shrink:0;
-            gap:16px;
-
-            border-bottom:none;
+            transform:
+                translateY(0);
 
         }
 
-        .header-telao::after{
+    }
 
-            content:"";
+    .fade-in {
 
-            position:absolute;
+        animation:
+            fadeEntrada .35s ease;
 
-            left:0;
-            right:0;
-            bottom:1px;
+    }
 
-            height:3px;
+    /* ==========================================================================
+       RESPONSIVIDADE
+       ========================================================================== */
 
-            background:linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(212,175,55,.15) 10%,
-                #f3cf5d 50%,
-                rgba(212,175,55,.15) 90%,
-                transparent 100%
-            );
+    @media (max-width: 1500px) {
 
-            box-shadow:
-            0 0 5px rgba(212,175,55,.22);
+        .header-telao h1 {
+
+            font-size: 2rem;
 
         }
 
-        @keyframes brilhoTitulo{
+        .cronometro-digital {
 
-            0%,96%,100%{
-
-                filter:brightness(1);
-
-                text-shadow:
-                    0 3px 8px rgba(0,0,0,.60),
-                    0 0 12px rgba(243,207,93,.18);
-
-            }
-
-            98%{
-
-                filter:brightness(1.18);
-
-                text-shadow:
-                    0 3px 8px rgba(0,0,0,.60),
-                    0 0 28px rgba(243,207,93,.45);
-
-            }
-
-        }
-        
-           .header-telao h1 {
-
-                margin: 0;
-
-                font-size: 2.35rem;
-                font-weight: 900;
-                line-height: 1;
-                white-space: nowrap;
-
-                background: linear-gradient(
-                    180deg,
-                    #fff8cf 0%,
-                    #f9e58d 18%,
-                    #f3cf5d 38%,
-                    #d4af37 58%,
-                    #b88a15 82%,
-                    #f8df7a 100%
-                );
-
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-
-                text-shadow:
-                    0 3px 8px rgba(0,0,0,.60),
-                    0 0 12px rgba(243,207,93,.18);
-
-               animation: brilhoTitulo 25s ease-in-out infinite;
-
-            }
-
-            .header-telao h1 span{
-
-                background:none;
-
-                color:#ffffff;
-                -webkit-text-fill-color:#ffffff;
-
-                text-shadow:
-                    0 3px 8px rgba(0,0,0,.60),
-                    0 0 8px rgba(255,255,255,.08);
-
-            }
-        
-        .cronometro-container{
-
-            position:relative;
-
-            border:2px solid var(--borda-ouro);
-            border-radius:6px;
-
-            padding:6px 22px 4px;
-
-            background:rgba(0,0,0,.80);
-
-            display:flex;
-            justify-content:center;
-            align-items:center;
-
-            flex-shrink:0;
-        }
-
-        .cronometro-wrapper{
-            position:relative;
-            display:flex;
-            align-items:center;
-        }
-
-        .cronometro-tag{
-
-            position:absolute;
-
-            top:-10px;
-            left:50%;
-            transform:translateX(-50%);
-
-            z-index:10;
-
-            padding:2px 8px;
-
-            background:var(--bg-card);
-
-            border:1px solid var(--borda-ouro);
-
-            border-radius:4px;
-
-            font-size:.42rem;
-
-            font-weight:700;
-
-            letter-spacing:.8px;
-
-            color:var(--dourado-brilhante);
-
-            text-transform:uppercase;
-
-            white-space:nowrap;
-
-            line-height:1;
-
-        }
-        
-        .cronometro-digital{
-
-            font-size:2.55rem;
-
-            font-family:'Courier New', monospace;
-
-            font-weight:900;
-
-            color:var(--dourado-brilhante);
-
-            line-height:.95;
-
-            letter-spacing:-1px;
+            font-size: 2.2rem;
 
         }
 
-        .painel-infos {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border: 1px solid var(--borda-ouro);
-            border-radius: 5px;
-            background: rgba(0, 0, 0, 0.2);
-            margin-bottom: 15px;
-            flex-shrink: 0;
-        }
-        .info-item {
-            padding: 8px 15px;
-            position: relative;
-        }
-        .info-item:not(:last-child)::after {
-            content: "";
-            position: absolute;
-            right: 0;
-            top: 15%;
-            height: 70%;
-            width: 1px;
-            background: rgba(212, 175, 55, 0.25);
-        }
-        .info-rotulo {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: var(--texto-mutado);
-            margin-bottom: 2px;
-            font-weight: 600;
-        }
-        .info-valor {
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: var(--dourado-brilhante);
+        .grid-jogos.modo-normal {
+
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
         }
 
-        .secao-titulo-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .secao-titulo {
-            font-size: 1.05rem;
-            color: var(--dourado-brilhante);
-            font-weight: bold;
-            text-transform: uppercase;
-            margin: 0;
-            white-space: nowrap;
-        }
-        .secao-linha {
-            flex-grow: 1;
-            height: 1px;
-            background: var(--borda-ouro);
-        }
+    }
 
-        /* --- Container Principal Adaptável --- */
+    @media (max-width: 1280px) {
+
         .container-telao {
-            display: grid;
-            grid-template-columns:2.9fr .8fr;
-            gap:16px;
-            flex-grow: 1; 
-            min-height: 0; 
-        }
 
-        .container-telao.modo-mata-mata {
-            grid-template-columns: 1fr !important; 
-        }
-
-        .coluna-mesas {
-            display: flex;
-            flex-direction: column;
-            min-height: 0; 
-            height: 100%;
-        }
-
-        .grid-jogos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
-            gap: 10px;
-            align-content: flex-start;
-            flex-grow: 1;
-            min-height: 0;
-            overflow: hidden; 
-        }
-
-        /* --- Mudança Dinâmica para o Combate Final --- */
-        .grid-jogos.layout-super-finais {
-            grid-template-columns: repeat(2, 1fr) !important; 
-            gap: 20px !important;
-            align-content: stretch !important; 
-            height: 85% !important;
-        }
-
-        /* ==========================================================
-           MODOS DA CLASSIFICATÓRIA
-           ========================================================== */
-
-        .grid-jogos.modo-normal{
-
-            grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+            grid-template-columns: 2.5fr .9fr;
 
         }
 
-        .grid-jogos.modo-normal .atleta-linha{
+        .grid-jogos.modo-normal {
 
-            font-size:.90rem;
-
-        }
-
-        .grid-jogos.modo-normal .atleta-box{
-
-            padding:6px 10px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 
         }
 
-        .grid-jogos.modo-compacto{
+        .info-valor {
 
-            grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-
-        }
-
-        .grid-jogos.modo-compacto .atleta-linha{
-
-            font-size:.82rem;
+            font-size: .95rem;
 
         }
 
-        .grid-jogos.modo-compacto .atleta-box{
+    }
 
-            padding:5px 10px;
+    @media (max-width: 1100px) {
 
-        }
+        .container-telao {
 
-        .grid-jogos.modo-ultra{
-
-            grid-template-columns:repeat(auto-fill,minmax(205px,1fr));
-
-            gap:8px;
+            grid-template-columns: 1fr;
 
         }
 
-        .grid-jogos.modo-ultra .card-jogo{
-
-            padding:5px 7px;
-
-        }
-
-        .grid-jogos.modo-ultra .mesa-tag{
-    
-            font-size:.72rem;
-
-            margin-bottom:2px;
-
-        }
-
-        .grid-jogos.modo-ultra .confronto-flex{
-
-            gap:2px;
-
-        }
-
-        .grid-jogos.modo-ultra .atleta-box{
-
-            padding:4px 7px;
-
-        }
-
-        .grid-jogos.modo-ultra .atleta-linha{
-
-            font-size:.72rem;
-
-        }
-
-        .grid-jogos.modo-ultra .placar-tag{
-
-            font-size:.65rem;
-
-            padding:2px 5px;
-
-        }
-
-        .grid-jogos.modo-ultra .divisor-atletas{
-
-            margin:3px 0;
-
-        }
-
-        .card-jogo {
-            background: var(--bg-card);
-            border: 1px solid var(--borda-ouro);
-            border-radius: 4px;
-            padding: 6px 10px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 0;
-            transition: all 0.3s ease;
-        }
-
-            /* ==========================================================
-               CARD DA SEMIFINAL
-            ========================================================== */
-
-           .card-semifinal{
-
-                position:relative;
-
-                border:2px solid var(--borda-ouro);
-
-                border-radius:8px;
-
-                background:linear-gradient(
-                    180deg,
-                    rgba(8,30,15,.98) 0%,
-                    rgba(3,12,6,.98) 100%
-                );
-            
-                box-shadow:
-                    inset 0 0 0 1px rgba(255,255,255,.04),
-                    0 10px 24px rgba(0,0,0,.45),
-                    0 0 12px rgba(212,175,55,.08);
-            
-                transition:all .30s ease;
-            
-            }
-            
-            .card-semifinal::before{
-            
-                content:"";
-            
-                position:absolute;
-            
-                left:18px;
-                right:18px;
-                top:0;
-            
-                height:3px;
-            
-                border-radius:20px;
-            
-                background:linear-gradient(
-                    90deg,
-                    transparent,
-                    #f3cf5d,
-                    transparent
-                );
-            
-                opacity:.9;
-            
-            }
-            
-            .card-semifinal::before{
-
-                content:"";
-            
-                position:absolute;
-            
-                left:28px;
-                right:28px;
-                top:10px;
-            
-                height:2px;
-            
-                border-radius:20px;
-            
-                background:linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(243,207,93,.20),
-                    #f3cf5d,
-                    rgba(243,207,93,.20),
-                    transparent
-                );
-            
-            }
-
-            .card-semifinal .atleta-linha{
-
-                font-size:2rem;
-
-                font-weight:900;
-
-                letter-spacing:.3px;
-
-            }
-        
-        .grid-jogos.layout-super-finais {
-
-            grid-template-columns: repeat(2, 1fr) !important;
-
-            grid-template-rows: 1fr;
-
-            gap: 20px !important;
-
-            height: 100% !important;
-
-            align-content: stretch;
-    
-            align-items: stretch;
-
-        }
-
-        .mesa-tag{
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-
-            padding:3px 10px;
-
-            margin-bottom:6px;
-
-            background:rgba(0,0,0,.35);
-
-            border:1px solid rgba(212,175,55,.30);
-
-            border-radius:4px;
-
-            color:var(--dourado-brilhante);
-
-            font-size:.82rem;
-
-            font-weight:700;
-
-            letter-spacing:.6px;
-
-            text-transform:uppercase;
-
-            line-height:1;
-
-            width:fit-content;
-
-            box-shadow:
-                inset 0 0 3px rgba(255,255,255,.03),
-                0 1px 3px rgba(0,0,0,.25);
-        }
-        
-        .confronto-flex {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-        
-        .grid-jogos.layout-super-finais .confronto-flex {
-            gap: 15px !important; 
-        }
-
-        .atleta-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 4px 10px;
-            border-radius: 4px;
-        }
-
-        .confronto-flex .atleta-box:first-child{
-            padding-bottom:0;
-            margin-bottom:0;
-            border-bottom:none;
-        }
-        
-        .grid-jogos.layout-super-finais .atleta-box {
-            padding: 22px 25px !important;
-            border-radius: 6px;
-        }
-
-        .atleta-box.lider-mesa {
-            border-left: 3px solid var(--sucesso);
-            background: rgba(46, 204, 113, 0.02);
-        }
-        
-        .atleta-box.vencedor-card {
-
-            background: linear-gradient(
-                90deg,
-                rgba(46,204,113,.18) 0%,
-                rgba(7,28,13,.88) 30%,
-                rgba(7,28,13,.88) 100%
-            ) !important;
-
-            border-left:5px solid #2ecc71;
-
-            box-shadow:
-                inset 0 0 10px rgba(46,204,113,.08);
-
-        }
-
-        .atleta-box.vencedor-card .atleta-linha{
-
-            color:#ecfff3 !important;
-
-            font-weight:700;
-
-        }
-
-        .atleta-box.perdedor-card{
-
-            background: linear-gradient(
-                90deg,
-                rgba(231,76,60,.12) 0%,
-                rgba(28,10,10,.78) 30%,
-                rgba(28,10,10,.78) 100%
-            ) !important;
-
-            border-left:4px solid #e74c3c !important;
-
-        }
-
-        .atleta-box.perdedor-card .atleta-linha{
-            color:#ececec !important;
-            font-weight:600;
-        }
-
-        .atleta-linha { 
-            font-weight: 600; 
-            font-size: 0.9rem; 
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; 
-            max-width: 65%;
-        }
-        .placar-tag { 
-            font-family: monospace; 
-            font-weight: bold; 
-            font-size: 0.82rem;
-            color: var(--borda-ouro); 
-            background: #000;
-            padding: 2px 7px;
-            border-radius: 2px;
-            white-space: nowrap;
-        }
-
-        .grid-jogos.layout-super-finais .placar-tag {
-            font-size: 1.4rem !important;
-            padding: 6px 14px !important;
-            border: 1px solid rgba(214, 175, 55, 0.3);
-        }
-
-        .card-semifinal .placar-tag{
-
-            min-width:220px;
-        
-            text-align:center;
-        
-            font-size:1.45rem;
-        
-            padding:10px 18px;
-        
-            border-radius:6px;
-        
-            background:linear-gradient(
-                180deg,
-                #0b0b0b,
-                #000
-            );
-        
-            border:1px solid rgba(243,207,93,.35);
-        
-            box-shadow:
-                inset 0 1px 0 rgba(255,255,255,.05);
-        
-        }
-
-        .vs-tag {
+        .coluna-ranking {
 
             display: none;
-    
-        }
-
-        .card-semifinal .divisor-atletas{
-
-            height:2px;
-
-            margin:14px 0;
-        
-            background:linear-gradient(
-                90deg,
-                transparent,
-                rgba(243,207,93,.65),
-                transparent
-            );
-        
-        }
-        
-        .grid-jogos.layout-super-finais .vs-tag {
-            font-size: 1.1rem !important;
-            color: var(--borda-ouro);
-            opacity: 0.5;
-        }
-
-        /* --- Painel Lateral do Ranking --- */
-        .ranking-container {
-            border: 1px solid var(--borda-ouro);
-            background: rgba(4, 15, 7, 0.4);
-            border-radius: 5px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            height: 100%;
-            box-sizing: border-box;
-        }
-        
-        .ranking-scroller-box {
-            flex-grow: 1;
-            overflow: hidden;
-            position: relative;
-            margin-top: 5px;
-        }
-
-        .tabela-ranking {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .tabela-ranking th { 
-            color: var(--texto-mutado); 
-            text-transform: uppercase; 
-            font-size: 0.65rem; 
-            font-weight: 700;
-            border-bottom: 1px solid var(--borda-ouro);
-            padding: 8px 6px;
-            position: sticky;
-            top: 0;
-            background: #06190c; 
-            z-index: 2;
-        }
-        
-        .ranking-marquise-body {
-            display: table-row-group;
-            position: relative;
-            top: 0;
-        }
-
-        .tabela-ranking td {
-            border-bottom: 1px solid rgba(214, 175, 55, 0.1);
-            font-size: 0.85rem;
-            padding: 8px 6px;
-        }
-        .posicao-num { 
-            width: 35px; 
-            font-weight: bold; 
-            color: var(--borda-ouro); 
-            font-size: 0.95rem;
-        }
-        .badge-vitorias { 
-            background: #000; 
-            color: var(--texto-claro);
-            padding: 3px 8px; 
-            border-radius: 4px; 
-            font-size: 0.75rem; 
-            font-weight: bold;
-            border: 1px solid rgba(214, 175, 55, 0.1); 
-        }
-
-        tr.top-atleta td.posicao-num {
-            color: var(--dourado-brilhante);
-            text-shadow: 0 0 5px rgba(243, 207, 93, 0.3);
-        }
-
-        .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
-        .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
-
-        /* --- Pódio Premium --- */
-        .podio-wrapper {
-            background: linear-gradient(180deg, rgba(7, 26, 12, 0.95) 0%, #030a04 100%);
-            padding: 25px;
-            border-radius: 4px;
-            border: 2px solid var(--borda-ouro);
-            height: 100%;
-            box-sizing: border-box;
-            overflow-y: auto; 
-        }
-        .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
-        .podio-flex { display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-top: 20px; }
-        .podio-card { background: rgba(0,0,0,0.4); border-radius: 4px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-        .podio-card.ouro { border: 3px solid var(--borda-ouro); height: 240px; width: 240px; order: 2; }
-        .podio-card.prata { border: 2px solid var(--plata-prata); height: 200px; width: 210px; order: 1; }
-        .podio-card.bronze { border: 2px solid var(--madeira-bronze); height: 180px; width: 210px; order: 3; }
-        .podio-medalha { font-size: 2.2rem; margin-bottom: 5px; }
-        .podio-rotulo-lugar { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--texto-mutado); }
-        .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
-
-        @keyframes pulseBorda {
-            from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
-            to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
-        }
-
-        @keyframes autoScrollRanking {
-
-            0%,15%{
-                transform:translateY(0);
-            }
-
-            40%,60%{
-                transform:translateY(var(--scroll-distancia));
-            }
-
-            85%,100%{
-                transform:translateY(0);
-            }
 
         }
 
+    }
 
-        /* ==========================================================
-           FAIXA DA SEMIFINAL
-        ========================================================== */
-        
-        .mesa-semifinal{
+    </style>
 
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-
-            padding:12px 24px;
-        
-            border-radius:8px;
-        
-            background:linear-gradient(
-                180deg,
-                #ffe38a 0%,
-                #d4af37 100%
-            );
-        
-            color:#1d1d1d;
-        
-            border:1px solid rgba(255,255,255,.35);
-        
-            font-family:'Cinzel', serif;
-        
-            font-size:1.05rem;
-        
-            font-weight:900;
-        
-            letter-spacing:1px;
-        
-            text-transform:uppercase;
-        
-            box-shadow:
-                inset 0 1px 0 rgba(255,255,255,.45),
-                0 8px 20px rgba(0,0,0,.35);
-        
-        }
-
-        
-       /* ==========================================================
-           PUBLICIDADE / PATROCINADORES
-           ========================================================== */
-
-        .card-desenvolvedor{
-
-            background:rgba(0,0,0,.65);
-
-            border:1px solid var(--borda-ouro);
-
-            border-radius:6px;
-
-            padding:6px 22px;
-
-            box-sizing:border-box;
-
-            display:flex;
-
-            flex-direction:column;
-
-        }
-
-        .publicidade-grid{
-
-            flex:1;
-
-            display:grid;
-
-            grid-template-columns:200px 1fr 220px;
-
-            gap:28px;
-
-            align-items:start;
-
-            min-height:72px;
-
-        }
-
-        .col-patrocinador{
-
-            display:flex;
-
-            flex-direction:column;
-
-            justify-content:center;
-            
-            align-self:center;
-
-            align-items:flex-start;
-
-        }
-
-        .col-assinatura{
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:flex-start;
-
-            align-self:center;
-
-            padding-left:30px;
-
-            border-left:1px solid rgba(212,175,55,.18);
-
-        }
-
-        .assinatura-sistema{
-
-            margin-top:4px;
-
-            padding-top:4px;
-
-            border-top:1px solid rgba(212,175,55,.12);
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:center;
-
-            gap:6px;
-
-            font-size:.68rem;
-
-            line-height:1;
-
-            letter-spacing:.3px;
-
-            color:#8d9a8d;
-
-        }
-
-        .assinatura-sistema strong{
-
-            color:var(--dourado-brilhante);
-
-            font-weight:700;
-
-        }
-
-        .assinatura-sistema span{
-
-            color:#7f907f;
-
-        }
-
-              
-        /* ==========================================================
-           LOGO
-           ========================================================== */
-
-        .col-logo{
-
-            display:flex;
-            align-items:center;
-            justify-content:center;
-
-            padding-left:10px;
-            padding-right:10px;
-
-            border-right:1px solid rgba(212,175,55,.18);
-
-            align-self:center;
-
-        }
-
-        #publicidade-logo{
-
-            width:185px;
-
-            height:110px;
-
-            display:flex;
-
-            align-items:center;
-
-            justify-content:center;
-
-            padding:4px;
-
-            border:1px solid rgba(212,175,55,.28);
-
-            border-radius:8px;
-
-            background:linear-gradient(
-                180deg,
-                rgba(255,255,255,.05),
-                rgba(255,255,255,.02)
-            );
-
-            box-shadow:
-                inset 0 0 8px rgba(255,255,255,.03),
-                0 0 10px rgba(0,0,0,.25);
-
-            overflow:hidden;
-
-            transition:.25s;
-
-        }
-
-        #publicidade-logo img{
-
-            max-width:100%;
-
-            max-height:100%;
-
-            object-fit:cover;
-
-            filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
-
-        }
-
-        /* ==========================================================
-           TEXTO
-           ========================================================== */
-
-        .col-texto{
-
-            display:flex;
-
-            align-items:center;
-
-        }
-
-        #publicidade-texto{
-
-            display:flex;
-
-            flex-direction:column;
-
-            justify-content:center;
-
-            color:var(--texto-mutado);
-
-            line-height:1.35;
-
-        }
-
-        .publicidade-mensagem{
-
-            margin-top:8px;
-
-            padding-left:2px;
-
-            font-size:.88rem;
-
-            color:#e6e6e6;
-
-            line-height:1.4;
-
-            font-weight:500;
-
-            letter-spacing:.2px;
-
-            opacity:.95;
-
-        }
-
-        #publicidade-texto strong{
-
-            font-size:1.75rem;
-
-            font-weight:700;
-
-            color:#ffffff;
-
-            letter-spacing:.3px;
-
-            margin-bottom:6px;
-
-            text-shadow:0 2px 6px rgba(0,0,0,.45);
-
-        }
-
-        .assinatura-dev{
-
-            display:flex;
-
-            flex-direction:column;
-
-            justify-content:center;
-
-            gap:4px;
-
-        }
-
-        .assinatura-dev span{
-
-            font-size:.75rem;
-
-            color:#9ea99e;
-
-        }
-
-        .assinatura-dev strong{
-
-            font-size:1.05rem;
-
-            font-weight:700;
-
-            color:#ffffff;
-
-        }
-
-        .assinatura-dev small{
-
-            font-size:.72rem;
-
-            color:#7f907f;
-
-        }
-
-        /* ==========================================================
-           BOTÕES
-           ========================================================== */
-
-        .col-botoes{
-
-            display:flex;
-
-            gap:10px;
-
-            margin-top:10px;
-
-            flex-wrap:wrap;
-
-        }
-
-        .btn-dev{
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:center;
-
-            height:30px;
-
-            padding:0 14px;
-
-            text-decoration:none;
-
-            font-size:.78rem;
-
-            font-weight:700;
-
-            border-radius:8px;
-
-            letter-spacing:.3px;
-
-            white-space:nowrap;
-
-            box-sizing:border-box;
-
-            transition:
-                background .25s,
-                color .25s,
-                transform .20s,
-                box-shadow .20s;
-
-        }
-
-        .btn-dev-comprar{
-
-            background:linear-gradient(
-                180deg,
-                #37c46b,
-                #28a85b
-            );
-
-            color:#fff;
-
-            border:1px solid #53d487;
-
-}
-
-        .btn-dev-comprar:hover{
-
-            background:#40cb72;
-
-            color:#fff;
-
-        }
-
-        .btn-dev-patrocinar{
-
-            background:rgba(0,0,0,.35);
-
-            color:var(--dourado-brilhante);
-
-            border:1px solid var(--borda-ouro);
-
-        }
-
-        .btn-dev-patrocinar:hover{
-
-            background:rgba(212,175,55,.12);
-
-            color:#fff;
-
-            border-color:var(--dourado-brilhante);
-
-        }
-
-        .btn-dev:hover{
-
-            transform:translateY(-1px);
-
-            box-shadow:0 4px 10px rgba(0,0,0,.25);
-
-        }
-
-        /* ==========================================================
-           ANIMAÇÃO
-           ========================================================== */
-
-          .publicidade-slide{
-
-            transition:
-                opacity .45s ease,
-                transform .45s ease;
-
-        }
-
-        .publicidade-slide.saindo{
-
-            opacity:0;
-
-            transform:translateX(-40px);
-
-        }
-
-        .publicidade-slide.entrando{
-
-            opacity:1;
-
-            transform:translateX(0);
-
-        }
-        
-            /* =========================================
-               FERREIRA SISTEMAS
-            ========================================= */
-
-            .marca-ferreira{
-
-                display:flex;
-                align-items:center;
-                gap:12px;
-
-            }
-
-            .logo-ef-mini{
-
-                width:52px;
-                height:52px;
-
-                display:flex;
-                align-items:center;
-                justify-content:center;
-
-                border:2px solid rgba(212,175,55,.40);
-                border-radius:14px;
-
-                background:linear-gradient(
-                    180deg,
-                    rgba(255,255,255,.05),
-                    rgba(255,255,255,.01)
-                );
-
-                box-shadow:
-                    inset 0 0 8px rgba(255,255,255,.04),
-                    0 0 10px rgba(0,0,0,.30);
-
-                flex-shrink:0;
-
-            }
-
-            .logo-ef-mini span{
-
-                color:#d4af37;
-
-                font-size:1.65rem;
-
-                font-weight:800;
-
-                letter-spacing:-2px;
-
-            }
-
-            .marca-texto{
-
-                display:flex;
-                flex-direction:column;
-
-                line-height:1.05;
-
-            }
-
-            .marca-label{
-
-                ffont-size:.56rem;
-
-                text-transform:uppercase;
-
-                lletter-spacing:3px;
-
-                color:#96a596;
-
-                margin-bottom:5px;
-                
-                opacity:.75;
-
-            }
-
-            .marca-ferreira-nome{
-
-                font-size:1.22rem;
-        
-                font-weight:800;
-
-                color:#ffffff;
-
-            }
-
-            .marca-ferreira-sistemas{
-
-                font-size:.80rem;
-
-                letter-spacing:4px;
-
-                color:#7ddf9c;
-
-            }
-
-            .marca-slogan{
-
-                margin-top:6px;
-
-                font-size:.70rem;
-
-                font-style:normal;
-
-                color:#aab6aa;
-
-            }
-        
-        </style>
-    
 </head>
-<body>
 
-    <div class="painel-admin-secreto">
+<body>
+    
+        <div class="painel-admin-secreto">
         <button class="btn-admin" onclick="forcarPodioManual()">🏆 Exibir Premiação</button>
         <button class="btn-admin btn-reset" onclick="liberarTelaoManual()">🔄 Voltar para Mesas</button>
     </div>
@@ -1510,15 +1531,18 @@
             <div class="info-rotulo">Fase Atual</div>
             <div id="info-fase" class="info-valor">---</div>
         </div>
+
         <div class="info-item">
             <div class="info-rotulo">Andamento</div>
             <div id="info-detalhe-fase" class="info-valor">---</div>
         </div>
+
         <div class="info-item">
-            <div class="info-max-rodadas" style="display:none;"></div> 
+            <div class="info-max-rodadas" style="display:none;"></div>
             <div class="info-rotulo">Mesas Decisivas</div>
             <div id="info-mesas-ativas-rotulo" class="info-valor">0 Mesas</div>
         </div>
+
         <div class="info-item">
             <div class="info-rotulo">Inscritos Confirmados</div>
             <div id="info-total-atletas" class="info-valor">-- Atletas</div>
@@ -1526,93 +1550,112 @@
     </div>
 
     <div id="conteudo-principal-telao" class="container-telao">
+
         <div class="coluna-mesas">
+
             <div class="secao-titulo-container">
-                <h2 class="secao-titulo" id="titulo-secao-jogos">Mesas em Andamento</h2>
+                <h2 class="secao-titulo" id="titulo-secao-jogos">
+                    Mesas em Andamento
+                </h2>
+
                 <div class="secao-linha"></div>
             </div>
+
             <div id="container-jogos" class="grid-jogos"></div>
+
         </div>
 
         <div class="ranking-container" id="coluna-ranking-lateral">
+
             <div class="secao-titulo-container">
-                <h2 class="secao-titulo">Classificação Geral</h2>
+                <h2 class="secao-titulo">
+                    Classificação Geral
+                </h2>
+
                 <div class="secao-linha"></div>
             </div>
+
             <div class="ranking-scroller-box" id="ranking-box-container">
+
                 <table class="tabela-ranking">
+
                     <thead>
                         <tr>
-                            <th style="text-align: left;">Pos</th>
-                            <th style="text-align: left;">Atleta</th>
-                            <th style="text-align: right;">Vitórias</th>
+                            <th style="text-align:left;">Pos</th>
+                            <th style="text-align:left;">Atleta</th>
+                            <th style="text-align:right;">Vitórias</th>
                         </tr>
                     </thead>
-                    <tbody id="tabela-ranking-corpo" class="ranking-marquise-body"></tbody>
+
+                    <tbody
+                        id="tabela-ranking-corpo"
+                        class="ranking-marquise-body">
+                    </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
     </div>
-               
-            <div class="rodape-publicidade">
+        <div class="rodape-publicidade">
 
-            <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
+        <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
 
-            <div class="card-desenvolvedor">
+        <div class="card-desenvolvedor">
 
-                <div id="publicidade-info" class="publicidade-grid">
+            <div id="publicidade-info" class="publicidade-grid">
 
-                    <div class="col-logo">
+                <div class="col-logo">
 
-                        <div id="publicidade-logo-slide" class="publicidade-slide">
+                    <div id="publicidade-logo-slide" class="publicidade-slide">
 
-                            <div id="publicidade-logo"></div>
+                        <div id="publicidade-logo"></div>
 
+                    </div>
+
+                </div>
+
+                <div class="col-patrocinador">
+
+                    <div id="publicidade-slide" class="publicidade-slide">
+
+                        <div id="publicidade-texto"></div>
+
+                        <div id="publicidade-botoes" class="col-botoes">
+                            <!-- JavaScript -->
                         </div>
 
                     </div>
 
-                    <div class="col-patrocinador">
+                </div>
 
-                        <div id="publicidade-slide" class="publicidade-slide">
+                <div class="col-assinatura">
 
-                            <div id="publicidade-texto"></div>
+                    <div class="marca-ferreira">
 
-                            <div id="publicidade-botoes" class="col-botoes">
-                                <!-- JavaScript -->
-                            </div>
-
+                        <div class="logo-ef-mini">
+                            <span>EF</span>
                         </div>
 
-                    </div>
+                        <div class="marca-texto">
 
-                    <div class="col-assinatura">
+                            <span class="marca-label">
+                                DESENVOLVIDO POR
+                            </span>
 
-                        <div class="marca-ferreira">
+                            <strong class="marca-ferreira-nome">
+                                FERREIRA
+                            </strong>
 
-                            <div class="logo-ef-mini">
-                                <span>EF</span>
-                            </div>
+                            <small class="marca-ferreira-sistemas">
+                                SISTEMAS
+                            </small>
 
-                            <div class="marca-texto">
-
-                                <span class="marca-label">
-                                    DESENVOLVIDO POR
-                                </span>
-
-                                <strong class="marca-ferreira-nome">
-                                    FERREIRA
-                                </strong>
-
-                                <small class="marca-ferreira-sistemas">
-                                    SISTEMAS
-                                </small>
-
-                                <em class="marca-slogan">
-                                    Tecnologia com propósito.
-                                </em>
-
-                            </div>
+                            <em class="marca-slogan">
+                                Tecnologia com propósito.
+                            </em>
 
                         </div>
 
@@ -1620,47 +1663,86 @@
 
                 </div>
 
-             </div>
+            </div>
 
-          </div>
+        </div>
 
-            <!-- ======================================================================= -->
-                
+    </div>
+
+    <!-- ======================================================================= -->
+
 <script>
-    
-    let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
+
+    let podioForcadoManualmente =
+        localStorage.getItem('telao_modo_podio') === 'true';
+
     let ultimoEstadoJogosStr = "";
     let ultimoEstadoRankingStr = "";
 
     function forcarPodioManual() {
+
         podioForcadoManualmente = true;
-        localStorage.setItem('telao_modo_podio', 'true');
+
+        localStorage.setItem(
+            'telao_modo_podio',
+            'true'
+        );
+
         atualizarTelao();
+
     }
 
     function liberarTelaoManual() {
+
         podioForcadoManualmente = false;
-        localStorage.setItem('telao_modo_podio', 'false');
+
+        localStorage.setItem(
+            'telao_modo_podio',
+            'false'
+        );
+
         window.location.reload();
+
     }
 
-    function ajustarTamanhoDosCards(totalMesas, ehMataMata) {
-        const grid = document.getElementById('container-jogos');
+    function ajustarTamanhoDosCards(
+        totalMesas,
+        ehMataMata
+    ) {
+
+        const grid =
+            document.getElementById('container-jogos');
+
         if (!grid) return;
 
-        const atletaLinhas = grid.querySelectorAll('.atleta-linha');
-        const atletaBoxes = grid.querySelectorAll('.atleta-box');
-        const tagsMesa = grid.querySelectorAll('.mesa-tag');
+        const atletaLinhas =
+            grid.querySelectorAll('.atleta-linha');
 
-        if (ehMataMata && totalMesas <= 2) {
+        const atletaBoxes =
+            grid.querySelectorAll('.atleta-box');
+
+        const tagsMesa =
+            grid.querySelectorAll('.mesa-tag');
+                    if (ehMataMata && totalMesas <= 2) {
+
             grid.classList.add('layout-super-finais');
+
             atletaLinhas.forEach(el => {
+
                 el.style.fontSize = "1.9rem";
                 el.style.fontWeight = "800";
                 el.style.maxWidth = "70%";
+
             });
-            tagsMesa.forEach(tag => tag.style.fontSize = "1.4rem");
-            return; 
+
+            tagsMesa.forEach(tag => {
+
+                tag.style.fontSize = "1.4rem";
+
+            });
+
+            return;
+
         }
 
         grid.classList.remove(
@@ -1695,494 +1777,1002 @@
         let minWidthGrid = "290px";
 
         if (ehMataMata) {
+
             fontSizeCard = "1.25rem";
             paddingBox = "14px 18px";
-            minWidthGrid = "450px"; 
-            tagsMesa.forEach(tag => tag.style.fontSize = "1.1rem");
+            minWidthGrid = "450px";
+
+            tagsMesa.forEach(tag => {
+
+                tag.style.fontSize = "1.1rem";
+
+            });
+
             grid.style.gap = "18px";
+
         } else {
+
             if (totalMesas > 12) {
+
                 fontSizeCard = "0.75rem";
                 paddingBox = "4px 8px";
                 minWidthGrid = "195px";
+
             } else if (totalMesas > 8) {
+
                 fontSizeCard = "0.82rem";
                 paddingBox = "5px 10px";
                 minWidthGrid = "250px";
+
             }
+
         }
 
         // O layout da fase classificatória agora é controlado pelo CSS.
         // Mantemos estes ajustes apenas para o mata-mata.
 
         if (ehMataMata) {
-            grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
-            atletaLinhas.forEach(el => el.style.fontSize = fontSizeCard);
-            atletaBoxes.forEach(el => el.style.padding = paddingBox);
-        }
+
+            grid.style.gridTemplateColumns =
+                `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
+
+            atletaLinhas.forEach(el => {
+
+                el.style.fontSize = fontSizeCard;
+
+            });
+
+            atletaBoxes.forEach(el => {
+
+                el.style.padding = paddingBox;
+
+            });
 
         }
+
+    }
 
     function gerenciarScrollDoRanking() {
-        const container = document.getElementById('ranking-box-container');
-        const body = document.getElementById('tabela-ranking-corpo');
+
+        const container =
+            document.getElementById('ranking-box-container');
+
+        const body =
+            document.getElementById('tabela-ranking-corpo');
+
         if (!container || !body) return;
 
-        const alturaDisponivel = container.clientHeight;
-        const alturaTabela = body.scrollHeight;
+        const alturaDisponivel =
+            container.clientHeight;
+
+        const alturaTabela =
+            body.scrollHeight;
 
         if (alturaTabela > alturaDisponivel) {
-            const distanciaScroll = alturaTabela - alturaDisponivel + 20; 
-            body.style.setProperty('--scroll-distancia', `-${distanciaScroll}px`);
-            body.style.animation = "autoScrollRanking 40s ease-in-out infinite alternate";
+
+            const distanciaScroll =
+                alturaTabela - alturaDisponivel + 20;
+
+            body.style.setProperty(
+                '--scroll-distancia',
+                `-${distanciaScroll}px`
+            );
+
+            body.style.animation =
+                "autoScrollRanking 40s ease-in-out infinite alternate";
+
         } else {
+
             body.style.animation = "none";
             body.style.transform = "translateY(0)";
+
         }
+
     }
 
     async function atualizarTelao() {
+
         try {
-            const response = await fetch(`/api/publico/dados?t=${new Date().getTime()}`);
+
+            const response =
+                await fetch(`/api/publico/dados?t=${new Date().getTime()}`);
+
             if (!response.ok) return;
+
             const data = await response.json();
+
             if (!data) return;
+                        const statusFase =
+                data.fase_torneio
+                    ? data.fase_torneio.toUpperCase()
+                    : "";
 
-            const statusFase = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
-            const nomeFaseStr = data.nome_fase ? data.nome_fase.toUpperCase() : "";
-            const faseRaw = Number(data.fase_atual);
-            
-            const ehMataMataAtivo = (faseRaw === -1 || faseRaw === -4 || nomeFaseStr.includes("MATA") || nomeFaseStr.includes("ELIMINATOR") || nomeFaseStr.includes("FINAL") || statusFase === "MATA_MATA");
+            const nomeFaseStr =
+                data.nome_fase
+                    ? data.nome_fase.toUpperCase()
+                    : "";
 
-            const exibirCerimonial = podioForcadoManualmente || 
-                                     statusFase === "ENCERRADO" || 
-                                     statusFase === "CONCLUIDO" || 
-                                     statusFase === "FINALIZADO" ||
-                                     nomeFaseStr.includes("ENCERRADO") || 
-                                     nomeFaseStr.includes("CONCLUÍDO") ||
-                                     faseRaw === -12;
+            const faseRaw =
+                Number(data.fase_atual);
 
-            const telaPrincipal = document.getElementById('conteudo-principal-telao');
+            const ehMataMataAtivo =
+                (
+                    faseRaw === -1 ||
+                    faseRaw === -4 ||
+                    nomeFaseStr.includes("MATA") ||
+                    nomeFaseStr.includes("ELIMINATOR") ||
+                    nomeFaseStr.includes("FINAL") ||
+                    statusFase === "MATA_MATA"
+                );
+
+            const exibirCerimonial =
+                podioForcadoManualmente ||
+
+                statusFase === "ENCERRADO" ||
+                statusFase === "CONCLUIDO" ||
+                statusFase === "FINALIZADO" ||
+
+                nomeFaseStr.includes("ENCERRADO") ||
+                nomeFaseStr.includes("CONCLUÍDO") ||
+
+                faseRaw === -12;
+
+            const telaPrincipal =
+                document.getElementById(
+                    'conteudo-principal-telao'
+                );
 
             if (exibirCerimonial) {
+
                 ultimoEstadoJogosStr = "";
                 ultimoEstadoRankingStr = "";
 
-                if (telaPrincipal) telaPrincipal.style.gridTemplateColumns = "1fr"; 
+                if (telaPrincipal) {
 
-                let p1 = "---", p2 = "---", p3 = "---", p4 = "---";
+                    telaPrincipal.style.gridTemplateColumns =
+                        "1fr";
+
+                }
+
+                let p1 = "---";
+                let p2 = "---";
+                let p3 = "---";
+                let p4 = "---";
+
                 let reiDasFloresNome = "---";
                 let qtdFloresTotal = 0;
 
-                if (data.confrontos && data.confrontos.length > 0) {
-                    const jogoFinal = data.confrontos.find(j => Number(j.fase_mesa) === -2 || Number(j.mesa) === 1);
+                if (
+                    data.confrontos &&
+                    data.confrontos.length > 0
+                ) {
+
+                    const jogoFinal =
+                        data.confrontos.find(j =>
+
+                            Number(j.fase_mesa) === -2 ||
+                            Number(j.mesa) === 1
+
+                        );
+
                     if (jogoFinal) {
-                        const t1 = Number(jogoFinal.tentos1 || 0);
-                        const t2 = Number(jogoFinal.tentos2 || 0);
-                        const vId = jogoFinal.vencedor_id;
-                        const idA1 = jogoFinal.atleta1_id || jogoFinal.athlete1_id;
 
-                        if (vId || t1 > 0 || t2 > 0) {
-                            if (vId == idA1 || t1 > t2) {
-                                p1 = jogoFinal.atleta1_nome || "---";
-                                p2 = jogoFinal.atleta2_nome || "---";
+                        const t1 =
+                            Number(jogoFinal.tentos1 || 0);
+
+                        const t2 =
+                            Number(jogoFinal.tentos2 || 0);
+
+                        const vId =
+                            jogoFinal.vencedor_id;
+
+                        const idA1 =
+                            jogoFinal.atleta1_id ||
+                            jogoFinal.athlete1_id;
+
+                        if (
+                            vId ||
+                            t1 > 0 ||
+                            t2 > 0
+                        ) {
+
+                            if (
+                                vId == idA1 ||
+                                t1 > t2
+                            ) {
+
+                                p1 =
+                                    jogoFinal.atleta1_nome ||
+                                    "---";
+
+                                p2 =
+                                    jogoFinal.atleta2_nome ||
+                                    "---";
+
                             } else {
-                                p1 = jogoFinal.atleta2_nome || "---";
-                                p2 = jogoFinal.atleta1_nome || "---";
+
+                                p1 =
+                                    jogoFinal.atleta2_nome ||
+                                    "---";
+
+                                p2 =
+                                    jogoFinal.atleta1_nome ||
+                                    "---";
+
                             }
+
                         } else {
-                            p1 = `${jogoFinal.atleta1_nome} (Finalista)`;
-                            p2 = `${jogoFinal.atleta2_nome} (Finalista)`;
+
+                            p1 =
+                                `${jogoFinal.atleta1_nome} (Finalista)`;
+
+                            p2 =
+                                `${jogoFinal.atleta2_nome} (Finalista)`;
+
                         }
+
                     }
 
-                    const jogoBronze = data.confrontos.find(j => Number(j.fase_mesa) === -3 || Number(j.mesa) === 2);
+                    const jogoBronze =
+                        data.confrontos.find(j =>
+
+                            Number(j.fase_mesa) === -3 ||
+                            Number(j.mesa) === 2
+
+                        );
+
                     if (jogoBronze) {
-                        const t1 = Number(jogoBronze.tentos1 || 0);
-                        const t2 = Number(jogoBronze.tentos2 || 0);
-                        const vId = jogoBronze.vencedor_id;
-                        const idA1 = jogoBronze.atleta1_id || jogoBronze.athlete1_id;
 
-                        if (vId || t1 > 0 || t2 > 0) {
-                            if (vId == idA1 || t1 > t2) {
-                                p3 = jogoBronze.atleta1_nome || "---";
-                                p4 = jogoBronze.atleta2_nome || "---";
+                        const t1 =
+                            Number(jogoBronze.tentos1 || 0);
+
+                        const t2 =
+                            Number(jogoBronze.tentos2 || 0);
+
+                        const vId =
+                            jogoBronze.vencedor_id;
+
+                        const idA1 =
+                            jogoBronze.atleta1_id ||
+                            jogoBronze.athlete1_id;
+                                                    if (
+                            vId ||
+                            t1 > 0 ||
+                            t2 > 0
+                        ) {
+
+                            if (
+                                vId == idA1 ||
+                                t1 > t2
+                            ) {
+
+                                p3 =
+                                    jogoBronze.atleta1_nome ||
+                                    "---";
+
+                                p4 =
+                                    jogoBronze.atleta2_nome ||
+                                    "---";
+
                             } else {
-                                p3 = jogoBronze.atleta2_nome || "---";
-                                p4 = jogoBronze.atleta1_nome || "---";
+
+                                p3 =
+                                    jogoBronze.atleta2_nome ||
+                                    "---";
+
+                                p4 =
+                                    jogoBronze.atleta1_nome ||
+                                    "---";
+
                             }
+
                         } else {
-                            p3 = `${jogoBronze.atleta1_nome} (Disputa)`;
-                            p4 = `${jogoBronze.atleta2_nome} (Disputa)`;
+
+                            p3 =
+                                `${jogoBronze.atleta1_nome} (Disputa)`;
+
+                            p4 =
+                                `${jogoBronze.atleta2_nome} (Disputa)`;
+
                         }
+
                     }
-                } 
-                
-                if (data.podio) {
-                    reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
-                    qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
-                    if (p1 === "---") p1 = data.podio.campeao || data.podio.p1 || "---";
-                    if (p2 === "---") p2 = data.podio.vice || data.podio.p2 || "---";
-                    if (p3 === "---") p3 = data.podio.terceiro || data.podio.p3 || "---";
-                    if (p4 === "---") p4 = data.podio.quarto || data.podio.p4 || "---";
+
                 }
 
-                if (p1 !== "---" && p1 !== "") {
-                    localStorage.setItem('cache_nomes_podio', JSON.stringify({p1, p2, p3, p4, reiDasFloresNome, qtdFloresTotal}));
+                if (data.podio) {
+
+                    reiDasFloresNome =
+                        data.podio.rei_nome ||
+                        data.podio.rei_flores ||
+                        "---";
+
+                    qtdFloresTotal =
+                        data.podio.max_flores ||
+                        data.podio.flores ||
+                        0;
+
+                    if (p1 === "---")
+                        p1 =
+                            data.podio.campeao ||
+                            data.podio.p1 ||
+                            "---";
+
+                    if (p2 === "---")
+                        p2 =
+                            data.podio.vice ||
+                            data.podio.p2 ||
+                            "---";
+
+                    if (p3 === "---")
+                        p3 =
+                            data.podio.terceiro ||
+                            data.podio.p3 ||
+                            "---";
+
+                    if (p4 === "---")
+                        p4 =
+                            data.podio.quarto ||
+                            data.podio.p4 ||
+                            "---";
+
+                }
+
+                if (
+                    p1 !== "---" &&
+                    p1 !== ""
+                ) {
+
+                    localStorage.setItem(
+                        'cache_nomes_podio',
+                        JSON.stringify({
+                            p1,
+                            p2,
+                            p3,
+                            p4,
+                            reiDasFloresNome,
+                            qtdFloresTotal
+                        })
+                    );
+
                 } else {
-                    const cache = JSON.parse(localStorage.getItem('cache_nomes_podio') || '{}');
+
+                    const cache =
+                        JSON.parse(
+                            localStorage.getItem(
+                                'cache_nomes_podio'
+                            ) || '{}'
+                        );
+
                     if (cache.p1) {
-                        p1 = cache.p1; p2 = cache.p2; p3 = cache.p3; p4 = cache.p4;
-                        reiDasFloresNome = cache.reiDasFloresNome || "---";
-                        qtdFloresTotal = cache.qtdFloresTotal || 0;
+
+                        p1 = cache.p1;
+                        p2 = cache.p2;
+                        p3 = cache.p3;
+                        p4 = cache.p4;
+
+                        reiDasFloresNome =
+                            cache.reiDasFloresNome || "---";
+
+                        qtdFloresTotal =
+                            cache.qtdFloresTotal || 0;
+
                     }
+
                 }
 
                 if (telaPrincipal) {
+
                     telaPrincipal.innerHTML = `
                         <div class="podio-wrapper">
-                            <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
-                            <div style="text-align:center; color:var(--texto-mutado); margin-bottom:15px; font-style:italic; font-size:1rem;">O pódio de honra da arena está consolidado!</div>
-                            
+
+                            <div class="podio-titulo">
+                                👑 CERIMÔNIA DE PREMIAÇÃO 👑
+                            </div>
+
+                            <div
+                                style="
+                                    text-align:center;
+                                    color:var(--texto-mutado);
+                                    margin-bottom:15px;
+                                    font-style:italic;
+                                    font-size:1rem;
+                                ">
+                                O pódio de honra da arena está consolidado!
+                            </div>
+
                             <div class="podio-flex">
-                                <div class="podio-card prata">
+                                                                <div class="podio-card prata">
+
                                     <div>
-                                        <div class="podio-medalha">🥈</div>
-                                        <div class="podio-rotulo-lugar">Vice-Campeão</div>
+
+                                        <div class="podio-medalha">
+                                            🥈
+                                        </div>
+
+                                        <div class="podio-rotulo-lugar">
+                                            Vice-Campeão
+                                        </div>
+
                                     </div>
-                                    <div class="podio-nome">${p2}</div>
+
+                                    <div class="podio-nome">
+                                        ${p2}
+                                    </div>
+
                                 </div>
 
                                 <div class="podio-card ouro">
+
                                     <div>
-                                        <div class="podio-medalha">👑</div>
-                                        <div class="podio-rotulo-lugar" style="color:var(--dourado-brilhante)">GRANDE CAMPEÃO</div>
+
+                                        <div class="podio-medalha">
+                                            👑
+                                        </div>
+
+                                        <div
+                                            class="podio-rotulo-lugar"
+                                            style="color:var(--dourado-brilhante)">
+
+                                            GRANDE CAMPEÃO
+
+                                        </div>
+
                                     </div>
-                                    <div class="podio-nome" style="font-size: 1.3rem; color: var(--dourado-brilhante); font-family:'Cinzel', serif;">${p1}</div>
+
+                                    <div
+                                        class="podio-nome"
+                                        style="
+                                            font-size:1.3rem;
+                                            color:var(--dourado-brilhante);
+                                            font-family:'Cinzel',serif;">
+
+                                        ${p1}
+
+                                    </div>
+
                                 </div>
 
                                 <div class="podio-card bronze">
+
                                     <div>
-                                        <div class="podio-medalha">🥉</div>
-                                        <div class="podio-rotulo-lugar">3º Colocado</div>
+
+                                        <div class="podio-medalha">
+                                            🥉
+                                        </div>
+
+                                        <div class="podio-rotulo-lugar">
+                                            3º Colocado
+                                        </div>
+
                                     </div>
-                                    <div class="podio-nome">${p3}</div>
+
+                                    <div class="podio-nome">
+                                        ${p3}
+                                    </div>
+
                                 </div>
 
-                                <div class="podio-card" style="border: 2px solid var(--madeira); height: 160px; width: 200px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div
+                                    class="podio-card"
+                                    style="
+                                        border:2px solid var(--madeira);
+                                        height:160px;
+                                        width:200px;
+                                        display:flex;
+                                        flex-direction:column;
+                                        justify-content:space-between;">
+
                                     <div>
-                                        <div class="podio-medalha" style="font-size: 1.8rem;">🏅</div>
-                                        <div class="podio-rotulo-lugar" style="color: var(--madeira);">4º Colocado</div>
+
+                                        <div
+                                            class="podio-medalha"
+                                            style="font-size:1.8rem;">
+
+                                            🏅
+
+                                        </div>
+
+                                        <div
+                                            class="podio-rotulo-lugar"
+                                            style="color:var(--madeira);">
+
+                                            4º Colocado
+
+                                        </div>
+
                                     </div>
-                                    <div class="podio-nome" style="color: #bbb; font-size: 0.95rem;">${p4}</div>
+
+                                    <div
+                                        class="podio-nome"
+                                        style="
+                                            color:#bbb;
+                                            font-size:.95rem;">
+
+                                        ${p4}
+
+                                    </div>
+
                                 </div>
+
                             </div>
 
-                            <div class="painel-rei-flores" style="border: 2px dashed var(--borda-ouro); background: linear-gradient(130deg, rgba(214,175,55,0.08), rgba(0,0,0,0)); padding: 15px; border-radius: 4px; text-align: center; max-width: 550px; margin: 30px auto 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                                <div style="color: var(--borda-ouro); font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
-                                <div style="color: var(--texto-mutado); font-size: 0.85rem; margin-bottom: 8px;">O maior cantador de flores da rodada:</div>
-                                <div style="color: #ffffff; font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;">${reiDasFloresNome.toUpperCase()}</div>
-                                <div style="display: inline-block; background: var(--borda-ouro); color: #000; padding: 4px 15px; border-radius: 2px; font-size: 0.8rem; font-weight: bold;">
-                                    🎯 ${qtdFloresTotal} Flores Cantadas no Torneio
+                            <div
+                                class="painel-rei-flores"
+                                style="
+                                    border:2px dashed var(--borda-ouro);
+                                    background:linear-gradient(130deg,rgba(214,175,55,.08),rgba(0,0,0,0));
+                                    padding:15px;
+                                    border-radius:4px;
+                                    text-align:center;
+                                    max-width:550px;
+                                    margin:30px auto 0 auto;
+                                    box-shadow:0 4px 15px rgba(0,0,0,.5);">
+
+                                <div
+                                    style="
+                                        color:var(--borda-ouro);
+                                        font-family:'Cinzel',serif;
+                                        font-size:1.2rem;
+                                        font-weight:bold;
+                                        margin-bottom:4px;
+                                        letter-spacing:1px;">
+
+                                    🌸 TROFÉU REI DAS FLORES 🌸
+
                                 </div>
+
+                                <div
+                                    style="
+                                        color:var(--texto-mutado);
+                                        font-size:.85rem;
+                                        margin-bottom:8px;">
+
+                                    O maior cantador de flores da rodada:
+
+                                </div>
+                                                                <div
+                                    style="
+                                        font-size:1.3rem;
+                                        color:var(--texto-principal);
+                                        font-weight:bold;
+                                        margin-bottom:6px;">
+
+                                    👑 ${reiDasFloresNome}
+
+                                </div>
+
+                                <div
+                                    style="
+                                        font-size:1rem;
+                                        color:var(--dourado-brilhante);">
+
+                                    🌸 ${qtdFloresTotal} flores cantadas
+
+                                </div>
+
                             </div>
+
                         </div>
                     `;
-                }
-                
-                document.getElementById('info-fase').innerText = "🏁 ENCERRADO";
-                document.getElementById('info-detalhe-fase').innerText = "Torneio Concluído";
-                document.getElementById('cronometro').innerText = "--:--";
-                return;
-            }
 
-            const rankingLateral = document.getElementById('coluna-ranking-lateral');
-            const tituloJogos = document.getElementById('titulo-secao-jogos');
+                }
+
+                return;
+
+            }
 
             if (telaPrincipal) {
-                if (ehMataMataAtivo) {
-                    telaPrincipal.classList.add('modo-mata-mata');
-                    if (rankingLateral) rankingLateral.style.display = 'none';
-                    if (tituloJogos) tituloJogos.innerText = "Confrontos Eliminatórios";
-                } else {
-                    telaPrincipal.classList.remove('modo-mata-mata');
-                    if (rankingLateral) rankingLateral.style.display = 'flex';
-                    if (tituloJogos) tituloJogos.innerText = "Mesas em Andamento";
-                }
+
+                telaPrincipal.innerHTML = `
+                    <div id="container-jogos"></div>
+
+                    <div id="ranking-box-container">
+
+                        <div class="ranking-header">
+                            Ranking Geral
+                        </div>
+
+                        <table class="ranking-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>#</th>
+
+                                    <th>Atleta</th>
+
+                                    <th>Pts</th>
+
+                                    <th>Vit</th>
+
+                                    <th>Flores</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="tabela-ranking-corpo"></tbody>
+
+                        </table>
+
+                    </div>
+                `;
+
             }
 
-            if (document.getElementById('info-fase')) {
-                let nomeExibicaoFase = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
-                if (faseRaw === -1) nomeExibicaoFase = "Mata-Mata Final";
-                if (faseRaw === -4) nomeExibicaoFase = "Semifinal";
-                document.getElementById('info-fase').innerText = nomeExibicaoFase.toUpperCase();
+            const ranking =
+                data.ranking || [];
+
+            const confrontos =
+                data.confrontos || [];
+
+            const jogosStr =
+                JSON.stringify(confrontos);
+
+            const rankingStr =
+                JSON.stringify(ranking);
+
+            const containerJogos =
+                document.getElementById(
+                    'container-jogos'
+                );
+
+            const rankingBody =
+                document.getElementById(
+                    'tabela-ranking-corpo'
+                );
+
+            if (
+                containerJogos &&
+                jogosStr !== ultimoEstadoJogosStr
+            ) {
+
+                ultimoEstadoJogosStr =
+                    jogosStr;
+
+                containerJogos.innerHTML = "";
+
+                ajustarTamanhoDosCards(
+                    confrontos.length,
+                    ehMataMataAtivo
+                );
+
+                confrontos.forEach(jogo => {
+
+                    const card =
+                        document.createElement('div');
+
+                    card.className =
+                        "card-jogo";
+                                            const tentos1 =
+                        Number(jogo.tentos1 || 0);
+
+                    const tentos2 =
+                        Number(jogo.tentos2 || 0);
+
+                    const atleta1 =
+                        jogo.atleta1_nome || "---";
+
+                    const atleta2 =
+                        jogo.atleta2_nome || "---";
+
+                    const mesa =
+                        jogo.mesa || "-";
+
+                    const status =
+                        (jogo.status || "")
+                            .toUpperCase();
+
+                    const vencedorId =
+                        jogo.vencedor_id;
+
+                    const atleta1Id =
+                        jogo.atleta1_id ||
+                        jogo.athlete1_id;
+
+                    const atleta1Venceu =
+                        vencedorId == atleta1Id ||
+                        tentos1 > tentos2;
+
+                    const classeStatus =
+                        status === "FINALIZADO"
+                            ? "status-finalizado"
+                            : status === "EM_ANDAMENTO"
+                                ? "status-andamento"
+                                : "status-pendente";
+
+                    card.innerHTML = `
+
+                        <div class="mesa-tag">
+
+                            Mesa ${mesa}
+
+                            <span class="${classeStatus}">
+                                ${status || "PENDENTE"}
+                            </span>
+
+                        </div>
+
+                        <div class="atleta-box ${atleta1Venceu && status === "FINALIZADO" ? "vencedor" : ""}">
+
+                            <div class="atleta-linha">
+                                ${atleta1}
+                            </div>
+
+                            <div class="placar">
+                                ${tentos1}
+                            </div>
+
+                        </div>
+
+                        <div class="versus">
+                            ×
+                        </div>
+
+                        <div class="atleta-box ${!atleta1Venceu && status === "FINALIZADO" ? "vencedor" : ""}">
+
+                            <div class="atleta-linha">
+                                ${atleta2}
+                            </div>
+
+                            <div class="placar">
+                                ${tentos2}
+                            </div>
+
+                        </div>
+
+                    `;
+
+                    containerJogos.appendChild(card);
+
+                });
+
             }
 
-            if (document.getElementById('info-detalhe-fase')) {
-                let andamentoTexto = data.detalhe_fase || data.andamento || data.status_rodada;
-                const faseTexto = document.getElementById('info-fase').innerText.toUpperCase();
-                if (andamentoTexto && andamentoTexto.toUpperCase() === faseTexto || (andamentoTexto && andamentoTexto.replace(/\D/g,'') === faseTexto.replace(/\D/g,''))) {
-                    andamentoTexto = ehMataMataAtivo ? "Jogos Decisivos" : "Em Andamento"; 
-                }
-                document.getElementById('info-detalhe-fase').innerText = andamentoTexto || "Em andamento";
+            if (
+                rankingBody &&
+                rankingStr !== ultimoEstadoRankingStr
+            ) {
+
+                ultimoEstadoRankingStr =
+                    rankingStr;
+
+                rankingBody.innerHTML = "";
+
+                ranking.forEach((item, index) => {
+
+                    const tr =
+                        document.createElement("tr");
+                                            tr.innerHTML = `
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td style="text-align:left;">
+                            ${item.nome}
+                        </td>
+
+                        <td>
+                            ${item.pontos ?? 0}
+                        </td>
+
+                        <td>
+                            ${item.vitorias ?? 0}
+                        </td>
+
+                        <td>
+                            ${item.flores ?? 0}
+                        </td>
+
+                    `;
+
+                    rankingBody.appendChild(tr);
+
+                });
+
+                gerenciarScrollDoRanking();
+
             }
 
-            const elMax = document.getElementById('info-mesas-ativas-rotulo');
-            let totalConfrontosAtuais = 0;
-            if (elMax) {
-                totalConfrontosAtuais = data.confrontos ? data.confrontos.length : 0;
-                elMax.innerText = `${totalConfrontosAtuais} Mesas`;
-            }
+            document.getElementById("titulo-torneio").textContent =
+                data.nome_torneio || "TORNEIO";
 
-            const elAtletas = document.getElementById('info-total-atletas');
-            if (elAtletas) {
-                let qtdAtletas = data.total_atletas || data.inscritos || data.total_jogadores || 0;
-                if (Number(qtdAtletas) === 0 && data.ranking) qtdAtletas = data.ranking.length;
-                elAtletas.innerText = `${qtdAtletas} Atletas`;
-            }
-            
-            const tempoFormatado = data.tempo || "00:00";
-            const cronoAtivo = data.crono_ativo === 1;
-            const cronoElement = document.getElementById('cronometro');
-            const alertaElement = document.getElementById('alerta-falta');
-            
-            // --- BLOCO ATUALIZADO DO CRONÔMETRO (BORDA E TEXTO) ---
-            if (!cronoAtivo) {
-                if (tempoFormatado === "AGORA TUDO É FALTA!") {
-                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; 
-                    cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--danger)'; 
-                    alertaElement.style.display = 'none'; 
-                } else {
-                    cronoElement.parentElement.style.borderColor = '#444444'; 
-                    alertaElement.style.display = 'none';
+            document.getElementById("fase-atual").textContent =
+                data.nome_fase || "---";
 
-                    if (tempoFormatado.includes('<span')) {
-                        cronoElement.innerHTML = tempoFormatado;
-                        cronoElement.style.color = ''; 
-                    } else {
-                        cronoElement.innerText = tempoFormatado;
-                        cronoElement.style.color = '#e0e0e0'; 
-                    }
-                }
-            } else {
-                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; 
-                
-                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
-                    cronoElement.innerText = tempoFormatado;
-                    cronoElement.style.color = 'var(--danger)'; 
-                    alertaElement.style.display = 'flex';
-                } else {
-                    if (tempoFormatado.includes('<span')) {
-                        cronoElement.innerHTML = tempoFormatado;
-                        cronoElement.style.color = '';
-                    } else {
-                        cronoElement.innerText = tempoFormatado;
-                        cronoElement.style.color = 'var(--dourado-brilhante)'; 
-                    }
-                    alertaElement.style.display = 'none';
-                }
-            }
+            document.getElementById("rodada-atual").textContent =
+                data.rodada_atual || "-";
 
-            // --- RENDERIZAÇÃO DOS CONFRONTOS ---
-            const containerJogos = document.getElementById('container-jogos');
-            if (containerJogos) {
-                const signatureAtualJogos = JSON.stringify(data.confrontos || []);
-                
-                if (signatureAtualJogos !== ultimoEstadoJogosStr) {
-                    ultimoEstadoJogosStr = signatureAtualJogos; 
-                    containerJogos.innerHTML = '';
-                    
-                    if (!data.confrontos || data.confrontos.length === 0) {
-                        containerJogos.innerHTML = `<div style="color: var(--texto-mutado); font-style: italic; padding: 10px;">Nenhum confronto ativo. Aguardando chaves...</div>`;
-                    } else {
-                        data.confrontos.forEach(jogo => {
-                            const card = document.createElement('div');
-                            card.className = 'card-jogo';
+            document.getElementById("cronometro").textContent =
+                data.tempo_restante || "--:--";
 
-                            const idMesaEspecial = Number(jogo.fase_mesa);
-                            const nomeFaseMesaOficial = jogo.fase_mesa_nome
-                                ? jogo.fase_mesa_nome.toUpperCase()
-                                : "";
-                            
-                            if (faseRaw === -4) {
-                                card.classList.add('card-semifinal');
-                            }
-                            
-                            if (
-                                idMesaEspecial === -2 ||
-                                nomeFaseMesaOficial.includes("GRANDE FINAL") ||
-                                nomeFaseMesaOficial === "FINAL"
-                            ) {
-                                card.classList.add('card-grande-final');
-                            }
-                            
-                            if (
-                                idMesaEspecial === -3 ||
-                                nomeFaseMesaOficial.includes("TERCEIRO") ||
-                                nomeFaseMesaOficial.includes("3º") ||
-                                nomeFaseMesaOficial.includes("BRONZE")
-                            ) {
-                                card.classList.add('card-terceiro-lugar');
-                            }
+            atualizarPublicidade(data.publicidade || []);
 
-                            const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA / W.O.";
-                            
-                            const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
-                            const t1 = jogo.tentos1 || 0;
-                            const fa1 = jogo.faltas1 || 0;
+        } catch (e) {
 
-                            const f2 = jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
-                            const t2 = jogo.tentos2 || 0;
-                            const fa2 = jogo.faltas2 || 0;
+            console.error(
+                "Erro ao atualizar telão:",
+                e
+            );
 
-                            const p1Str = `${f1}S | ${t1}T | ${fa1}F`;
-                            const p2Str = `${f2}S | ${t2}T | ${fa2}F`;
-                            
-                            const statusMesa = jogo.status ? jogo.status.toUpperCase() : 'ANDAMENTO';
-                            const partidaConcluida = (statusMesa === 'FINALIZADO' || statusMesa === 'CONCLUIDO' || jogo.encerrado === true || jogo.vencedor_id !== null);
+        }
 
-                            let classeJ1 = ""; let classeJ2 = "";
-                            let prefixoJ1 = ""; let prefixoJ2 = "";
+    }
 
-                            if (partidaConcluida) {
-                                const idVencedor = jogo.vencedor_id;
-                                const idAtleta1 = jogo.atleta1_id || jogo.athlete1_id;
-                                const idAtleta2 = jogo.atleta2_id || jogo.athlete2_id;
+    let indicePublicidade = 0;
 
-                                let j1Ganhou = false; let j2Ganhou = false;
+    function atualizarPublicidade(lista) {
 
-                                if (idVencedor !== null && idVencedor !== undefined) {
-                                    j1Ganhou = (idVencedor == idAtleta1);
-                                    j2Ganhou = (idVencedor == idAtleta2);
-                                } else {
-                                    j1Ganhou = (f1 > f2) || (f1 === f2 && t1 > t2);
-                                    j2Ganhou = (f2 > f1) || (f1 === f2 && t2 > t1);
-                                }
+        const texto =
+            document.getElementById("publicidade-texto");
 
-                                if (j1Ganhou) {
-                                    classeJ1 = "vencedor-card"; prefixoJ1 = "👑 ";
-                                    classeJ2 = "perdedor-card"; prefixoJ2 = "❌ ";
-                                } else if (j2Ganhou) {
-                                    classeJ1 = "perdedor-card"; prefixoJ1 = "❌ ";
-                                    classeJ2 = "vencedor-card"; prefixoJ2 = "👑 ";
-                                }
-                            } else {
-                                const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
-                                const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
-                                if (j1Lider) classeJ1 = "lider-mesa";
-                                if (j2Lider) classeJ2 = "lider-mesa";
-                            }
+        const logo =
+            document.getElementById("publicidade-logo");
 
-                            let textoTagMesa = `Mesa ${jogo.mesa}`;
+        const botoes =
+            document.getElementById("publicidade-botoes");
 
-                            // 1. Se o banco/API já mandou um nome específico para a mesa, respeitamos primeiro
-                            if (nomeFaseMesaOficial.includes("SEMIFINAL") || statusFase.includes("SEMIFINAL") || nomeFaseStr.includes("SEMIFINAL")) {
-                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL ${jogo.mesa}</span>`;
-                            } else if (idMesaEspecial === -2 || nomeFaseMesaOficial.includes("GRANDE FINAL") || nomeFaseMesaOficial === "FINAL") {
-                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (idMesaEspecial === -3 || nomeFaseMesaOficial.includes("TERCEIRO") || nomeFaseMesaOficial.includes("3º") || nomeFaseMesaOficial.includes("BRONZE")) {
-                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
-                            } 
-                            // 2. Se não veio nome oficial da API, fazemos o fallback inteligente por ID ou número da mesa
-                            else if (idMesaEspecial === -2 || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
-                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
-                            } else if (idMesaEspecial === -3 || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
-                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
-                            } else if (idMesaEspecial === -4) {
-                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL</span>`;
-                            } else if (jogo.fase_mesa_nome) {
-                                textoTagMesa = `💥 ${jogo.fase_mesa_nome.toUpperCase()}`;
-                            } else if (ehMataMataAtivo) {
-                                textoTagMesa = `⚔️ MESA ${jogo.mesa} - ELIMINATÓRIA`;
-                            } else {
-                                textoTagMesa = `MESA ${jogo.mesa}`;
-                            }
+        if (
+            !lista ||
+            lista.length === 0
+        ) {
 
+            texto.innerHTML =
+                "<strong>Sem patrocinadores cadastrados</strong>";
 
-                            let classeMesa = "mesa-tag";
-                            
-                            if (card.classList.contains("card-semifinal")) {
-                                classeMesa += " mesa-semifinal";
-                            }
-                            
-                            if (card.classList.contains("card-grande-final")) {
-                                classeMesa += " mesa-grande-final";
-                            }
-                            
-                            if (card.classList.contains("card-terceiro-lugar")) {
+            logo.innerHTML = "";
+
+            botoes.innerHTML = "";
+
+            return;
+
+        }
+
+        if (
+            indicePublicidade >=
+            lista.length
+        ) {
+
+            indicePublicidade = 0;
+
+        }
+
+        const pub =
+            lista[indicePublicidade];
+
+        texto.innerHTML =
+            `<strong>${pub.nome}</strong><br>${pub.descricao || ""}`;
+
+        logo.innerHTML =
+            pub.logo
+                ? `<img src="${pub.logo}" alt="${pub.nome}">`
+                : "";
+
+        botoes.innerHTML = "";
+                                    if (card.classList.contains("card-terceiro-lugar")) {
                                 classeMesa += " mesa-terceiro-lugar";
                             }
 
-                            
-                           card.innerHTML = `
+                            card.innerHTML = `
                                 <div class="${classeMesa}">${textoTagMesa}</div>
 
                                 <div class="confronto-flex">
-                            
+
                                     <div class="atleta-box ${classeJ1}">
                                         <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
                                         <span class="placar-tag">${p1Str}</span>
                                     </div>
-                            
+
                                     <div class="divisor-atletas"></div>
-                            
+
                                     <div class="atleta-box ${classeJ2}">
                                         <span class="atleta-linha">${prefixoJ2}${advNome}</span>
                                         <span class="placar-tag">${p2Str}</span>
                                     </div>
-                            
+
                                 </div>
                             `;
-                            
+
                             containerJogos.appendChild(card);
+
                         });
 
-                        ajustarTamanhoDosCards(totalConfrontosAtuais, ehMataMataAtivo);
+                        ajustarTamanhoDosCards(
+                            totalConfrontosAtuais,
+                            ehMataMataAtivo
+                        );
+
                     }
+
                 }
+
             }
 
             // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
-            if (!ehMataMataAtivo) {
-                const rankingCompletoData = data.ranking ? data.ranking : [];
-                const signatureAtualRanking = JSON.stringify(rankingCompletoData);
 
-                if (signatureAtualRanking !== ultimoEstadoRankingStr) {
-                    ultimoEstadoRankingStr = signatureAtualRanking; 
-                    const tableBody = document.getElementById('tabela-ranking-corpo');
+            if (!ehMataMataAtivo) {
+
+                const rankingCompletoData =
+                    data.ranking ? data.ranking : [];
+
+                const signatureAtualRanking =
+                    JSON.stringify(rankingCompletoData);
+
+                if (
+                    signatureAtualRanking !==
+                    ultimoEstadoRankingStr
+                ) {
+
+                    ultimoEstadoRankingStr =
+                        signatureAtualRanking;
+
+                    const tableBody =
+                        document.getElementById(
+                            'tabela-ranking-corpo'
+                        );
+
                     if (tableBody) {
+
                         tableBody.innerHTML = '';
+
                         if (rankingCompletoData.length > 0) {
+
                             rankingCompletoData.forEach((player, index) => {
-                                const row = document.createElement('tr');
-                                if (index < 4) row.className = 'top-atleta';
+
+                                const row =
+                                    document.createElement('tr');
+
+                                if (index < 4)
+                                    row.className = 'top-atleta';
+
                                 row.innerHTML = `
                                     <td class="posicao-num">${index + 1}º</td>
-                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
-                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
+                                    <td style="font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${player.nome}</td>
+                                    <td style="text-align:right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
                                 `;
+
                                 tableBody.appendChild(row);
+
                             });
-                            setTimeout(gerenciarScrollDoRanking, 100);
+
+                            setTimeout(
+                                gerenciarScrollDoRanking,
+                                100
+                            );
+
                         }
+
                     }
+
                 }
+
             }
 
         } catch (error) {
-            console.error("Erro no processamento de dados do telão:", error);
+
+            console.error(
+                "Erro no processamento de dados do telão:",
+                error
+            );
+
         }
+
     }
 
     atualizarTelao();
-    setInterval(atualizarTelao, 3000);
-    
+
+    setInterval(
+        atualizarTelao,
+        3000
+    );
+
     /* ============================
        PAINEL ADMINISTRATIVO
     ============================ */
-
-    const painelAdmin = document.querySelector(".painel-admin-secreto");
+        const painelAdmin = document.querySelector(".painel-admin-secreto");
 
     let timeoutPainel;
 
@@ -2207,7 +2797,7 @@
         }
 
     });
-    
+
 </script>
 
 <script src="/static/js/patrocinadores.js"></script>
