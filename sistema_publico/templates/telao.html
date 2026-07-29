@@ -780,27 +780,24 @@
         }
 
         /* --- Pódio Premium --- */
-        .podio-wrapper {
-            background: linear-gradient(180deg, rgba(7,26,12,.95) 0%, #030a04 100%);
-            padding: 15px;
-            border-radius: 4px;
-            border: 2px solid var(--borda-ouro);
-            height: 100%;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow: hidden;
+        .podio-wrapper{
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            box-sizing:border-box;
+            padding:18px 28px;
+            overflow:hidden;
+        
+            background:
+                radial-gradient(circle at center,
+                    rgba(214,175,55,.10),
+                    rgba(0,0,0,0) 55%);
         }
+        
         .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
-        .podio-flex { display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-top: 10px; }
-        .podio-card { background: rgba(0,0,0,0.4); border-radius: 4px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-        .podio-card.ouro { border: 3px solid var(--borda-ouro); height: 200px; width: 210px; order: 2; }
-        .podio-card.prata { border: 2px solid var(--plata-prata); height: 170px; width: 185px; order: 1; }
-        .podio-card.bronze { border: 2px solid var(--madeira-bronze); height: 155px; width: 185px; order: 3; }
-        .podio-medalha { font-size: 2.2rem; margin-bottom: 5px; }
-        .podio-rotulo-lugar { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--texto-mutado); }
-        .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
+
+
+        
         @keyframes pulseBorda {
             from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
             to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
@@ -1549,51 +1546,118 @@
                 if (telaPrincipal) {
                     telaPrincipal.innerHTML = `
                         <div class="podio-wrapper">
-                            <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
-                            <div style="text-align:center; color:var(--texto-mutado); margin-bottom:15px; font-style:italic; font-size:1rem;">O PÓDIO DE HONRA ESTÁ CONSOLIDADO!</div>
-                            
-                            <div class="podio-flex">
-                                <div class="podio-card prata">
-                                    <div>
-                                        <div class="podio-medalha">🥈</div>
-                                        <div class="podio-rotulo-lugar">Vice-Campeão</div>
-                                    </div>
-                                    <div class="podio-nome">${p2}</div>
+                    
+                            <div class="podio-header">
+                                <div class="podio-titulo">
+                                    👑 CERIMÔNIA DE PREMIAÇÃO 👑
                                 </div>
-
-                                <div class="podio-card ouro">
-                                    <div>
-                                        <div class="podio-medalha">👑</div>
-                                        <div class="podio-rotulo-lugar" style="color:var(--dourado-brilhante)">GRANDE CAMPEÃO</div>
-                                    </div>
-                                    <div class="podio-nome" style="font-size: 1.3rem; color: var(--dourado-brilhante); font-family:'Cinzel', serif;">${p1}</div>
-                                </div>
-
-                                <div class="podio-card bronze">
-                                    <div>
-                                        <div class="podio-medalha">🥉</div>
-                                        <div class="podio-rotulo-lugar">3º Colocado</div>
-                                    </div>
-                                    <div class="podio-nome">${p3}</div>
-                                </div>
-
-                                <div class="podio-card" style="border: 2px solid var(--madeira); height: 130px; width: 160px; display: flex; flex-direction: column; justify-content: space-between;">
-                                    <div>
-                                        <div class="podio-medalha" style="font-size: 1.8rem;">🏅</div>
-                                        <div class="podio-rotulo-lugar" style="color: var(--madeira);">4º Colocado</div>
-                                    </div>
-                                    <div class="podio-nome" style="color: #bbb; font-size: 0.95rem;">${p4}</div>
+                    
+                                <div class="podio-subtitulo">
+                                    O PÓDIO DE HONRA ESTÁ CONSOLIDADO
                                 </div>
                             </div>
-
-                            <div class="painel-rei-flores" style="border: 2px dashed var(--borda-ouro); background: linear-gradient(130deg, rgba(214,175,55,0.08), rgba(0,0,0,0)); padding: 15px; border-radius: 4px; text-align: center; max-width: 550px; margin: 10px auto 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                                <div style="color: var(--borda-ouro); font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
-                                <div style="color: var(--texto-mutado); font-size: 0.85rem; margin-bottom: 8px;">O maior cantador de flores do torneio:</div>
-                                <div style="color: #ffffff; font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;">${reiDasFloresNome.toUpperCase()}</div>
-                                <div style="display: inline-block; background: var(--borda-ouro); color: #000; padding: 4px 15px; border-radius: 2px; font-size: 0.8rem; font-weight: bold;">
-                                    🎯 ${qtdFloresTotal} Flores Cantadas no Torneio
+                    
+                            <div class="podio-palco">
+                    
+                                <!-- Vice-Campeão -->
+                                <div class="podio-pilar prata">
+                    
+                                    <div class="podio-medalha">
+                                        🥈
+                                    </div>
+                    
+                                    <div class="podio-posicao">
+                                        Vice-Campeão
+                                    </div>
+                    
+                                    <div class="podio-atleta">
+                                        ${p2}
+                                    </div>
+                    
+                                    <div class="pedestal pedestal-prata"></div>
+                    
                                 </div>
+                    
+                                <!-- Campeão -->
+                                <div class="podio-pilar campeao">
+                    
+                                    <div class="campeao-coroa">
+                                        👑
+                                    </div>
+                    
+                                    <div class="podio-atleta destaque">
+                                        ${p1}
+                                    </div>
+                    
+                                    <div class="podio-posicao campeao-texto">
+                                        GRANDE CAMPEÃO
+                                    </div>
+                    
+                                    <div class="pedestal pedestal-ouro"></div>
+                    
+                                </div>
+                    
+                                <!-- Terceiro -->
+                                <div class="podio-pilar bronze">
+                    
+                                    <div class="podio-medalha">
+                                        🥉
+                                    </div>
+                    
+                                    <div class="podio-posicao">
+                                        3º Colocado
+                                    </div>
+                    
+                                    <div class="podio-atleta">
+                                        ${p3}
+                                    </div>
+                    
+                                    <div class="pedestal pedestal-bronze"></div>
+                    
+                                </div>
+                    
                             </div>
+                    
+                            <div class="podio-quarto">
+                    
+                                <div class="quarto-medalha">
+                                    🏅
+                                </div>
+                    
+                                <div class="quarto-conteudo">
+                    
+                                    <div class="quarto-titulo">
+                                        4º Colocado
+                                    </div>
+                    
+                                    <div class="quarto-nome">
+                                        ${p4}
+                                    </div>
+                    
+                                </div>
+                    
+                            </div>
+                    
+                            <div class="rei-flores">
+                    
+                                <div class="rei-titulo">
+                                    🌸 TROFÉU REI DAS FLORES 🌸
+                                </div>
+                    
+                                <div class="rei-subtitulo">
+                                    O maior cantador de flores do torneio
+                                </div>
+                    
+                                <div class="rei-nome">
+                                    ${reiDasFloresNome.toUpperCase()}
+                                </div>
+                    
+                                <div class="rei-total">
+                                    🎯 ${qtdFloresTotal} Flores Cantadas
+                                </div>
+                    
+                            </div>
+                    
                         </div>
                     `;
                 }
