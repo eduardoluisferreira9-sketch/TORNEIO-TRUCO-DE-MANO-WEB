@@ -81,15 +81,55 @@
 
     flex:1;
 
+    display:grid;
+
+    grid-template-columns:220px 1fr 220px;
+
+    align-items:end;
+
+    gap:40px;
+
+    width:100%;
+
+    min-height:0;
+
+}
+
+.podio-centro{
+
+    display:flex;
+
+    min-width:0;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:flex-end;
+
+}
+
+.podio-lateral{
+
     display:flex;
 
     flex-direction:column;
 
-    justify-content:flex-end;
+    justify-content:center;
 
     align-items:center;
 
-    padding-top:0;
+    height:320px;
+   
+    align-self:end;
+
+    padding:20px;
+
+    border:1px solid rgba(212,170,35,.35);
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.03);
 
 }
 
@@ -106,7 +146,7 @@
 
     align-items:flex-end;
 
-    gap:90px;
+    gap:80px;
 
     padding-top:55px;
 
@@ -121,29 +161,6 @@
     align-items:center;
     justify-content:flex-start;
     gap:6px;
-
-}
-
-/* medalhas */
-
-.podio-medalha{
-    font-size:3rem;
-    margin-bottom:10px;
-    filter:drop-shadow(
-        0 4px 8px rgba(0,0,0,.35)
-    );
-
-}
-
-/* coroa */
-
-.campeao-coroa{
-    font-size:3.5rem;
-    margin-bottom:8px;
-    filter:
-        drop-shadow(
-            0 0 18px rgba(243,207,93,.45)
-        );
 
 }
 
@@ -209,9 +226,8 @@
 .pedestal{
    position:relative;
    z-index:5;
-   top:8px;
-   bottom:-6px;
-   width:230px;
+   top:0;
+   width:200px;
    display:flex;
    align-items:center;
    justify-content:center;
@@ -263,7 +279,7 @@
 ========================================================== */
 
 .campeao .pedestal{
-    width:210px;
+    width:200px;
     height:220px;
     background:
         linear-gradient(
@@ -283,7 +299,7 @@
 ========================================================== */
 
 .prata .pedestal{
-    width:190px;
+    width:200px;
     height:180px;
     background:
         linear-gradient(
@@ -303,7 +319,7 @@
 ========================================================== */
 
 .bronze .pedestal{
-    width:190px;
+    width:200px;
     height:145px;
     background:
         linear-gradient(
@@ -340,9 +356,10 @@
 
    position:relative;
    z-index:1;
-   width:min(1250px,95%);
+   width:100%;
+   max-width:900px;
    height:16px;
-   mmargin-top:0;
+   margin-top:0;
    border-radius:8px;
    background:
        linear-gradient(
@@ -385,163 +402,7 @@
     z-index:2;
 
 }
-/* ==========================================================
-   FAIXA INFERIOR
-========================================================== */
 
-.podio-inferior{
-    height:110px;
-    min-height:105px;
-    max-height:105px;
-    width:min(1200px,96%);
-    margin:8px auto 0;
-    display:grid;
-    grid-template-columns:45% 1px 55%;
-    align-items:center;
-    background:linear-gradient(
-        to bottom,
-        rgba(255,255,255,.08),
-        rgba(255,255,255,.03)
-    );
-
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:16px;
-    overflow:hidden;
-    backdrop-filter:blur(8px);
-    box-shadow:
-        0 12px 28px rgba(0,0,0,.30);
-
-}
-
-/* ==========================================================
-   DIVISOR
-========================================================== */
-
-.podio-inferior::before{
-    content:"";
-    grid-column:2;
-    width:1px;
-    height:70%;
-    background:rgba(255,255,255,.15);
-    justify-self:center;
-
-}
-
-/* ==========================================================
-   BLOCOS
-========================================================== */
-
-.podio-quarto,
-.rei-flores{
-
-    height:100%;
-
-    padding:10px 18px;
-
-}
-
-/* ==========================================================
-   ÍCONES
-========================================================== */
-
-.quarto-medalha,
-.rei-icone{
-    width:52px;
-    height:52px;
-    flex-shrink:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:50%;
-    font-size:1.6rem;
-    background:rgba(255,255,255,.08);
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.15);
-
-}
-
-.quarto-medalha{
-    color:#d8d8d8;
-
-}
-
-.rei-icone{
-    color:#f3cf5d;
-
-}
-
-/* ==========================================================
-   CONTEÚDO
-========================================================== */
-
-.quarto-conteudo,
-.rei-conteudo{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-
-}
-
-/* ==========================================================
-   TÍTULOS
-========================================================== */
-
-.quarto-titulo,
-.rei-titulo{
-    font-size:.85rem;
-    font-weight:800;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:#aeb7aa;
-
-}
-
-/* ==========================================================
-   NOMES
-========================================================== */
-
-.quarto-nome,
-.rei-nome{
-    font-size:1.5rem;
-    font-weight:900;
-    color:#fff;
-    line-height:1.1;
-
-}
-
-/* ==========================================================
-   SUBTÍTULO
-========================================================== */
-
-.rei-subtitulo{
-    font-size:.95rem;
-    color:#d8d8d8;
-    font-weight:600;
-
-}
-
-/* ==========================================================
-   FLORES
-========================================================== */
-
-.rei-total{
-    margin-top:4px;
-    font-size:1.2rem;
-    font-weight:900;
-    color:var(--podio-ouro);
-
-}
-
-/* ==========================================================
-   HOVER (caso seja usado fora do telão)
-========================================================== */
-
-.podio-quarto:hover,
-.rei-flores:hover{
-    background:rgba(255,255,255,.03);
-    transition:.25s;
-
-}
 /* ==========================================================
    ANIMAÇÕES
 ========================================================== */
