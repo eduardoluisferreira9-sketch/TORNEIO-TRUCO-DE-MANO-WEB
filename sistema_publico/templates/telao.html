@@ -532,7 +532,10 @@
 
         .card-grande-final .mesa-tag,
         .card-terceiro-lugar .mesa-tag{
+            display:flex;
             width:100%;
+            justify-content:center;
+            align-items:center;
             padding:0;
             margin-bottom:18px;
             background:none;
@@ -752,7 +755,9 @@
             display:flex;
             justify-content:center;
             align-items:center;     
-            width:68%;
+            width:fit-content;
+            min-width:420px;
+            max-width:80%;
             margin:0 auto;
             padding:18px 20px;
             white-space:nowrap;
