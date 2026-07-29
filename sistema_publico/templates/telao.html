@@ -1493,256 +1493,39 @@
 </head>
 
 <body>
-    
-        <div class="painel-admin-secreto">
-        <button class="btn-admin" onclick="forcarPodioManual()">🏆 Exibir Premiação</button>
-        <button class="btn-admin btn-reset" onclick="liberarTelaoManual()">🔄 Voltar para Mesas</button>
-    </div>
-
-    <div id="alerta-falta" class="alerta-falta-banner">
-        <div class="alerta-falta-conteudo">
-            <h2>⚠️ TEMPO ESGOTADO!</h2>
-            <h2>AGORA TUDO É <span>FAIXA / FALTA!</span></h2>
-            <p style="font-size: 1.5rem;">Fechem as vazas e concluam a jogada imediatamente.</p>
-        </div>
-    </div>
-
-    <div class="header-telao">
-        <h1 id="nome-torneio">
-            TORNEIO DE TRUCO <span>CEGO</span>
-        </h1>
-
-        <div class="cronometro-wrapper">
-
-            <div class="cronometro-tag">
-                TEMPO DA RODADA
-            </div>
-
-            <div class="cronometro-container">
-                <div id="cronometro" class="cronometro-digital">00:00</div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="painel-infos">
-        <div class="info-item">
-            <div class="info-rotulo">Fase Atual</div>
-            <div id="info-fase" class="info-valor">---</div>
-        </div>
-
-        <div class="info-item">
-            <div class="info-rotulo">Andamento</div>
-            <div id="info-detalhe-fase" class="info-valor">---</div>
-        </div>
-
-        <div class="info-item">
-            <div class="info-max-rodadas" style="display:none;"></div>
-            <div class="info-rotulo">Mesas Decisivas</div>
-            <div id="info-mesas-ativas-rotulo" class="info-valor">0 Mesas</div>
-        </div>
-
-        <div class="info-item">
-            <div class="info-rotulo">Inscritos Confirmados</div>
-            <div id="info-total-atletas" class="info-valor">-- Atletas</div>
-        </div>
-    </div>
-
-    <div id="conteudo-principal-telao" class="container-telao">
-
-        <div class="coluna-mesas">
-
-            <div class="secao-titulo-container">
-                <h2 class="secao-titulo" id="titulo-secao-jogos">
-                    Mesas em Andamento
-                </h2>
-
-                <div class="secao-linha"></div>
-            </div>
-
-            <div id="container-jogos" class="grid-jogos"></div>
-
-        </div>
-
-        <div class="ranking-container" id="coluna-ranking-lateral">
-
-            <div class="secao-titulo-container">
-                <h2 class="secao-titulo">
-                    Classificação Geral
-                </h2>
-
-                <div class="secao-linha"></div>
-            </div>
-
-            <div class="ranking-scroller-box" id="ranking-box-container">
-
-                <table class="tabela-ranking">
-
-                    <thead>
-                        <tr>
-                            <th style="text-align:left;">Pos</th>
-                            <th style="text-align:left;">Atleta</th>
-                            <th style="text-align:right;">Vitórias</th>
-                        </tr>
-                    </thead>
-
-                    <tbody
-                        id="tabela-ranking-corpo"
-                        class="ranking-marquise-body">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-        <div class="rodape-publicidade">
-
-        <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
-
-        <div class="card-desenvolvedor">
-
-            <div id="publicidade-info" class="publicidade-grid">
-
-                <div class="col-logo">
-
-                    <div id="publicidade-logo-slide" class="publicidade-slide">
-
-                        <div id="publicidade-logo"></div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-patrocinador">
-
-                    <div id="publicidade-slide" class="publicidade-slide">
-
-                        <div id="publicidade-texto"></div>
-
-                        <div id="publicidade-botoes" class="col-botoes">
-                            <!-- JavaScript -->
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-assinatura">
-
-                    <div class="marca-ferreira">
-
-                        <div class="logo-ef-mini">
-                            <span>EF</span>
-                        </div>
-
-                        <div class="marca-texto">
-
-                            <span class="marca-label">
-                                DESENVOLVIDO POR
-                            </span>
-
-                            <strong class="marca-ferreira-nome">
-                                FERREIRA
-                            </strong>
-
-                            <small class="marca-ferreira-sistemas">
-                                SISTEMAS
-                            </small>
-
-                            <em class="marca-slogan">
-                                Tecnologia com propósito.
-                            </em>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- ======================================================================= -->
-
-<script>
-
-    let podioForcadoManualmente =
-        localStorage.getItem('telao_modo_podio') === 'true';
-
+        let podioForcadoManualmente = localStorage.getItem('telao_modo_podio') === 'true';
     let ultimoEstadoJogosStr = "";
     let ultimoEstadoRankingStr = "";
 
     function forcarPodioManual() {
-
         podioForcadoManualmente = true;
-
-        localStorage.setItem(
-            'telao_modo_podio',
-            'true'
-        );
-
+        localStorage.setItem('telao_modo_podio', 'true');
         atualizarTelao();
-
     }
 
     function liberarTelaoManual() {
-
         podioForcadoManualmente = false;
-
-        localStorage.setItem(
-            'telao_modo_podio',
-            'false'
-        );
-
+        localStorage.setItem('telao_modo_podio', 'false');
         window.location.reload();
-
     }
 
-    function ajustarTamanhoDosCards(
-        totalMesas,
-        ehMataMata
-    ) {
-
-        const grid =
-            document.getElementById('container-jogos');
-
+    function ajustarTamanhoDosCards(totalMesas, ehMataMata) {
+        const grid = document.getElementById('container-jogos');
         if (!grid) return;
 
-        const atletaLinhas =
-            grid.querySelectorAll('.atleta-linha');
+        const atletaLinhas = grid.querySelectorAll('.atleta-linha');
+        const atletaBoxes = grid.querySelectorAll('.atleta-box');
+        const tagsMesa = grid.querySelectorAll('.mesa-tag');
 
-        const atletaBoxes =
-            grid.querySelectorAll('.atleta-box');
-
-        const tagsMesa =
-            grid.querySelectorAll('.mesa-tag');
-                    if (ehMataMata && totalMesas <= 2) {
-
+        if (ehMataMata && totalMesas <= 2) {
             grid.classList.add('layout-super-finais');
-
             atletaLinhas.forEach(el => {
-
                 el.style.fontSize = "1.9rem";
                 el.style.fontWeight = "800";
                 el.style.maxWidth = "70%";
-
             });
-
-            tagsMesa.forEach(tag => {
-
-                tag.style.fontSize = "1.4rem";
-
-            });
-
-            return;
-
+            tagsMesa.forEach(tag => tag.style.fontSize = "1.4rem");
+            return; 
         }
 
         grid.classList.remove(
@@ -1777,964 +1560,494 @@
         let minWidthGrid = "290px";
 
         if (ehMataMata) {
-
             fontSizeCard = "1.25rem";
             paddingBox = "14px 18px";
-            minWidthGrid = "450px";
-
-            tagsMesa.forEach(tag => {
-
-                tag.style.fontSize = "1.1rem";
-
-            });
-
+            minWidthGrid = "450px"; 
+            tagsMesa.forEach(tag => tag.style.fontSize = "1.1rem");
             grid.style.gap = "18px";
-
         } else {
-
             if (totalMesas > 12) {
-
                 fontSizeCard = "0.75rem";
                 paddingBox = "4px 8px";
                 minWidthGrid = "195px";
-
             } else if (totalMesas > 8) {
-
                 fontSizeCard = "0.82rem";
                 paddingBox = "5px 10px";
                 minWidthGrid = "250px";
-
             }
-
         }
 
         // O layout da fase classificatória agora é controlado pelo CSS.
         // Mantemos estes ajustes apenas para o mata-mata.
 
         if (ehMataMata) {
-
-            grid.style.gridTemplateColumns =
-                `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
-
-            atletaLinhas.forEach(el => {
-
-                el.style.fontSize = fontSizeCard;
-
-            });
-
-            atletaBoxes.forEach(el => {
-
-                el.style.padding = paddingBox;
-
-            });
-
+            grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidthGrid}, 1fr))`;
+            atletaLinhas.forEach(el => el.style.fontSize = fontSizeCard);
+            atletaBoxes.forEach(el => el.style.padding = paddingBox);
         }
 
-    }
+        }
 
     function gerenciarScrollDoRanking() {
-
-        const container =
-            document.getElementById('ranking-box-container');
-
-        const body =
-            document.getElementById('tabela-ranking-corpo');
-
+        const container = document.getElementById('ranking-box-container');
+        const body = document.getElementById('tabela-ranking-corpo');
         if (!container || !body) return;
 
-        const alturaDisponivel =
-            container.clientHeight;
-
-        const alturaTabela =
-            body.scrollHeight;
+        const alturaDisponivel = container.clientHeight;
+        const alturaTabela = body.scrollHeight;
 
         if (alturaTabela > alturaDisponivel) {
-
-            const distanciaScroll =
-                alturaTabela - alturaDisponivel + 20;
-
-            body.style.setProperty(
-                '--scroll-distancia',
-                `-${distanciaScroll}px`
-            );
-
-            body.style.animation =
-                "autoScrollRanking 40s ease-in-out infinite alternate";
-
+            const distanciaScroll = alturaTabela - alturaDisponivel + 20; 
+            body.style.setProperty('--scroll-distancia', `-${distanciaScroll}px`);
+            body.style.animation = "autoScrollRanking 40s ease-in-out infinite alternate";
         } else {
-
             body.style.animation = "none";
             body.style.transform = "translateY(0)";
-
         }
-
     }
 
     async function atualizarTelao() {
-
         try {
-
-            const response =
-                await fetch(`/api/publico/dados?t=${new Date().getTime()}`);
-
+            const response = await fetch(`/api/publico/dados?t=${new Date().getTime()}`);
             if (!response.ok) return;
-
             const data = await response.json();
-
             if (!data) return;
-                        const statusFase =
-                data.fase_torneio
-                    ? data.fase_torneio.toUpperCase()
-                    : "";
 
-            const nomeFaseStr =
-                data.nome_fase
-                    ? data.nome_fase.toUpperCase()
-                    : "";
+            const statusFase = data.fase_torneio ? data.fase_torneio.toUpperCase() : "";
+            const nomeFaseStr = data.nome_fase ? data.nome_fase.toUpperCase() : "";
+            const faseRaw = Number(data.fase_atual);
+            
+            const ehMataMataAtivo = (faseRaw === -1 || faseRaw === -4 || nomeFaseStr.includes("MATA") || nomeFaseStr.includes("ELIMINATOR") || nomeFaseStr.includes("FINAL") || statusFase === "MATA_MATA");
 
-            const faseRaw =
-                Number(data.fase_atual);
+            const exibirCerimonial = podioForcadoManualmente || 
+                                     statusFase === "ENCERRADO" || 
+                                     statusFase === "CONCLUIDO" || 
+                                     statusFase === "FINALIZADO" ||
+                                     nomeFaseStr.includes("ENCERRADO") || 
+                                     nomeFaseStr.includes("CONCLUÍDO") ||
+                                     faseRaw === -12;
 
-            const ehMataMataAtivo =
-                (
-                    faseRaw === -1 ||
-                    faseRaw === -4 ||
-                    nomeFaseStr.includes("MATA") ||
-                    nomeFaseStr.includes("ELIMINATOR") ||
-                    nomeFaseStr.includes("FINAL") ||
-                    statusFase === "MATA_MATA"
-                );
-
-            const exibirCerimonial =
-                podioForcadoManualmente ||
-
-                statusFase === "ENCERRADO" ||
-                statusFase === "CONCLUIDO" ||
-                statusFase === "FINALIZADO" ||
-
-                nomeFaseStr.includes("ENCERRADO") ||
-                nomeFaseStr.includes("CONCLUÍDO") ||
-
-                faseRaw === -12;
-
-            const telaPrincipal =
-                document.getElementById(
-                    'conteudo-principal-telao'
-                );
+            const telaPrincipal = document.getElementById('conteudo-principal-telao');
 
             if (exibirCerimonial) {
-
                 ultimoEstadoJogosStr = "";
                 ultimoEstadoRankingStr = "";
 
-                if (telaPrincipal) {
+                if (telaPrincipal) telaPrincipal.style.gridTemplateColumns = "1fr"; 
 
-                    telaPrincipal.style.gridTemplateColumns =
-                        "1fr";
-
-                }
-
-                let p1 = "---";
-                let p2 = "---";
-                let p3 = "---";
-                let p4 = "---";
-
+                let p1 = "---", p2 = "---", p3 = "---", p4 = "---";
                 let reiDasFloresNome = "---";
                 let qtdFloresTotal = 0;
 
-                if (
-                    data.confrontos &&
-                    data.confrontos.length > 0
-                ) {
-
-                    const jogoFinal =
-                        data.confrontos.find(j =>
-
-                            Number(j.fase_mesa) === -2 ||
-                            Number(j.mesa) === 1
-
-                        );
-
+                if (data.confrontos && data.confrontos.length > 0) {
+                    const jogoFinal = data.confrontos.find(j => Number(j.fase_mesa) === -2 || Number(j.mesa) === 1);
                     if (jogoFinal) {
+                        const t1 = Number(jogoFinal.tentos1 || 0);
+                        const t2 = Number(jogoFinal.tentos2 || 0);
+                        const vId = jogoFinal.vencedor_id;
+                        const idA1 = jogoFinal.atleta1_id || jogoFinal.athlete1_id;
 
-                        const t1 =
-                            Number(jogoFinal.tentos1 || 0);
-
-                        const t2 =
-                            Number(jogoFinal.tentos2 || 0);
-
-                        const vId =
-                            jogoFinal.vencedor_id;
-
-                        const idA1 =
-                            jogoFinal.atleta1_id ||
-                            jogoFinal.athlete1_id;
-
-                        if (
-                            vId ||
-                            t1 > 0 ||
-                            t2 > 0
-                        ) {
-
-                            if (
-                                vId == idA1 ||
-                                t1 > t2
-                            ) {
-
-                                p1 =
-                                    jogoFinal.atleta1_nome ||
-                                    "---";
-
-                                p2 =
-                                    jogoFinal.atleta2_nome ||
-                                    "---";
-
+                        if (vId || t1 > 0 || t2 > 0) {
+                            if (vId == idA1 || t1 > t2) {
+                                p1 = jogoFinal.atleta1_nome || "---";
+                                p2 = jogoFinal.atleta2_nome || "---";
                             } else {
-
-                                p1 =
-                                    jogoFinal.atleta2_nome ||
-                                    "---";
-
-                                p2 =
-                                    jogoFinal.atleta1_nome ||
-                                    "---";
-
+                                p1 = jogoFinal.atleta2_nome || "---";
+                                p2 = jogoFinal.atleta1_nome || "---";
                             }
-
                         } else {
-
-                            p1 =
-                                `${jogoFinal.atleta1_nome} (Finalista)`;
-
-                            p2 =
-                                `${jogoFinal.atleta2_nome} (Finalista)`;
-
+                            p1 = `${jogoFinal.atleta1_nome} (Finalista)`;
+                            p2 = `${jogoFinal.atleta2_nome} (Finalista)`;
                         }
-
                     }
 
-                    const jogoBronze =
-                        data.confrontos.find(j =>
-
-                            Number(j.fase_mesa) === -3 ||
-                            Number(j.mesa) === 2
-
-                        );
-
+                    const jogoBronze = data.confrontos.find(j => Number(j.fase_mesa) === -3 || Number(j.mesa) === 2);
                     if (jogoBronze) {
+                        const t1 = Number(jogoBronze.tentos1 || 0);
+                        const t2 = Number(jogoBronze.tentos2 || 0);
+                        const vId = jogoBronze.vencedor_id;
+                        const idA1 = jogoBronze.atleta1_id || jogoBronze.athlete1_id;
 
-                        const t1 =
-                            Number(jogoBronze.tentos1 || 0);
-
-                        const t2 =
-                            Number(jogoBronze.tentos2 || 0);
-
-                        const vId =
-                            jogoBronze.vencedor_id;
-
-                        const idA1 =
-                            jogoBronze.atleta1_id ||
-                            jogoBronze.athlete1_id;
-                                                    if (
-                            vId ||
-                            t1 > 0 ||
-                            t2 > 0
-                        ) {
-
-                            if (
-                                vId == idA1 ||
-                                t1 > t2
-                            ) {
-
-                                p3 =
-                                    jogoBronze.atleta1_nome ||
-                                    "---";
-
-                                p4 =
-                                    jogoBronze.atleta2_nome ||
-                                    "---";
-
+                        if (vId || t1 > 0 || t2 > 0) {
+                            if (vId == idA1 || t1 > t2) {
+                                p3 = jogoBronze.atleta1_nome || "---";
+                                p4 = jogoBronze.atleta2_nome || "---";
                             } else {
-
-                                p3 =
-                                    jogoBronze.atleta2_nome ||
-                                    "---";
-
-                                p4 =
-                                    jogoBronze.atleta1_nome ||
-                                    "---";
-
+                                p3 = jogoBronze.atleta2_nome || "---";
+                                p4 = jogoBronze.atleta1_nome || "---";
                             }
-
                         } else {
-
-                            p3 =
-                                `${jogoBronze.atleta1_nome} (Disputa)`;
-
-                            p4 =
-                                `${jogoBronze.atleta2_nome} (Disputa)`;
-
+                            p3 = `${jogoBronze.atleta1_nome} (Disputa)`;
+                            p4 = `${jogoBronze.atleta2_nome} (Disputa)`;
                         }
-
                     }
-
-                }
-
+                } 
+                
                 if (data.podio) {
-
-                    reiDasFloresNome =
-                        data.podio.rei_nome ||
-                        data.podio.rei_flores ||
-                        "---";
-
-                    qtdFloresTotal =
-                        data.podio.max_flores ||
-                        data.podio.flores ||
-                        0;
-
-                    if (p1 === "---")
-                        p1 =
-                            data.podio.campeao ||
-                            data.podio.p1 ||
-                            "---";
-
-                    if (p2 === "---")
-                        p2 =
-                            data.podio.vice ||
-                            data.podio.p2 ||
-                            "---";
-
-                    if (p3 === "---")
-                        p3 =
-                            data.podio.terceiro ||
-                            data.podio.p3 ||
-                            "---";
-
-                    if (p4 === "---")
-                        p4 =
-                            data.podio.quarto ||
-                            data.podio.p4 ||
-                            "---";
-
+                    reiDasFloresNome = data.podio.rei_nome || data.podio.rei_flores || "---";
+                    qtdFloresTotal = data.podio.max_flores || data.podio.flores || 0;
+                    if (p1 === "---") p1 = data.podio.campeao || data.podio.p1 || "---";
+                    if (p2 === "---") p2 = data.podio.vice || data.podio.p2 || "---";
+                    if (p3 === "---") p3 = data.podio.terceiro || data.podio.p3 || "---";
+                    if (p4 === "---") p4 = data.podio.quarto || data.podio.p4 || "---";
                 }
 
-                if (
-                    p1 !== "---" &&
-                    p1 !== ""
-                ) {
-
-                    localStorage.setItem(
-                        'cache_nomes_podio',
-                        JSON.stringify({
-                            p1,
-                            p2,
-                            p3,
-                            p4,
-                            reiDasFloresNome,
-                            qtdFloresTotal
-                        })
-                    );
-
+                if (p1 !== "---" && p1 !== "") {
+                    localStorage.setItem('cache_nomes_podio', JSON.stringify({p1, p2, p3, p4, reiDasFloresNome, qtdFloresTotal}));
                 } else {
-
-                    const cache =
-                        JSON.parse(
-                            localStorage.getItem(
-                                'cache_nomes_podio'
-                            ) || '{}'
-                        );
-
+                    const cache = JSON.parse(localStorage.getItem('cache_nomes_podio') || '{}');
                     if (cache.p1) {
-
-                        p1 = cache.p1;
-                        p2 = cache.p2;
-                        p3 = cache.p3;
-                        p4 = cache.p4;
-
-                        reiDasFloresNome =
-                            cache.reiDasFloresNome || "---";
-
-                        qtdFloresTotal =
-                            cache.qtdFloresTotal || 0;
-
+                        p1 = cache.p1; p2 = cache.p2; p3 = cache.p3; p4 = cache.p4;
+                        reiDasFloresNome = cache.reiDasFloresNome || "---";
+                        qtdFloresTotal = cache.qtdFloresTotal || 0;
                     }
-
                 }
 
                 if (telaPrincipal) {
-
                     telaPrincipal.innerHTML = `
                         <div class="podio-wrapper">
-
-                            <div class="podio-titulo">
-                                👑 CERIMÔNIA DE PREMIAÇÃO 👑
-                            </div>
-
-                            <div
-                                style="
-                                    text-align:center;
-                                    color:var(--texto-mutado);
-                                    margin-bottom:15px;
-                                    font-style:italic;
-                                    font-size:1rem;
-                                ">
-                                O pódio de honra da arena está consolidado!
-                            </div>
-
+                            <div class="podio-titulo">👑 CERIMÔNIA DE PREMIAÇÃO 👑</div>
+                            <div style="text-align:center; color:var(--texto-mutado); margin-bottom:15px; font-style:italic; font-size:1rem;">O pódio de honra da arena está consolidado!</div>
+                            
                             <div class="podio-flex">
-                                                                <div class="podio-card prata">
-
+                                <div class="podio-card prata">
                                     <div>
-
-                                        <div class="podio-medalha">
-                                            🥈
-                                        </div>
-
-                                        <div class="podio-rotulo-lugar">
-                                            Vice-Campeão
-                                        </div>
-
+                                        <div class="podio-medalha">🥈</div>
+                                        <div class="podio-rotulo-lugar">Vice-Campeão</div>
                                     </div>
-
-                                    <div class="podio-nome">
-                                        ${p2}
-                                    </div>
-
+                                    <div class="podio-nome">${p2}</div>
                                 </div>
 
                                 <div class="podio-card ouro">
-
                                     <div>
-
-                                        <div class="podio-medalha">
-                                            👑
-                                        </div>
-
-                                        <div
-                                            class="podio-rotulo-lugar"
-                                            style="color:var(--dourado-brilhante)">
-
-                                            GRANDE CAMPEÃO
-
-                                        </div>
-
+                                        <div class="podio-medalha">👑</div>
+                                        <div class="podio-rotulo-lugar" style="color:var(--dourado-brilhante)">GRANDE CAMPEÃO</div>
                                     </div>
-
-                                    <div
-                                        class="podio-nome"
-                                        style="
-                                            font-size:1.3rem;
-                                            color:var(--dourado-brilhante);
-                                            font-family:'Cinzel',serif;">
-
-                                        ${p1}
-
-                                    </div>
-
+                                    <div class="podio-nome" style="font-size: 1.3rem; color: var(--dourado-brilhante); font-family:'Cinzel', serif;">${p1}</div>
                                 </div>
 
                                 <div class="podio-card bronze">
-
                                     <div>
-
-                                        <div class="podio-medalha">
-                                            🥉
-                                        </div>
-
-                                        <div class="podio-rotulo-lugar">
-                                            3º Colocado
-                                        </div>
-
+                                        <div class="podio-medalha">🥉</div>
+                                        <div class="podio-rotulo-lugar">3º Colocado</div>
                                     </div>
-
-                                    <div class="podio-nome">
-                                        ${p3}
-                                    </div>
-
+                                    <div class="podio-nome">${p3}</div>
                                 </div>
 
-                                <div
-                                    class="podio-card"
-                                    style="
-                                        border:2px solid var(--madeira);
-                                        height:160px;
-                                        width:200px;
-                                        display:flex;
-                                        flex-direction:column;
-                                        justify-content:space-between;">
-
+                                <div class="podio-card" style="border: 2px solid var(--madeira); height: 160px; width: 200px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>
-
-                                        <div
-                                            class="podio-medalha"
-                                            style="font-size:1.8rem;">
-
-                                            🏅
-
-                                        </div>
-
-                                        <div
-                                            class="podio-rotulo-lugar"
-                                            style="color:var(--madeira);">
-
-                                            4º Colocado
-
-                                        </div>
-
+                                        <div class="podio-medalha" style="font-size: 1.8rem;">🏅</div>
+                                        <div class="podio-rotulo-lugar" style="color: var(--madeira);">4º Colocado</div>
                                     </div>
-
-                                    <div
-                                        class="podio-nome"
-                                        style="
-                                            color:#bbb;
-                                            font-size:.95rem;">
-
-                                        ${p4}
-
-                                    </div>
-
+                                    <div class="podio-nome" style="color: #bbb; font-size: 0.95rem;">${p4}</div>
                                 </div>
-
                             </div>
 
-                            <div
-                                class="painel-rei-flores"
-                                style="
-                                    border:2px dashed var(--borda-ouro);
-                                    background:linear-gradient(130deg,rgba(214,175,55,.08),rgba(0,0,0,0));
-                                    padding:15px;
-                                    border-radius:4px;
-                                    text-align:center;
-                                    max-width:550px;
-                                    margin:30px auto 0 auto;
-                                    box-shadow:0 4px 15px rgba(0,0,0,.5);">
-
-                                <div
-                                    style="
-                                        color:var(--borda-ouro);
-                                        font-family:'Cinzel',serif;
-                                        font-size:1.2rem;
-                                        font-weight:bold;
-                                        margin-bottom:4px;
-                                        letter-spacing:1px;">
-
-                                    🌸 TROFÉU REI DAS FLORES 🌸
-
+                            <div class="painel-rei-flores" style="border: 2px dashed var(--borda-ouro); background: linear-gradient(130deg, rgba(214,175,55,0.08), rgba(0,0,0,0)); padding: 15px; border-radius: 4px; text-align: center; max-width: 550px; margin: 30px auto 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                                <div style="color: var(--borda-ouro); font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px;">🌸 TROFÉU REI DAS FLORES 🌸</div>
+                                <div style="color: var(--texto-mutado); font-size: 0.85rem; margin-bottom: 8px;">O maior cantador de flores da rodada:</div>
+                                <div style="color: #ffffff; font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;">${reiDasFloresNome.toUpperCase()}</div>
+                                <div style="display: inline-block; background: var(--borda-ouro); color: #000; padding: 4px 15px; border-radius: 2px; font-size: 0.8rem; font-weight: bold;">
+                                    🎯 ${qtdFloresTotal} Flores Cantadas no Torneio
                                 </div>
-
-                                <div
-                                    style="
-                                        color:var(--texto-mutado);
-                                        font-size:.85rem;
-                                        margin-bottom:8px;">
-
-                                    O maior cantador de flores da rodada:
-
-                                </div>
-                                                                <div
-                                    style="
-                                        font-size:1.3rem;
-                                        color:var(--texto-principal);
-                                        font-weight:bold;
-                                        margin-bottom:6px;">
-
-                                    👑 ${reiDasFloresNome}
-
-                                </div>
-
-                                <div
-                                    style="
-                                        font-size:1rem;
-                                        color:var(--dourado-brilhante);">
-
-                                    🌸 ${qtdFloresTotal} flores cantadas
-
-                                </div>
-
                             </div>
-
                         </div>
                     `;
-
                 }
-
+                
+                document.getElementById('info-fase').innerText = "🏁 ENCERRADO";
+                document.getElementById('info-detalhe-fase').innerText = "Torneio Concluído";
+                document.getElementById('cronometro').innerText = "--:--";
                 return;
-
             }
+
+            const rankingLateral = document.getElementById('coluna-ranking-lateral');
+            const tituloJogos = document.getElementById('titulo-secao-jogos');
 
             if (telaPrincipal) {
-
-                telaPrincipal.innerHTML = `
-                    <div id="container-jogos"></div>
-
-                    <div id="ranking-box-container">
-
-                        <div class="ranking-header">
-                            Ranking Geral
-                        </div>
-
-                        <table class="ranking-table">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>#</th>
-
-                                    <th>Atleta</th>
-
-                                    <th>Pts</th>
-
-                                    <th>Vit</th>
-
-                                    <th>Flores</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="tabela-ranking-corpo"></tbody>
-
-                        </table>
-
-                    </div>
-                `;
-
+                if (ehMataMataAtivo) {
+                    telaPrincipal.classList.add('modo-mata-mata');
+                    if (rankingLateral) rankingLateral.style.display = 'none';
+                    if (tituloJogos) tituloJogos.innerText = "Confrontos Eliminatórios";
+                } else {
+                    telaPrincipal.classList.remove('modo-mata-mata');
+                    if (rankingLateral) rankingLateral.style.display = 'flex';
+                    if (tituloJogos) tituloJogos.innerText = "Mesas em Andamento";
+                }
             }
 
-            const ranking =
-                data.ranking || [];
-
-            const confrontos =
-                data.confrontos || [];
-
-            const jogosStr =
-                JSON.stringify(confrontos);
-
-            const rankingStr =
-                JSON.stringify(ranking);
-
-            const containerJogos =
-                document.getElementById(
-                    'container-jogos'
-                );
-
-            const rankingBody =
-                document.getElementById(
-                    'tabela-ranking-corpo'
-                );
-
-            if (
-                containerJogos &&
-                jogosStr !== ultimoEstadoJogosStr
-            ) {
-
-                ultimoEstadoJogosStr =
-                    jogosStr;
-
-                containerJogos.innerHTML = "";
-
-                ajustarTamanhoDosCards(
-                    confrontos.length,
-                    ehMataMataAtivo
-                );
-
-                confrontos.forEach(jogo => {
-
-                    const card =
-                        document.createElement('div');
-
-                    card.className =
-                        "card-jogo";
-                                            const tentos1 =
-                        Number(jogo.tentos1 || 0);
-
-                    const tentos2 =
-                        Number(jogo.tentos2 || 0);
-
-                    const atleta1 =
-                        jogo.atleta1_nome || "---";
-
-                    const atleta2 =
-                        jogo.atleta2_nome || "---";
-
-                    const mesa =
-                        jogo.mesa || "-";
-
-                    const status =
-                        (jogo.status || "")
-                            .toUpperCase();
-
-                    const vencedorId =
-                        jogo.vencedor_id;
-
-                    const atleta1Id =
-                        jogo.atleta1_id ||
-                        jogo.athlete1_id;
-
-                    const atleta1Venceu =
-                        vencedorId == atleta1Id ||
-                        tentos1 > tentos2;
-
-                    const classeStatus =
-                        status === "FINALIZADO"
-                            ? "status-finalizado"
-                            : status === "EM_ANDAMENTO"
-                                ? "status-andamento"
-                                : "status-pendente";
-
-                    card.innerHTML = `
-
-                        <div class="mesa-tag">
-
-                            Mesa ${mesa}
-
-                            <span class="${classeStatus}">
-                                ${status || "PENDENTE"}
-                            </span>
-
-                        </div>
-
-                        <div class="atleta-box ${atleta1Venceu && status === "FINALIZADO" ? "vencedor" : ""}">
-
-                            <div class="atleta-linha">
-                                ${atleta1}
-                            </div>
-
-                            <div class="placar">
-                                ${tentos1}
-                            </div>
-
-                        </div>
-
-                        <div class="versus">
-                            ×
-                        </div>
-
-                        <div class="atleta-box ${!atleta1Venceu && status === "FINALIZADO" ? "vencedor" : ""}">
-
-                            <div class="atleta-linha">
-                                ${atleta2}
-                            </div>
-
-                            <div class="placar">
-                                ${tentos2}
-                            </div>
-
-                        </div>
-
-                    `;
-
-                    containerJogos.appendChild(card);
-
-                });
-
+            if (document.getElementById('info-fase')) {
+                let nomeExibicaoFase = data.nome_fase || data.fase_atual || data.fase || "Fase Classificatória";
+                if (faseRaw === -1) nomeExibicaoFase = "Mata-Mata Final";
+                if (faseRaw === -4) nomeExibicaoFase = "Semifinal";
+                document.getElementById('info-fase').innerText = nomeExibicaoFase.toUpperCase();
             }
 
-            if (
-                rankingBody &&
-                rankingStr !== ultimoEstadoRankingStr
-            ) {
-
-                ultimoEstadoRankingStr =
-                    rankingStr;
-
-                rankingBody.innerHTML = "";
-
-                ranking.forEach((item, index) => {
-
-                    const tr =
-                        document.createElement("tr");
-                                            tr.innerHTML = `
-
-                        <td>
-                            ${index + 1}
-                        </td>
-
-                        <td style="text-align:left;">
-                            ${item.nome}
-                        </td>
-
-                        <td>
-                            ${item.pontos ?? 0}
-                        </td>
-
-                        <td>
-                            ${item.vitorias ?? 0}
-                        </td>
-
-                        <td>
-                            ${item.flores ?? 0}
-                        </td>
-
-                    `;
-
-                    rankingBody.appendChild(tr);
-
-                });
-
-                gerenciarScrollDoRanking();
-
+            if (document.getElementById('info-detalhe-fase')) {
+                let andamentoTexto = data.detalhe_fase || data.andamento || data.status_rodada;
+                const faseTexto = document.getElementById('info-fase').innerText.toUpperCase();
+                if (andamentoTexto && andamentoTexto.toUpperCase() === faseTexto || (andamentoTexto && andamentoTexto.replace(/\D/g,'') === faseTexto.replace(/\D/g,''))) {
+                    andamentoTexto = ehMataMataAtivo ? "Jogos Decisivos" : "Em Andamento"; 
+                }
+                document.getElementById('info-detalhe-fase').innerText = andamentoTexto || "Em andamento";
             }
 
-            document.getElementById("titulo-torneio").textContent =
-                data.nome_torneio || "TORNEIO";
+            const elMax = document.getElementById('info-mesas-ativas-rotulo');
+            let totalConfrontosAtuais = 0;
+            if (elMax) {
+                totalConfrontosAtuais = data.confrontos ? data.confrontos.length : 0;
+                elMax.innerText = `${totalConfrontosAtuais} Mesas`;
+            }
 
-            document.getElementById("fase-atual").textContent =
-                data.nome_fase || "---";
+            const elAtletas = document.getElementById('info-total-atletas');
+            if (elAtletas) {
+                let qtdAtletas = data.total_atletas || data.inscritos || data.total_jogadores || 0;
+                if (Number(qtdAtletas) === 0 && data.ranking) qtdAtletas = data.ranking.length;
+                elAtletas.innerText = `${qtdAtletas} Atletas`;
+            }
+            
+            const tempoFormatado = data.tempo || "00:00";
+            const cronoAtivo = data.crono_ativo === 1;
+            const cronoElement = document.getElementById('cronometro');
+            const alertaElement = document.getElementById('alerta-falta');
+            
+            // --- BLOCO ATUALIZADO DO CRONÔMETRO (BORDA E TEXTO) ---
+            if (!cronoAtivo) {
+                if (tempoFormatado === "AGORA TUDO É FALTA!") {
+                    cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; 
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = 'var(--danger)'; 
+                    alertaElement.style.display = 'none'; 
+                } else {
+                    cronoElement.parentElement.style.borderColor = '#444444'; 
+                    alertaElement.style.display = 'none';
 
-            document.getElementById("rodada-atual").textContent =
-                data.rodada_atual || "-";
+                    if (tempoFormatado.includes('<span')) {
+                        cronoElement.innerHTML = tempoFormatado;
+                        cronoElement.style.color = ''; 
+                    } else {
+                        cronoElement.innerText = tempoFormatado;
+                        cronoElement.style.color = '#e0e0e0'; 
+                    }
+                }
+            } else {
+                cronoElement.parentElement.style.borderColor = 'var(--borda-ouro)'; 
+                
+                if (tempoFormatado === "AGORA TUDO É FALTA!" || tempoFormatado === "00:00") {
+                    cronoElement.innerText = tempoFormatado;
+                    cronoElement.style.color = 'var(--danger)'; 
+                    alertaElement.style.display = 'flex';
+                } else {
+                    if (tempoFormatado.includes('<span')) {
+                        cronoElement.innerHTML = tempoFormatado;
+                        cronoElement.style.color = '';
+                    } else {
+                        cronoElement.innerText = tempoFormatado;
+                        cronoElement.style.color = 'var(--dourado-brilhante)'; 
+                    }
+                    alertaElement.style.display = 'none';
+                }
+            }
 
-            document.getElementById("cronometro").textContent =
-                data.tempo_restante || "--:--";
+            // --- RENDERIZAÇÃO DOS CONFRONTOS ---
+            const containerJogos = document.getElementById('container-jogos');
+            if (containerJogos) {
+                const signatureAtualJogos = JSON.stringify(data.confrontos || []);
+                
+                if (signatureAtualJogos !== ultimoEstadoJogosStr) {
+                    ultimoEstadoJogosStr = signatureAtualJogos; 
+                    containerJogos.innerHTML = '';
+                    
+                    if (!data.confrontos || data.confrontos.length === 0) {
+                        containerJogos.innerHTML = `<div style="color: var(--texto-mutado); font-style: italic; padding: 10px;">Nenhum confronto ativo. Aguardando chaves...</div>`;
+                    } else {
+                        data.confrontos.forEach(jogo => {
+                            const card = document.createElement('div');
+                            card.className = 'card-jogo';
 
-            atualizarPublicidade(data.publicidade || []);
+                            const idMesaEspecial = Number(jogo.fase_mesa);
+                            const nomeFaseMesaOficial = jogo.fase_mesa_nome
+                                ? jogo.fase_mesa_nome.toUpperCase()
+                                : "";
+                            
+                            if (faseRaw === -4) {
+                                card.classList.add('card-semifinal');
+                            }
+                            
+                            if (
+                                idMesaEspecial === -2 ||
+                                nomeFaseMesaOficial.includes("GRANDE FINAL") ||
+                                nomeFaseMesaOficial === "FINAL"
+                            ) {
+                                card.classList.add('card-grande-final');
+                            }
+                            
+                            if (
+                                idMesaEspecial === -3 ||
+                                nomeFaseMesaOficial.includes("TERCEIRO") ||
+                                nomeFaseMesaOficial.includes("3º") ||
+                                nomeFaseMesaOficial.includes("BRONZE")
+                            ) {
+                                card.classList.add('card-terceiro-lugar');
+                            }
 
-        } catch (e) {
+                            const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA / W.O.";
+                            
+                            const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
+                            const t1 = jogo.tentos1 || 0;
+                            const fa1 = jogo.faltas1 || 0;
 
-            console.error(
-                "Erro ao atualizar telão:",
-                e
-            );
+                            const f2 = jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
+                            const t2 = jogo.tentos2 || 0;
+                            const fa2 = jogo.faltas2 || 0;
 
-        }
+                            const p1Str = `${f1}S | ${t1}T | ${fa1}F`;
+                            const p2Str = `${f2}S | ${t2}T | ${fa2}F`;
+                            
+                            const statusMesa = jogo.status ? jogo.status.toUpperCase() : 'ANDAMENTO';
+                            const partidaConcluida = (statusMesa === 'FINALIZADO' || statusMesa === 'CONCLUIDO' || jogo.encerrado === true || jogo.vencedor_id !== null);
 
-    }
+                            let classeJ1 = ""; let classeJ2 = "";
+                            let prefixoJ1 = ""; let prefixoJ2 = "";
 
-    let indicePublicidade = 0;
+                            if (partidaConcluida) {
+                                const idVencedor = jogo.vencedor_id;
+                                const idAtleta1 = jogo.atleta1_id || jogo.athlete1_id;
+                                const idAtleta2 = jogo.atleta2_id || jogo.athlete2_id;
 
-    function atualizarPublicidade(lista) {
+                                let j1Ganhou = false; let j2Ganhou = false;
 
-        const texto =
-            document.getElementById("publicidade-texto");
+                                if (idVencedor !== null && idVencedor !== undefined) {
+                                    j1Ganhou = (idVencedor == idAtleta1);
+                                    j2Ganhou = (idVencedor == idAtleta2);
+                                } else {
+                                    j1Ganhou = (f1 > f2) || (f1 === f2 && t1 > t2);
+                                    j2Ganhou = (f2 > f1) || (f1 === f2 && t2 > t1);
+                                }
 
-        const logo =
-            document.getElementById("publicidade-logo");
+                                if (j1Ganhou) {
+                                    classeJ1 = "vencedor-card"; prefixoJ1 = "👑 ";
+                                    classeJ2 = "perdedor-card"; prefixoJ2 = "❌ ";
+                                } else if (j2Ganhou) {
+                                    classeJ1 = "perdedor-card"; prefixoJ1 = "❌ ";
+                                    classeJ2 = "vencedor-card"; prefixoJ2 = "👑 ";
+                                }
+                            } else {
+                                const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
+                                const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
+                                if (j1Lider) classeJ1 = "lider-mesa";
+                                if (j2Lider) classeJ2 = "lider-mesa";
+                            }
 
-        const botoes =
-            document.getElementById("publicidade-botoes");
+                            let textoTagMesa = `Mesa ${jogo.mesa}`;
 
-        if (
-            !lista ||
-            lista.length === 0
-        ) {
+                            // 1. Se o banco/API já mandou um nome específico para a mesa, respeitamos primeiro
+                            if (nomeFaseMesaOficial.includes("SEMIFINAL") || statusFase.includes("SEMIFINAL") || nomeFaseStr.includes("SEMIFINAL")) {
+                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL ${jogo.mesa}</span>`;
+                            } else if (idMesaEspecial === -2 || nomeFaseMesaOficial.includes("GRANDE FINAL") || nomeFaseMesaOficial === "FINAL") {
+                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                            } else if (idMesaEspecial === -3 || nomeFaseMesaOficial.includes("TERCEIRO") || nomeFaseMesaOficial.includes("3º") || nomeFaseMesaOficial.includes("BRONZE")) {
+                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                            } 
+                            // 2. Se não veio nome oficial da API, fazemos o fallback inteligente por ID ou número da mesa
+                            else if (idMesaEspecial === -2 || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
+                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                            } else if (idMesaEspecial === -3 || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
+                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                            } else if (idMesaEspecial === -4) {
+                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL</span>`;
+                            } else if (jogo.fase_mesa_nome) {
+                                textoTagMesa = `💥 ${jogo.fase_mesa_nome.toUpperCase()}`;
+                            } else if (ehMataMataAtivo) {
+                                textoTagMesa = `⚔️ MESA ${jogo.mesa} - ELIMINATÓRIA`;
+                            } else {
+                                textoTagMesa = `MESA ${jogo.mesa}`;
+                            }
 
-            texto.innerHTML =
-                "<strong>Sem patrocinadores cadastrados</strong>";
 
-            logo.innerHTML = "";
+                            let classeMesa = "mesa-tag";
+                            
+                            if (card.classList.contains("card-semifinal")) {
+                                classeMesa += " mesa-semifinal";
+                            }
+                            
+                            if (card.classList.contains("card-grande-final")) {
+                                classeMesa += " mesa-grande-final";
+                            }
+                            
+                            if (card.classList.contains("card-terceiro-lugar")) {
+                                classeMesa += " mesa-terceiro-lugar";
+                            }
 
-            botoes.innerHTML = "";
+                            
+                           card.innerHTML = `
+                                <div class="${classeMesa}">${textoTagMesa}</div>
 
-            return;
+                                <div class="confronto-flex">
+                            
+                                    <div class="atleta-box ${classeJ1}">
+                                        <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
+                                        <span class="placar-tag">${p1Str}</span>
+                                    </div>
+                            
+                                    <div class="divisor-atletas"></div>
+                            
+                                    <div class="atleta-box ${classeJ2}">
+                                        <span class="atleta-linha">${prefixoJ2}${advNome}</span>
+                                        <span class="placar-tag">${p2Str}</span>
+                                    </div>
+                            
+                                </div>
+                            `;
+                            
+                            containerJogos.appendChild(card);
+                        });
 
-        }
-
-        if (
-            indicePublicidade >=
-            lista.length
-        ) {
-
-            indicePublicidade = 0;
-
-        }
-
-        const pub =
-            lista[indicePublicidade];
-
-        texto.innerHTML =
-            `<strong>${pub.nome}</strong><br>${pub.descricao || ""}`;
-
-        logo.innerHTML =
-            pub.logo
-                ? `<img src="${pub.logo}" alt="${pub.nome}">`
-                : "";
-
-        botoes.innerHTML = "";
+                        ajustarTamanhoDosCards(totalConfrontosAtuais, ehMataMataAtivo);
+                    }
+                }
+            }
 
             // --- RENDERIZAÇÃO SEGUNDA COLUNA (CLASSIFICATÓRIA APENAS) ---
-
             if (!ehMataMataAtivo) {
+                const rankingCompletoData = data.ranking ? data.ranking : [];
+                const signatureAtualRanking = JSON.stringify(rankingCompletoData);
 
-                const rankingCompletoData =
-                    data.ranking ? data.ranking : [];
-
-                const signatureAtualRanking =
-                    JSON.stringify(rankingCompletoData);
-
-                if (
-                    signatureAtualRanking !==
-                    ultimoEstadoRankingStr
-                ) {
-
-                    ultimoEstadoRankingStr =
-                        signatureAtualRanking;
-
-                    const tableBody =
-                        document.getElementById(
-                            'tabela-ranking-corpo'
-                        );
-
+                if (signatureAtualRanking !== ultimoEstadoRankingStr) {
+                    ultimoEstadoRankingStr = signatureAtualRanking; 
+                    const tableBody = document.getElementById('tabela-ranking-corpo');
                     if (tableBody) {
-
                         tableBody.innerHTML = '';
-
                         if (rankingCompletoData.length > 0) {
-
                             rankingCompletoData.forEach((player, index) => {
-
-                                const row =
-                                    document.createElement('tr');
-
-                                if (index < 4)
-                                    row.className = 'top-atleta';
-
+                                const row = document.createElement('tr');
+                                if (index < 4) row.className = 'top-atleta';
                                 row.innerHTML = `
                                     <td class="posicao-num">${index + 1}º</td>
-                                    <td style="font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${player.nome}</td>
-                                    <td style="text-align:right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
+                                    <td style="font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${player.nome}</td>
+                                    <td style="text-align: right;"><span class="badge-vitorias">${player.vitorias} V</span></td>
                                 `;
-
                                 tableBody.appendChild(row);
-
                             });
-
-                            setTimeout(
-                                gerenciarScrollDoRanking,
-                                100
-                            );
-
+                            setTimeout(gerenciarScrollDoRanking, 100);
                         }
-
                     }
-
                 }
-
             }
 
         } catch (error) {
-
-            console.error(
-                "Erro no processamento de dados do telão:",
-                error
-            );
-
+            console.error("Erro no processamento de dados do telão:", error);
         }
-
     }
 
     atualizarTelao();
-
-    setInterval(
-        atualizarTelao,
-        3000
-    );
-
+    setInterval(atualizarTelao, 3000);
+    
     /* ============================
        PAINEL ADMINISTRATIVO
     ============================ */
-        const painelAdmin = document.querySelector(".painel-admin-secreto");
+
+    const painelAdmin = document.querySelector(".painel-admin-secreto");
 
     let timeoutPainel;
 
@@ -2759,7 +2072,7 @@
         }
 
     });
-
+    
 </script>
 
 <script src="/static/js/patrocinadores.js"></script>
@@ -2767,3 +2080,4 @@
 
 </body>
 </html>
+ 
