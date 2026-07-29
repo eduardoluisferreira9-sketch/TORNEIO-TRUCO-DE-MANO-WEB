@@ -1546,6 +1546,9 @@
                 }
 
                 if (telaPrincipal) {
+                    if (telaPrincipal.querySelector('.podio-wrapper')) {
+                    return;
+                }
                     telaPrincipal.innerHTML = `
                         <div class="podio-wrapper">
                     
