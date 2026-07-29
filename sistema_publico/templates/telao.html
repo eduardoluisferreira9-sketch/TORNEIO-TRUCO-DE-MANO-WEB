@@ -49,30 +49,22 @@
         }
 
         .painel-admin-secreto{
-
             position:fixed;
-
             top:-70px;
             left:20px;
-
             display:flex;
             gap:12px;
-
             padding:8px 12px;
-
             background:rgba(0,0,0,.88);
             backdrop-filter:blur(8px);
-
             border:1px solid rgba(212,175,55,.30);
             border-radius:0 0 8px 8px;
 
             transition:
                 top .30s ease,
                 opacity .30s ease;
-
-            opacity:0;
-
-            z-index:99999;
+                opacity:0;
+                z-index:99999;
 
         }
 
@@ -131,31 +123,22 @@
             display:flex;
             justify-content:space-between;
             align-items:center;
-
             position:relative;
-
             padding-bottom:10px;
             margin-bottom:8px;
-
             flex-shrink:0;
             gap:16px;
-
             border-bottom:none;
 
         }
 
         .header-telao::after{
-
             content:"";
-
             position:absolute;
-
             left:0;
             right:0;
             bottom:1px;
-
             height:3px;
-
             background:linear-gradient(
                 90deg,
                 transparent 0%,
@@ -171,11 +154,8 @@
         }
 
         @keyframes brilhoTitulo{
-
             0%,96%,100%{
-
                 filter:brightness(1);
-
                 text-shadow:
                     0 3px 8px rgba(0,0,0,.60),
                     0 0 12px rgba(243,207,93,.18);
@@ -183,9 +163,7 @@
             }
 
             98%{
-
                 filter:brightness(1.18);
-
                 text-shadow:
                     0 3px 8px rgba(0,0,0,.60),
                     0 0 28px rgba(243,207,93,.45);
@@ -195,14 +173,11 @@
         }
         
            .header-telao h1 {
-
                 margin: 0;
-
                 font-size: 2.35rem;
                 font-weight: 900;
                 line-height: 1;
                 white-space: nowrap;
-
                 background: linear-gradient(
                     180deg,
                     #fff8cf 0%,
@@ -216,22 +191,17 @@
                 -webkit-background-clip: text;
                 background-clip: text;
                 -webkit-text-fill-color: transparent;
-
                 text-shadow:
                     0 3px 8px rgba(0,0,0,.60),
                     0 0 12px rgba(243,207,93,.18);
-
                animation: brilhoTitulo 25s ease-in-out infinite;
 
             }
 
             .header-telao h1 span{
-
                 background:none;
-
                 color:#ffffff;
                 -webkit-text-fill-color:#ffffff;
-
                 text-shadow:
                     0 3px 8px rgba(0,0,0,.60),
                     0 0 8px rgba(255,255,255,.08);
@@ -239,20 +209,14 @@
             }
         
         .cronometro-container{
-
             position:relative;
-
             border:2px solid var(--borda-ouro);
             border-radius:6px;
-
             padding:6px 22px 4px;
-
             background:rgba(0,0,0,.80);
-
             display:flex;
             justify-content:center;
             align-items:center;
-
             flex-shrink:0;
         }
 
@@ -263,51 +227,31 @@
         }
 
         .cronometro-tag{
-
             position:absolute;
-
             top:-10px;
             left:50%;
             transform:translateX(-50%);
-
             z-index:10;
-
             padding:2px 8px;
-
             background:var(--bg-card);
-
             border:1px solid var(--borda-ouro);
-
             border-radius:4px;
-
             font-size:.42rem;
-
             font-weight:700;
-
             letter-spacing:.8px;
-
             color:var(--dourado-brilhante);
-
             text-transform:uppercase;
-
             white-space:nowrap;
-
             line-height:1;
 
         }
         
         .cronometro-digital{
-
             font-size:2.55rem;
-
             font-family:'Courier New', monospace;
-
             font-weight:900;
-
             color:var(--dourado-brilhante);
-
             line-height:.95;
-
             letter-spacing:-1px;
 
         }
@@ -321,10 +265,12 @@
             margin-bottom: 15px;
             flex-shrink: 0;
         }
+        
         .info-item {
             padding: 8px 15px;
             position: relative;
         }
+        
         .info-item:not(:last-child)::after {
             content: "";
             position: absolute;
@@ -334,6 +280,7 @@
             width: 1px;
             background: rgba(212, 175, 55, 0.25);
         }
+        
         .info-rotulo {
             font-size: 0.65rem;
             text-transform: uppercase;
@@ -341,6 +288,7 @@
             margin-bottom: 2px;
             font-weight: 600;
         }
+        
         .info-valor {
             font-size: 1.05rem;
             font-weight: bold;
@@ -353,6 +301,7 @@
             gap: 10px;
             margin-bottom: 12px;
         }
+        
         .secao-titulo {
             font-size: 1.05rem;
             color: var(--dourado-brilhante);
@@ -361,6 +310,7 @@
             margin: 0;
             white-space: nowrap;
         }
+        
         .secao-linha {
             flex-grow: 1;
             height: 1px;
@@ -402,91 +352,74 @@
            ========================================================== */
 
         .grid-jogos.modo-normal{
-
             grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
 
         }
 
         .grid-jogos.modo-normal .atleta-linha{
-
             font-size:.90rem;
 
         }
 
         .grid-jogos.modo-normal .atleta-box{
-
             padding:6px 10px;
 
         }
 
         .grid-jogos.modo-compacto{
-
             grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
 
         }
 
         .grid-jogos.modo-compacto .atleta-linha{
-
             font-size:.82rem;
 
         }
 
         .grid-jogos.modo-compacto .atleta-box{
-
             padding:5px 10px;
 
         }
 
         .grid-jogos.modo-ultra{
-
             grid-template-columns:repeat(auto-fill,minmax(205px,1fr));
-
             gap:8px;
 
         }
 
         .grid-jogos.modo-ultra .card-jogo{
-
             padding:5px 7px;
 
         }
 
         .grid-jogos.modo-ultra .mesa-tag{
-    
             font-size:.72rem;
-
             margin-bottom:2px;
 
         }
 
         .grid-jogos.modo-ultra .confronto-flex{
-
             gap:2px;
 
         }
 
         .grid-jogos.modo-ultra .atleta-box{
-
             padding:4px 7px;
 
         }
 
         .grid-jogos.modo-ultra .atleta-linha{
-
             font-size:.72rem;
 
         }
 
         .grid-jogos.modo-ultra .placar-tag{
-
             font-size:.65rem;
-
             padding:2px 5px;
 
         }
 
         .grid-jogos.modo-ultra .divisor-atletas{
-
             margin:3px 0;
 
         }
@@ -509,13 +442,9 @@
             ========================================================== */
 
            .card-semifinal{
-
                 position:relative;
-
                 border:2px solid var(--borda-ouro);
-
                 border-radius:8px;
-
                 background:linear-gradient(
                     180deg,
                     rgba(8,30,15,.98) 0%,
@@ -526,25 +455,18 @@
                     inset 0 0 0 1px rgba(255,255,255,.04),
                     0 10px 24px rgba(0,0,0,.45),
                     0 0 12px rgba(212,175,55,.08);
-            
                 transition:all .30s ease;
             
             }
                                  
             .card-semifinal::before{
-
                 content:"";
-            
                 position:absolute;
-            
                 left:28px;
                 right:28px;
                 top:10px;
-            
                 height:2px;
-            
                 border-radius:20px;
-            
                 background:linear-gradient(
                     90deg,
                     transparent,
@@ -557,27 +479,18 @@
             }
 
             .card-semifinal .atleta-linha{
-
                 font-size:2rem;
-
                 font-weight:900;
-
                 letter-spacing:.3px;
 
             }
         
         .grid-jogos.layout-super-finais {
-
             grid-template-columns: repeat(2, 1fr) !important;
-
             grid-template-rows: 1fr;
-
             gap: 20px !important;
-
             height: 100% !important;
-
             align-content: stretch;
-    
             align-items: stretch;
 
         }
@@ -586,31 +499,18 @@
             display:inline-flex;
             align-items:center;
             justify-content:center;
-
             padding:3px 10px;
-
             margin-bottom:6px;
-
             background:rgba(0,0,0,.35);
-
             border:1px solid rgba(212,175,55,.30);
-
             border-radius:4px;
-
             color:var(--dourado-brilhante);
-
             font-size:.82rem;
-
             font-weight:700;
-
             letter-spacing:.6px;
-
             text-transform:uppercase;
-
             line-height:1;
-
             width:fit-content;
-
             box-shadow:
                 inset 0 0 3px rgba(255,255,255,.03),
                 0 1px 3px rgba(0,0,0,.25);
@@ -652,38 +552,31 @@
         }
         
         .atleta-box.vencedor-card {
-
             background: linear-gradient(
                 90deg,
                 rgba(46,204,113,.18) 0%,
                 rgba(7,28,13,.88) 30%,
                 rgba(7,28,13,.88) 100%
             ) !important;
-
             border-left:5px solid #2ecc71;
-
             box-shadow:
                 inset 0 0 10px rgba(46,204,113,.08);
 
         }
 
         .atleta-box.vencedor-card .atleta-linha{
-
             color:#ecfff3 !important;
-
             font-weight:700;
 
         }
 
         .atleta-box.perdedor-card{
-
             background: linear-gradient(
                 90deg,
                 rgba(231,76,60,.12) 0%,
                 rgba(28,10,10,.78) 30%,
                 rgba(28,10,10,.78) 100%
             ) !important;
-
             border-left:4px solid #e74c3c !important;
 
         }
@@ -702,6 +595,7 @@
             text-overflow: ellipsis; 
             max-width: 65%;
         }
+        
         .placar-tag { 
             font-family: monospace; 
             font-weight: bold; 
@@ -720,17 +614,11 @@
         }
 
         .card-semifinal .placar-tag{
-
             min-width:220px;
-        
             text-align:center;
-        
             font-size:1.45rem;
-        
             padding:10px 18px;
-        
             border-radius:6px;
-        
             background:linear-gradient(
                 180deg,
                 #0b0b0b,
@@ -738,24 +626,19 @@
             );
         
             border:1px solid rgba(243,207,93,.35);
-        
             box-shadow:
                 inset 0 1px 0 rgba(255,255,255,.05);
         
         }
 
         .vs-tag {
-
             display: none;
     
         }
 
         .card-semifinal .divisor-atletas{
-
             height:2px;
-
             margin:14px 0;
-        
             background:linear-gradient(
                 90deg,
                 transparent,
@@ -862,14 +745,12 @@
         .podio-medalha { font-size: 2.2rem; margin-bottom: 5px; }
         .podio-rotulo-lugar { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--texto-mutado); }
         .podio-nome { font-size: 1.1rem; font-weight: bold; margin-top: 10px; color: #fff; }
-
         @keyframes pulseBorda {
             from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
             to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
         }
 
         @keyframes autoScrollRanking {
-
             0%,15%{
                 transform:translateY(0);
             }
@@ -884,21 +765,16 @@
 
         }
 
-
         /* ==========================================================
            FAIXA DA SEMIFINAL
         ========================================================== */
         
         .mesa-semifinal{
-
             display:inline-flex;
             align-items:center;
             justify-content:center;
-
             padding:12px 24px;
-        
             border-radius:8px;
-        
             background:linear-gradient(
                 180deg,
                 #ffe38a 0%,
@@ -906,172 +782,112 @@
             );
         
             color:#1d1d1d;
-        
             border:1px solid rgba(255,255,255,.35);
-        
             font-family:'Cinzel', serif;
-        
             font-size:1.05rem;
-        
             font-weight:900;
-        
             letter-spacing:1px;
-        
             text-transform:uppercase;
-        
             box-shadow:
                 inset 0 1px 0 rgba(255,255,255,.45),
                 0 8px 20px rgba(0,0,0,.35);
         
         }
 
-        
        /* ==========================================================
            PUBLICIDADE / PATROCINADORES
            ========================================================== */
 
         .card-desenvolvedor{
-
             background:rgba(0,0,0,.65);
-
             border:1px solid var(--borda-ouro);
-
             border-radius:6px;
-
             padding:6px 22px;
-
             box-sizing:border-box;
-
             display:flex;
-
             flex-direction:column;
 
         }
 
         .publicidade-grid{
-
             flex:1;
-
             display:grid;
-
             grid-template-columns:200px 1fr 220px;
-
             gap:28px;
-
             align-items:start;
-
             min-height:72px;
 
         }
 
         .col-patrocinador{
-
             display:flex;
-
             flex-direction:column;
-
-            justify-content:center;
-            
+            justify-content:center;      
             align-self:center;
-
             align-items:flex-start;
 
         }
 
         .col-assinatura{
-
             display:flex;
-
             justify-content:center;
-
             align-items:flex-start;
-
             align-self:center;
-
             padding-left:30px;
-
             border-left:1px solid rgba(212,175,55,.18);
 
         }
 
         .assinatura-sistema{
-
             margin-top:4px;
-
             padding-top:4px;
-
             border-top:1px solid rgba(212,175,55,.12);
-
             display:flex;
-
             justify-content:center;
-
             align-items:center;
-
             gap:6px;
-
             font-size:.68rem;
-
             line-height:1;
-
             letter-spacing:.3px;
-
             color:#8d9a8d;
 
         }
 
         .assinatura-sistema strong{
-
             color:var(--dourado-brilhante);
-
             font-weight:700;
 
         }
 
         .assinatura-sistema span{
-
             color:#7f907f;
 
         }
-
-              
+           
         /* ==========================================================
            LOGO
            ========================================================== */
 
         .col-logo{
-
             display:flex;
             align-items:center;
             justify-content:center;
-
             padding-left:10px;
             padding-right:10px;
-
             border-right:1px solid rgba(212,175,55,.18);
-
             align-self:center;
 
         }
 
         #publicidade-logo{
-
             width:185px;
-
             height:110px;
-
             display:flex;
-
             align-items:center;
-
             justify-content:center;
-
             padding:4px;
-
             border:1px solid rgba(212,175,55,.28);
-
             border-radius:8px;
-
             background:linear-gradient(
                 180deg,
                 rgba(255,255,255,.05),
@@ -1081,21 +897,15 @@
             box-shadow:
                 inset 0 0 8px rgba(255,255,255,.03),
                 0 0 10px rgba(0,0,0,.25);
-
             overflow:hidden;
-
             transition:.25s;
 
         }
 
         #publicidade-logo img{
-
             max-width:100%;
-
             max-height:100%;
-
             object-fit:cover;
-
             filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
 
         }
@@ -1105,97 +915,65 @@
            ========================================================== */
 
         .col-texto{
-
             display:flex;
-
             align-items:center;
 
         }
 
         #publicidade-texto{
-
             display:flex;
-
             flex-direction:column;
-
             justify-content:center;
-
             color:var(--texto-mutado);
-
             line-height:1.35;
 
         }
 
         .publicidade-mensagem{
-
             margin-top:8px;
-
             padding-left:2px;
-
             font-size:.88rem;
-
             color:#e6e6e6;
-
             line-height:1.4;
-
             font-weight:500;
-
             letter-spacing:.2px;
-
             opacity:.95;
 
         }
 
         #publicidade-texto strong{
-
             font-size:1.75rem;
-
             font-weight:700;
-
             color:#ffffff;
-
             letter-spacing:.3px;
-
             margin-bottom:6px;
-
             text-shadow:0 2px 6px rgba(0,0,0,.45);
 
         }
 
         .assinatura-dev{
-
             display:flex;
-
             flex-direction:column;
-
             justify-content:center;
-
             gap:4px;
 
         }
 
         .assinatura-dev span{
-
             font-size:.75rem;
-
             color:#9ea99e;
 
         }
 
         .assinatura-dev strong{
-
             font-size:1.05rem;
-
             font-weight:700;
-
             color:#ffffff;
 
         }
 
         .assinatura-dev small{
-
             font-size:.72rem;
-
             color:#7f907f;
 
         }
@@ -1205,43 +983,26 @@
            ========================================================== */
 
         .col-botoes{
-
             display:flex;
-
             gap:10px;
-
             margin-top:10px;
-
             flex-wrap:wrap;
 
         }
 
         .btn-dev{
-
             display:flex;
-
             justify-content:center;
-
             align-items:center;
-
             height:30px;
-
             padding:0 14px;
-
             text-decoration:none;
-
             font-size:.78rem;
-
             font-weight:700;
-
             border-radius:8px;
-
             letter-spacing:.3px;
-
             white-space:nowrap;
-
             box-sizing:border-box;
-
             transition:
                 background .25s,
                 color .25s,
@@ -1251,7 +1012,6 @@
         }
 
         .btn-dev-comprar{
-
             background:linear-gradient(
                 180deg,
                 #37c46b,
@@ -1259,43 +1019,32 @@
             );
 
             color:#fff;
-
             border:1px solid #53d487;
 
-}
+        }
 
         .btn-dev-comprar:hover{
-
             background:#40cb72;
-
             color:#fff;
 
         }
 
         .btn-dev-patrocinar{
-
             background:rgba(0,0,0,.35);
-
             color:var(--dourado-brilhante);
-
             border:1px solid var(--borda-ouro);
 
         }
 
         .btn-dev-patrocinar:hover{
-
             background:rgba(212,175,55,.12);
-
             color:#fff;
-
             border-color:var(--dourado-brilhante);
 
         }
 
         .btn-dev:hover{
-
             transform:translateY(-1px);
-
             box-shadow:0 4px 10px rgba(0,0,0,.25);
 
         }
@@ -1305,7 +1054,6 @@
            ========================================================== */
 
           .publicidade-slide{
-
             transition:
                 opacity .45s ease,
                 transform .45s ease;
@@ -1313,17 +1061,13 @@
         }
 
         .publicidade-slide.saindo{
-
             opacity:0;
-
             transform:translateX(-40px);
 
         }
 
         .publicidade-slide.entrando{
-
             opacity:1;
-
             transform:translateX(0);
 
         }
@@ -1333,7 +1077,6 @@
             ========================================= */
 
             .marca-ferreira{
-
                 display:flex;
                 align-items:center;
                 gap:12px;
@@ -1341,17 +1084,13 @@
             }
 
             .logo-ef-mini{
-
                 width:52px;
                 height:52px;
-
                 display:flex;
                 align-items:center;
                 justify-content:center;
-
                 border:2px solid rgba(212,175,55,.40);
                 border-radius:14px;
-
                 background:linear-gradient(
                     180deg,
                     rgba(255,255,255,.05),
@@ -1361,76 +1100,53 @@
                 box-shadow:
                     inset 0 0 8px rgba(255,255,255,.04),
                     0 0 10px rgba(0,0,0,.30);
-
                 flex-shrink:0;
 
             }
 
             .logo-ef-mini span{
-
                 color:#d4af37;
-
                 font-size:1.65rem;
-
                 font-weight:800;
-
                 letter-spacing:-2px;
 
             }
 
             .marca-texto{
-
                 display:flex;
                 flex-direction:column;
-
                 line-height:1.05;
 
             }
 
             .marca-label{
-
                 font-size:.56rem;
-
                 text-transform:uppercase;
-
                 letter-spacing:3px;
-
                 color:#96a596;
-
                 margin-bottom:5px;
-                
                 opacity:.75;
-
+                
             }
 
             .marca-ferreira-nome{
-
                 font-size:1.22rem;
-        
                 font-weight:800;
-
                 color:#ffffff;
 
             }
 
             .marca-ferreira-sistemas{
-
                 font-size:.80rem;
-
                 letter-spacing:4px;
-
                 color:#7ddf9c;
 
             }
 
             .marca-slogan{
-
                 margin-top:6px;
-
                 font-size:.70rem;
-
                 font-style:normal;
-
                 color:#aab6aa;
 
             }
@@ -1459,7 +1175,6 @@
         </h1>
 
         <div class="cronometro-wrapper">
-
             <div class="cronometro-tag">
                 TEMPO DA RODADA
             </div>
@@ -1526,69 +1241,43 @@
             <!-- ================= BANNER DO DESENVOLVEDOR & PATROCÍNIOS ================= -->
 
             <div class="card-desenvolvedor">
-
                 <div id="publicidade-info" class="publicidade-grid">
-
                     <div class="col-logo">
-
                         <div id="publicidade-logo-slide" class="publicidade-slide">
-
                             <div id="publicidade-logo"></div>
-
                         </div>
-
                     </div>
-
                     <div class="col-patrocinador">
-
                         <div id="publicidade-slide" class="publicidade-slide">
-
                             <div id="publicidade-texto"></div>
-
                             <div id="publicidade-botoes" class="col-botoes">
                                 <!-- JavaScript -->
                             </div>
-
                         </div>
-
                     </div>
-
                     <div class="col-assinatura">
-
                         <div class="marca-ferreira">
-
                             <div class="logo-ef-mini">
                                 <span>EF</span>
                             </div>
-
                             <div class="marca-texto">
-
                                 <span class="marca-label">
                                     DESENVOLVIDO POR
                                 </span>
-
                                 <strong class="marca-ferreira-nome">
                                     FERREIRA
                                 </strong>
-
                                 <small class="marca-ferreira-sistemas">
                                     SISTEMAS
                                 </small>
-
                                 <em class="marca-slogan">
                                     Tecnologia com propósito.
                                 </em>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
              </div>
-
           </div>
 
             <!-- ======================================================================= -->
@@ -1638,19 +1327,12 @@
         );
 
         grid.style.gap = "10px";
-
         if (!ehMataMata) {
-
             if (totalMesas > 16) {
-
                 grid.classList.add('modo-ultra');
-
-            } else if (totalMesas > 10) {
-
+           } else if (totalMesas > 10) {
                 grid.classList.add('modo-compacto');
-
             } else {
-
                 grid.classList.add('modo-normal');
 
             }
@@ -2084,16 +1766,12 @@
                             
                            card.innerHTML = `
                                 <div class="${classeMesa}">${textoTagMesa}</div>
-
                                 <div class="confronto-flex">
-                            
                                     <div class="atleta-box ${classeJ1}">
                                         <span class="atleta-linha">${prefixoJ1}${jogo.atleta1_nome}</span>
                                         <span class="placar-tag">${p1Str}</span>
                                     </div>
-                            
                                     <div class="divisor-atletas"></div>
-                            
                                     <div class="atleta-box ${classeJ2}">
                                         <span class="atleta-linha">${prefixoJ2}${advNome}</span>
                                         <span class="placar-tag">${p2Str}</span>
@@ -2150,25 +1828,15 @@
     ============================ */
 
     const painelAdmin = document.querySelector(".painel-admin-secreto");
-
     let timeoutPainel;
-
     document.addEventListener("mousemove", (e) => {
-
         if (e.clientY <= 20) {
-
             painelAdmin.classList.add("visivel");
-
             clearTimeout(timeoutPainel);
-
         } else {
-
             clearTimeout(timeoutPainel);
-
             timeoutPainel = setTimeout(() => {
-
                 painelAdmin.classList.remove("visivel");
-
             }, 1200);
 
         }
