@@ -478,6 +478,20 @@
             
             }
 
+            .card-grande-final{
+                border:2px solid #d4af37;
+                box-shadow:
+                    0 0 18px rgba(212,175,55,.20),
+                    inset 0 0 8px rgba(255,255,255,.03);
+            }
+
+            .card-terceiro-lugar{
+                border:2px solid #cd7f32;
+                box-shadow:
+                    0 0 18px rgba(205,127,50,.18),
+                    inset 0 0 8px rgba(255,255,255,.03);
+            }
+
             .card-semifinal .atleta-linha{
                 font-size:2rem;
                 font-weight:900;
@@ -522,6 +536,7 @@
             border:none;
             box-shadow:none;
             padding:0;
+            padding-top: 10px;
         }
         
         .confronto-flex {
@@ -736,7 +751,8 @@
             display:flex;
             justify-content:center;
             align-items:center;
-            width:100%;
+            width: calc(100% - 20px);
+            margin: 0 auto;
             box-sizing:border-box;
             padding:18px 20px;
             font-size:1.6rem;
