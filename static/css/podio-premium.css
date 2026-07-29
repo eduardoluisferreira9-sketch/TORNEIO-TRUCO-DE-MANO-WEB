@@ -293,6 +293,69 @@
    REI DAS FLORES
 ========================================================== */
 
+.rei-flores{
+    width:min(760px,95%);
+    margin:35px auto 0;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    padding:24px 32px;
+
+    border-radius:18px;
+
+    border:2px solid rgba(243,207,93,.35);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.05),
+            rgba(0,0,0,.22)
+        );
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.rei-titulo{
+    font-size:1.1rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    color:var(--dourado-brilhante);
+}
+
+.rei-subtitulo{
+    margin-top:8px;
+
+    font-size:.95rem;
+    color:var(--texto-mutado);
+
+    text-align:center;
+}
+
+.rei-nome{
+    margin-top:20px;
+
+    font-size:2rem;
+    font-weight:900;
+
+    color:#fff;
+
+    letter-spacing:1px;
+}
+
+.rei-total{
+    margin-top:10px;
+
+    font-size:1.25rem;
+    font-weight:700;
+
+    color:#ffd76a;
+}
+
 /* ==========================================================
    ANIMAÇÕES
 ========================================================== */
