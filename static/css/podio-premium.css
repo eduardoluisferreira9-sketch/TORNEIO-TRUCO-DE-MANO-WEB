@@ -81,7 +81,7 @@
 
 .campeao{
     order:2;
-    transform:translateY(-25px);
+    transform:translateY(-45px);
 }
 
 .prata{
@@ -134,17 +134,23 @@
 ========================================================== */
 
 .pedestal{
-    width:170px;
+    position:relative;
+    overflow:hidden;
+
+    width:220px;
     border-radius:10px 10px 0 0;
     margin-top:18px;
+
     border:2px solid rgba(255,255,255,.18);
+
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.15),
+        inset 0 -8px 12px rgba(0,0,0,.18),
         0 8px 18px rgba(0,0,0,.35);
 }
 
 .pedestal-ouro{
-    height:180px;
+    height:210px;
     background:linear-gradient(
         to bottom,
         #ffe27a 0%,
@@ -155,7 +161,7 @@
 }
 
 .pedestal-prata{
-    height:140px;
+    height:165px;
     background:linear-gradient(
         to bottom,
         #f4f4f4 0%,
@@ -165,13 +171,57 @@
 }
 
 .pedestal-bronze{
-    height:110px;
+    height:135px;
     background:linear-gradient(
         to bottom,
         #d58a50 0%,
         #9b5a2c 45%,
         #603517 100%
     );
+}
+
+.pedestal::before{
+    position:absolute;
+    left:50%;
+    bottom:18px;
+    transform:translateX(-50%);
+
+    font-size:4rem;
+    font-weight:900;
+
+    color:rgba(255,255,255,.22);
+    text-shadow:0 2px 6px rgba(0,0,0,.35);
+
+    z-index:2;
+}
+
+.pedestal-ouro::before{
+    content:"1";
+}
+
+.pedestal-prata::before{
+    content:"2";
+}
+
+.pedestal-bronze::before{
+    content:"3";
+}
+
+.pedestal::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,.28) 0%,
+            rgba(255,255,255,0) 30%,
+            rgba(255,255,255,.10) 70%,
+            rgba(255,255,255,0) 100%
+        );
+
+    pointer-events:none;
 }
 
 /* ==========================================================
