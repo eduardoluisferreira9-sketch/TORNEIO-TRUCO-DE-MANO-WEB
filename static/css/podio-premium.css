@@ -9,7 +9,7 @@
    WRAPPER
 ========================================================== */
 .podio-wrapper {
-   animation: entradaPodio .8s ease-out;
+   animation: entradaPodio .8s ease-out forwards;
    display: flex;
    flex-direction: column;
    height: 100%;
@@ -202,13 +202,13 @@
 ========================================================== */
 
 .campeao{
-    animation: campeaoEntrada .8s ease-out;
     order:2;
     transform:translateY(-45px);
+    animation: campeaoEntrada .8s ease-out forwards;
 }
 
 .campeao-coroa{
-    animation: brilhoCoroa 3s ease-in-out infinite;
+    animation: brilhoCoroa 2s ease-out forwards;
     font-size:3.2rem;
     margin-bottom:12px;
     filter:drop-shadow(0 0 10px rgba(243,207,93,.45));
