@@ -1,4 +1,8 @@
-/* Arquivo da cerimônia de premiação */
+/* ==========================================================
+   CERIMÔNIA DE PREMIAÇÃO PREMIUM
+========================================================== */
+
+/* ---------- Wrapper ---------- */
         .podio-wrapper{
             display:flex;
             flex-direction:column;
@@ -12,7 +16,8 @@
                     rgba(214,175,55,.10),
                     rgba(0,0,0,0) 55%);
         }
-        
+
+/* ---------- Título ---------- */
         .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
 
 
