@@ -1,1 +1,18 @@
 /* Arquivo da cerimônia de premiação */
+        .podio-wrapper{
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            box-sizing:border-box;
+            padding:18px 28px;
+            overflow:hidden;
+        
+            background:
+                radial-gradient(circle at center,
+                    rgba(214,175,55,.10),
+                    rgba(0,0,0,0) 55%);
+        }
+        
+        .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
+
+
