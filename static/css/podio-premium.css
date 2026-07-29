@@ -661,7 +661,7 @@
 
 .campeao-coroa{
 
-    animation:brilhoCoroa 2.8s ease-in-out infinite;
+    animation: brilhoCoroa 2.8s ease-out forwards;
 }
 
 .pedestal{
