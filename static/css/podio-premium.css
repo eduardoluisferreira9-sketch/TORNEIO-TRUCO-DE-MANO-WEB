@@ -165,15 +165,16 @@
 
 .podio-atleta.destaque{
     color:var(--podio-ouro);
-    font-size:2.6rem;
+    font-size:2.2rem;
+    max-width:280px;
 
 }
 
 /* descrição */
 
 .podio-posicao{
-    margin-bottom:10px;
-    font-size:.95rem;
+    margin-bottom:8px;
+    font-size:1rem;
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:2px;
@@ -648,11 +649,14 @@
 }
 
 .podio-atleta{
-    max-width:220px;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-    margin-bottom:2px;
+   max-width:220px;
+   overflow:hidden;
+   white-space:nowrap;
+   text-overflow:ellipsis;
+   margin-bottom:2px;
+   font-size:1.8rem;
+   font-weight:800;
+   letter-spacing:.5px;
 
 }
 
