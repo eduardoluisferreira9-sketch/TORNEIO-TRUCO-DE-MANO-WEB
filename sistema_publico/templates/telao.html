@@ -780,26 +780,7 @@
             border:1px solid rgba(255,255,255,.30);
             color:#fff;
         }
-
-        /* --- Pódio Premium --- */
-        .podio-wrapper{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            box-sizing:border-box;
-            padding:18px 28px;
-            overflow:hidden;
-        
-            background:
-                radial-gradient(circle at center,
-                    rgba(214,175,55,.10),
-                    rgba(0,0,0,0) 55%);
-        }
-        
-        .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
-
-
-        
+             
         @keyframes pulseBorda {
             from { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(255, 71, 87, 0.4); }
             to { border-color: #ff6b81; box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.2); }
@@ -1550,126 +1531,119 @@
                     return;
                 }
                     telaPrincipal.innerHTML = `
-                        <div class="podio-wrapper">
+                    <div class="podio-wrapper">
                     
-                            <div class="podio-header">
-                                <div class="podio-titulo">
-                                    👑 CERIMÔNIA DE PREMIAÇÃO 👑
-                                </div>
-                    
-                                <div class="podio-subtitulo">
-                                    O PÓDIO DE HONRA ESTÁ CONSOLIDADO
-                                </div>
+                        <div class="podio-header">
+                            <div class="podio-titulo">
+                                👑 CERIMÔNIA DE PREMIAÇÃO 👑
                             </div>
                     
-                            <div class="podio-palco">
+                            <div class="podio-subtitulo">
+                                O PÓDIO DE HONRA ESTÁ CONSOLIDADO
+                            </div>
+                        </div>
                     
-                                <!-- Vice-Campeão -->
-                                <div class="podio-pilar prata">
+                        <div class="podio-palco">
                     
-                                    <div class="podio-medalha">
-                                        🥈
-                                    </div>
+                            <!-- Vice -->
+                            <div class="podio-pilar prata">
                     
-                                    <div class="podio-posicao">
-                                        Vice-Campeão
-                                    </div>
+                                <div class="podio-medalha">🥈</div>
                     
-                                    <div class="podio-atleta">
-                                        ${p2}
-                                    </div>
-                    
-                                    <div class="pedestal pedestal-prata"></div>
-                    
+                                <div class="podio-posicao">
+                                    Vice-Campeão
                                 </div>
                     
-                                <!-- Campeão -->
-                                <div class="podio-pilar campeao">
-                    
-                                    <div class="campeao-coroa">
-                                        👑
-                                    </div>
-                    
-                                    <div class="podio-atleta destaque">
-                                        ${p1}
-                                    </div>
-                    
-                                    <div class="podio-posicao campeao-texto">
-                                        GRANDE CAMPEÃO
-                                    </div>
-                    
-                                    <div class="pedestal pedestal-ouro"></div>
-                    
+                                <div class="podio-atleta">
+                                    ${p2}
                                 </div>
                     
-                                <!-- Terceiro -->
-                                <div class="podio-pilar bronze">
-                    
-                                    <div class="podio-medalha">
-                                        🥉
-                                    </div>
-                    
-                                    <div class="podio-posicao">
-                                        3º Colocado
-                                    </div>
-                    
-                                    <div class="podio-atleta">
-                                        ${p3}
-                                    </div>
-                    
-                                    <div class="pedestal pedestal-bronze"></div>
-                    
-                                </div>
+                                <div class="pedestal pedestal-prata"></div>
                     
                             </div>
                     
-                            <div class="podio-inferior">
-
+                            <!-- Campeão -->
+                            <div class="podio-pilar campeao">
+                    
+                                <div class="campeao-coroa">👑</div>
+                    
+                                <div class="podio-atleta destaque">
+                                    ${p1}
+                                </div>
+                    
+                                <div class="podio-posicao campeao-texto">
+                                    GRANDE CAMPEÃO
+                                </div>
+                    
+                                <div class="pedestal pedestal-ouro"></div>
+                    
+                            </div>
+                    
+                            <!-- Terceiro -->
+                            <div class="podio-pilar bronze">
+                    
+                                <div class="podio-medalha">🥉</div>
+                    
+                                <div class="podio-posicao">
+                                    3º Colocado
+                                </div>
+                    
+                                <div class="podio-atleta">
+                                    ${p3}
+                                </div>
+                    
+                                <div class="pedestal pedestal-bronze"></div>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                        <div class="podio-inferior">
+                    
                             <div class="podio-quarto">
-                        
+                    
                                 <div class="quarto-medalha">
                                     🏅
                                 </div>
-                        
+                    
                                 <div class="quarto-conteudo">
-                        
+                    
                                     <div class="quarto-titulo">
-                                        4º Colocado
+                                        4º COLOCADO
                                     </div>
-                        
+                    
                                     <div class="quarto-nome">
                                         ${p4}
                                     </div>
-                        
+                    
                                 </div>
-                        
+                    
                             </div>
-                        
+                    
                             <div class="rei-flores">
-                        
+                    
                                 <div class="rei-titulo">
-                                    🌸 TROFÉU REI DAS FLORES 🌸
+                                    🌸 REI DAS FLORES 🌸
                                 </div>
-                        
+                    
                                 <div class="rei-subtitulo">
-                                    O maior cantador de flores do torneio
+                                    Maior cantador de flores
                                 </div>
-                        
+                    
                                 <div class="rei-nome">
                                     ${reiDasFloresNome.toUpperCase()}
                                 </div>
-                        
+                    
                                 <div class="rei-total">
                                     🎯 ${qtdFloresTotal} Flores Cantadas
                                 </div>
-                        
+                    
                             </div>
-                        
+                    
                         </div>
-                        
-                      </div>
-                        
-                   `;
+                    
+                    </div>
+                    `;
                 }
                 
                 document.getElementById('info-fase').innerText = "🏁 ENCERRADO";
