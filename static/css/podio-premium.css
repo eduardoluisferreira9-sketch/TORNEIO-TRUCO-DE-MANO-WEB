@@ -1,23 +1,92 @@
 /* ==========================================================
    CERIMÔNIA DE PREMIAÇÃO PREMIUM
+   Sistema: Ferreira Sistemas
+   Módulo: Telão
+   Arquivo: podio-premium.css
 ========================================================== */
 
-/* ---------- Wrapper ---------- */
-        .podio-wrapper{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            box-sizing:border-box;
-            padding:18px 28px;
-            overflow:hidden;
-        
-            background:
-                radial-gradient(circle at center,
-                    rgba(214,175,55,.10),
-                    rgba(0,0,0,0) 55%);
-        }
+/* ==========================================================
+   WRAPPER
+========================================================== */
+.podio-wrapper {
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   box-sizing: border-box;
+   padding: 18px 28px;
+   overflow: hidden;
+   background:
+      radial-gradient(
+         circle at center,
+         rgba(214,175,55,.10),
+         rgba(0,0,0,0) 55%
+      );
+}
 
-/* ---------- Título ---------- */
-        .podio-titulo { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--borda-ouro); margin-bottom: 5px; }
+/* ==========================================================
+   CABEÇALHO
+========================================================== */
+
+.podio-header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:28px;
+}
+
+.podio-titulo{
+    font-family:'Cinzel', serif;
+    letter-spacing:1px;
+    text-align:center;
+    font-size:2.2rem;
+    font-weight:900;
+    color:var(--borda-ouro);
+    margin-bottom:6px;
+    text-shadow:
+        0 3px 10px rgba(0,0,0,.60),
+        0 0 14px rgba(243,207,93,.20);
+}
+
+.podio-subtitulo{
+    font-size:.95rem;
+    font-weight:600;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--texto-mutado);
+    text-align:center;
+}
+
+/* ==========================================================
+   PALCO
+========================================================== */
+
+.podio-palco{
+
+}
+
+/* ==========================================================
+   CAMPEÃO
+========================================================== */
+
+/* ==========================================================
+   VICE
+========================================================== */
+
+/* ==========================================================
+   TERCEIRO
+========================================================== */
+
+/* ==========================================================
+   QUARTO LUGAR
+========================================================== */
+
+/* ==========================================================
+   REI DAS FLORES
+========================================================== */
+
+/* ==========================================================
+   ANIMAÇÕES
+========================================================== */
 
 
