@@ -518,13 +518,10 @@
 
         .card-grande-final .mesa-tag,
         .card-terceiro-lugar .mesa-tag{
-            display:flex;
-            width:100%;
-            justify-content:center;
-            align-items:center;
-            padding:14px 0;
-            margin-bottom:22px;
-
+            background:transparent;
+            border:none;
+            box-shadow:none;
+            padding:0;
         }
         
         .confronto-flex {
@@ -736,17 +733,27 @@
 
         .badge-final-ouro,
         .badge-final-bronze{
-
             display:flex;
             justify-content:center;
             align-items:center;
             width:100%;
+            box-sizing:border-box;
             padding:18px 20px;
             font-size:1.6rem;
             font-weight:900;
-            border-radius:8px;
-            box-sizing:border-box;
-        
+            border-radius:10px;
+            color:#1d1d1d;
+        }
+
+        .badge-final-ouro{
+            background:linear-gradient(180deg,#ffe38a,#d4af37);
+            border:1px solid rgba(255,255,255,.35);
+        }
+
+        .badge-final-bronze{
+            background:linear-gradient(180deg,#f0b77d,#cd7f32);
+            border:1px solid rgba(255,255,255,.30);
+            color:#fff;
         }
 
         /* --- Pódio Premium --- */
