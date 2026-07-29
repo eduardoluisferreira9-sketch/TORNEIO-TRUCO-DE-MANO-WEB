@@ -1530,7 +1530,7 @@
                     if (telaPrincipal.querySelector('.podio-wrapper')) {
                     return;
                 }
-                    telaPrincipal.innerHTML = `
+                  telaPrincipal.innerHTML = `
                     <div class="podio-wrapper">
                     
                         <div class="podio-header">
@@ -1544,66 +1544,73 @@
                         </div>
                     
                         <div class="podio-palco">
+                    
                             <div class="podio-linha">
                     
-                            <!-- Vice -->
-                            <div class="podio-pilar prata">
+                                <!-- Vice -->
+                                <div class="podio-pilar prata">
                     
-                                <div class="podio-medalha">🥈</div>
+                                    <div class="podio-medalha">🥈</div>
                     
-                                <div class="podio-posicao">
-                                    Vice-Campeão
-                                </div>
-                    
-                                <div class="podio-atleta">
-                                    ${p2}
-                                </div>
-                    
-                                <div class="pedestal pedestal-prata"></div>
-                    
-                            </div>
-                    
-                            <!-- Campeão -->
-                            <div class="podio-pilar campeao">
-                    
-                                <div class="campeao-coroa">👑</div>
-                    
-                                <div class="podio-atleta destaque">
-                                    ${p1}
-                                </div>
-                    
-                                <div class="podio-posicao campeao-texto">
-                                    GRANDE CAMPEÃO
-                                </div>
-                    
-                                <div class="pedestal pedestal-ouro"></div>
-                    
-                            </div>
-                    
-                            <!-- Terceiro -->
-                            <div class="podio-pilar bronze">
-                    
-                                <div class="podio-medalha">🥉</div>
-                    
-                                <div class="podio-posicao">
-                                    3º Colocado
-                                </div>
-                    
-                                <div class="podio-atleta">
-                                    ${p3}
-                                </div>
-                    
-                                <div class="pedestal pedestal-bronze"></div>
-
-                                        </div>
-                                
+                                    <div class="podio-atleta">
+                                        ${p2}
                                     </div>
-                                
-                                    <div class="podio-base"></div>
-                                
+                    
+                                    <div class="podio-posicao">
+                                        VICE-CAMPEÃO
+                                    </div>
+                    
+                                    <div class="pedestal">
+                                        <span>2</span>
+                                    </div>
+                    
                                 </div>
-                                
-                                <div class="podio-inferior">
+                    
+                                <!-- Campeão -->
+                                <div class="podio-pilar campeao">
+                    
+                                    <div class="campeao-coroa">👑</div>
+                    
+                                    <div class="podio-atleta destaque">
+                                        ${p1}
+                                    </div>
+                    
+                                    <div class="podio-posicao">
+                                        GRANDE CAMPEÃO
+                                    </div>
+                    
+                                    <div class="pedestal">
+                                        <span>1</span>
+                                    </div>
+                    
+                                </div>
+                    
+                                <!-- Terceiro -->
+                                <div class="podio-pilar bronze">
+                    
+                                    <div class="podio-medalha">🥉</div>
+                    
+                                    <div class="podio-atleta">
+                                        ${p3}
+                                    </div>
+                    
+                                    <div class="podio-posicao">
+                                        3º COLOCADO
+                                    </div>
+                    
+                                    <div class="pedestal">
+                                        <span>3</span>
+                                    </div>
+                    
+                                </div>
+                    
+                            </div>
+                    
+                            <div class="podio-base"></div>
+                    
+                        </div>
+                    
+                        <div class="podio-inferior">
                     
                             <div class="podio-quarto">
                     
@@ -1627,20 +1634,28 @@
                     
                             <div class="rei-flores">
                     
-                                <div class="rei-titulo">
-                                    🌸 REI DAS FLORES 🌸
+                                <div class="rei-icone">
+                                    🌸
                                 </div>
                     
-                                <div class="rei-subtitulo">
-                                    Maior cantador de flores
-                                </div>
+                                <div class="rei-conteudo">
                     
-                                <div class="rei-nome">
-                                    ${reiDasFloresNome.toUpperCase()}
-                                </div>
+                                    <div class="rei-titulo">
+                                        REI DAS FLORES
+                                    </div>
                     
-                                <div class="rei-total">
-                                    🎯 ${qtdFloresTotal} Flores Cantadas
+                                    <div class="rei-subtitulo">
+                                        Maior cantador de flores
+                                    </div>
+                    
+                                    <div class="rei-nome">
+                                        ${reiDasFloresNome.toUpperCase()}
+                                    </div>
+                    
+                                    <div class="rei-total">
+                                        🎯 ${qtdFloresTotal} FLORES
+                                    </div>
+                    
                                 </div>
                     
                             </div>
