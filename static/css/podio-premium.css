@@ -78,13 +78,18 @@
 ========================================================== */
 
 .podio-palco{
+
     flex:1;
+
     display:flex;
+
     flex-direction:column;
+
     justify-content:flex-end;
+
     align-items:center;
-    padding-top:8px;
-    min-height:0;
+
+    padding-top:0;
 
 }
 
@@ -92,12 +97,18 @@
 /* linha dos vencedores */
 
 .podio-linha{
+
     width:100%;
+
     display:flex;
+
     justify-content:center;
+
     align-items:flex-end;
+
     gap:90px;
-    padding-top:40px;
+
+    padding-top:55px;
 
 }
 
