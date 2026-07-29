@@ -208,6 +208,8 @@
 
 .pedestal{
    position:relative;
+   z-index:5;
+   top:8px;
    bottom:-6px;
    width:230px;
    display:flex;
@@ -335,21 +337,24 @@
 ========================================================== */
 
 .podio-base{
-    width:min(1250px,95%);
-    height:16px;
-    margin-top:-8px;
-    border-radius:10px;
-    background:
-        linear-gradient(
-            to bottom,
-            #585858,
-            #2e2e2e
-        );
 
-    border:1px solid rgba(255,255,255,.12);
-    box-shadow:
-        0 12px 26px rgba(0,0,0,.45),
-        inset 0 1px 0 rgba(255,255,255,.18);
+   position:relative;
+   z-index:1;
+   width:min(1250px,95%);
+   height:16px;
+   mmargin-top:0;
+   border-radius:8px;
+   background:
+       linear-gradient(
+           to bottom,
+           #585858,
+           #2e2e2e
+       );
+
+   border:1px solid rgba(255,255,255,.12);
+   box-shadow:
+       0 12px 26px rgba(0,0,0,.45),
+       inset 0 1px 0 rgba(255,255,255,.18);
 
 }
 
