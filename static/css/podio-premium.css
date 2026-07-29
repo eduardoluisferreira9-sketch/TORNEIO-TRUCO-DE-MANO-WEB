@@ -8,20 +8,17 @@
 /* ==========================================================
    WRAPPER
 ========================================================== */
-.podio-wrapper {
-   animation: entradaPodio .8s ease-out forwards;
-   display: flex;
-   flex-direction: column;
-   height: 100%;
-   box-sizing: border-box;
-   padding: 18px 28px;
-   overflow: visible;
-   background:
-      radial-gradient(
-         circle at center,
-         rgba(214,175,55,.10),
-         rgba(0,0,0,0) 55%
-      );
+.podio-wrapper{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    box-sizing:border-box;
+    padding:12px 30px 8px;
+    background:
+        radial-gradient(circle at center,
+        rgba(214,175,55,.08),
+        rgba(0,0,0,0) 60%);
 }
 
 /* ==========================================================
@@ -29,33 +26,21 @@
 ========================================================== */
 
 .podio-header{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    margin-bottom:15px;
+    flex:0 0 auto;
+    text-align:center;
+    margin-bottom:12px;
 }
 
 .podio-titulo{
-    font-family:'Cinzel', serif;
-    letter-spacing:1px;
-    text-align:center;
-    font-size:2.2rem;
+    font-size:2.4rem;
     font-weight:900;
-    color:var(--borda-ouro);
-    margin-bottom:6px;
-    text-shadow:
-        0 3px 10px rgba(0,0,0,.60),
-        0 0 14px rgba(243,207,93,.20);
 }
 
 .podio-subtitulo{
+    margin-top:6px;
     font-size:.95rem;
-    font-weight:600;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:var(--texto-mutado);
-    text-align:center;
+    opacity:.8;
+    letter-spacing:1px;
 }
 
 /* ==========================================================
@@ -63,12 +48,12 @@
 ========================================================== */
 
 .podio-palco{
+    flex:1;
     display:flex;
     justify-content:center;
     align-items:flex-end;
-    gap:32px;
-    margin:20px auto 10px;
-    width:100%;
+    gap:60px;
+    min-height:0;
 }
 
 .podio-pilar{
@@ -77,7 +62,7 @@
     align-items:center;
     justify-content:flex-end;
     text-align:center;
-    min-width:220px;
+    min-width:180px;
 }
 
 .podio-medalha{
@@ -110,7 +95,7 @@
     position:relative;
     overflow:hidden;
 
-    width:220px;
+    width:180px;
     border-radius:10px 10px 0 0;
     margin-top:18px;
 
@@ -123,7 +108,7 @@
 }
 
 .pedestal-ouro{
-    height:150px;
+    height:120px;
     background:linear-gradient(
         to bottom,
         #ffe27a 0%,
@@ -134,7 +119,7 @@
 }
 
 .pedestal-prata{
-    height:125px;
+    height:100px;
     background:linear-gradient(
         to bottom,
         #f4f4f4 0%,
@@ -144,7 +129,7 @@
 }
 
 .pedestal-bronze{
-    height:105px;
+    height:85px;
     background:linear-gradient(
         to bottom,
         #d58a50 0%,
@@ -244,13 +229,11 @@
 ========================================================== */
 
 .podio-inferior{
-    width:min(1200px,95%);
-    margin:25px auto 0;
-
+    flex:0 0 auto;
     display:flex;
-    justify-content:center;
+    gap:35px;
+    margin-top:18px;
     align-items:stretch;
-    gap:40px;
 }
 
 /* ==========================================================
@@ -260,7 +243,7 @@
 .podio-quarto{
     flex:1;
     margin:0;
-
+    min-height:105px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -313,17 +296,14 @@
 .rei-flores{
     flex:1;
     margin:0;
-
+    min-height:105px;
+    justify-content:center;
     display:flex;
     flex-direction:column;
     align-items:center;
-
     padding:24px 32px;
-
     border-radius:18px;
-
     border:2px solid rgba(243,207,93,.35);
-
     background:
         linear-gradient(
             180deg,
@@ -399,13 +379,13 @@
 
 @keyframes campeaoEntrada {
     0% {
-        transform: translateY(-45px) scale(.92);
+        transform:translateY(-20px) scale(.92);
     }
     70% {
-        transform: translateY(-45px) scale(1.05);
+        transform:translateY(-20px) scale(1.05);
     }
     100% {
-        transform: translateY(-45px) scale(1);
+        transform:translateY(-20px) scale(1);
     }
 }
 
