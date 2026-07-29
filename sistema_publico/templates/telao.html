@@ -515,6 +515,17 @@
                 inset 0 0 3px rgba(255,255,255,.03),
                 0 1px 3px rgba(0,0,0,.25);
         }
+
+        .card-grande-final .mesa-tag,
+        .card-terceiro-lugar .mesa-tag{
+            display:flex;
+            width:100%;
+            justify-content:center;
+            align-items:center;
+            padding:14px 0;
+            margin-bottom:22px;
+
+        }
         
         .confronto-flex {
             display: flex;
@@ -723,8 +734,20 @@
             text-shadow: 0 0 5px rgba(243, 207, 93, 0.3);
         }
 
-        .badge-final-ouro { background: var(--borda-ouro); color: #000; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
-        .badge-final-bronze { background: var(--madeira-bronze); color: #fff; padding: 5px 12px; border-radius: 3px; font-weight: 900; font-size: 1.1rem; }
+        .badge-final-ouro,
+        .badge-final-bronze{
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            width:100%;
+            padding:18px 20px;
+            font-size:1.6rem;
+            font-weight:900;
+            border-radius:8px;
+            box-sizing:border-box;
+        
+        }
 
         /* --- Pódio Premium --- */
         .podio-wrapper {
@@ -1730,15 +1753,15 @@
 
                             // 1. Se o banco/API já mandou um nome específico para a mesa, respeitamos primeiro
                             if (nomeFaseMesaOficial.includes("SEMIFINAL") || statusFase.includes("SEMIFINAL") || nomeFaseStr.includes("SEMIFINAL")) {
-                                textoTagMesa = `<span class="badge-final-ouro">🏆 SEMIFINAL ${jogo.mesa}</span>`;
+                                textoTagMesa = `<div class="badge-final-ouro">🏆 SEMIFINAL ${jogo.mesa}</div>`;
                             } else if (idMesaEspecial === -2 || nomeFaseMesaOficial.includes("GRANDE FINAL") || nomeFaseMesaOficial === "FINAL") {
-                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                                textoTagMesa = `<div class="badge-final-ouro">🥇 GRANDE FINAL</div>`;
                             } else if (idMesaEspecial === -3 || nomeFaseMesaOficial.includes("TERCEIRO") || nomeFaseMesaOficial.includes("3º") || nomeFaseMesaOficial.includes("BRONZE")) {
-                                textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
+                                textoTagMesa = `<div class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</div>`;
                             } 
                             // 2. Se não veio nome oficial da API, fazemos o fallback inteligente por ID ou número da mesa
                             else if (idMesaEspecial === -2 || (String(jogo.mesa) === "1" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
-                                textoTagMesa = `<span class="badge-final-ouro">🥇 GRANDE FINAL</span>`;
+                                textoTagMesa = `<div class="badge-final-ouro">🥇 GRANDE FINAL</div>`;
                             } else if (idMesaEspecial === -3 || (String(jogo.mesa) === "2" && ehMataMataAtivo && totalConfrontosAtuais <= 2)) {
                                 textoTagMesa = `<span class="badge-final-bronze">🥉 DISPUTA DE 3º LUGAR</span>`;
                             } else if (idMesaEspecial === -4) {
