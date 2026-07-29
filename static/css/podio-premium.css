@@ -9,6 +9,7 @@
    WRAPPER
 ========================================================== */
 .podio-wrapper {
+   animation: entradaPodio .8s ease-out;
    display: flex;
    flex-direction: column;
    height: 100%;
@@ -201,11 +202,13 @@
 ========================================================== */
 
 .campeao{
+    animation: campeaoEntrada .8s ease-out;
     order:2;
     transform:translateY(-45px);
 }
 
 .campeao-coroa{
+    animation: brilhoCoroa 3s ease-in-out infinite;
     font-size:3.2rem;
     margin-bottom:12px;
     filter:drop-shadow(0 0 10px rgba(243,207,93,.45));
@@ -359,5 +362,37 @@
 /* ==========================================================
    ANIMAÇÕES
 ========================================================== */
+
+@keyframes entradaPodio {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes brilhoCoroa {
+    0%,100% {
+        filter: drop-shadow(0 0 8px rgba(243,207,93,.35));
+    }
+    50% {
+        filter: drop-shadow(0 0 20px rgba(243,207,93,.80));
+    }
+}
+
+@keyframes campeaoEntrada {
+    0% {
+        transform: translateY(-45px) scale(.92);
+    }
+    70% {
+        transform: translateY(-45px) scale(1.05);
+    }
+    100% {
+        transform: translateY(-45px) scale(1);
+    }
+}
 
 
