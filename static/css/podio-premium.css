@@ -240,12 +240,26 @@
 }
 
 /* ==========================================================
+   ÁREA INFERIOR
+========================================================== */
+
+.podio-inferior{
+    width:min(1200px,95%);
+    margin:25px auto 0;
+
+    display:flex;
+    justify-content:center;
+    align-items:stretch;
+    gap:40px;
+}
+
+/* ==========================================================
    QUARTO LUGAR
 ========================================================== */
 
 .podio-quarto{
-    width:min(650px,90%);
-    margin:45px auto 25px;
+    flex:1;
+    margin:0;
 
     display:flex;
     align-items:center;
@@ -297,8 +311,8 @@
 ========================================================== */
 
 .rei-flores{
-    width:min(760px,95%);
-    margin:35px auto 0;
+    flex:1;
+    margin:0;
 
     display:flex;
     flex-direction:column;
