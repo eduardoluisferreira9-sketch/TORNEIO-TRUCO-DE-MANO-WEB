@@ -240,6 +240,55 @@
    QUARTO LUGAR
 ========================================================== */
 
+.podio-quarto{
+    width:min(650px,90%);
+    margin:45px auto 25px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+
+    padding:18px 28px;
+
+    border:2px solid rgba(243,207,93,.30);
+    border-radius:16px;
+
+    background:linear-gradient(
+        180deg,
+        rgba(255,255,255,.05),
+        rgba(0,0,0,.18)
+    );
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.quarto-medalha{
+    font-size:3rem;
+    flex-shrink:0;
+}
+
+.quarto-conteudo{
+    text-align:left;
+}
+
+.quarto-titulo{
+    font-size:.95rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    color:var(--texto-mutado);
+    margin-bottom:6px;
+}
+
+.quarto-nome{
+    font-size:1.7rem;
+    font-weight:800;
+    color:#fff;
+}
+
 /* ==========================================================
    REI DAS FLORES
 ========================================================== */
