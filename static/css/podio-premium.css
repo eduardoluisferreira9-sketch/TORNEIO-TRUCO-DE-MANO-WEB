@@ -1,392 +1,826 @@
 /* ==========================================================
    CERIMÔNIA DE PREMIAÇÃO PREMIUM
-   Sistema: Ferreira Sistemas
-   Módulo: Telão
-   Arquivo: podio-premium.css
+   Ferreira Sistemas
+   podio-premium.css
 ========================================================== */
+
 
 /* ==========================================================
    WRAPPER
 ========================================================== */
+
 .podio-wrapper{
+
     width:100%;
     height:100%;
+
     display:flex;
     flex-direction:column;
+
+    padding:18px 38px 12px;
+
     box-sizing:border-box;
-    padding:12px 30px 8px;
+
     background:
-        radial-gradient(circle at center,
-        rgba(214,175,55,.08),
-        rgba(0,0,0,0) 60%);
+        radial-gradient(
+            circle at center,
+            rgba(255,215,90,.10),
+            rgba(0,0,0,0) 58%
+        );
 }
+
 
 /* ==========================================================
    CABEÇALHO
 ========================================================== */
 
 .podio-header{
+
     flex:0 0 auto;
+
     text-align:center;
-    margin-bottom:12px;
+
+    margin-bottom:10px;
 }
 
 .podio-titulo{
-    font-size:2.4rem;
+
+    font-size:3rem;
     font-weight:900;
+    letter-spacing:2px;
+
+    color:#ffffff;
+
+    text-shadow:
+
+        0 2px 10px rgba(0,0,0,.45),
+
+        0 0 24px rgba(243,207,93,.18);
+
 }
 
 .podio-subtitulo{
-    margin-top:6px;
-    font-size:.95rem;
-    opacity:.8;
+
+    margin-top:8px;
+
+    font-size:1.15rem;
+
     letter-spacing:1px;
+
+    color:#d6d6d6;
+
+    text-transform:uppercase;
+
+    opacity:.9;
 }
+
 
 /* ==========================================================
    PALCO
 ========================================================== */
 
 .podio-palco{
+
     flex:1;
+
     display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    gap:60px;
-    min-height:0;
+
+    flex-direction:column;
+
+    justify-content:flex-end;
+
+    align-items:center;
 }
+
+
+/* linha dos atletas */
+
+.podio-linha{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-end;
+
+    gap:85px;
+}
+
+
+/* cada posição */
 
 .podio-pilar{
+
+    width:240px;
+
     display:flex;
+
     flex-direction:column;
+
     align-items:center;
+
     justify-content:flex-end;
+
     text-align:center;
-    min-width:180px;
 }
+
+
+/* medalhas */
 
 .podio-medalha{
-    font-size:2.8rem;
+
+    font-size:3rem;
+
     margin-bottom:12px;
+
+    filter:drop-shadow(
+        0 4px 10px rgba(0,0,0,.35)
+    );
 }
+
+
+/* coroa */
+
+.campeao-coroa{
+
+    font-size:3.4rem;
+
+    margin-bottom:10px;
+
+    filter:
+
+        drop-shadow(0 0 18px rgba(243,207,93,.50));
+
+}
+
+
+/* posição */
 
 .podio-posicao{
-    font-size:.95rem;
+
+    margin-top:6px;
+
+    margin-bottom:12px;
+
+    font-size:1rem;
+
     font-weight:700;
+
+    letter-spacing:2px;
+
     text-transform:uppercase;
-    letter-spacing:1px;
-    color:var(--texto-mutado);
-    margin-bottom:10px;
+
+    color:#cfd6c9;
 }
+
+
+/* atleta */
 
 .podio-atleta{
-    font-size:1.45rem;
-    font-weight:800;
-    color:#fff;
-    margin-bottom:16px;
-    text-shadow:0 2px 8px rgba(0,0,0,.5);
+
+    margin-bottom:22px;
+
+    font-size:2rem;
+
+    font-weight:900;
+
+    color:white;
+
+    text-align:center;
+
+    text-shadow:
+
+        0 3px 12px rgba(0,0,0,.45);
 }
 
+
+/* campeão */
+
+.podio-atleta.destaque{
+
+    color:#ffd75d;
+
+    font-size:2.35rem;
+}
+
+
+/* ==========================================================
+   ORDENAÇÃO
+========================================================== */
+
+.prata{
+
+    order:1;
+}
+
+.campeao{
+
+    order:2;
+
+    transform:translateY(-18px);
+}
+
+.bronze{
+
+    order:3;
+}
 /* ==========================================================
    PEDESTAIS
 ========================================================== */
 
 .pedestal{
-    position:relative;
-    overflow:hidden;
 
-    width:180px;
-    border-radius:10px 10px 0 0;
-    margin-top:18px;
+    position:relative;
+
+    width:210px;
+
+    border-radius:8px;
+
+    overflow:hidden;
 
     border:2px solid rgba(255,255,255,.18);
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.15),
-        inset 0 -8px 12px rgba(0,0,0,.18),
-        0 8px 18px rgba(0,0,0,.35);
+
+        inset 0 1px 0 rgba(255,255,255,.30),
+
+        inset 0 -14px 18px rgba(0,0,0,.18),
+
+        0 10px 24px rgba(0,0,0,.45);
+
 }
+
+
+/* ---------- OURO ---------- */
 
 .pedestal-ouro{
-    height:120px;
-    background:linear-gradient(
-        to bottom,
-        #ffe27a 0%,
-        #d9a916 45%,
-        #8f6712 100%
-    );
-    border-color:#f3cf5d;
+
+    height:150px;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            #ffe889 0%,
+            #f1c53b 28%,
+            #d59f11 62%,
+            #8f6412 100%
+        );
+
+    border-color:#ffe27d;
 }
+
+
+/* ---------- PRATA ---------- */
 
 .pedestal-prata{
-    height:100px;
-    background:linear-gradient(
-        to bottom,
-        #f4f4f4 0%,
-        #bdbdbd 45%,
-        #757575 100%
-    );
+
+    height:125px;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #d9d9d9 30%,
+            #a9a9a9 70%,
+            #666666 100%
+        );
 }
+
+
+/* ---------- BRONZE ---------- */
 
 .pedestal-bronze{
-    height:85px;
-    background:linear-gradient(
-        to bottom,
-        #d58a50 0%,
-        #9b5a2c 45%,
-        #603517 100%
-    );
+
+    height:105px;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            #e7aa70 0%,
+            #b56b34 38%,
+            #88451f 70%,
+            #5c2e12 100%
+        );
 }
+
+
+/* brilho */
 
 .pedestal::before{
-    position:absolute;
-    left:50%;
-    bottom:18px;
-    transform:translateX(-50%);
 
-    font-size:4rem;
-    font-weight:900;
-
-    color:rgba(255,255,255,.22);
-    text-shadow:0 2px 6px rgba(0,0,0,.35);
-
-    z-index:2;
-}
-
-.pedestal-ouro::before{
-    content:"1";
-}
-
-.pedestal-prata::before{
-    content:"2";
-}
-
-.pedestal-bronze::before{
-    content:"3";
-}
-
-.pedestal::after{
     content:"";
+
     position:absolute;
+
     inset:0;
 
     background:
+
         linear-gradient(
-            120deg,
-            rgba(255,255,255,.28) 0%,
-            rgba(255,255,255,0) 30%,
-            rgba(255,255,255,.10) 70%,
-            rgba(255,255,255,0) 100%
+            125deg,
+
+            rgba(255,255,255,.42),
+
+            rgba(255,255,255,0) 32%,
+
+            rgba(255,255,255,.08) 65%,
+
+            rgba(255,255,255,0)
         );
 
-    pointer-events:none;
 }
 
+
+/* número */
+
+.pedestal::after{
+
+    position:absolute;
+
+    left:50%;
+
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    font-size:4.8rem;
+
+    font-weight:900;
+
+    color:rgba(255,255,255,.30);
+
+    text-shadow:
+
+        0 2px 6px rgba(0,0,0,.35);
+
+}
+
+.pedestal-prata::after{
+
+    content:"2";
+}
+
+.pedestal-ouro::after{
+
+    content:"1";
+}
+
+.pedestal-bronze::after{
+
+    content:"3";
+}
+
+
+
 /* ==========================================================
-   CAMPEÃO
+   PLATAFORMA
 ========================================================== */
 
-.campeao{
-    order:2;
-    transform:translateY(-20px);
-    animation: campeaoEntrada .8s ease-out forwards;
+.podio-base{
+
+    width:880px;
+
+    height:20px;
+
+    margin-top:-2px;
+
+    border-radius:2px;
+
+    background:
+
+        linear-gradient(
+            to bottom,
+
+            #7d5320,
+
+            #3f260d
+        );
+
+    border-top:2px solid #ffd768;
+
+    box-shadow:
+
+        0 8px 18px rgba(0,0,0,.45),
+
+        0 0 18px rgba(255,210,70,.18);
+
+    position:relative;
 }
 
-.campeao-coroa{
-    animation: brilhoCoroa 2s ease-out forwards;
-    font-size:3.2rem;
-    margin-bottom:12px;
-    filter:drop-shadow(0 0 10px rgba(243,207,93,.45));
-}
 
-.campeao-texto{
-    color:var(--dourado-brilhante);
-}
+.podio-base::before{
 
-.podio-atleta.destaque{
-    font-size:1.8rem;
-    color:var(--dourado-brilhante);
-}
+    content:"";
 
+    position:absolute;
+
+    left:0;
+    right:0;
+    top:-2px;
+
+    height:3px;
+
+    background:
+
+        linear-gradient(
+            90deg,
+
+            transparent,
+
+            rgba(255,235,150,.95),
+
+            transparent
+        );
+
+}
 /* ==========================================================
-   VICE
-========================================================== */
-
-.prata{
-    order:1;
-}
-
-/* ==========================================================
-   TERCEIRO
-========================================================== */
-
-.bronze{
-    order:3;
-}
-
-/* ==========================================================
-   ÁREA INFERIOR
+   FAIXA INFERIOR
 ========================================================== */
 
 .podio-inferior{
-    flex:0 0 auto;
-    display:flex;
-    gap:35px;
+
     margin-top:18px;
-    align-items:stretch;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:0;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    border:2px solid rgba(243,207,93,.22);
+
+    background:
+
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.05),
+            rgba(0,0,0,.18)
+        );
+
+    box-shadow:
+
+        0 10px 24px rgba(0,0,0,.35),
+
+        inset 0 1px 0 rgba(255,255,255,.08);
 }
+
 
 /* ==========================================================
    QUARTO LUGAR
 ========================================================== */
 
 .podio-quarto{
-    flex:1;
-    margin:0;
-    min-height:105px;
+
     display:flex;
+
     align-items:center;
-    justify-content:center;
+
     gap:22px;
 
-    padding:18px 28px;
+    padding:22px 28px;
 
-    border:2px solid rgba(243,207,93,.30);
-    border-radius:16px;
+    min-height:95px;
 
-    background:linear-gradient(
-        180deg,
-        rgba(255,255,255,.05),
-        rgba(0,0,0,.18)
-    );
-
-    box-shadow:
-        0 10px 28px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.08);
+    background:transparent;
 }
 
+
 .quarto-medalha{
+
     font-size:3rem;
+
+    width:70px;
+
+    display:flex;
+
+    justify-content:center;
+
     flex-shrink:0;
 }
 
+
 .quarto-conteudo{
-    text-align:left;
+
+    display:flex;
+
+    flex-direction:column;
 }
+
 
 .quarto-titulo{
-    font-size:.95rem;
-    font-weight:700;
+
+    font-size:.90rem;
+
     text-transform:uppercase;
+
     letter-spacing:2px;
-    color:var(--texto-mutado);
+
+    color:#cfd6c9;
+
     margin-bottom:6px;
+
+    font-weight:700;
 }
 
+
 .quarto-nome{
-    font-size:1.7rem;
-    font-weight:800;
-    color:#fff;
+
+    font-size:1.9rem;
+
+    font-weight:900;
+
+    color:white;
+
+    text-shadow:
+
+        0 2px 8px rgba(0,0,0,.35);
 }
+
+
 
 /* ==========================================================
    REI DAS FLORES
 ========================================================== */
 
 .rei-flores{
-    flex:1;
-    margin:0;
-    min-height:105px;
-    justify-content:center;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:24px 32px;
-    border-radius:18px;
-    border:2px solid rgba(243,207,93,.35);
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.05),
-            rgba(0,0,0,.22)
-        );
 
-    box-shadow:
-        0 10px 28px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.08);
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:95px;
+
+    padding:22px 28px;
+
+    background:transparent;
 }
+
+
+/* divisor */
+
+.rei-flores::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:18px;
+
+    bottom:18px;
+
+    width:2px;
+
+    background:
+
+        linear-gradient(
+            to bottom,
+
+            transparent,
+
+            rgba(243,207,93,.45),
+
+            transparent
+        );
+}
+
 
 .rei-titulo{
-    font-size:1.1rem;
+
+    font-size:1rem;
+
     font-weight:800;
-    text-transform:uppercase;
+
     letter-spacing:2px;
-    color:var(--dourado-brilhante);
-}
 
-.rei-subtitulo{
-    margin-top:8px;
-
-    font-size:.95rem;
-    color:var(--texto-mutado);
-
-    text-align:center;
-}
-
-.rei-nome{
-    margin-top:20px;
-
-    font-size:2rem;
-    font-weight:900;
-
-    color:#fff;
-
-    letter-spacing:1px;
-}
-
-.rei-total{
-    margin-top:10px;
-
-    font-size:1.25rem;
-    font-weight:700;
+    text-transform:uppercase;
 
     color:#ffd76a;
 }
 
+
+.rei-subtitulo{
+
+    margin-top:4px;
+
+    font-size:.85rem;
+
+    color:#cfd6c9;
+}
+
+
+.rei-nome{
+
+    margin-top:12px;
+
+    font-size:2rem;
+
+    font-weight:900;
+
+    color:white;
+}
+
+
+.rei-total{
+
+    margin-top:8px;
+
+    font-size:1.15rem;
+
+    font-weight:700;
+
+    color:#ffd76a;
+}
 /* ==========================================================
    ANIMAÇÕES
 ========================================================== */
 
-@keyframes entradaPodio {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.podio-wrapper{
+    animation:entradaCerimonia .45s ease-out;
 }
 
-@keyframes brilhoCoroa {
-    0%,100% {
-        filter: drop-shadow(0 0 8px rgba(243,207,93,.35));
-    }
-    50% {
-        filter: drop-shadow(0 0 20px rgba(243,207,93,.80));
-    }
+.campeao{
+    animation:campeaoEntrada .7s ease-out;
 }
 
-@keyframes campeaoEntrada {
-    0% {
-        transform:translateY(-20px) scale(.92);
-    }
-    70% {
-        transform:translateY(-20px) scale(1.05);
-    }
-    100% {
-        transform:translateY(-20px) scale(1);
-    }
+.campeao-coroa{
+
+    animation:brilhoCoroa 2.8s ease-in-out infinite;
+}
+
+.pedestal{
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+.pedestal:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+        inset 0 1px 0 rgba(255,255,255,.30),
+
+        inset 0 -14px 18px rgba(0,0,0,.18),
+
+        0 18px 35px rgba(0,0,0,.45);
 }
 
 
+/* ==========================================================
+   AJUSTES VISUAIS
+========================================================== */
+
+.podio-medalha,
+.campeao-coroa{
+
+    user-select:none;
+}
+
+.podio-atleta,
+.quarto-nome,
+.rei-nome{
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+}
+
+.rei-total,
+.quarto-titulo,
+.rei-subtitulo{
+
+    opacity:.92;
+}
+
+
+/* ==========================================================
+   RESPONSIVIDADE
+========================================================== */
+
+@media (max-width:1600px){
+
+    .podio-linha{
+
+        gap:55px;
+    }
+
+    .podio-pilar{
+
+        width:200px;
+    }
+
+    .pedestal{
+
+        width:180px;
+    }
+
+    .pedestal-ouro{
+
+        height:135px;
+    }
+
+    .pedestal-prata{
+
+        height:112px;
+    }
+
+    .pedestal-bronze{
+
+        height:95px;
+    }
+
+    .podio-base{
+
+        width:760px;
+    }
+
+    .podio-atleta{
+
+        font-size:1.7rem;
+    }
+
+    .podio-atleta.destaque{
+
+        font-size:2rem;
+    }
+
+}
+
+
+@keyframes entradaCerimonia{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(15px);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+    }
+
+}
+
+
+@keyframes campeaoEntrada{
+
+    0%{
+
+        transform:translateY(-40px) scale(.92);
+    }
+
+    65%{
+
+        transform:translateY(-15px) scale(1.04);
+    }
+
+    100%{
+
+        transform:translateY(-18px) scale(1);
+    }
+
+}
+
+
+@keyframes brilhoCoroa{
+
+    0%,100%{
+
+        filter:
+
+            drop-shadow(0 0 10px rgba(243,207,93,.45));
+    }
+
+    50%{
+
+        filter:
+
+            drop-shadow(0 0 22px rgba(243,207,93,.85));
+    }
+
+}
