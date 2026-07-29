@@ -80,15 +80,11 @@
 ========================================================== */
 
 .podio-palco{
-
     flex:1;
-
     display:flex;
-
     flex-direction:column;
-
     justify-content:flex-end;
-
+    padding-bottom:6px;
     align-items:center;
 }
 
@@ -383,57 +379,36 @@
 
 .podio-base{
 
-    width:880px;
-
-    height:20px;
-
+    width:1200px;
+    height:26px;
     margin-top:-2px;
-
     border-radius:2px;
-
     background:
-
         linear-gradient(
             to bottom,
-
             #7d5320,
-
             #3f260d
         );
-
     border-top:2px solid #ffd768;
-
     box-shadow:
-
         0 8px 18px rgba(0,0,0,.45),
-
         0 0 18px rgba(255,210,70,.18);
-
     position:relative;
 }
 
 
 .podio-base::before{
-
     content:"";
-
     position:absolute;
-
     left:0;
     right:0;
     top:-2px;
-
     height:3px;
-
     background:
-
         linear-gradient(
             90deg,
-
             transparent,
-
             rgba(255,235,150,.95),
-
             transparent
         );
 
@@ -665,8 +640,8 @@
 }
 
 .pedestal{
-
-    transition:
+   width:250px;
+   transition:
         transform .25s ease,
         box-shadow .25s ease;
 }
