@@ -26,7 +26,7 @@
 
 .podio-wrapper{
     width:100%;
-    height:100%;
+    height:calc(100vh - 170px);
     display:flex;
     flex-direction:column;
     padding:24px 42px 18px;
@@ -81,9 +81,10 @@
     flex:1;
     display:flex;
     flex-direction:column;
-    justify-content:flex-start;
+    justify-content:flex-end;
     align-items:center;
     padding-top:8px;
+    min-height:0;
 
 }
 
@@ -363,9 +364,9 @@
 ========================================================== */
 
 .podio-inferior{
-    flex:0 0 auto;
+    flex:0 0 110px;
     width:min(1200px,96%);
-    margin-top:8px;
+    margin:8px auto 0;
     display:grid;
     grid-template-columns:1fr 1px 1fr;
     align-items:center;
@@ -650,9 +651,8 @@
 ========================================================== */
 
 .publicidade-container{
-    margin-top:22px;
-    flex-shrink:0;
-
+    margin-top:8px;
+    flex:0 0 125px;
 }
 
 
