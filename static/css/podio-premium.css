@@ -33,7 +33,7 @@
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    margin-bottom:28px;
+    margin-bottom:15px;
 }
 
 .podio-titulo{
@@ -67,7 +67,7 @@
     justify-content:center;
     align-items:flex-end;
     gap:32px;
-    margin:20px auto 15px;
+    margin:20px auto 10px;
     width:100%;
 }
 
@@ -123,7 +123,7 @@
 }
 
 .pedestal-ouro{
-    height:170px;
+    height:150px;
     background:linear-gradient(
         to bottom,
         #ffe27a 0%,
@@ -134,7 +134,7 @@
 }
 
 .pedestal-prata{
-    height:140px;
+    height:125px;
     background:linear-gradient(
         to bottom,
         #f4f4f4 0%,
@@ -144,7 +144,7 @@
 }
 
 .pedestal-bronze{
-    height:115px;
+    height:105px;
     background:linear-gradient(
         to bottom,
         #d58a50 0%,
@@ -203,7 +203,7 @@
 
 .campeao{
     order:2;
-    transform:translateY(-25px);
+    transform:translateY(-20px);
     animation: campeaoEntrada .8s ease-out forwards;
 }
 
