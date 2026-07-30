@@ -620,6 +620,16 @@
 
 }
 
+.prata .pedestal{
+
+    margin-bottom:-10px;
+}
+
+.bronze .pedestal{
+
+    margin-bottom:-10px;
+}
+
 
 /* ==========================================================
    NOMES DOS ATLETAS
@@ -1145,10 +1155,19 @@
 
 .campeao .pedestal{
 
-    transform:translateY(-3px);
+    transform:none;
 
 }
 
+.prata .pedestal{
+
+    margin-bottom:-10px;
+}
+
+.bronze .pedestal{
+
+    margin-bottom:-10px;
+}
 
 .prata .pedestal,
 .bronze .pedestal{
