@@ -476,22 +476,41 @@
     filter: saturate(.96);
 }
 
-.pedestal .colocacao {
-    position: relative;
-    z-index: 3;
-    font-size: 4.8rem;
-    font-weight: 900;
-    line-height: 1;
+.pedestal .colocacao{
+    position:relative;
+    z-index:3;
+
+    font-family:'Cinzel', serif;
+    font-size:4.8rem;
+    font-weight:900;
+    line-height:1;
+    letter-spacing:-2px;
+
+    user-select:none;
+
     text-shadow:
-        0 3px 6px rgba(0, 0, 0, .30),
-        0 1px 0 rgba(255, 255, 255, .15);
-    letter-spacing: -2px;
-    user-select: none;
+        0 1px 0 rgba(255,255,255,.18),
+        0 -1px 0 rgba(0,0,0,.18);
 }
 
-.campeao .pedestal .colocacao { color: #fffef4; }
-.prata   .pedestal .colocacao { color: #ffffff; }
-.bronze  .pedestal .colocacao { color: #fff8f3; }
+.campeao .pedestal .colocacao{
+    color:#3b2500;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.18),
+        0 -1px 0 rgba(0,0,0,.18);
+}
+.prata .pedestal .colocacao{
+    color:#474747;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.18),
+        0 -1px 0 rgba(0,0,0,.18);
+}
+.bronze .pedestal .colocacao{
+    color:#5a3119;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.15),
+        0 -1px 0 rgba(0,0,0,.20);
+}
 
 /* ==========================================================
    ÍNDICES DAS CARTAS
