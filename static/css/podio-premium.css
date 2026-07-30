@@ -457,7 +457,7 @@
     height: 178px;
     background: linear-gradient(180deg, #ffffff, #ececec 14%, #d6d6d6 42%, #b8b8b8 72%, #8a8a8a);
     border: 1px solid rgba(255, 255, 255, .34);
-    margin-bottom: -10px;
+    margin-bottom: 0;
     filter: saturate(.96);
 }
 
@@ -465,7 +465,7 @@
     height: 145px;
     background: linear-gradient(180deg, #e3ae84, #cb8856 18%, #ab6536 55%, #7c3f1a 100%);
     border: 1px solid rgba(255, 220, 185, .22);
-    margin-bottom: -10px;
+    margin-bottom: 0;
     filter: saturate(.96);
 }
 
