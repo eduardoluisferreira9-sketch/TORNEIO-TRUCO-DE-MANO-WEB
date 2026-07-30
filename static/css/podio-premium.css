@@ -546,6 +546,29 @@
     color:#472113
 }
 
+.pedestal .colocacao::before,
+.pedestal .colocacao::after{
+    content:"— ✦ —";
+
+    position:absolute;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    font-size:1rem;
+    line-height:1;
+
+    opacity:.35;
+}
+
+.pedestal .colocacao::before{
+    top:-22px;
+}
+
+.pedestal .colocacao::after{
+    bottom:-22px;
+}
+
 /* ==========================================================
    ÍNDICES DAS CARTAS
 ========================================================== */
