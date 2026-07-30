@@ -576,13 +576,13 @@
 }
 
 .indice-superior{
-    top:8px;
-    left:8px;
+    top:11px;
+    left:11px;
 }
 
 .indice-inferior{
-    right:8px;
-    bottom:8px;
+    right:11px;
+    bottom:11px;
 }
 
 .numero-carta{
@@ -593,7 +593,7 @@
 
 .naipe{
     font-size:1.45rem;
-    margin-top:6px;
+    margin-top:4px;
     line-height:1;
 }
 
