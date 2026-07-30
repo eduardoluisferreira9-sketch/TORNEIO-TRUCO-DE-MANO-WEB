@@ -418,44 +418,36 @@
     will-change: transform;
 }
 
-.pedestal::before {
-    content: "";
-    position: absolute;
-    inset: 7px;
+.pedestal::before{
+    content:"";
+    position:absolute;
+    inset:7px;
     border-radius:10px;
 
     background:
         linear-gradient(
             180deg,
             rgba(255,255,255,.26) 0%,
-            rgba(255,255,255,.14) 22%,
-            rgba(255,255,255,.03) 48%,
+            rgba(255,255,255,.10) 22%,
+            rgba(255,255,255,.02) 48%,
             transparent 100%
         ),
+
         linear-gradient(
             90deg,
-            rgba(255,255,255,.08),
+            rgba(255,255,255,.05),
             transparent 18%,
             transparent 82%,
             rgba(0,0,0,.05)
         );
 
-    border:1px solid rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.20);
 
-box-shadow:
-    /* brilho superior */
-    inset 0 2px 0 rgba(255,255,255,.22),
-
-    /* primeira moldura */
-    inset 0 0 0 1px rgba(255,255,255,.10),
-
-    /* segunda moldura */
-    inset 0 0 0 8px rgba(255,255,255,.035),
-
-    /* leve profundidade */
-    inset 0 -8px 14px rgba(0,0,0,.08);
-
-    pointer-events: none;
+    box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.22),
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        inset 0 0 0 9px rgba(255,255,255,.03),
+        inset 0 -10px 16px rgba(0,0,0,.12);
 }
 
 .pedestal::after {
@@ -562,29 +554,42 @@ box-shadow:
     line-height:1;
     z-index:6;
     user-select:none;
+    color:inherit;
+}
+
+.campeao .indice{
+    color:#4a2b00;
+}
+
+.prata .indice{
+    color:#565656;
+}
+
+.bronze .indice{
+    color:#5a2d18;
 }
 
 .indice-superior{
-    top:12px;
-    left:12px;
+    top:10px;
+    left:10px;
 }
 
 .indice-inferior{
-    right:12px;
-    bottom:12px;
+    right:10px;
+    bottom:10px;
     transform:rotate(180deg);
 }
 
 .numero-carta{
-    font-size:.95rem;
+    font-size:1.50rem;
     font-weight:900;
     letter-spacing:-.5px;
     text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
 
 .naipe{
-    font-size:.85rem;
-    line-height:1;
+    font-size:1.3rem;
+    margin-top:4px;
 }
 
 /* ==========================================================
