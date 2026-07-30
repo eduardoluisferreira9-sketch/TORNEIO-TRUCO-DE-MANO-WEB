@@ -583,7 +583,7 @@
 
     position:relative;
 
-    width:200px;
+    width:185px;
 
     display:flex;
 
@@ -619,17 +619,6 @@
     order:3;
 
 }
-
-.prata .pedestal{
-
-    margin-bottom:-10px;
-}
-
-.bronze .pedestal{
-
-    margin-bottom:-10px;
-}
-
 
 /* ==========================================================
    NOMES DOS ATLETAS
@@ -753,7 +742,7 @@
 
     position:relative;
 
-    width:182px;
+    width:170px;
 
     display:flex;
 
@@ -1028,9 +1017,9 @@
 
     max-width:700px;
 
-    height:52px;
+    height:60px;
 
-    margin-top:-12px;
+    margin-top:-24px;
 
     border-radius:999px;
 
@@ -1550,7 +1539,7 @@
 
     .podio-pilar{
 
-        width:200px;
+        width:185px;
 
     }
 
