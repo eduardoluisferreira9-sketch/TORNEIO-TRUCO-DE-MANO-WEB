@@ -482,9 +482,11 @@
 
     font-family:'Cinzel', serif;
     font-size:4.8rem;
-    font-weight:900;
+    font-weight:700;
     line-height:1;
     letter-spacing:-2px;
+
+    transform:scaleX(.95);
 
     user-select:none;
 
@@ -494,19 +496,19 @@
 }
 
 .campeao .pedestal .colocacao{
-    color:#3b2500;
+    color:#4a2b00;
     text-shadow:
         0 1px 0 rgba(255,255,255,.18),
         0 -1px 0 rgba(0,0,0,.18);
 }
 .prata .pedestal .colocacao{
-    color:#474747;
+    color:#565656;
     text-shadow:
         0 1px 0 rgba(255,255,255,.18),
         0 -1px 0 rgba(0,0,0,.18);
 }
 .bronze .pedestal .colocacao{
-    color:#5a3119;
+    color:#5a2d18;
     text-shadow:
         0 1px 0 rgba(255,255,255,.15),
         0 -1px 0 rgba(0,0,0,.20);
