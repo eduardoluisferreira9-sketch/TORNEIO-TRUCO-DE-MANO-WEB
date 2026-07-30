@@ -261,15 +261,11 @@
 
     display:grid;
 
-    grid-template-columns:
-
-        210px
-        1fr
-        210px
+    grid-template-columns:210px 1fr 210px;
 
     align-items:end;
 
-    gap:32px;
+    gap:30px;
 
     min-height:0;
 
