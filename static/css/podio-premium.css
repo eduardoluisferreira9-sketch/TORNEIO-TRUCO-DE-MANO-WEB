@@ -146,7 +146,7 @@
 
     align-items:flex-end;
 
-    gap:80px;
+    gap:65px;
 
     padding-top:55px;
 
@@ -185,7 +185,7 @@
 
 .podio-atleta.destaque{
     color:var(--podio-ouro);
-    font-size:2.2rem;
+    font-size:2.35rem;
     max-width:280px;
 
 }
@@ -357,10 +357,10 @@
    position:relative;
    z-index:1;
    width:100%;
-   max-width:900px;
-   height:16px;
-   margin-top:0;
-   border-radius:8px;
+   max-width:760px;
+   height:20px;
+   margin-top:-2px;
+   border-radius:10px;
    background:
        linear-gradient(
            to bottom,
