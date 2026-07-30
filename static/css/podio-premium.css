@@ -490,8 +490,8 @@
 ========================================================== */
 .podio-base {
     position: relative;
-    width: 90%;
-    max-width: 680px;
+    width: 95%;
+    max-width: 720px;
     height: 48px;
     margin-top: -12px;
     border-radius: 999px;
