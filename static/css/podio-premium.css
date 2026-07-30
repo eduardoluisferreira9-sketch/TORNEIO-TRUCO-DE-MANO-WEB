@@ -408,7 +408,7 @@
     align-items: center;
     justify-content: center;
     overflow: visible;
-    border-radius: 22px 22px 0 0;
+    border-radius: 12px 12px 0 0;
     isolation: isolate;
     box-shadow: 
         0 14px 26px rgba(0, 0, 0, .28),
