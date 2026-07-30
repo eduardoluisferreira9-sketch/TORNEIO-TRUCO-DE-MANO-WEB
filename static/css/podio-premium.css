@@ -586,14 +586,14 @@
 }
 
 .numero-carta{
-    font-size:1.45rem;
+    font-size:1.25rem;
     font-weight:700;
     line-height:1;
 }
 
 .naipe{
-    font-size:1.45rem;
-    margin-top:4px;
+    font-size:1.25rem;
+    margin-top:2px;
     line-height:1;
 }
 
