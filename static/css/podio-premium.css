@@ -558,7 +558,7 @@
 
     position:relative;
 
-    z-index:2;
+    z-index:3;
 
     width:100%;
 
@@ -568,9 +568,9 @@
 
     align-items:flex-end;
 
-    gap:58px;
+    gap:40px;
 
-    padding-top:24px;
+    padding-top:10px;
 
 }
 
@@ -583,7 +583,7 @@
 
     position:relative;
 
-    width:220px;
+    width:200px;
 
     display:flex;
 
@@ -593,7 +593,7 @@
 
     justify-content:flex-end;
 
-    gap:10px;
+    gap:8px;
 
 }
 
@@ -743,7 +743,7 @@
 
     position:relative;
 
-    z-index:5;
+    width:182px;
 
     display:flex;
 
@@ -751,23 +751,17 @@
 
     justify-content:center;
 
-    overflow:hidden;
+    overflow:visible;
 
-    width:198px;
-
-    border-radius:18px 18px 0 0;
+    border-radius:22px 22px 0 0;
 
     isolation:isolate;
 
     box-shadow:
 
-        0 18px 34px rgba(0,0,0,.32),
+        0 14px 26px rgba(0,0,0,.28),
 
-        0 8px 14px rgba(0,0,0,.18),
-
-        inset 0 1px 0 rgba(255,255,255,.28),
-
-        inset 0 -16px 24px rgba(0,0,0,.16);
+        inset 0 1px 0 rgba(255,255,255,.24);
 
 }
 
@@ -1020,19 +1014,17 @@
 
     position:relative;
 
-    z-index:1;
+    width:82%;
 
-    width:100%;
+    max-width:700px;
 
-    max-width:860px;
+    height:52px;
 
-    height:18px;
+    margin-top:-12px;
 
-    margin-top:-1px;
+    border-radius:999px;
 
-    border-radius:12px;
-
-    overflow:hidden;
+    overflow:visible;
 
     background:
 
@@ -1040,30 +1032,29 @@
 
             180deg,
 
-            #6a6a6a 0%,
+            #707070 0%,
 
-            #474747 30%,
+            #4f4f4f 22%,
 
-            #303030 65%,
+            #353535 60%,
 
-            #202020 100%
+            #242424 100%
 
         );
 
     border:
 
-        1px solid rgba(255,255,255,.10);
+        1px solid rgba(255,220,140,.20);
 
     box-shadow:
 
-        0 14px 28px rgba(0,0,0,.38),
+        0 18px 34px rgba(0,0,0,.38),
 
-        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 2px 0 rgba(255,255,255,.18),
 
-        inset 0 -3px 8px rgba(0,0,0,.28);
+        inset 0 -10px 18px rgba(0,0,0,.28);
 
 }
-
 
 /* brilho superior */
 
