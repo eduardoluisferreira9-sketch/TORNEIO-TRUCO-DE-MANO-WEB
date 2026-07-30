@@ -427,7 +427,7 @@
     background:
         linear-gradient(
             180deg,
-            rgba(255,255,255,.34) 0%,
+            rgba(255,255,255,.26) 0%,
             rgba(255,255,255,.14) 22%,
             rgba(255,255,255,.03) 48%,
             transparent 100%
@@ -443,8 +443,9 @@
     border: 1px solid rgba(255,255,255,.14);
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.20),
-        inset 0 0 0 1px rgba(255,255,255,.04);
+    inset 0 2px 0 rgba(255,255,255,.20),
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    inset 0 0 0 8px rgba(0,0,0,.04);
 
     pointer-events: none;
 }
@@ -511,9 +512,13 @@
 
     user-select:none;
 
+   filter: drop-shadow(0 2px 2px rgba(0,0,0,.12));
+
     text-shadow:
-        0 1px 0 rgba(255,255,255,.18),
-        0 -1px 0 rgba(0,0,0,.18);
+       0 1px 0 rgba(255,255,255,.22),
+       0 -1px 0 rgba(0,0,0,.22),
+       0 2px 2px rgba(0,0,0,.12),
+       0 4px 8px rgba(0,0,0,.08);
 }
 
 .campeao .pedestal .colocacao{
