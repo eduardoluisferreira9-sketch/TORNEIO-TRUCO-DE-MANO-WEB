@@ -263,15 +263,13 @@
 
     grid-template-columns:
 
-        235px
-
+        210px
         1fr
-
-        235px;
+        210px
 
     align-items:end;
 
-    gap:56px;
+    gap:32px;
 
     min-height:0;
 
@@ -574,9 +572,9 @@
 
     align-items:flex-end;
 
-    gap:74px;
+    gap:58px;
 
-    padding-top:34px;
+    padding-top:24px;
 
 }
 
@@ -1079,15 +1077,15 @@
 
     position:absolute;
 
-    left:10px;
+    left:16px;
 
-    right:10px;
+    right:16px;
 
-    top:2px;
+    top:4px;
 
     height:3px;
 
-    border-radius:999px;
+    border-radius:30px;
 
     background:
 
@@ -1097,7 +1095,7 @@
 
             transparent,
 
-            rgba(255,255,255,.32),
+            rgba(255,255,255,.42),
 
             transparent
 
@@ -1114,13 +1112,13 @@
 
     position:absolute;
 
-    left:18px;
+    left:-10px;
 
-    right:18px;
+    right:-10px;
 
-    bottom:-8px;
+    bottom:-16px;
 
-    height:18px;
+    height:26px;
 
     border-radius:50%;
 
@@ -1130,13 +1128,13 @@
 
             ellipse,
 
-            rgba(0,0,0,.28),
+            rgba(0,0,0,.36),
 
-            transparent 75%
+            transparent 72%
 
         );
 
-    filter:blur(6px);
+    filter:blur(10px);
 
 }
 
@@ -1532,9 +1530,9 @@
 
     .podio-palco{
 
-        grid-template-columns:200px 1fr 200px;
+        235px 1fr 235px
 
-        gap:28px;
+        gap:56px;;
 
     }
 
