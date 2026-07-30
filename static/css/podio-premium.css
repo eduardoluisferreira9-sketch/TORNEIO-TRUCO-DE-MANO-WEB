@@ -494,6 +494,45 @@
 .bronze  .pedestal .colocacao { color: #fff8f3; }
 
 /* ==========================================================
+   ÍNDICES DAS CARTAS
+========================================================== */
+
+.indice{
+    position:absolute;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    line-height:1;
+    z-index:6;
+    user-select:none;
+}
+
+.indice-superior{
+    top:12px;
+    left:12px;
+}
+
+.indice-inferior{
+    right:12px;
+    bottom:12px;
+    transform:rotate(180deg);
+}
+
+.numero-carta{
+    font-size:.95rem;
+    font-weight:900;
+    letter-spacing:-.5px;
+    text-shadow:0 1px 2px rgba(0,0,0,.35);
+}
+
+.naipe{
+    font-size:.85rem;
+    line-height:1;
+}
+
+/* ==========================================================
    PLATAFORMA BASE
 ========================================================== */
 .podio-base {
