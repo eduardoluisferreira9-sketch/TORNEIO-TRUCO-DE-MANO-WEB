@@ -636,9 +636,16 @@
     max-width: 720px;
     height: 48px;
     margin-top: 0;
-    border-radius: 999px;
-    background: linear-gradient(180deg, #606060 0%, #3e3e3e 40%, #242424 100%);
-    border: 1px solid rgba(255, 220, 140, .20);
+    border-radius: 100px;
+    background:
+    linear-gradient(
+        180deg,
+        #7d5a37 0%,
+        #654121 35%,
+        #4a2d16 70%,
+        #2f1b0d 100%
+    );
+    border:1px solid rgba(210,170,110,.28);
     box-shadow: 
         0 18px 34px rgba(0, 0, 0, .38),
         inset 0 2px 0 rgba(255, 255, 255, .18),
@@ -650,8 +657,13 @@
     position: absolute;
     left: 16px; right: 16px; top: 4px;
     height: 3px;
-    border-radius: 30px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .42), transparent);
+    border-radius: 20px;
+    background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,242,200,.28),
+    transparent
+);
 }
 
 .podio-base::after {
