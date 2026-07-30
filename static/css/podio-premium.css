@@ -515,7 +515,7 @@
     position:relative;
     z-index:3;
 
-    font-family:'Cinzel', serif;
+    font-family:'Bodoni Moda', serif;
     font-size:4.8rem;
     font-weight:700;
     line-height:1;
@@ -535,15 +535,15 @@
 }
 
 .campeao .pedestal .colocacao{
-    color:#4a2b00;
+    color:#342113;
 }
 
 .prata .pedestal .colocacao{
-    color:#565656;
+    color:#494949
 }
 
 .bronze .pedestal .colocacao{
-    color:#5a2d18;
+    color:#472113
 }
 
 /* ==========================================================
