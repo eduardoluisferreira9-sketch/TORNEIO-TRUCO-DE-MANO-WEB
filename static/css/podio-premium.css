@@ -523,21 +523,14 @@
 
 .campeao .pedestal .colocacao{
     color:#4a2b00;
-    text-shadow:
-        0 1px 0 rgba(255,255,255,.18),
-        0 -1px 0 rgba(0,0,0,.18);
 }
+
 .prata .pedestal .colocacao{
     color:#565656;
-    text-shadow:
-        0 1px 0 rgba(255,255,255,.18),
-        0 -1px 0 rgba(0,0,0,.18);
 }
+
 .bronze .pedestal .colocacao{
     color:#5a2d18;
-    text-shadow:
-        0 1px 0 rgba(255,255,255,.15),
-        0 -1px 0 rgba(0,0,0,.20);
 }
 
 /* ==========================================================
@@ -570,26 +563,32 @@
 }
 
 .indice-superior{
-    top:10px;
-    left:10px;
+    top:8px;
+    left:8px;
 }
 
 .indice-inferior{
-    right:10px;
-    bottom:10px;
-    transform:rotate(180deg);
+    right:8px;
+    bottom:8px;
 }
 
 .numero-carta{
-    font-size:1.50rem;
-    font-weight:900;
-    letter-spacing:-.5px;
-    text-shadow:0 1px 2px rgba(0,0,0,.35);
+    font-size:1.7rem;
+    font-weight:700;
+    line-height:1;
 }
 
 .naipe{
-    font-size:1.3rem;
-    margin-top:4px;
+    font-size:1.45rem;
+    margin-top:6px;
+    line-height:1;
+}
+
+.numero-carta,
+.naipe{
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.15),
+        0 -1px 0 rgba(0,0,0,.20);
 }
 
 /* ==========================================================
