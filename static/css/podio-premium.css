@@ -336,7 +336,7 @@
 }
 
 .prata { order: 1; z-index: 4; }
-.campeao { order: 2; transform: translateY(-6px); z-index: 6; }
+.campeao { order: 2; z-index: 6; }
 .bronze { order: 3; z-index: 3; }
 
 /* ==========================================================
