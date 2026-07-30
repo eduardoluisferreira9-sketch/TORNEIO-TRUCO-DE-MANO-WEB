@@ -191,7 +191,7 @@
 
     inset:8px;
 
-    border:1px solid rgba(243,207,93,.08);
+    border:1px solid rgba(243,207,93,.12);
 
     border-radius:14px;
 
@@ -215,15 +215,15 @@
 
 .lateral-titulo{
 
-    font-size:.95rem;
+    font-size:.9rem;
 
     font-weight:800;
 
-    letter-spacing:2px;
+    letter-spacing:3px;
 
     text-transform:uppercase;
 
-    color:#d7c67a;
+    color:#d9c06d;
 
     text-align:center;
 
@@ -251,7 +251,7 @@
 
     margin-top:18px;
 
-    font-size:1.8rem;
+    font-size:2rem;
 
     font-weight:900;
 
