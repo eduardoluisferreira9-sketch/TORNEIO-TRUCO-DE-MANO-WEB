@@ -424,13 +424,21 @@
     inset: 8px;
     border-radius: 12px;
 
-    background: linear-gradient(
-        180deg,
-        rgba(255,255,255,.34) 0%,
-        rgba(255,255,255,.14) 22%,
-        rgba(255,255,255,.03) 48%,
-        transparent 100%
-    );
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.34) 0%,
+            rgba(255,255,255,.14) 22%,
+            rgba(255,255,255,.03) 48%,
+            transparent 100%
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.08),
+            transparent 18%,
+            transparent 82%,
+            rgba(0,0,0,.05)
+        );
 
     border: 1px solid rgba(255,255,255,.14);
 
@@ -445,13 +453,24 @@
     content: "";
     position: absolute;
     left: 0; right: 0; bottom: 0;
-    height: 12px;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .22));
+    height: 22px;
+    background:linear-gradient(
+      180deg,
+      rgba(0,0,0,0),
+      rgba(0,0,0,.06) 35%,
+      rgba(0,0,0,.18) 100%);
 }
 
 .campeao .pedestal {
     height: 216px;
-    background: linear-gradient(180deg, #fff4b8 0%, #ffe37d 10%, #f3cf5d 28%, #dcae22 60%, #9b7004 100%);
+    background:linear-gradient(
+      180deg,
+      #fff6bf 0%,
+      #ffe98f 12%,
+      #f5d35d 26%,
+      #e6bf3c 46%,
+      #c79212 72%,
+      #8e6402 100%);
     border: 1px solid rgba(255, 245, 180, .55);
     box-shadow: 
         0 22px 42px rgba(0, 0, 0, .36),
