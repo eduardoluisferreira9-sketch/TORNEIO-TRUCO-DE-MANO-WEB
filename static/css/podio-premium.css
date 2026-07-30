@@ -85,7 +85,8 @@
     );
 
     box-shadow:
-        0 0 8px rgba(243,207,93,.35);
+       0 0 12px rgba(243,207,93,.45),
+       0 0 24px rgba(243,207,93,.15);
 
 }
 
@@ -512,8 +513,9 @@
 
    border:1px solid rgba(255,255,255,.12);
    box-shadow:
-       0 12px 26px rgba(0,0,0,.45),
-       inset 0 1px 0 rgba(255,255,255,.18);
+        0 12px 26px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 0 18px rgba(243,207,93,.08);
 
 }
 
