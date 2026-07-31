@@ -188,12 +188,12 @@
     align-self: flex-end;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     overflow: hidden;
     width: 220px;
-    height: 320px;
-    padding: 24px 16px;
+    height: 340px;
+    padding: 34px 18px 26px;
     border-radius: var(--podio-raio);
     border: 1px solid var(--podio-borda);
     background: var(--podio-fundo);
