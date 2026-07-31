@@ -181,118 +181,144 @@
 }
 
 /* ==========================================================
-   CARDS LATERAIS
+   CARDS LATERAIS PREMIUM (ESTILO CARTA / TRUCO)
 ========================================================== */
 .podio-lateral {
     position: relative;
     align-self: flex-end;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center; /* Centraliza o conteúdo verticalmente */
     align-items: center;
     overflow: hidden;
-    width: 220px;
-    height: 340px;
-    padding: 34px 18px 26px;
-    border-radius: var(--podio-raio);
-    border: 1px solid var(--podio-borda);
-    background: var(--podio-fundo);
-    backdrop-filter: blur(14px);
+    width: 180px;
+    height: 310px;
+    padding: 24px 16px;
+    border-radius: 20px;
+    
+    /* Borda externa dourada fina */
+    border: 1px solid rgba(243, 207, 93, 0.6);
+    background: linear-gradient(180deg, rgba(8, 28, 18, 0.85) 0%, rgba(4, 16, 10, 0.92) 100%);
+    backdrop-filter: blur(12px);
     box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        inset 0 -18px 40px rgba(0, 0, 0, .12),
-        var(--podio-sombra-card);
+        0 12px 28px rgba(0, 0, 0, 0.5),
+        inset 0 0 15px rgba(243, 207, 93, 0.05);
 }
 
+/* Borda Interna Dupla com canto arredondado */
 .podio-lateral::before {
     content: "";
     position: absolute;
-    inset: 8px;
-    border-radius: 10px;
-    border: 1px solid var(--podio-borda-interna);
+    inset: 6px;
+    border-radius: 14px;
+    border: 1px solid rgba(243, 207, 93, 0.4);
     pointer-events: none;
 }
 
+/* Ponto de brilho / Flare no topo e base */
 .podio-lateral::after {
     content: "";
     position: absolute;
-    left: 28px;
-    right: 28px;
-    top: 18px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
     height: 2px;
-    border-radius: 20px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(243, 207, 93, .75),
-        transparent
-    );
-    box-shadow: 0 0 12px rgba(243, 207, 93, .30);
+    background: #ffffff;
+    box-shadow: 
+        0 0 8px #f3cf5d,
+        0 0 18px #f3cf5d,
+        0 0 28px #f3cf5d;
+    border-radius: 50%;
 }
 
+/* ==========================================================
+   ELEMENTOS INTERNOS DO CARD
+========================================================== */
+
+/* Ícone da Categoria (Flor/Troféu) sem o círculo fundo */
 .lateral-icone {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 56px;
-    height: 56px;
+    width: auto;
+    height: auto;
     margin-bottom: 12px;
-    font-size: 1.8rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(243, 207, 93, .14), rgba(243, 207, 93, .02));
-    border: 1px solid rgba(243, 207, 93, .22);
-    box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, .12),
-        0 0 18px rgba(243, 207, 93, .18);
+    font-size: 2.2rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    filter: drop-shadow(0 2px 6px rgba(243, 207, 93, 0.4));
 }
 
+/* Título (ex: REI DAS FLORES) */
 .lateral-titulo {
     position: relative;
-    font-size: .80rem;
+    font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #d8c06b;
+    color: #f3cf5d;
     text-align: center;
     line-height: 1.2;
+    margin-bottom: 8px;
 }
 
+/* Divisória com o Losango no meio (estilo imagem) */
 .lateral-titulo::after {
-    content: "";
-    display: block;
-    width: 60px;
-    height: 2px;
-    margin: 10px auto;
-    border-radius: 20px;
-    background: linear-gradient(90deg, transparent, rgba(243, 207, 93, .85), transparent);
+    content: "◆"; /* Simbolo de losango */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+    color: #f3cf5d;
+    margin: 10px auto 12px;
+    width: 100px;
+    position: relative;
 }
 
+/* Linhas douradas nas laterais do losango */
+.lateral-titulo::before {
+    content: "";
+    position: absolute;
+    bottom: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(243, 207, 93, 0.6), transparent);
+}
+
+/* Nome do Atleta */
 .lateral-nome {
     margin-top: 4px;
-    font-size: 1.25rem;
-    font-weight: 800;
+    font-size: 1.15rem;
+    font-weight: 900;
     line-height: 1.2;
     text-align: center;
     color: #ffffff;
-    text-shadow: 0 3px 8px rgba(0, 0, 0, .5);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* Informação Extra (ex: 🎯 3 FLORES) */
 .lateral-extra {
-    margin-top: 12px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    border: 1px solid rgba(243, 207, 93, .25);
-    background: rgba(243, 207, 93, .08);
-    font-size: .85rem;
+    margin-top: 18px;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
     font-weight: 800;
-    letter-spacing: .5px;
-    color: var(--podio-ouro);
-    display: inline-flex;
+    letter-spacing: 1px;
+    color: #f3cf5d;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
-
 /* ==========================================================
    LINHA DOS VENCEDORES & PILARES
 ========================================================== */
