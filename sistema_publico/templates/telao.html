@@ -1533,7 +1533,7 @@
                     
                     telaPrincipal.innerHTML = `
                         <div class="podio-wrapper">
-                
+                    
                             <div class="podio-header">
                                 <div class="podio-titulo-linha">
                                     <span class="linha"></span>
@@ -1542,95 +1542,164 @@
                                     </div>
                                     <span class="linha"></span>
                                 </div>
+                    
                                 <div class="podio-subtitulo">
                                     O PÓDIO DE HONRA ESTÁ CONSOLIDADO
                                 </div>
                             </div>
-                
+                    
                             <div class="podio-palco">
-                
-                                <!-- 4º LUGAR (LATERAL ESQUERDO) -->
+                    
+                                <!-- 4º LUGAR -->
                                 <div class="podio-lateral esquerda">
+                    
                                     <div class="lateral-icone">
                                         🏅
                                     </div>
+                    
                                     <div class="lateral-titulo">
                                         4º LUGAR
                                     </div>
+                    
                                     <div class="lateral-nome">
                                         ${p4}
                                     </div>
+                    
                                 </div>
-                
-                                <!-- PÓDIO CENTRAL (1º, 2º e 3º LUGAR) -->
+                    
+                                <!-- PÓDIO -->
                                 <div class="podio-centro">
+                    
                                     <div class="podio-linha">
-                
-                                        <!-- VICE-CAMPEÃO (2 DE ESPADAS) -->
+                    
+                                        <!-- VICE -->
+                    
                                         <div class="podio-pilar prata">
+                    
                                             <div class="podio-atleta">
                                                 ${p2}
                                             </div>
+                    
                                             <div class="podio-posicao">
                                                 VICE-CAMPEÃO
                                             </div>
+                    
                                             <div class="pedestal">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Spanish_suited_cards_2_of_swords.svg" alt="2 de Espadas" class="carta-podio">
+                    
+                                                <div class="indice indice-superior">
+                                                    <span class="numero-carta">2</span>
+                                                    <span class="naipe">⚔</span>
+                                                </div>
+                    
+                                                <span class="colocacao">
+                                                    2º
+                                                </span>
+                    
+                                                <div class="indice indice-inferior">
+                                                    <span class="numero-carta">2</span>
+                                                    <span class="naipe">⚔</span>
+                                                </div>
+                    
                                             </div>
+                    
                                         </div>
-                
-                                        <!-- CAMPEÃO (ÁS DE ESPADAS) -->
+                    
+                                        <!-- CAMPEÃO -->
+                    
                                         <div class="podio-pilar campeao">
+                    
                                             <div class="podio-atleta destaque">
                                                 ${p1}
                                             </div>
+                    
                                             <div class="podio-posicao">
                                                 GRANDE CAMPEÃO
                                             </div>
+                    
                                             <div class="pedestal">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Spanish_suited_cards_1_of_swords.svg" alt="Ás de Espadas" class="carta-podio">
+                    
+                                                <div class="indice indice-superior">
+                                                    <span class="numero-carta">1</span>
+                                                    <span class="naipe">⚔</span>
+                                                </div>
+                    
+                                                <span class="colocacao">
+                                                    1º
+                                                </span>
+                    
+                                                <div class="indice indice-inferior">
+                                                    <span class="numero-carta">1</span>
+                                                    <span class="naipe">⚔</span>
+                                                </div>
+                    
                                             </div>
+                    
                                         </div>
-                
-                                        <!-- 3º COLOCADO (3 DE ESPADAS) -->
+                    
+                                        <!-- TERCEIRO -->
+                    
                                         <div class="podio-pilar bronze">
+                    
                                             <div class="podio-atleta">
                                                 ${p3}
                                             </div>
+                    
                                             <div class="podio-posicao">
                                                 3º COLOCADO
                                             </div>
+                    
                                             <div class="pedestal">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Spanish_suited_cards_3_of_swords.svg" alt="3 de Espadas" class="carta-podio">
+                    
+                                                <div class="indice indice-superior">
+                                                    <span class="numero-carta">3</span>
+                                                    <span class="naipe">⚔</span>
+                                                </div>
+                    
+                                                <span class="colocacao">
+                                                    3º
+                                                </span>
+                    
+                                                <div class="indice indice-inferior">
+                                                    <span class="numero-carta">3</span>
+                                                    <span class="naipe">⚔</span>
+                                                </div>
+                    
                                             </div>
+                    
                                         </div>
-                
+                    
                                     </div>
-                
+                    
                                     <div class="podio-base"></div>
+                    
                                 </div>
-                
-                                <!-- REI DAS FLORES (LATERAL DIREITO) -->
+                    
+                                <!-- REI DAS FLORES -->
+                    
                                 <div class="podio-lateral direita">
+                    
                                     <div class="lateral-icone">
                                         🌸
                                     </div>
+                    
                                     <div class="lateral-titulo">
                                         REI DAS FLORES
                                     </div>
+                    
                                     <div class="lateral-nome">
                                         ${reiDasFloresNome.toUpperCase()}
                                     </div>
+                    
                                     <div class="lateral-extra">
                                         🎯 ${qtdFloresTotal} FLORES
                                     </div>
+                    
                                 </div>
-                
+                    
                             </div>
-                
+                    
                         </div>
                     `;
-                    
                     document.getElementById('info-fase').innerText = "🏁 ENCERRADO";
                     document.getElementById('info-detalhe-fase').innerText = "Torneio Concluído";
                     document.getElementById('cronometro').innerText = "--:--";
