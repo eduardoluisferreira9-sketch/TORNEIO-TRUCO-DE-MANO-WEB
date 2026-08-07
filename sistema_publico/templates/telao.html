@@ -939,8 +939,10 @@
             border:2px solid #d4af37;
         
             box-shadow:
-                0 0 25px rgba(212,175,55,.18),
-                inset 0 2px 10px rgba(255,255,255,.12),
+                0 0 10px rgba(243,207,93,.25),
+                0 0 22px rgba(243,207,93,.18),
+                0 0 40px rgba(243,207,93,.08),
+                inset 0 2px 8px rgba(255,255,255,.18),
                 inset 0 -12px 18px rgba(0,0,0,.22);
         }
         
@@ -957,21 +959,27 @@
         #publicidade-logo::after{
             content:"";
             position:absolute;
-            top:8px;
-            left:20px;
-            right:20px;
-            height:14px;
+        
+            top:-3px;
+            left:18px;
+            right:18px;
+        
+            height:18px;
         
             border-radius:50%;
         
             background:linear-gradient(
                 90deg,
                 transparent,
-                rgba(255,255,255,.55),
+                rgba(255,255,255,.95),
+                rgba(255,247,190,.90),
+                rgba(255,255,255,.95),
                 transparent
             );
         
-            filter:blur(2px);
+            filter:blur(3px);
+        
+            opacity:.95;
         }
         
           #publicidade-logo img{
