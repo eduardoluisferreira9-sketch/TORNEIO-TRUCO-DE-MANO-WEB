@@ -73,7 +73,7 @@ const patrocinadores = [
 
         nome: "GEPETO MÓVEIS INFANTIS",
 
-        slogan: "Dando vida à madeira",
+        slogan: "👴🏻 Dando vida à madeira",
 
         mensagem: "Desenvolvimento infantil - brinquedos e móveis",
 
