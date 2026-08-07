@@ -41,13 +41,13 @@ const patrocinadores = [
 
         titulo: "🏆 MASTER",
 
-        nome: "Cusco artigos gaúchos",
+        nome: "CUSCO ARTIGOS GAÚCHOS",
 
-        slogan: "Patrocinador",
+        slogan: "Há mais de uma década, a Cusco Artigos Gaúchos vem preservando as raízes das tradições gaúchas",
 
-        mensagem: "Há mais de uma década, a Cusco Artigos Gaúchos vem preservando as raízes das tradições gaúchas.",
+        mensagem: "Desde pilchas até facas, e uma ampla variedade de acessórios para churrasco e chimarrão",
 
-        logo: "/static/patrocinadores/Logo-cusco.jpg",
+        logo: "/static/patrocinadores/Logo-cusco2.JPG",
 
         botao1: {
             texto: "Conheça",
@@ -71,22 +71,22 @@ const patrocinadores = [
 
         titulo: "🥇 OURO",
 
-        nome: "POSTO AVENIDA",
+        nome: "GEPETO MÓVEIS INFANTIS",
 
-        slogan: "Seu combustível de confiança",
+        slogan: "Dnado vida à madeira",
 
-        mensagem: "⛽ Combustível, conveniência e atendimento de qualidade.",
+        mensagem: "Desenvolvimento infantil - brinquedos e móveis",
 
-        logo: "/static/patrocinadores/posto-avenida.jpg",
+        logo: "/static/patrocinadores/Logo-gepeto.JPG",
 
         botao1: {
             texto: "Conheça",
-            link: "https://maps.google.com"
+            link: "https://gepeto.art.br"
         },
 
         botao2: {
             texto: "WhatsApp",
-            link: "https://wa.me/5554991410550"
+            link: "https://wa.me/5554984021840"
         },
 
         tempo: 10
