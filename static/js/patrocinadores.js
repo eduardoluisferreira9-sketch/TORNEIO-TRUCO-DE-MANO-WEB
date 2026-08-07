@@ -41,22 +41,22 @@ const patrocinadores = [
 
         titulo: "🏆 MASTER",
 
-        nome: "SUPERMERCADO CENTRAL",
+        nome: "Cusco artigos gaúchos",
 
-        slogan: "Patrocinador Oficial",
+        slogan: "Patrocinador",
 
-        mensagem: "🛒 Há mais de 30 anos atendendo nossa comunidade.",
+        mensagem: "Há mais de uma década, a Cusco Artigos Gaúchos vem preservando as raízes das tradições gaúchas.",
 
-        logo: "/static/patrocinadores/mercado-central.jpg",
+        logo: "/static/patrocinadores/Logo-cusco.jpg",
 
         botao1: {
             texto: "Conheça",
-            link: "#"
+            link: "https://www.cuscoartigosgauchos.com.br"
         },
 
         botao2: {
             texto: "WhatsApp",
-            link: "https://wa.me/5554991410550"
+            link: "https://api.whatsapp.com/send?1=pt_BR&phone=5554993001127"
         },
 
         tempo: 16
