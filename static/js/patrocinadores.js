@@ -47,7 +47,7 @@ const patrocinadores = [
 
         mensagem: "Desde pilchas até facas, e uma ampla variedade de acessórios para churrasco e chimarrão",
 
-        logo: "/static/patrocinadores/Logo-cusco.JPG",
+        logo: "/static/patrocinadores/Logo-cusco.jpg",
 
         botao1: {
             texto: "Conheça",
