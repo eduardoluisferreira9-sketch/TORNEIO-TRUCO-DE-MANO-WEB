@@ -43,7 +43,7 @@ const patrocinadores = [
 
         nome: "CUSCO ARTIGOS GAÚCHOS",
 
-        slogan: "Há mais de uma década, a Cusco Artigos Gaúchos vem preservando as raízes das tradições gaúchas",
+        slogan: "🐕‍🦺 Há mais de uma década, a Cusco Artigos Gaúchos vem preservando as raízes das tradições gaúchas",
 
         mensagem: "Desde pilchas até facas, e uma ampla variedade de acessórios para churrasco e chimarrão",
 
