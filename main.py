@@ -588,97 +588,565 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
 
 @app.post("/admin/gerar-rodada")
 @app.post("/admin-painel/admin/gerar-rodada")
-def gerar_rodada_admin(tempo_minutos: int = Form(None), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def gerar_rodada_admin(
+    tempo_minutos: int = Form(None),
+    db=Depends(get_db),
+    auth: bool = Depends(verificar_admin)
+):
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
-    if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
-    cursor.execute(f"SELECT COALESCE(MAX(rodada), 0) FROM confrontos WHERE rodada > 0 AND torneio_id = {p}", (cfg["id"],))
+    # ==========================================================
+    # 1. VALIDAÇÕES BÁSICAS
+    # ==========================================================
+
+    if cfg["fase_torneio"] == "INSCRICAO":
+        return RedirectResponse(
+            url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio",
+            status_code=303
+        )
+
+    cursor.execute(
+        f"""
+        SELECT COALESCE(MAX(rodada), 0)
+        FROM confrontos
+        WHERE rodada > 0
+          AND torneio_id = {p}
+        """,
+        (cfg["id"],)
+    )
+
     rodada_atual = cursor.fetchone()[0]
     proxima_rodada = rodada_atual + 1
-    
+
+    # ==========================================================
+    # 2. NÃO PERMITIR NOVA RODADA ENQUANTO A ATUAL NÃO TERMINAR
+    # ==========================================================
+
     if rodada_atual > 0:
-        cursor.execute(f"SELECT COUNT(*) FROM confrontos WHERE rodada = {p} AND torneio_id = {p} AND vencedor_id IS NULL", (rodada_atual, cfg["id"]))
+        cursor.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM confrontos
+            WHERE rodada = {p}
+              AND torneio_id = {p}
+              AND vencedor_id IS NULL
+            """,
+            (rodada_atual, cfg["id"])
+        )
+
         if cursor.fetchone()[0] > 0:
-            return RedirectResponse(url="/admin-painel/admin/jogos?erro=jogos_pendentes", status_code=303)
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=jogos_pendentes",
+                status_code=303
+            )
+
+    # ==========================================================
+    # 3. VERIFICAR LIMITE DE RODADAS
+    # ==========================================================
 
     if proxima_rodada > cfg["max_rodadas_classificatoria"]:
-        return RedirectResponse(url="/admin-painel/admin/classificacao?aviso=fim_da_classificatoria", status_code=303)
-        
-    cursor.execute(f"SELECT id, nome, entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
+        return RedirectResponse(
+            url="/admin-painel/admin/classificacao?aviso=fim_da_classificatoria",
+            status_code=303
+        )
+
+    # ==========================================================
+    # 4. CARREGAR ATLETAS APROVADOS
+    # ==========================================================
+
+    cursor.execute(
+        f"""
+        SELECT id, nome, entidade
+        FROM atletas
+        WHERE status = 'APROVADO'
+          AND torneio_id = {p}
+        """,
+        (cfg["id"],)
+    )
+
     atletas_lista = [dict(row) for row in cursor.fetchall()]
+
     if len(atletas_lista) < 2:
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes", status_code=303)
-        
-    cursor.execute(f"SELECT atleta1_id, atleta2_id FROM confrontos WHERE atleta2_id IS NOT NULL AND rodada > 0 AND torneio_id = {p}", (cfg["id"],))
-    historico = {tuple(sorted((r["atleta1_id"], r["atleta2_id"]))) for r in cursor.fetchall()}
-        
-    sucesso = False
-    parceiros_finais = []
+        return RedirectResponse(
+            url="/admin-painel/admin/inscricoes?erro=jogadores_insuficientes",
+            status_code=303
+        )
+
+    # ==========================================================
+    # 5. HISTÓRICO DE ADVERSÁRIOS
+    #
+    # Nunca poderá acontecer:
+    #
+    # João x Pedro
+    # ...
+    # novamente João x Pedro
+    #
+    # Independentemente da posição dos atletas.
+    # ==========================================================
+
+    cursor.execute(
+        f"""
+        SELECT atleta1_id, atleta2_id
+        FROM confrontos
+        WHERE atleta2_id IS NOT NULL
+          AND rodada > 0
+          AND torneio_id = {p}
+        """,
+        (cfg["id"],)
+    )
+
+    historico = {
+        tuple(sorted((r["atleta1_id"], r["atleta2_id"])))
+        for r in cursor.fetchall()
+    }
+
+    # ==========================================================
+    # 6. HISTÓRICO DE CHAPÉUS
+    #
+    # Um atleta só pode receber CHAPÉU uma vez.
+    #
+    # Os chapéis são registrados como:
+    #
+    # atleta1_id = atleta que recebeu o chapéu
+    # atleta2_id = NULL
+    #
+    # ==========================================================
+
+    cursor.execute(
+        f"""
+        SELECT atleta1_id
+        FROM confrontos
+        WHERE atleta2_id IS NULL
+          AND rodada > 0
+          AND torneio_id = {p}
+        """,
+        (cfg["id"],)
+    )
+
+    atletas_que_ja_tiveram_chapeu = {
+        r["atleta1_id"]
+        for r in cursor.fetchall()
+        if r["atleta1_id"] is not None
+    }
+
+    # ==========================================================
+    # 7. PREPARAR MAPA DOS ATLETAS
+    # ==========================================================
+
+    atletas_por_id = {
+        atleta["id"]: atleta
+        for atleta in atletas_lista
+    }
+
+    # ==========================================================
+    # 8. FUNÇÃO DE VALIDAÇÃO DE PAR
+    # ==========================================================
+
+    def par_valido(a, b):
+        if a["id"] == b["id"]:
+            return False
+
+        # Nunca repetir adversário
+        chave = tuple(sorted((a["id"], b["id"])))
+
+        if chave in historico:
+            return False
+
+        return True
+
+    # ==========================================================
+    # 9. GERAÇÃO DE UMA SOLUÇÃO
+    #
+    # Aqui NÃO usamos ID, nome ou posição para decidir.
+    #
+    # A lista é embaralhada antes de cada tentativa.
+    #
+    # A entidade entra apenas como critério de qualidade:
+    # preferimos entidades diferentes na mesma mesa.
+    # ==========================================================
+
+    def gerar_solucao(atletas_disponiveis):
+        restantes = atletas_disponiveis.copy()
+        random.shuffle(restantes)
+
+        pares = []
+
+        while restantes:
+            # Escolhe aleatoriamente um atleta entre os restantes.
+            a1 = restantes.pop(
+                random.randrange(len(restantes))
+            )
+
+            candidatos = [
+                atleta
+                for atleta in restantes
+                if par_valido(a1, atleta)
+            ]
+
+            if not candidatos:
+                return None
+
+            # ==================================================
+            # Prioridade:
+            #
+            # 1. adversário nunca enfrentado
+            # 2. entidade diferente
+            # 3. escolha aleatória
+            #
+            # Não usamos ID/nome como critério.
+            # ==================================================
+
+            candidatos_entidade_diferente = [
+                atleta
+                for atleta in candidatos
+                if str(atleta.get("entidade", "")).strip().upper()
+                != str(a1.get("entidade", "")).strip().upper()
+            ]
+
+            if candidatos_entidade_diferente:
+                candidatos = candidatos_entidade_diferente
+
+            random.shuffle(candidatos)
+
+            # ==================================================
+            # Para evitar escolhas ruins no início da montagem,
+            # damos preferência ao candidato que deixa mais
+            # possibilidades para os demais.
+            #
+            # Empates continuam sendo resolvidos aleatoriamente.
+            # ==================================================
+
+            melhor_candidatos = []
+            melhor_grau = None
+
+            for candidato in candidatos:
+
+                grau = sum(
+                    1
+                    for outro in restantes
+                    if outro["id"] != candidato["id"]
+                    and par_valido(candidato, outro)
+                )
+
+                if melhor_grau is None or grau > melhor_grau:
+                    melhor_grau = grau
+                    melhor_candidatos = [candidato]
+
+                elif grau == melhor_grau:
+                    melhor_candidatos.append(candidato)
+
+            parceiro = random.choice(melhor_candidatos)
+
+            restantes.remove(parceiro)
+
+            pares.append((a1, parceiro))
+
+        return pares
+
+    # ==========================================================
+    # 10. ESCOLHA DO CHAPÉU
+    #
+    # Se número de atletas for ímpar:
+    #
+    # - só pode receber chapéu quem ainda não recebeu;
+    # - tentamos diferentes candidatos;
+    # - para cada candidato tentamos montar a rodada inteira.
+    #
+    # Isso é importante porque o atleta escolhido para o chapéu
+    # pode influenciar a possibilidade de formar os demais pares.
+    # ==========================================================
+
+    candidatos_chapeu = []
+
+    if len(atletas_lista) % 2 == 1:
+
+        candidatos_chapeu = [
+            atleta
+            for atleta in atletas_lista
+            if atleta["id"] not in atletas_que_ja_tiveram_chapeu
+        ]
+
+        if not candidatos_chapeu:
+            # Não existe mais ninguém elegível para receber chapéu.
+            #
+            # NÃO vamos quebrar a regra para gerar a rodada.
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=chapeus_esgotados",
+                status_code=303
+            )
+
+        random.shuffle(candidatos_chapeu)
+
+    else:
+        # Número par: ninguém recebe chapéu.
+        candidatos_chapeu = [None]
+
+    # ==========================================================
+    # 11. PROCURAR UMA COMBINAÇÃO VÁLIDA
+    #
+    # Fazemos várias tentativas aleatórias.
+    #
+    # Diferentemente do código antigo, se não houver solução:
+    # NÃO criamos confrontos inválidos.
+    # ==========================================================
+
+    parceiros_finais = None
     atleta_folga = None
-    
-    for tentativa in range(1000):
-        copia_atletas = atletas_lista.copy()
-        random.shuffle(copia_atletas)
-        propostos = []
-        valido = True
-        
-        while len(copia_atletas) >= 2:
-            a1 = copia_atletas[0]
-            parceiro_encontrado = None
-            for i in range(1, len(copia_atletas)):
-                potencial_a2 = copia_atletas[i]
-                ja_jogaram = tuple(sorted((a1["id"], potencial_a2["id"]))) in historico
-                mesma_entidade = a1["entidade"] == potencial_a2["entidade"]
-                
-                if tentativa < 500:
-                    if not ja_jogaram and not mesma_entidade:
-                        parceiro_encontrado = potencial_a2
-                        break
-                else:
-                    if not ja_jogaram:
-                        parceiro_encontrado = potencial_a2
-                        break
-            if parceiro_encontrado:
-                copia_atletas.remove(a1)
-                copia_atletas.remove(parceiro_encontrado)
-                propostos.append((a1, parceiro_encontrado))
-            else:
-                valido = False
-                break
-        if valido:
-            if copia_atletas: atleta_folga = copia_atletas[0]
-            parceiros_finais = propostos
-            sucesso = True
-            break
-            
-    if not sucesso:
-        copia_atletas = atletas_lista.copy()
-        random.shuffle(copia_atletas)
-        parceiros_finais = []
-        while len(copia_atletas) >= 2:
-            parceiros_finais.append((copia_atletas.pop(0), copia_atletas.pop(0)))
-        atleta_folga = copia_atletas[0] if copia_atletas else None
+
+    MAX_TENTATIVAS = 5000
+
+    for tentativa in range(MAX_TENTATIVAS):
+
+        if len(atletas_lista) % 2 == 1:
+
+            # Em cada tentativa sorteamos novamente o possível chapéu.
+            atleta_folga_tentativa = random.choice(candidatos_chapeu)
+
+            atletas_para_pareamento = [
+                atleta
+                for atleta in atletas_lista
+                if atleta["id"] != atleta_folga_tentativa["id"]
+            ]
+
+        else:
+            atleta_folga_tentativa = None
+            atletas_para_pareamento = atletas_lista.copy()
+
+        random.shuffle(atletas_para_pareamento)
+
+        solucao = gerar_solucao(atletas_para_pareamento)
+
+        if solucao is None:
+            continue
+
+        # ======================================================
+        # SOLUÇÃO ENCONTRADA
+        # ======================================================
+
+        parceiros_finais = solucao
+        atleta_folga = atleta_folga_tentativa
+
+        break
+
+    # ==========================================================
+    # 12. SE NÃO EXISTIR SOLUÇÃO, NÃO GERAR RODADA
+    # ==========================================================
+
+    if parceiros_finais is None:
+
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=nao_foi_possivel_formar_rodada",
+            status_code=303
+        )
+
+    # ==========================================================
+    # 13. VALIDAÇÃO FINAL DE SEGURANÇA
+    #
+    # Antes de gravar qualquer coisa no banco, conferimos:
+    #
+    # - nenhum adversário repetido;
+    # - nenhum atleta duplicado;
+    # - chapéu permitido;
+    # - todas as pessoas utilizadas.
+    # ==========================================================
+
+    atletas_usados = set()
+    pares_validacao = set()
+
+    for a1, a2 in parceiros_finais:
+
+        if a1["id"] in atletas_usados or a2["id"] in atletas_usados:
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=erro_interno_sorteio",
+                status_code=303
+            )
+
+        atletas_usados.add(a1["id"])
+        atletas_usados.add(a2["id"])
+
+        chave = tuple(sorted((a1["id"], a2["id"])))
+
+        if chave in historico:
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=adversario_repetido_bloqueado",
+                status_code=303
+            )
+
+        if chave in pares_validacao:
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=par_duplicado_bloqueado",
+                status_code=303
+            )
+
+        pares_validacao.add(chave)
+
+    # ==========================================================
+    # 14. VALIDAR CHAPÉU
+    # ==========================================================
+
+    if atleta_folga:
+
+        if atleta_folga["id"] in atletas_usados:
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=atleta_chapeu_duplicado",
+                status_code=303
+            )
+
+        if atleta_folga["id"] in atletas_que_ja_tiveram_chapeu:
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=chapeu_repetido_bloqueado",
+                status_code=303
+            )
+
+        atletas_usados.add(atleta_folga["id"])
+
+    # ==========================================================
+    # 15. CONFERIR SE TODOS OS ATLETAS FORAM UTILIZADOS
+    # ==========================================================
+
+    ids_atletas = {atleta["id"] for atleta in atletas_lista}
+
+    if atletas_usados != ids_atletas:
+
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=atletas_nao_distribuidos",
+            status_code=303
+        )
+
+    # ==========================================================
+    # 16. EMBARALHAR A ORDEM DAS MESAS
+    #
+    # Mesmo depois de encontrar os pares, não queremos que
+    # a ordem dos pares denuncie qualquer critério.
+    # ==========================================================
+
+    random.shuffle(parceiros_finais)
+
+    # ==========================================================
+    # 17. GRAVAR AS MESAS
+    # ==========================================================
 
     mesa = 1
+
     for a1, a2 in parceiros_finais:
-        cursor.execute(f'INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p})',
-                       (cfg["id"], proxima_rodada, mesa, a1['id'], a2['id'], a1['nome'], a2['nome']))
+
+        cursor.execute(
+            f"""
+            INSERT INTO confrontos (
+                torneio_id,
+                rodada,
+                mesa,
+                atleta1_id,
+                atleta2_id,
+                atleta1_nome,
+                atleta2_nome
+            )
+            VALUES (
+                {p},
+                {p},
+                {p},
+                {p},
+                {p},
+                {p},
+                {p}
+            )
+            """,
+            (
+                cfg["id"],
+                proxima_rodada,
+                mesa,
+                a1["id"],
+                a2["id"],
+                a1["nome"],
+                a2["nome"]
+            )
+        )
+
         mesa += 1
-    
+
+    # ==========================================================
+    # 18. GRAVAR CHAPÉU
+    # ==========================================================
+
     if atleta_folga:
-        cursor.execute(f"""
-            INSERT INTO confrontos (torneio_id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome, tipo_placar, sets1, sets2, tentos1, tentos2, vencedor_id) 
-            VALUES ({p}, {p}, {p}, {p}, NULL, {p}, 'FOLGA - GANHOU PONTOS', '2x0', 3, 0, 72, 0, {p})
-        """, (cfg["id"], proxima_rodada, mesa, atleta_folga['id'], atleta_folga['nome'], atleta_folga['id']))
-    
-    # Se o admin selecionou um tempo no input, aplica. Senão, mantém o tempo padrão.
-    novo_tempo_seg = (tempo_minutos * 60) if tempo_minutos else int(cfg.get("crono_tempo_restante_seg", 1800))
-    cursor.execute(f"UPDATE torneios SET crono_ativo = 0, crono_fim_ms = 0, crono_tempo_restante_seg = {p} WHERE id = {p}", (novo_tempo_seg, cfg["id"],))
+
+        cursor.execute(
+            f"""
+            INSERT INTO confrontos (
+                torneio_id,
+                rodada,
+                mesa,
+                atleta1_id,
+                atleta2_id,
+                atleta1_nome,
+                atleta2_nome,
+                tipo_placar,
+                sets1,
+                sets2,
+                tentos1,
+                tentos2,
+                vencedor_id
+            )
+            VALUES (
+                {p},
+                {p},
+                {p},
+                {p},
+                NULL,
+                {p},
+                'FOLGA - GANHOU PONTOS',
+                '2x0',
+                3,
+                0,
+                72,
+                0,
+                {p}
+            )
+            """,
+            (
+                cfg["id"],
+                proxima_rodada,
+                mesa,
+                atleta_folga["id"],
+                atleta_folga["nome"],
+                atleta_folga["id"]
+            )
+        )
+
+    # ==========================================================
+    # 19. CRONÔMETRO
+    # ==========================================================
+
+    novo_tempo_seg = (
+        tempo_minutos * 60
+        if tempo_minutos
+        else int(cfg.get("crono_tempo_restante_seg", 1800))
+    )
+
+    cursor.execute(
+        f"""
+        UPDATE torneios
+        SET
+            crono_ativo = 0,
+            crono_fim_ms = 0,
+            crono_tempo_restante_seg = {p}
+        WHERE id = {p}
+        """,
+        (novo_tempo_seg, cfg["id"])
+    )
+
+    # ==========================================================
+    # 20. CONFIRMAR TRANSAÇÃO
+    # ==========================================================
+
     db.commit()
-    return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+
+    return RedirectResponse(
+        url="/admin-painel/admin/jogos",
+        status_code=303
+    )
 
 @app.post("/admin/disparar-matamata")
 @app.post("/admin-painel/admin/disparar-matamata")
