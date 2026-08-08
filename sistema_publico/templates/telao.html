@@ -1906,32 +1906,83 @@
                             let prefixoJ1 = ""; let prefixoJ2 = "";
 
                             if (partidaConcluida) {
+
                                 const idVencedor = jogo.vencedor_id;
+                            
                                 const idAtleta1 = jogo.atleta1_id || jogo.athlete1_id;
                                 const idAtleta2 = jogo.atleta2_id || jogo.athlete2_id;
-
-                                let j1Ganhou = false; let j2Ganhou = false;
-
-                                if (idVencedor !== null && idVencedor !== undefined) {
-                                    j1Ganhou = (idVencedor == idAtleta1);
-                                    j2Ganhou = (idVencedor == idAtleta2);
-                                } else {
-                                    j1Ganhou = (f1 > f2) || (f1 === f2 && t1 > t2);
-                                    j2Ganhou = (f2 > f1) || (f1 === f2 && t2 > t1);
-                                }
-
+                            
+                                const j1Ganhou =
+                                    idVencedor !== null &&
+                                    idVencedor !== undefined &&
+                                    idVencedor == idAtleta1;
+                            
+                                const j2Ganhou =
+                                    idVencedor !== null &&
+                                    idVencedor !== undefined &&
+                                    idVencedor == idAtleta2;
+                            
                                 if (j1Ganhou) {
-                                    classeJ1 = "vencedor-card"; prefixoJ1 = "👑 ";
-                                    classeJ2 = "perdedor-card"; prefixoJ2 = "❌ ";
+                            
+                                    classeJ1 = "vencedor-card";
+                                    prefixoJ1 = "👑 ";
+                            
+                                    classeJ2 = "perdedor-card";
+                                    prefixoJ2 = "❌ ";
+                            
                                 } else if (j2Ganhou) {
-                                    classeJ1 = "perdedor-card"; prefixoJ1 = "❌ ";
-                                    classeJ2 = "vencedor-card"; prefixoJ2 = "👑 ";
+                            
+                                    classeJ1 = "perdedor-card";
+                                    prefixoJ1 = "❌ ";
+                            
+                                    classeJ2 = "vencedor-card";
+                                    prefixoJ2 = "👑 ";
                                 }
+                            
                             } else {
-                                const j1Lider = (f1 > f2) || (f1 === f2 && t1 > t2);
-                                const j2Lider = (f2 > f1) || (f1 === f2 && t2 > t1);
-                                if (j1Lider) classeJ1 = "lider-mesa";
-                                if (j2Lider) classeJ2 = "lider-mesa";
+                            
+                                /*
+                                 * PARTIDA EM ANDAMENTO
+                                 *
+                                 * Critério visual para mostrar quem está à frente:
+                                 * 1º Sets
+                                 * 2º Tentos
+                                 * 3º Flores
+                                 */
+                            
+                                const j1Lider =
+                                    sets1 > sets2 ||
+                                    (
+                                        sets1 === sets2 &&
+                                        (
+                                            tentos1 > tentos2 ||
+                                            (
+                                                tentos1 === tentos2 &&
+                                                flores1 > flores2
+                                            )
+                                        )
+                                    );
+                            
+                                const j2Lider =
+                                    sets2 > sets1 ||
+                                    (
+                                        sets2 === sets1 &&
+                                        (
+                                            tentos2 > tentos1 ||
+                                            (
+                                                tentos2 === tentos1 &&
+                                                flores2 > flores1
+                                            )
+                                        )
+                                    );
+                            
+                                if (j1Lider) {
+                                    classeJ1 = "lider-mesa";
+                                }
+                            
+                                if (j2Lider) {
+                                    classeJ2 = "lider-mesa";
+                                }
                             }
 
                             let textoTagMesa = `Mesa ${jogo.mesa}`;
