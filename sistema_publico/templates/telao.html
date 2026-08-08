@@ -1888,16 +1888,16 @@
 
                             const advNome = jogo.atleta2_nome ? jogo.atleta2_nome : "FOLGA / W.O.";
                             
-                            const f1 = jogo.sets1 !== null ? jogo.sets1 : (jogo.flores1 || 0);
-                            const t1 = jogo.tentos1 || 0;
-                            const fa1 = jogo.faltas1 || 0;
-
-                            const f2 = jogo.sets2 !== null ? jogo.sets2 : (jogo.flores2 || 0);
-                            const t2 = jogo.tentos2 || 0;
-                            const fa2 = jogo.faltas2 || 0;
-
-                            const p1Str = `${f1}S | ${t1}T | ${fa1}F`;
-                            const p2Str = `${f2}S | ${t2}T | ${fa2}F`;
+                            const sets1 = Number(jogo.sets1 ?? 0);
+                            const tentos1 = Number(jogo.tentos1 ?? 0);
+                            const flores1 = Number(jogo.flores1 ?? 0);
+                            
+                            const sets2 = Number(jogo.sets2 ?? 0);
+                            const tentos2 = Number(jogo.tentos2 ?? 0);
+                            const flores2 = Number(jogo.flores2 ?? 0);
+                            
+                            const p1Str = `${sets1}S | ${tentos1}T | ${flores1}F`;
+                            const p2Str = `${sets2}S | ${tentos2}T | ${flores2}F`;
                             
                             const statusMesa = jogo.status ? jogo.status.toUpperCase() : 'ANDAMENTO';
                             const partidaConcluida = (statusMesa === 'FINALIZADO' || statusMesa === 'CONCLUIDO' || jogo.encerrado === true || jogo.vencedor_id !== null);
