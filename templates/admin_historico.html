@@ -123,6 +123,30 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
 
+        .botao-excluir-historico {
+            width: 100%;
+            margin-top: 20px;
+            padding: 11px 15px;
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            border-radius: 7px;
+            background: rgba(127, 29, 29, 0.18);
+            color: #fca5a5;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .botao-excluir-historico:hover {
+            background: rgba(220, 38, 38, 0.85);
+            border-color: #ef4444;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
         @media (max-width: 768px) {
             nav { display: block; text-align: center; }
             .nav-brand, .nav-container-links { display: block; text-align: center; width: 100%; }
@@ -183,6 +207,16 @@
                     🌸 <strong style="color: #f5d0fe;">Rei das Flores:</strong> <span style="color: #fff; font-weight: 700; text-transform: uppercase;">{{ h.rei_das_flores }}</span> <br>
                     <div style="color: #cbd5e1; font-size: 0.8rem; margin-top: 6px; font-weight: 500; letter-spacing: 0.3px;">Cantou {{ h.qtd_flores }} flores ao longo do evento.</div>
                 </div>
+               <form 
+                    action="/admin-painel/admin/historico/excluir/{{ h.id }}" 
+                    method="POST"
+                    onsubmit="return confirmarExclusao(this);"
+                    data-torneio="{{ h.nome_torneio }}"
+                >
+                    <button type="submit" class="botao-excluir-historico">
+                        🗑️ Excluir este torneio
+                    </button>
+                </form>
             </div>
             {% else %}
             <div style="grid-column: 1 / -1; background: rgba(10, 43, 24, 0.6); padding: 60px 20px; border-radius: 12px; border: 2px dashed var(--border-feltro); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
@@ -191,5 +225,20 @@
             {% endfor %}
         </div>
     </div>
+    <script>
+function confirmarExclusao(formulario) {
+
+    const nomeTorneio = formulario.dataset.torneio;
+
+    return confirm(
+        "⚠️ ATENÇÃO!\n\n" +
+        "Você está prestes a excluir da Galeria de Imortais:\n\n" +
+        "\"" + nomeTorneio + "\"\n\n" +
+        "Os dados históricos desta edição também serão removidos.\n\n" +
+        "Essa ação NÃO poderá ser desfeita.\n\n" +
+        "Deseja realmente continuar?"
+    );
+}
+</script>
 </body>
 </html>
