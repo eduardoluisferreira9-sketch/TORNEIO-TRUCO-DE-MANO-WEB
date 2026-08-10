@@ -1426,140 +1426,182 @@ def exibir_historico(request: Request, db=Depends(get_db), auth: bool = Depends(
     galeria = cursor.fetchall()
     return templates.TemplateResponse(request=request, name="admin_historico.html", context={"config": cfg, "galeria": galeria, "aba_ativa": "historico"})
 
+@app.post("/admin/historico/excluir/{historico_id}")
+@app.post("/admin-painel/admin/historico/excluir/{historico_id}")
+def excluir_historico(
+    historico_id: int,
+    db=Depends(get_db),
+    auth: bool = Depends(verificar_admin)
+):
+    cursor = db.cursor()
+    p = "%s" if DATABASE_URL else "?"
+
+    try:
+        # ==========================================================
+        # LOCALIZAR O REGISTRO DA GALERIA
+        # ==========================================================
+
+        cursor.execute(
+            f"""
+            SELECT torneio_id
+            FROM historico_campeoes
+            WHERE id = {p}
+            """,
+            (historico_id,)
+        )
+
+        historico = cursor.fetchone()
+
+        if not historico:
+            return RedirectResponse(
+                url="/admin-painel/admin/historico?erro=historico_nao_encontrado",
+                status_code=303
+            )
+
+        torneio_id = historico["torneio_id"]
+
+        # ==========================================================
+        # EXCLUIR O REGISTRO DA GALERIA
+        # ==========================================================
+
+        cursor.execute(
+            f"""
+            DELETE FROM historico_campeoes
+            WHERE id = {p}
+            """,
+            (historico_id,)
+        )
+
+        # ==========================================================
+        # EXCLUIR OS DADOS DO TORNEIO ARQUIVADO
+        # ==========================================================
+
+        if torneio_id is not None:
+
+            cursor.execute(
+                f"""
+                DELETE FROM confrontos
+                WHERE torneio_id = {p}
+                """,
+                (torneio_id,)
+            )
+
+            cursor.execute(
+                f"""
+                DELETE FROM atletas
+                WHERE torneio_id = {p}
+                """,
+                (torneio_id,)
+            )
+
+            cursor.execute(
+                f"""
+                DELETE FROM torneios
+                WHERE id = {p}
+                """,
+                (torneio_id,)
+            )
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise
+
+    return RedirectResponse(
+        url="/admin-painel/admin/historico?sucesso=historico_excluido",
+        status_code=303
+    ) 
+
 @app.post("/admin/reset-total-testes")
 @app.post("/admin-painel/admin/reset-total-testes")
-def reset_total_testes(db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def reset_total_testes(
+    db=Depends(get_db),
+    auth: bool = Depends(verificar_admin)
+):
     cursor = db.cursor()
-    
-    cursor.execute("DROP TABLE IF EXISTS confrontos;")
-    cursor.execute("DROP TABLE IF EXISTS atletas;")
-    cursor.execute("DROP TABLE IF EXISTS historico_campeoes;")
-    cursor.execute("DROP TABLE IF EXISTS torneios;")
-    
-    if DATABASE_URL:
-        cursor.execute('''
-            CREATE TABLE torneios (
-                id SERIAL PRIMARY KEY,
-                nome_torneio VARCHAR(255) DEFAULT 'Torneio de Truco Cego',
-                fase_torneio VARCHAR(50) DEFAULT 'INSCRICAO',
-                max_rodadas_classificatoria INTEGER DEFAULT 5,
-                taxa_inscricao REAL DEFAULT 45.00,
-                crono_tempo_restante_seg INTEGER DEFAULT 3000,
-                crono_ativo INTEGER DEFAULT 0,
-                crono_fim_ms BIGINT DEFAULT 0
+    p = "%s" if DATABASE_URL else "?"
+
+    try:
+
+        # ==========================================================
+        # LIMPEZA DOS DADOS OPERACIONAIS
+        # ==========================================================
+        #
+        # IMPORTANTE:
+        # NÃO apagamos a tabela historico_campeoes.
+        #
+        # A Galeria de Campeões é permanente.
+        #
+        cursor.execute("DELETE FROM confrontos;")
+        cursor.execute("DELETE FROM atletas;")
+
+        # ==========================================================
+        # PRESERVAR TORNEIOS QUE JÁ ESTÃO NA GALERIA
+        # ==========================================================
+        #
+        # Torneios que possuem registro em historico_campeoes
+        # permanecem preservados.
+        #
+        cursor.execute("""
+            DELETE FROM torneios
+            WHERE id NOT IN (
+                SELECT torneio_id
+                FROM historico_campeoes
+                WHERE torneio_id IS NOT NULL
             );
-        ''')
-        cursor.execute('''
-            INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-            VALUES ('Torneio de Truco Cego', 45.00, 5, 3000, 'INSCRICAO', 0);
-        ''')
-        cursor.execute('''
-            CREATE TABLE atletas (
-                id SERIAL PRIMARY KEY,
-                torneio_id INTEGER,
-                nome VARCHAR(255) NOT NULL,
-                entidade VARCHAR(255) DEFAULT 'AVULSO',
-                whatsapp VARCHAR(50),
-                status VARCHAR(50) DEFAULT 'PENDENTE',
-                comprovante_url VARCHAR(500) DEFAULT NULL
-            );
-        ''')
-        cursor.execute('''
-            CREATE TABLE confrontos (
-                id SERIAL PRIMARY KEY,
-                torneio_id INTEGER,
-                rodada INTEGER NOT NULL,
-                mesa INTEGER NOT NULL,
-                atleta1_id INTEGER,
-                atleta2_id INTEGER,
-                atleta1_nome VARCHAR(255),
-                atleta2_nome VARCHAR(255),
-                tipo_placar VARCHAR(50) DEFAULT NULL,
-                sets1 INTEGER DEFAULT 0,
-                sets2 INTEGER DEFAULT 0,
-                tentos1 INTEGER DEFAULT 0,
-                tentos2 INTEGER DEFAULT 0,
-                flores1 INTEGER DEFAULT 0,
-                flores2 INTEGER DEFAULT 0,
-                vencedor_id INTEGER
-            );
-        ''')
-        cursor.execute('''
-            CREATE TABLE historico_campeoes (
-                id SERIAL PRIMARY KEY,
-                torneio_id INTEGER,
-                nome_torneio VARCHAR(255),
-                campeao VARCHAR(255),
-                vice VARCHAR(255),
-                terceiro VARCHAR(255),
-                quarto VARCHAR(255),
-                rei_das_flores VARCHAR(255),
-                qtd_flores INTEGER
-            );
-        ''')
-    else:
-        cursor.execute('''
-            CREATE TABLE torneios (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome_torneio TEXT DEFAULT 'Torneio de Truco Cego',
-                fase_torneio TEXT DEFAULT 'INSCRICAO',
-                max_rodadas_classificatoria INTEGER DEFAULT 5,
-                taxa_inscricao REAL DEFAULT 45.00,
-                crono_tempo_restante_seg INTEGER DEFAULT 3000,
-                crono_ativo INTEGER DEFAULT 0,
-                crono_fim_ms INTEGER DEFAULT 0
+        """)
+
+        # ==========================================================
+        # CRIAR NOVO TORNEIO
+        # ==========================================================
+
+        cursor.execute(
+            f"""
+            INSERT INTO torneios (
+                nome_torneio,
+                taxa_inscricao,
+                max_rodadas_classificatoria,
+                crono_tempo_restante_seg,
+                fase_torneio,
+                crono_ativo,
+                crono_fim_ms
             )
-        ''')
-        cursor.execute('''
-            INSERT INTO torneios (nome_torneio, taxa_inscricao, max_rodadas_classificatoria, crono_tempo_restante_seg, fase_torneio, crono_fim_ms) 
-            VALUES ('Torneio de Truco Cego', 45.00, 5, 3000, 'INSCRICAO', 0)
-        ''')
-        cursor.execute('''
-            CREATE TABLE atletas (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                torneio_id INTEGER,
-                nome TEXT NOT NULL,
-                entidade TEXT DEFAULT 'AVULSO',
-                whatsapp TEXT,
-                status TEXT DEFAULT 'PENDENTE'
+            VALUES (
+                {p},
+                {p},
+                {p},
+                {p},
+                {p},
+                {p},
+                {p}
             )
-        ''')
-        cursor.execute('''
-            CREATE TABLE confrontos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                torneio_id INTEGER,
-                rodada INTEGER NOT NULL,
-                mesa INTEGER NOT NULL,
-                atleta1_id INTEGER,
-                atleta2_id INTEGER,
-                atleta1_nome TEXT,
-                atleta2_nome TEXT,
-                tipo_placar TEXT DEFAULT NULL,
-                sets1 INTEGER DEFAULT 0,
-                sets2 INTEGER DEFAULT 0,
-                tentos1 INTEGER DEFAULT 0,
-                tentos2 INTEGER DEFAULT 0,
-                flores1 INTEGER DEFAULT 0,
-                flores2 INTEGER DEFAULT 0,
-                vencedor_id INTEGER
+            """,
+            (
+                "Torneio de Truco Cego",
+                45.00,
+                5,
+                3000,
+                "INSCRICAO",
+                0,
+                0
             )
-        ''')
-        cursor.execute('''
-            CREATE TABLE historico_campeoes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                torneio_id INTEGER,
-                nome_torneio TEXT,
-                campeao TEXT,
-                vice TEXT,
-                terceiro TEXT,
-                quarto TEXT,
-                rei_das_flores TEXT,
-                qtd_flores INTEGER
-            )
-        ''')
-    
-    db.commit()
-    return RedirectResponse(url="/admin-painel/admin/inscricoes?sucesso=banco_zerado", status_code=303)
+        )
+
+        # ==========================================================
+        # CONFIRMAR
+        # ==========================================================
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise
+
+    return RedirectResponse(
+        url="/admin-painel/admin/inscricoes?sucesso=banco_zerado",
+        status_code=303
+    )
 
 @app.post("/admin/cadastrar-direto")
 @app.post("/admin-painel/admin/cadastrar-direto")
