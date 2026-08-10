@@ -296,10 +296,28 @@
 
     <script>
     function confirmarResetMesa() {
-        const passo1 = confirm("⚠️ ATENÇÃO MÁXIMA:\nIsso vai deletar TODOS os guapos cadastrados, confrontos gerados e o histórico da Galeria de Lendas para sempre!\n\nDeseja mesmo prosseguir com a limpeza?");
+        const passo1 = confirm(
+            "⚠️ ATENÇÃO:\n\n" +
+            "Isso irá limpar os dados OPERACIONAIS do torneio atual:\n\n" +
+            "• Competidores cadastrados\n" +
+            "• Confrontos e resultados\n" +
+            "• Mesas e dados da edição atual\n\n" +
+            "✅ A GALERIA DE LENDAS NÃO SERÁ APAGADA.\n" +
+            "As edições já finalizadas permanecerão preservadas.\n\n" +
+            "Um novo torneio será preparado para você iniciar.\n\n" +
+            "Deseja realmente continuar?"
+        );
+    
         if (passo1) {
-            return confirm("🔴 ÚLTIMO AVISO:\nVocê tem certeza absoluta? Essa ação NÃO tem volta e o salão será resetado para o estado inicial de testes.");
+            return confirm(
+                "🔴 ÚLTIMO AVISO:\n\n" +
+                "Você está prestes a reiniciar o salão para uma nova edição.\n\n" +
+                "A Galeria de Lendas continuará preservada.\n\n" +
+                "Os dados operacionais do torneio atual serão limpos.\n\n" +
+                "Deseja confirmar o reinício?"
+            );
         }
+    
         return false;
     }
     </script>
