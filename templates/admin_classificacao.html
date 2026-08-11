@@ -88,6 +88,7 @@
         <div class="card">
             <h2>Tabela de Classificação Geral (Classificatória)</h2>
             <p style="font-size: 0.9rem; color: #8fa393; margin-bottom: 20px;">Critério Oficial: Vitórias > Sets Ganhos > Saldo Tentos > Tentos Pró > Flores.</p>
+            <p style="font-size: 0.88rem; color: #f39c12; margin-bottom: 20px;">🚫 Atletas marcados como desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase. O sistema busca o próximo atleta elegível para completar o corte.</p>
             <table>
                 <thead>
                     <tr>
@@ -102,9 +103,12 @@
                 </thead>
                 <tbody>
                     {% for item in classificacao %}
-                    <tr style="{% if loop.index <= 8 and config.fase_torneio == 'CLASSIFICATORIA' %}background: #193320; border-left: 3px solid #2ecc71;{% endif %}">
+                    <tr>
                         <td><strong>{{ loop.index }}º</strong></td>
-                        <td style="color: #fff; font-weight: bold;">{{ item.nome }}</td>
+                        <td style="color: {% if item.status == 'DESISTENTE' %}#e67e22{% else %}#fff{% endif %}; font-weight: bold;">
+                            {{ item.nome }}
+                            {% if item.status == 'DESISTENTE' %}<span style="margin-left:8px; color:#e67e22; font-size:0.72rem; font-weight:800;">🚫 DESISTENTE</span>{% endif %}
+                        </td>
                         <td style="color: #2ecc71; font-weight: bold; text-align: center;">{{ item.vitorias }}</td>
                         <td style="text-align: center;">{{ item.sets_ganhos }}</td>
                         <td style="color: {% if item.saldo_tentos >= 0 %}#2ecc71{% else %}#e74c3c{% endif %}; font-weight: bold; text-align: center;">
