@@ -685,16 +685,16 @@
             if (historicoAjuste.has(novoParDestino)) repeticoes.push(`Mesa ${destino.mesa}`);
 
             if (repeticoes.length) {
-                const continuar = confirm(
-                    "⚠️ ATENÇÃO — CONFRONTO REPETIDO\n\n" +
+                alert(
+                    "⚠️ CONFRONTO JÁ REALIZADO\n\n" +
                     "Esta troca cria um confronto que já aconteceu anteriormente.\n\n" +
                     "Mesas afetadas: " + repeticoes.join(" e ") + ".\n\n" +
-                    "Normalmente isso deve ser evitado, mas o administrador pode autorizar uma exceção.\n\n" +
-                    "Deseja confirmar este ajuste mesmo assim?"
+                    "Não é permitido repetir adversários neste torneio.\n\n" +
+                    "Escolha outro atleta para realizar o ajuste."
                 );
 
-                if (!continuar) return false;
-                document.getElementById('ajuste_confirmar_excecao').value = "1";
+                document.getElementById('ajuste_confirmar_excecao').value = "0";
+                return false;
             } else {
                 document.getElementById('ajuste_confirmar_excecao').value = "0";
             }
