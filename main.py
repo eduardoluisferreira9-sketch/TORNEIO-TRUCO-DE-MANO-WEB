@@ -768,17 +768,34 @@ def gerar_rodada_admin(
     # ==========================================================
 
     def gerar_solucao(atletas_disponiveis):
+        """
+        Gera UMA solução válida de confrontos.
+
+        IMPORTANTE:
+        - adversário repetido continua sendo proibido;
+        - jogador contra ele mesmo continua sendo proibido;
+        - a entidade NÃO decide sozinha o confronto;
+        - a qualidade da entidade será avaliada na solução completa.
+        """
+
         restantes = atletas_disponiveis.copy()
         random.shuffle(restantes)
 
         pares = []
 
         while restantes:
-            # Escolhe aleatoriamente um atleta entre os restantes.
+
+            # Escolha aleatória do próximo atleta.
             a1 = restantes.pop(
                 random.randrange(len(restantes))
             )
 
+            # ==================================================
+            # CANDIDATOS VÁLIDOS
+            # ==================================================
+            #
+            # Aqui continuam valendo as regras ABSOLUTAS.
+            #
             candidatos = [
                 atleta
                 for atleta in restantes
@@ -789,34 +806,18 @@ def gerar_rodada_admin(
                 return None
 
             # ==================================================
-            # Prioridade:
-            #
-            # 1. adversário nunca enfrentado
-            # 2. entidade diferente
-            # 3. escolha aleatória
-            #
-            # Não usamos ID/nome como critério.
+            # ESCOLHA DO PARCEIRO
             # ==================================================
-
-            candidatos_entidade_diferente = [
-                atleta
-                for atleta in candidatos
-                if str(atleta.get("entidade", "")).strip().upper()
-                != str(a1.get("entidade", "")).strip().upper()
-            ]
-
-            if candidatos_entidade_diferente:
-                candidatos = candidatos_entidade_diferente
-
-            random.shuffle(candidatos)
-
-            # ==================================================
-            # Para evitar escolhas ruins no início da montagem,
-            # damos preferência ao candidato que deixa mais
-            # possibilidades para os demais.
+            #
+            # Não vamos mais obrigar entidade diferente aqui.
+            #
+            # Primeiro procuramos candidatos que mantenham
+            # boas possibilidades para os atletas restantes.
             #
             # Empates continuam sendo resolvidos aleatoriamente.
             # ==================================================
+
+            random.shuffle(candidatos)
 
             melhor_candidatos = []
             melhor_grau = None
@@ -884,24 +885,38 @@ def gerar_rodada_admin(
         candidatos_chapeu = [None]
 
     # ==========================================================
-    # 11. PROCURAR UMA COMBINAÇÃO VÁLIDA
+    # 11. PROCURAR A MELHOR COMBINAÇÃO VÁLIDA
     #
-    # Fazemos várias tentativas aleatórias.
+    # Não aceitamos simplesmente a primeira solução encontrada.
     #
-    # Diferentemente do código antigo, se não houver solução:
-    # NÃO criamos confrontos inválidos.
+    # Fazemos várias tentativas e escolhemos entre as melhores.
+    #
+    # REGRAS ABSOLUTAS:
+    # - adversário repetido continua proibido;
+    # - atleta não pode aparecer duas vezes;
+    # - chapéu não pode ser repetido.
+    #
+    # CRITÉRIO DE QUALIDADE:
+    # - preferir confrontos entre entidades diferentes;
+    # - manter aleatoriedade entre soluções equivalentes.
     # ==========================================================
 
     parceiros_finais = None
     atleta_folga = None
 
+    melhores_solucoes = []
+    melhor_pontuacao = None
+
     MAX_TENTATIVAS = 5000
 
     for tentativa in range(MAX_TENTATIVAS):
 
+        # ------------------------------------------------------
+        # ESCOLHER POSSÍVEL CHAPÉU
+        # ------------------------------------------------------
+
         if len(atletas_lista) % 2 == 1:
 
-            # Em cada tentativa sorteamos novamente o possível chapéu.
             atleta_folga_tentativa = random.choice(candidatos_chapeu)
 
             atletas_para_pareamento = [
@@ -911,24 +926,117 @@ def gerar_rodada_admin(
             ]
 
         else:
+
             atleta_folga_tentativa = None
             atletas_para_pareamento = atletas_lista.copy()
 
+        # ------------------------------------------------------
+        # EMBARALHAR
+        # ------------------------------------------------------
+
         random.shuffle(atletas_para_pareamento)
+
+        # ------------------------------------------------------
+        # TENTAR GERAR UMA SOLUÇÃO COMPLETA
+        # ------------------------------------------------------
 
         solucao = gerar_solucao(atletas_para_pareamento)
 
         if solucao is None:
             continue
 
-        # ======================================================
-        # SOLUÇÃO ENCONTRADA
-        # ======================================================
+        # ------------------------------------------------------
+        # AVALIAR A SOLUÇÃO
+        #
+        # Quanto MENOR a pontuação, melhor.
+        # ------------------------------------------------------
 
-        parceiros_finais = solucao
-        atleta_folga = atleta_folga_tentativa
+        confrontos_mesma_entidade = 0
 
-        break
+        for a1, a2 in solucao:
+
+            if a1["entidade"] == a2["entidade"]:
+                confrontos_mesma_entidade += 1
+
+        # ------------------------------------------------------
+        # SEGUNDO CRITÉRIO:
+        #
+        # Entre soluções com a mesma quantidade de confrontos
+        # da mesma entidade, verificamos se algum desses pares
+        # já aconteceu anteriormente.
+        #
+        # Isso NÃO invalida a solução, porque a regra absoluta
+        # de adversário repetido já foi tratada por par_valido().
+        #
+        # Aqui é apenas um critério de desempate.
+        # ------------------------------------------------------
+
+        peso_historico_entidade = 0
+
+        for a1, a2 in solucao:
+
+            if a1["entidade"] != a2["entidade"]:
+                continue
+
+            chave = tuple(sorted((a1["id"], a2["id"])))
+
+            if chave in historico:
+                peso_historico_entidade += 1
+
+        # ------------------------------------------------------
+        # PONTUAÇÃO
+        #
+        # A prioridade principal é NÃO colocar atletas da mesma
+        # entidade frente a frente.
+        #
+        # O random.random() garante que não fique sempre
+        # escolhendo exatamente a mesma configuração.
+        # ------------------------------------------------------
+
+        pontuacao = (
+            confrontos_mesma_entidade * 1000
+            + peso_historico_entidade * 100
+            + random.random()
+        )
+
+        # ------------------------------------------------------
+        # PRIMEIRA SOLUÇÃO
+        # ------------------------------------------------------
+
+        if melhor_pontuacao is None:
+
+            melhor_pontuacao = pontuacao
+
+            melhores_solucoes = [{
+                "solucao": solucao,
+                "folga": atleta_folga_tentativa
+            }]
+
+        # ------------------------------------------------------
+        # SOLUÇÃO MELHOR
+        # ------------------------------------------------------
+
+        elif pontuacao < melhor_pontuacao:
+
+            melhor_pontuacao = pontuacao
+
+            melhores_solucoes = [{
+                "solucao": solucao,
+                "folga": atleta_folga_tentativa
+            }]
+
+        # ------------------------------------------------------
+        # SOLUÇÃO EQUIVALENTE
+        #
+        # Mantemos também para preservar aleatoriedade.
+        # ------------------------------------------------------
+
+        elif pontuacao == melhor_pontuacao:
+
+            melhores_solucoes.append({
+                "solucao": solucao,
+                "folga": atleta_folga_tentativa
+            })
 
     # ==========================================================
     # 12. SE NÃO EXISTIR SOLUÇÃO, NÃO GERAR RODADA
