@@ -768,34 +768,17 @@ def gerar_rodada_admin(
     # ==========================================================
 
     def gerar_solucao(atletas_disponiveis):
-        """
-        Gera UMA solução válida de confrontos.
-
-        IMPORTANTE:
-        - adversário repetido continua sendo proibido;
-        - jogador contra ele mesmo continua sendo proibido;
-        - a entidade NÃO decide sozinha o confronto;
-        - a qualidade da entidade será avaliada na solução completa.
-        """
-
         restantes = atletas_disponiveis.copy()
         random.shuffle(restantes)
 
         pares = []
 
         while restantes:
-
-            # Escolha aleatória do próximo atleta.
+            # Escolhe aleatoriamente um atleta entre os restantes.
             a1 = restantes.pop(
                 random.randrange(len(restantes))
             )
 
-            # ==================================================
-            # CANDIDATOS VÁLIDOS
-            # ==================================================
-            #
-            # Aqui continuam valendo as regras ABSOLUTAS.
-            #
             candidatos = [
                 atleta
                 for atleta in restantes
@@ -806,18 +789,34 @@ def gerar_rodada_admin(
                 return None
 
             # ==================================================
-            # ESCOLHA DO PARCEIRO
+            # Prioridade:
+            #
+            # 1. adversário nunca enfrentado
+            # 2. entidade diferente
+            # 3. escolha aleatória
+            #
+            # Não usamos ID/nome como critério.
             # ==================================================
-            #
-            # Não vamos mais obrigar entidade diferente aqui.
-            #
-            # Primeiro procuramos candidatos que mantenham
-            # boas possibilidades para os atletas restantes.
+
+            candidatos_entidade_diferente = [
+                atleta
+                for atleta in candidatos
+                if str(atleta.get("entidade", "")).strip().upper()
+                != str(a1.get("entidade", "")).strip().upper()
+            ]
+
+            if candidatos_entidade_diferente:
+                candidatos = candidatos_entidade_diferente
+
+            random.shuffle(candidatos)
+
+            # ==================================================
+            # Para evitar escolhas ruins no início da montagem,
+            # damos preferência ao candidato que deixa mais
+            # possibilidades para os demais.
             #
             # Empates continuam sendo resolvidos aleatoriamente.
             # ==================================================
-
-            random.shuffle(candidatos)
 
             melhor_candidatos = []
             melhor_grau = None
