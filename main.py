@@ -1038,15 +1038,21 @@ def gerar_rodada_admin(
             })
 
     # ==========================================================
-    # 12. SE NÃO EXISTIR SOLUÇÃO, NÃO GERAR RODADA
+    # 12. ESCOLHER A MELHOR SOLUÇÃO ENCONTRADA
     # ==========================================================
-
-    if parceiros_finais is None:
-
+    
+    if not melhores_solucoes:
         return RedirectResponse(
             url="/admin-painel/admin/jogos?erro=nao_foi_possivel_formar_rodada",
             status_code=303
         )
+    
+    # Escolhe aleatoriamente entre as melhores soluções equivalentes.
+    # Isso mantém o sorteio imprevisível.
+    solucao_escolhida = random.choice(melhores_solucoes)
+    
+    parceiros_finais = solucao_escolhida["solucao"]
+    atleta_folga = solucao_escolhida["folga"]
 
     # ==========================================================
     # 13. VALIDAÇÃO FINAL DE SEGURANÇA
