@@ -567,6 +567,25 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
     qtd_pendentes = res_concluida["total"] if isinstance(res_concluida, dict) else res_concluida[0]
     rodada_concluida = (qtd_pendentes == 0) if confrontos else False
 
+    # Histórico de adversários para o ajuste manual.
+    # A rodada atual fica fora porque estamos apenas reorganizando os jogos dela.
+    cursor.execute(
+        f"""
+        SELECT atleta1_id, atleta2_id
+        FROM confrontos
+        WHERE torneio_id = {p}
+          AND rodada > 0
+          AND rodada != {p}
+          AND atleta2_id IS NOT NULL
+        """,
+        (cfg["id"], rodada_atual)
+    )
+    historico_ajuste = [
+        [int(r["atleta1_id"]), int(r["atleta2_id"])]
+        for r in cursor.fetchall()
+        if r["atleta1_id"] is not None and r["atleta2_id"] is not None
+    ]
+
     mins = cfg["crono_tempo_restante_seg"] // 60
     segs = cfg["crono_tempo_restante_seg"] % 60
     tempo_formatado = f"{mins:02d}:{segs:02d}"
@@ -579,8 +598,9 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
             "torneio": cfg, 
             "rodada": rodada_atual, 
             "fase_atual_rodada": rodada_atual, 
-            "confrontos": confrontos, 
-            "rodada_concluida": rodada_concluida, 
+            "confrontos": confrontos,
+            "rodada_concluida": rodada_concluida,
+            "historico_ajuste": historico_ajuste,
             "tempo_formatado": tempo_formatado, 
             "aba_ativa": "jogos"
         }
@@ -1506,6 +1526,240 @@ def salvar_placar(confronto_id: int = Form(...), vencedor_id: int = Form(...), t
         return JSONResponse(status_code=e.status_code, content={"erro": e.detail})
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/jogos", status_code=303)
+
+
+@app.post("/admin/ajustar-confronto")
+@app.post("/admin-painel/admin/ajustar-confronto")
+def ajustar_confronto_admin(
+    confronto_id_origem: int = Form(...),
+    jogador_origem_id: int = Form(...),
+    confronto_id_destino: int = Form(...),
+    jogador_destino_id: int = Form(...),
+    confirmar_excecao: bool = Form(False),
+    db=Depends(get_db),
+    auth: bool = Depends(verificar_admin)
+):
+    """
+    Troca dois atletas entre duas mesas da rodada atual.
+
+    Segurança:
+    - somente a rodada atualmente exibida pode ser alterada;
+    - nenhuma das duas partidas pode ter resultado lançado;
+    - folga automática não pode ser usada nesta troca;
+    - cada atleta continua aparecendo uma única vez na rodada;
+    - se a troca criar adversário repetido, o administrador precisa
+      confirmar explicitamente a exceção.
+    """
+    cursor = db.cursor()
+    cfg = obtener_torneio_ativo(cursor)
+    p = "%s" if DATABASE_URL else "?"
+
+    if not cfg:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=torneio_nao_encontrado",
+            status_code=303
+        )
+
+    cursor.execute(
+        f"SELECT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY id DESC LIMIT 1",
+        (cfg["id"],)
+    )
+    ultima = cursor.fetchone()
+    if not ultima:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=nenhum_jogo",
+            status_code=303
+        )
+
+    rodada_atual = ultima["rodada"]
+
+    if rodada_atual <= 0:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=ajuste_apenas_classificatoria",
+            status_code=303
+        )
+
+    if confronto_id_origem == confronto_id_destino:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=mesma_mesa",
+            status_code=303
+        )
+
+    cursor.execute(
+        f"""
+        SELECT id, rodada, mesa, atleta1_id, atleta2_id, atleta1_nome, atleta2_nome,
+               vencedor_id
+        FROM confrontos
+        WHERE id IN ({p}, {p})
+          AND torneio_id = {p}
+        ORDER BY id
+        """,
+        (confronto_id_origem, confronto_id_destino, cfg["id"])
+    )
+    encontrados = cursor.fetchall()
+
+    if len(encontrados) != 2:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=confronto_nao_encontrado",
+            status_code=303
+        )
+
+    confs = {int(r["id"]): r for r in encontrados}
+    origem = confs.get(confronto_id_origem)
+    destino = confs.get(confronto_id_destino)
+
+    if not origem or not destino:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=confronto_nao_encontrado",
+            status_code=303
+        )
+
+    if origem["rodada"] != rodada_atual or destino["rodada"] != rodada_atual:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=rodada_invalida",
+            status_code=303
+        )
+
+    # Não mexer em partidas já lançadas nem na folga automática.
+    if origem["vencedor_id"] is not None or destino["vencedor_id"] is not None:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=ajuste_jogo_ja_lancado",
+            status_code=303
+        )
+
+    if origem["atleta2_id"] is None or destino["atleta2_id"] is None:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=ajuste_folga_nao_permitida",
+            status_code=303
+        )
+
+    jogadores_origem = {int(origem["atleta1_id"]), int(origem["atleta2_id"])}
+    jogadores_destino = {int(destino["atleta1_id"]), int(destino["atleta2_id"])}
+
+    if jogador_origem_id not in jogadores_origem or jogador_destino_id not in jogadores_destino:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=atleta_invalido",
+            status_code=303
+        )
+
+    if jogador_origem_id == jogador_destino_id:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=mesmo_atleta",
+            status_code=303
+        )
+
+    # Descobre quem permanece em cada mesa após a troca.
+    restante_origem = (
+        origem["atleta2_id"]
+        if int(origem["atleta1_id"]) == jogador_origem_id
+        else origem["atleta1_id"]
+    )
+    restante_destino = (
+        destino["atleta2_id"]
+        if int(destino["atleta1_id"]) == jogador_destino_id
+        else destino["atleta1_id"]
+    )
+
+    novos_pares = [
+        tuple(sorted((int(restante_origem), int(jogador_destino_id)))),
+        tuple(sorted((int(restante_destino), int(jogador_origem_id))))
+    ]
+
+    # Histórico anterior à rodada atual.
+    cursor.execute(
+        f"""
+        SELECT atleta1_id, atleta2_id
+        FROM confrontos
+        WHERE torneio_id = {p}
+          AND rodada > 0
+          AND rodada != {p}
+          AND atleta2_id IS NOT NULL
+        """,
+        (cfg["id"], rodada_atual)
+    )
+    historico = {
+        tuple(sorted((int(r["atleta1_id"]), int(r["atleta2_id"]))))
+        for r in cursor.fetchall()
+        if r["atleta1_id"] is not None and r["atleta2_id"] is not None
+    }
+
+    repetidos = [par for par in novos_pares if par in historico]
+
+    if repetidos and not confirmar_excecao:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=ajuste_repeticao",
+            status_code=303
+        )
+
+    # Faz a troca somente dos atletas. Resultado, placar e demais dados
+    # permanecem intocados porque a partida ainda não começou.
+    if int(origem["atleta1_id"]) == jogador_origem_id:
+        origem_novo1_id = jogador_destino_id
+        origem_novo1_nome = destino["atleta1_nome"] if int(destino["atleta1_id"]) == jogador_destino_id else destino["atleta2_nome"]
+    else:
+        origem_novo1_id = origem["atleta1_id"]
+        origem_novo1_nome = origem["atleta1_nome"]
+
+    if int(origem["atleta2_id"]) == jogador_origem_id:
+        origem_novo2_id = jogador_destino_id
+        origem_novo2_nome = destino["atleta1_nome"] if int(destino["atleta1_id"]) == jogador_destino_id else destino["atleta2_nome"]
+    else:
+        origem_novo2_id = origem["atleta2_id"]
+        origem_novo2_nome = origem["atleta2_nome"]
+
+    if int(destino["atleta1_id"]) == jogador_destino_id:
+        destino_novo1_id = jogador_origem_id
+        destino_novo1_nome = origem["atleta1_nome"] if int(origem["atleta1_id"]) == jogador_origem_id else origem["atleta2_nome"]
+    else:
+        destino_novo1_id = destino["atleta1_id"]
+        destino_novo1_nome = destino["atleta1_nome"]
+
+    if int(destino["atleta2_id"]) == jogador_destino_id:
+        destino_novo2_id = jogador_origem_id
+        destino_novo2_nome = origem["atleta1_nome"] if int(origem["atleta1_id"]) == jogador_origem_id else origem["atleta2_nome"]
+    else:
+        destino_novo2_id = destino["atleta2_id"]
+        destino_novo2_nome = destino["atleta2_nome"]
+
+    try:
+        cursor.execute(
+            f"""
+            UPDATE confrontos
+            SET atleta1_id = {p}, atleta1_nome = {p},
+                atleta2_id = {p}, atleta2_nome = {p}
+            WHERE id = {p} AND torneio_id = {p}
+            """,
+            (
+                origem_novo1_id, origem_novo1_nome,
+                origem_novo2_id, origem_novo2_nome,
+                origem["id"], cfg["id"]
+            )
+        )
+
+        cursor.execute(
+            f"""
+            UPDATE confrontos
+            SET atleta1_id = {p}, atleta1_nome = {p},
+                atleta2_id = {p}, atleta2_nome = {p}
+            WHERE id = {p} AND torneio_id = {p}
+            """,
+            (
+                destino_novo1_id, destino_novo1_nome,
+                destino_novo2_id, destino_novo2_nome,
+                destino["id"], cfg["id"]
+            )
+        )
+
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    return RedirectResponse(
+        url="/admin-painel/admin/jogos?sucesso=ajuste_realizado",
+        status_code=303
+    )
+
 
 @app.get("/admin/classificacao")
 @app.get("/admin-painel/admin/classificacao")
