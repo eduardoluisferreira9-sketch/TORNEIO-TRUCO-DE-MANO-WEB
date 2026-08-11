@@ -522,9 +522,9 @@
             {
                 id: {{ c.id }},
                 mesa: {{ c.mesa }},
-                atleta1_id: {{ id_atleta1 if id_atleta1 is not none else 'null' }},
+                atleta1_id: {{ c.atleta1_id if c.atleta1_id is not none else 'null' }},
                 atleta1_nome: "{{ c.atleta1_nome|escapejs }}",
-                atleta2_id: {{ id_atleta2 if id_atleta2 is not none else 'null' }},
+                atleta2_id: {{ c.atleta2_id if c.atleta2_id is not none else 'null' }},
                 atleta2_nome: "{{ (c.atleta2_nome if c.atleta2_nome else '')|escapejs }}",
                 vencedor_id: {{ c.vencedor_id if c.vencedor_id is not none else 'null' }}
             },
