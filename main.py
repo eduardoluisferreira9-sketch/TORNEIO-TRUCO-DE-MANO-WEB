@@ -627,9 +627,9 @@ def gerar_rodada_admin(
     # Refazer NÃO cria uma nova rodada.
     # Ele substitui a rodada classificatória atual.
     # ==========================================================
-    
+
     if refazer:
-    
+
         # Só podemos refazer uma rodada classificatória existente.
         if rodada_atual <= 0:
             return RedirectResponse(
@@ -637,59 +637,59 @@ def gerar_rodada_admin(
                 status_code=303
             )
 
-    # ------------------------------------------------------
-    # VERIFICAR SE ALGUM JOGO REAL JÁ POSSUI RESULTADO
-    #
-    # A folga automática possui vencedor_id preenchido,
-    # portanto ela NÃO conta como partida disputada.
-    # ------------------------------------------------------
-    cursor.execute(
-        f"""
-        SELECT COUNT(*)
-        FROM confrontos
-        WHERE rodada = {p}
-          AND torneio_id = {p}
-          AND atleta2_id IS NOT NULL
-          AND vencedor_id IS NOT NULL
-        """,
-        (rodada_atual, cfg["id"])
-    )
-
-    partidas_com_resultado = cursor.fetchone()[0]
-
-    if partidas_com_resultado > 0:
-        return RedirectResponse(
-            url="/admin-painel/admin/jogos?erro=rodada_ja_iniciada",
-            status_code=303
-        )
-
-    # A nova rodada terá o MESMO número da rodada atual.
-    proxima_rodada = rodada_atual
-
-else:
-
-    # ======================================================
-    # 2. NÃO PERMITIR NOVA RODADA ENQUANTO A ATUAL
-    #    NÃO TERMINAR
-    # ======================================================
-
-    if rodada_atual > 0:
+        # ------------------------------------------------------
+        # VERIFICAR SE ALGUM JOGO REAL JÁ POSSUI RESULTADO
+        #
+        # A folga automática possui vencedor_id preenchido,
+        # portanto ela NÃO conta como partida disputada.
+        # ------------------------------------------------------
         cursor.execute(
             f"""
             SELECT COUNT(*)
             FROM confrontos
             WHERE rodada = {p}
               AND torneio_id = {p}
-              AND vencedor_id IS NULL
+              AND atleta2_id IS NOT NULL
+              AND vencedor_id IS NOT NULL
             """,
             (rodada_atual, cfg["id"])
         )
 
-        if cursor.fetchone()[0] > 0:
+        partidas_com_resultado = cursor.fetchone()[0]
+
+        if partidas_com_resultado > 0:
             return RedirectResponse(
-                url="/admin-painel/admin/jogos?erro=jogos_pendentes",
+                url="/admin-painel/admin/jogos?erro=rodada_ja_iniciada",
                 status_code=303
             )
+
+        # A nova rodada terá o MESMO número da rodada atual.
+        proxima_rodada = rodada_atual
+
+    else:
+
+        # ======================================================
+        # 2. NÃO PERMITIR NOVA RODADA ENQUANTO A ATUAL
+        #    NÃO TERMINAR
+        # ======================================================
+
+        if rodada_atual > 0:
+            cursor.execute(
+                f"""
+                SELECT COUNT(*)
+                FROM confrontos
+                WHERE rodada = {p}
+                  AND torneio_id = {p}
+                  AND vencedor_id IS NULL
+                """,
+                (rodada_atual, cfg["id"])
+            )
+
+            if cursor.fetchone()[0] > 0:
+                return RedirectResponse(
+                    url="/admin-painel/admin/jogos?erro=jogos_pendentes",
+                    status_code=303
+                )
 
     # ==========================================================
     # 3. VERIFICAR LIMITE DE RODADAS
