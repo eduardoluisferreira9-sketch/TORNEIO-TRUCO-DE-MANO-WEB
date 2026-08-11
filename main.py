@@ -276,7 +276,7 @@ def atualizar_e_obter_cronometro(db):
 
 def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     p = "%s" if DATABASE_URL else "?"
-    cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (torneio_id,))
+    cursor.execute(f"SELECT id, nome, status FROM atletas WHERE status IN ('APROVADO', 'DESISTENTE') AND torneio_id = {p} ORDER BY nome ASC", (torneio_id,))
     todos_atletas = cursor.fetchall()
     lista_classificacao = []
     
@@ -309,7 +309,7 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
         flores = p1["fl"] + p2["fl"]
         
         lista_classificacao.append({
-            "id": atleta_id, "nome": atleta["nome"], "vitorias": vitorias, "sets_ganhos": sets_ganhos,
+            "id": atleta_id, "nome": atleta["nome"], "status": atleta["status"], "vitorias": vitorias, "sets_ganhos": sets_ganhos,
             "saldo_tentos": tentos_pro - tentos_contra, "tentos_pro": tentos_pro, "flores": flores, "chapeu_jogados": p1["byes"]
         })
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
@@ -489,11 +489,13 @@ def aba_inscricoes(request: Request, db=Depends(get_db), auth: bool = Depends(ve
     pendentes = cursor.fetchall()
     cursor.execute(f"SELECT * FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p} ORDER BY nome ASC", (cfg["id"],))
     oficiais = cursor.fetchall()
+    cursor.execute(f"SELECT * FROM atletas WHERE status = 'DESISTENTE' AND torneio_id = {p} ORDER BY nome ASC", (cfg["id"],))
+    desistentes = cursor.fetchall()
     total_arrecadado = len(oficiais) * cfg['taxa_inscricao']
     
     return templates.TemplateResponse(
         request=request, name="admin_inscricoes.html", 
-        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
+        context={"config": cfg, "pendentes": pendentes, "oficiais": oficiais, "desistentes": desistentes, "total_arrecadado": str(total_arrecadado), "aba_ativa": "inscricoes"}
     )
 
 @app.post("/admin/salvar-configuracoes")
@@ -1386,7 +1388,10 @@ def disparar_matamata(corte: int = Form(...), tempo_minutos: int = Form(None), d
     if len(ranking) < corte:
         return RedirectResponse(url="/admin-painel/admin/classificacao?erro=atletas_insuficientes_para_corte", status_code=303)
 
-    classificados = ranking[:corte]
+    # Desistentes permanecem na classificação, mas não ocupam vaga na próxima fase.
+    classificados = [atleta for atleta in ranking if atleta.get("status") != "DESISTENTE"][:corte]
+    if len(classificados) < corte:
+        return RedirectResponse(url="/admin-painel/admin/classificacao?erro=atletas_insuficientes_para_corte", status_code=303)
     cursor.execute(f"UPDATE torneios SET fase_torneio = 'MATA_MATA' WHERE id = {p}", (cfg["id"],))
     
     if corte == 16: fase_id = -1
@@ -2075,12 +2080,25 @@ def cadastrar_direto_admin(nome: str = Form(...), entity: str = Form(None), enti
 def acao_atleta_admin(id_atleta: int = Form(...), acao: str = Form(...), db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cursor = db.cursor()
     p = "%s" if DATABASE_URL else "?"
+    cfg = obtener_torneio_ativo(cursor)
+
     if acao == "aprovar":
         cursor.execute(f"UPDATE atletas SET status = 'APROVADO' WHERE id = {p}", (id_atleta,))
-    elif acao in ["recusar", "excluir"]:
+    elif acao == "desistir":
+        if cfg["fase_torneio"] == "INSCRICAO":
+            return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=torneio_nao_iniciado", status_code=303)
+        cursor.execute(f"UPDATE atletas SET status = 'DESISTENTE' WHERE id = {p}", (id_atleta,))
+    elif acao == "reativar":
+        if cfg["fase_torneio"] != "CLASSIFICATORIA":
+            return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=reativacao_indisponivel", status_code=303)
+        cursor.execute(f"UPDATE atletas SET status = 'APROVADO' WHERE id = {p}", (id_atleta,))
+    elif acao == "excluir":
+        if cfg["fase_torneio"] != "INSCRICAO":
+            return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=exclusao_bloqueada_torneio_iniciado", status_code=303)
         cursor.execute(f"DELETE FROM atletas WHERE id = {p}", (id_atleta,))
     db.commit()
     return RedirectResponse(url="/admin-painel/admin/inscricoes", status_code=303)
+
 
 @app.get("/telao", response_class=HTMLResponse)
 def pagina_telao_publico(request: Request, db=Depends(get_db)):
