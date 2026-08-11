@@ -590,6 +590,7 @@ def aba_jogos(request: Request, db=Depends(get_db), auth: bool = Depends(verific
 @app.post("/admin-painel/admin/gerar-rodada")
 def gerar_rodada_admin(
     tempo_minutos: int = Form(None),
+    refazer: bool = Form(False),
     db=Depends(get_db),
     auth: bool = Depends(verificar_admin)
 ):
@@ -619,10 +620,58 @@ def gerar_rodada_admin(
 
     rodada_atual = cursor.fetchone()[0]
     proxima_rodada = rodada_atual + 1
+    
+    # ==========================================================
+    # 2. MODO REFAZER RODADA
+    #
+    # Refazer NÃO cria uma nova rodada.
+    # Ele substitui a rodada classificatória atual.
+    # ==========================================================
+    
+    if refazer:
+    
+        # Só podemos refazer uma rodada classificatória existente.
+        if rodada_atual <= 0:
+            return RedirectResponse(
+                url="/admin-painel/admin/jogos?erro=refazer_indisponivel",
+                status_code=303
+            )
 
-    # ==========================================================
-    # 2. NÃO PERMITIR NOVA RODADA ENQUANTO A ATUAL NÃO TERMINAR
-    # ==========================================================
+    # ------------------------------------------------------
+    # VERIFICAR SE ALGUM JOGO REAL JÁ POSSUI RESULTADO
+    #
+    # A folga automática possui vencedor_id preenchido,
+    # portanto ela NÃO conta como partida disputada.
+    # ------------------------------------------------------
+    cursor.execute(
+        f"""
+        SELECT COUNT(*)
+        FROM confrontos
+        WHERE rodada = {p}
+          AND torneio_id = {p}
+          AND atleta2_id IS NOT NULL
+          AND vencedor_id IS NOT NULL
+        """,
+        (rodada_atual, cfg["id"])
+    )
+
+    partidas_com_resultado = cursor.fetchone()[0]
+
+    if partidas_com_resultado > 0:
+        return RedirectResponse(
+            url="/admin-painel/admin/jogos?erro=rodada_ja_iniciada",
+            status_code=303
+        )
+
+    # A nova rodada terá o MESMO número da rodada atual.
+    proxima_rodada = rodada_atual
+
+else:
+
+    # ======================================================
+    # 2. NÃO PERMITIR NOVA RODADA ENQUANTO A ATUAL
+    #    NÃO TERMINAR
+    # ======================================================
 
     if rodada_atual > 0:
         cursor.execute(
@@ -674,29 +723,40 @@ def gerar_rodada_admin(
             status_code=303
         )
 
-    # ==========================================================
-    # 5. HISTÓRICO DE ADVERSÁRIOS
-    #
-    # Nunca poderá acontecer:
-    #
-    # João x Pedro
-    # ...
-    # novamente João x Pedro
-    #
-    # Independentemente da posição dos atletas.
-    # ==========================================================
-
-    cursor.execute(
-        f"""
-        SELECT atleta1_id, atleta2_id
-        FROM confrontos
-        WHERE atleta2_id IS NOT NULL
-          AND rodada > 0
-          AND torneio_id = {p}
-        """,
-        (cfg["id"],)
-    )
-
+   # ==========================================================
+   # 5. HISTÓRICO DE ADVERSÁRIOS
+   #
+   # Quando estamos refazendo a rodada atual, a própria rodada
+   # atual NÃO pode participar do histórico.
+   # ==========================================================
+    
+   if refazer:
+    
+       cursor.execute(
+          f"""
+          SELECT atleta1_id, atleta2_id
+          FROM confrontos
+           WHERE atleta2_id IS NOT NULL
+             AND rodada > 0
+             AND rodada != {p}
+             AND torneio_id = {p}
+           """,
+           (rodada_atual, cfg["id"])
+       )
+    
+   else:
+    
+       cursor.execute(
+           f"""
+           SELECT atleta1_id, atleta2_id
+           FROM confrontos
+           WHERE atleta2_id IS NOT NULL
+             AND rodada > 0
+             AND torneio_id = {p}
+           """,
+           (cfg["id"],)
+       )
+    
     historico = {
         tuple(sorted((r["atleta1_id"], r["atleta2_id"])))
         for r in cursor.fetchall()
@@ -704,27 +764,35 @@ def gerar_rodada_admin(
 
     # ==========================================================
     # 6. HISTÓRICO DE CHAPÉUS
-    #
-    # Um atleta só pode receber CHAPÉU uma vez.
-    #
-    # Os chapéis são registrados como:
-    #
-    # atleta1_id = atleta que recebeu o chapéu
-    # atleta2_id = NULL
-    #
     # ==========================================================
-
-    cursor.execute(
-        f"""
-        SELECT atleta1_id
-        FROM confrontos
-        WHERE atleta2_id IS NULL
-          AND rodada > 0
-          AND torneio_id = {p}
-        """,
-        (cfg["id"],)
-    )
-
+    
+    if refazer:
+    
+        cursor.execute(
+            f"""
+            SELECT atleta1_id
+            FROM confrontos
+            WHERE atleta2_id IS NULL
+              AND rodada > 0
+              AND rodada != {p}
+              AND torneio_id = {p}
+            """,
+            (rodada_atual, cfg["id"])
+        )
+    
+    else:
+    
+        cursor.execute(
+            f"""
+            SELECT atleta1_id
+            FROM confrontos
+            WHERE atleta2_id IS NULL
+              AND rodada > 0
+              AND torneio_id = {p}
+            """,
+            (cfg["id"],)
+        )
+    
     atletas_que_ja_tiveram_chapeu = {
         r["atleta1_id"]
         for r in cursor.fetchall()
