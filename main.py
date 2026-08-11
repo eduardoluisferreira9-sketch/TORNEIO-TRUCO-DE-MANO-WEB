@@ -1206,6 +1206,25 @@ else:
     random.shuffle(parceiros_finais)
 
     # ==========================================================
+    # 16.5. SE FOR REFAZER, REMOVER A RODADA ANTIGA
+    #
+    # Só chegamos aqui depois de encontrar uma nova solução
+    # válida. Assim, nunca apagamos a rodada sem ter uma
+    # nova combinação pronta.
+    # ==========================================================
+    
+    if refazer:
+    
+        cursor.execute(
+            f"""
+            DELETE FROM confrontos
+            WHERE rodada = {p}
+              AND torneio_id = {p}
+            """,
+            (rodada_atual, cfg["id"])
+        )
+
+    # ==========================================================
     # 17. GRAVAR AS MESAS
     # ==========================================================
 
