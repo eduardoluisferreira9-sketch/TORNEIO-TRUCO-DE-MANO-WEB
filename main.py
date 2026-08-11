@@ -723,40 +723,40 @@ def gerar_rodada_admin(
             status_code=303
         )
 
-   # ==========================================================
-   # 5. HISTÓRICO DE ADVERSÁRIOS
-   #
-   # Quando estamos refazendo a rodada atual, a própria rodada
-   # atual NÃO pode participar do histórico.
-   # ==========================================================
-    
-   if refazer:
-    
-       cursor.execute(
-          f"""
-          SELECT atleta1_id, atleta2_id
-          FROM confrontos
-           WHERE atleta2_id IS NOT NULL
-             AND rodada > 0
-             AND rodada != {p}
-             AND torneio_id = {p}
-           """,
-           (rodada_atual, cfg["id"])
-       )
-    
-   else:
-    
-       cursor.execute(
-           f"""
-           SELECT atleta1_id, atleta2_id
-           FROM confrontos
-           WHERE atleta2_id IS NOT NULL
-             AND rodada > 0
-             AND torneio_id = {p}
-           """,
-           (cfg["id"],)
-       )
-    
+ # ==========================================================
+    # 5. HISTÓRICO DE ADVERSÁRIOS
+    #
+    # Quando estamos refazendo a rodada atual, a própria rodada
+    # atual NÃO pode participar do histórico.
+    # ==========================================================
+
+    if refazer:
+
+        cursor.execute(
+            f"""
+            SELECT atleta1_id, atleta2_id
+            FROM confrontos
+            WHERE atleta2_id IS NOT NULL
+              AND rodada > 0
+              AND rodada != {p}
+              AND torneio_id = {p}
+            """,
+            (rodada_atual, cfg["id"])
+        )
+
+    else:
+
+        cursor.execute(
+            f"""
+            SELECT atleta1_id, atleta2_id
+            FROM confrontos
+            WHERE atleta2_id IS NOT NULL
+              AND rodada > 0
+              AND torneio_id = {p}
+            """,
+            (cfg["id"],)
+        )
+
     historico = {
         tuple(sorted((r["atleta1_id"], r["atleta2_id"])))
         for r in cursor.fetchall()
@@ -765,9 +765,9 @@ def gerar_rodada_admin(
     # ==========================================================
     # 6. HISTÓRICO DE CHAPÉUS
     # ==========================================================
-    
+
     if refazer:
-    
+
         cursor.execute(
             f"""
             SELECT atleta1_id
@@ -779,9 +779,9 @@ def gerar_rodada_admin(
             """,
             (rodada_atual, cfg["id"])
         )
-    
+
     else:
-    
+
         cursor.execute(
             f"""
             SELECT atleta1_id
@@ -792,7 +792,7 @@ def gerar_rodada_admin(
             """,
             (cfg["id"],)
         )
-    
+
     atletas_que_ja_tiveram_chapeu = {
         r["atleta1_id"]
         for r in cursor.fetchall()
