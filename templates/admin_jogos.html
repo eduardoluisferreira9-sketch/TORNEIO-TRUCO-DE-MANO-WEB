@@ -72,6 +72,56 @@
         
         .btn-impressao-mesa { background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--ouro-brilhante); padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
         .btn-impressao-mesa:hover { background: var(--ouro); color: var(--texto-escuro); border-color: var(--ouro-brilhante); }
+
+        .btn-ajuste {
+            background: linear-gradient(135deg, #8e44ad 0%, #5b2c6f 100%);
+            border: 1px solid #bb8fce;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-ajuste:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+        .mesa-acoes {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .ajuste-aviso {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            color: var(--texto-subtil);
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            margin-bottom: 18px;
+        }
+        .ajuste-select {
+            width: 100%;
+            padding: 11px;
+            background: #050d08;
+            color: #fff;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            box-sizing: border-box;
+        }
+        .ajuste-select:focus {
+            outline: none;
+            border-color: var(--ouro);
+        }
         
         .btn-impressao-geral { background: linear-gradient(135deg, #1b3d28 0%, #092113 100%); border: 1px solid var(--ouro); color: var(--ouro-brilhante); padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.2s; margin-right: 12px; display: inline-flex; align-items: center; gap: 8px; }
         .btn-impressao-geral:hover { background: linear-gradient(135deg, #255437 0%, #0d2e1b 100%); border-color: var(--ouro-brilhante); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(212,175,55,0.15); }
@@ -314,7 +364,12 @@
                 </span>
                 
                 {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|escapejs }}', '{{ c.atleta2_nome|escapejs }}')">🖨️ Súmula</button>
+                <div class="mesa-acoes">
+                    <button type="button" class="btn-impressao-mesa" onclick="imprimirSumulaIndividual('{{ c.mesa }}', '{{ c.atleta1_nome|escapejs }}', '{{ c.atleta2_nome|escapejs }}')">🖨️ Súmula</button>
+                    {% if not c.vencedor_id and rodada > 0 %}
+                    <button type="button" class="btn-ajuste" onclick="abrirModalAjuste('{{ c.id }}')">✏️ Ajustar</button>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
             
@@ -414,6 +469,42 @@
         </div>
     </div>
 
+    <div class="modal" id="modalAjuste">
+        <div class="modal-content" style="width: 520px; max-width: calc(100vw - 40px);">
+            <h3 style="margin: 0 0 5px 0; color: var(--ouro); font-family: 'Cinzel', serif;">✏️ Ajuste Manual de Confronto</h3>
+            <p style="margin: 0 0 20px 0; font-size: 0.82rem; color: var(--texto-subtil);">
+                Troque dois atletas entre mesas sem refazer a rodada inteira.
+            </p>
+
+            <div class="ajuste-aviso">
+                <strong style="color: var(--ouro-brilhante);">Como funciona:</strong><br>
+                Escolha o atleta da mesa atual e depois a mesa/atleta com quem ele será trocado.
+                Partidas que já possuem resultado lançado não podem ser alteradas.
+            </div>
+
+            <form action="/admin-painel/admin/ajustar-confronto" method="POST" onsubmit="return validarAjusteManual();">
+                <input type="hidden" name="confronto_id_origem" id="ajuste_conf_origem">
+                <input type="hidden" name="confirmar_excecao" id="ajuste_confirmar_excecao" value="0">
+
+                <label>1. Atleta que será movido</label>
+                <select class="ajuste-select" id="ajuste_jogador_origem" name="jogador_origem_id" onchange="atualizarPreviewAjuste()"></select>
+
+                <label>2. Mesa de destino</label>
+                <select class="ajuste-select" id="ajuste_conf_destino" name="confronto_id_destino" onchange="atualizarJogadorDestino()"></select>
+
+                <label>3. Atleta da mesa de destino que será trocado</label>
+                <select class="ajuste-select" id="ajuste_jogador_destino" name="jogador_destino_id" onchange="atualizarPreviewAjuste()"></select>
+
+                <div id="ajuste-preview" class="ajuste-aviso" style="margin-top: 18px; margin-bottom: 0;"></div>
+
+                <div style="margin-top: 25px; display: flex; justify-content: space-between; gap: 10px;">
+                    <button type="button" onclick="fecharModalAjuste()" style="background:#444; border:none; padding:12px 20px; color:#fff; cursor:pointer; border-radius:6px; font-weight:bold; font-family:'Cinzel', serif; font-size:0.8rem;">Cancelar</button>
+                    <button type="submit" style="background:linear-gradient(135deg, #8e44ad 0%, #5b2c6f 100%); color:#fff; font-weight:bold; border:1px solid #bb8fce; padding:12px 25px; cursor:pointer; border-radius:6px; font-family:'Cinzel', serif; font-size:0.8rem;">Confirmar Ajuste</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const dadosConfrontosParaImpressao = [
             {% for c in confrontos %}
@@ -425,11 +516,200 @@
             },
             {% endfor %}
         ];
+
+        const dadosAjuste = [
+            {% for c in confrontos %}
+            {
+                id: {{ c.id }},
+                mesa: {{ c.mesa }},
+                atleta1_id: {{ id_atleta1 if id_atleta1 is not none else 'null' }},
+                atleta1_nome: "{{ c.atleta1_nome|escapejs }}",
+                atleta2_id: {{ id_atleta2 if id_atleta2 is not none else 'null' }},
+                atleta2_nome: "{{ (c.atleta2_nome if c.atleta2_nome else '')|escapejs }}",
+                vencedor_id: {{ c.vencedor_id if c.vencedor_id is not none else 'null' }}
+            },
+            {% endfor %}
+        ];
+
+        const historicoAjuste = new Set([
+            {% for par in historico_ajuste %}
+            "{{ par[0] }}-{{ par[1] }}",
+            {% endfor %}
+        ]);
     </script>
 
     <script>
         let realId1 = null, realId2 = null;
         let selecionadoIdx = null;
+
+        (function mostrarRetornoAjuste() {
+            const params = new URLSearchParams(window.location.search);
+            const sucesso = params.get('sucesso');
+            const erro = params.get('erro');
+
+            if (sucesso === 'ajuste_realizado') {
+                alert("✅ Ajuste realizado com sucesso! Os dois atletas foram trocados entre as mesas.");
+            }
+
+            const mensagens = {
+                'ajuste_repeticao': "⚠️ A troca criaria um adversário repetido. Confirme o ajuste pelo botão de Ajustar para autorizar a exceção.",
+                'ajuste_jogo_ja_lancado': "⚠️ Não é possível alterar uma partida que já possui resultado lançado.",
+                'ajuste_folga_nao_permitida': "⚠️ A folga automática não pode ser usada nesta troca.",
+                'ajuste_apenas_classificatoria': "⚠️ O ajuste manual está disponível nesta versão apenas para a fase classificatória.",
+                'atleta_invalido': "⚠️ O atleta selecionado não pertence à mesa informada.",
+                'mesmo_atleta': "⚠️ Escolha dois atletas diferentes.",
+                'mesma_mesa': "⚠️ Escolha duas mesas diferentes."
+            };
+
+            if (erro && mensagens[erro]) {
+                alert(mensagens[erro]);
+            }
+        })();
+
+        function obterConfrontoAjuste(id) {
+            return dadosAjuste.find(c => Number(c.id) === Number(id));
+        }
+
+        function abrirModalAjuste(confId) {
+            const origem = obterConfrontoAjuste(confId);
+            if (!origem || !origem.atleta2_id || origem.vencedor_id !== null) {
+                alert("Esta mesa não está disponível para ajuste.");
+                return;
+            }
+
+            document.getElementById('ajuste_conf_origem').value = origem.id;
+            document.getElementById('ajuste_confirmar_excecao').value = "0";
+
+            const origemSelect = document.getElementById('ajuste_jogador_origem');
+            origemSelect.innerHTML = `
+                <option value="${origem.atleta1_id}">${origem.atleta1_nome}</option>
+                <option value="${origem.atleta2_id}">${origem.atleta2_nome}</option>
+            `;
+
+            const destinoSelect = document.getElementById('ajuste_conf_destino');
+            destinoSelect.innerHTML = dadosAjuste
+                .filter(c => Number(c.id) !== Number(origem.id) && c.atleta2_id !== null && c.vencedor_id === null)
+                .map(c => `<option value="${c.id}">Mesa ${c.mesa} — ${c.atleta1_nome} × ${c.atleta2_nome}</option>`)
+                .join('');
+
+            if (!destinoSelect.options.length) {
+                alert("Não há outra mesa disponível para troca nesta rodada.");
+                return;
+            }
+
+            atualizarJogadorDestino();
+            atualizarPreviewAjuste();
+            document.getElementById('modalAjuste').style.display = 'flex';
+        }
+
+        function fecharModalAjuste() {
+            document.getElementById('modalAjuste').style.display = 'none';
+        }
+
+        function atualizarJogadorDestino() {
+            const origem = obterConfrontoAjuste(document.getElementById('ajuste_conf_origem').value);
+            const destino = obterConfrontoAjuste(document.getElementById('ajuste_conf_destino').value);
+            const select = document.getElementById('ajuste_jogador_destino');
+
+            if (!origem || !destino) {
+                select.innerHTML = '';
+                atualizarPreviewAjuste();
+                return;
+            }
+
+            select.innerHTML = `
+                <option value="${destino.atleta1_id}">${destino.atleta1_nome}</option>
+                <option value="${destino.atleta2_id}">${destino.atleta2_nome}</option>
+            `;
+
+            atualizarPreviewAjuste();
+        }
+
+        function atualizarPreviewAjuste() {
+            const origem = obterConfrontoAjuste(document.getElementById('ajuste_conf_origem').value);
+            const destino = obterConfrontoAjuste(document.getElementById('ajuste_conf_destino').value);
+            const jogadorOrigemId = Number(document.getElementById('ajuste_jogador_origem').value);
+            const jogadorDestinoId = Number(document.getElementById('ajuste_jogador_destino').value);
+            const preview = document.getElementById('ajuste-preview');
+
+            if (!origem || !destino || !jogadorOrigemId || !jogadorDestinoId) {
+                preview.innerHTML = "Selecione os atletas para visualizar a troca.";
+                return;
+            }
+
+            const nomeOrigem = jogadorOrigemId === Number(origem.atleta1_id) ? origem.atleta1_nome : origem.atleta2_nome;
+            const nomeDestino = jogadorDestinoId === Number(destino.atleta1_id) ? destino.atleta1_nome : destino.atleta2_nome;
+
+            const restanteOrigem = jogadorOrigemId === Number(origem.atleta1_id)
+                ? { id: origem.atleta2_id, nome: origem.atleta2_nome }
+                : { id: origem.atleta1_id, nome: origem.atleta1_nome };
+
+            const restanteDestino = jogadorDestinoId === Number(destino.atleta1_id)
+                ? { id: destino.atleta2_id, nome: destino.atleta2_nome }
+                : { id: destino.atleta1_id, nome: destino.atleta1_nome };
+
+            preview.innerHTML =
+                `<strong style="color:var(--ouro-brilhante);">Prévia da troca</strong><br>` +
+                `Mesa ${origem.mesa}: ${restanteOrigem.nome} × ${nomeDestino}<br>` +
+                `Mesa ${destino.mesa}: ${restanteDestino.nome} × ${nomeOrigem}`;
+        }
+
+        function chavePar(a, b) {
+            return [Number(a), Number(b)].sort((x, y) => x - y).join('-');
+        }
+
+        function validarAjusteManual() {
+            const origem = obterConfrontoAjuste(document.getElementById('ajuste_conf_origem').value);
+            const destino = obterConfrontoAjuste(document.getElementById('ajuste_conf_destino').value);
+            const jogadorOrigemId = Number(document.getElementById('ajuste_jogador_origem').value);
+            const jogadorDestinoId = Number(document.getElementById('ajuste_jogador_destino').value);
+
+            if (!origem || !destino) {
+                alert("Selecione as mesas para realizar a troca.");
+                return false;
+            }
+
+            if (!jogadorOrigemId || !jogadorDestinoId || jogadorOrigemId === jogadorDestinoId) {
+                alert("Selecione dois atletas diferentes.");
+                return false;
+            }
+
+            const restanteOrigem = jogadorOrigemId === Number(origem.atleta1_id) ? origem.atleta2_id : origem.atleta1_id;
+            const restanteDestino = jogadorDestinoId === Number(destino.atleta1_id) ? destino.atleta2_id : destino.atleta1_id;
+
+            const novoParOrigem = chavePar(restanteOrigem, jogadorDestinoId);
+            const novoParDestino = chavePar(restanteDestino, jogadorOrigemId);
+
+            const repeticoes = [];
+            if (historicoAjuste.has(novoParOrigem)) repeticoes.push(`Mesa ${origem.mesa}`);
+            if (historicoAjuste.has(novoParDestino)) repeticoes.push(`Mesa ${destino.mesa}`);
+
+            if (repeticoes.length) {
+                const continuar = confirm(
+                    "⚠️ ATENÇÃO — CONFRONTO REPETIDO\n\n" +
+                    "Esta troca cria um confronto que já aconteceu anteriormente.\n\n" +
+                    "Mesas afetadas: " + repeticoes.join(" e ") + ".\n\n" +
+                    "Normalmente isso deve ser evitado, mas o administrador pode autorizar uma exceção.\n\n" +
+                    "Deseja confirmar este ajuste mesmo assim?"
+                );
+
+                if (!continuar) return false;
+                document.getElementById('ajuste_confirmar_excecao').value = "1";
+            } else {
+                document.getElementById('ajuste_confirmar_excecao').value = "0";
+            }
+
+            return confirm(
+                "Confirmar este ajuste manual?\n\n" +
+                "Apenas os dois atletas serão trocados entre as mesas.\n" +
+                "Os resultados das partidas ainda não lançadas permanecem intactos."
+            );
+        }
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('modalAjuste');
+            if (event.target === modal) fecharModalAjuste();
+        });
 
         function atualizarTempo() {
             fetch('/admin-painel/api/cronometro').then(r => r.json()).then(data => {
