@@ -224,7 +224,77 @@
                     </form>
                 {% endif %}
             {% else %}
-                <button disabled style="background: #111; color: #444; border: 1px solid #222; padding: 12px 24px; font-weight: bold; border-radius: 6px; cursor: not-allowed; font-family: 'Cinzel', serif; font-size: 0.9rem;">🔒 Aguardando Fim dos Jogos</button>
+                {% if rodada > 0 %}
+                    <div style="display: inline-flex; align-items: center; gap: 10px;">
+
+                        <form
+                            action="/admin-painel/admin/gerar-rodada"
+                            method="POST"
+                            style="display: inline;"
+                            onsubmit="return confirm(
+                                '⚠️ REFAZER SORTEIO\\n\\n' +
+                                'A rodada {{ rodada }} será sorteada novamente.\\n\\n' +
+                                'Nenhum resultado já lançado será apagado.\\n' +
+                                'Deseja continuar?'
+                            );"
+                        >
+                            <input type="hidden" name="refazer" value="true">
+
+                            <button
+                                type="submit"
+                                style="
+                                    background: linear-gradient(135deg, #8e44ad 0%, #5b2c6f 100%);
+                                    color: white;
+                                    padding: 12px 24px;
+                                    font-weight: bold;
+                                    border: 1px solid #bb8fce;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-family: 'Cinzel', serif;
+                                    font-size: 0.9rem;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+                                "
+                            >
+                                🔄 REFAZER SORTEIO
+                            </button>
+                        </form>
+
+                        <button
+                            disabled
+                            style="
+                                background: #111;
+                                color: #444;
+                                border: 1px solid #222;
+                                padding: 12px 24px;
+                                font-weight: bold;
+                                border-radius: 6px;
+                                cursor: not-allowed;
+                                font-family: 'Cinzel', serif;
+                                font-size: 0.9rem;
+                            "
+                        >
+                            🔒 Aguardando Fim dos Jogos
+                        </button>
+
+                    </div>
+                {% else %}
+                    <button
+                        disabled
+                        style="
+                            background: #111;
+                            color: #444;
+                            border: 1px solid #222;
+                            padding: 12px 24px;
+                            font-weight: bold;
+                            border-radius: 6px;
+                            cursor: not-allowed;
+                            font-family: 'Cinzel', serif;
+                            font-size: 0.9rem;
+                        "
+                    >
+                        🔒 Aguardando Fim dos Jogos
+                    </button>
+                {% endif %}
             {% endif %}
         </div>
     </div>
