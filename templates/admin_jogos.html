@@ -886,15 +886,6 @@
             if(!v_id) { alert("Selecione o vencedor!"); return false; }
             if(!fmt) { alert("Selecione o formato (2x0 ou 2x1)!"); return false; }
 
-            if (fmt === '2x1') {
-                if (selecionadoIdx === 1 && t1 <= t2) {
-                    alert("No formato 2x1, os tentos do Vencedor (Atleta 1) precisam ser maiores que os do perdedor!");
-                    return false;
-                }
-                if (selecionadoIdx === 2 && t2 <= t1) {
-                    alert("No formato 2x1, os tentos do Vencedor (Atleta 2) precisam ser maiores que os do perdedor!");
-                    return false;
-                }
             }
 
             document.getElementById('inp_t1').disabled = false;
