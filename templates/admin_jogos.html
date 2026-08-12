@@ -882,12 +882,17 @@
             let fmt = document.getElementById('m_tipo_placar').value;
             let t1 = parseInt(document.getElementById('inp_t1').value) || 0;
             let t2 = parseInt(document.getElementById('inp_t2').value) || 0;
-
-            if(!v_id) { alert("Selecione o vencedor!"); return false; }
-            if(!fmt) { alert("Selecione o formato (2x0 ou 2x1)!"); return false; }
-
+        
+            if(!v_id) { 
+                alert("Selecione o vencedor!"); 
+                return false; 
             }
-
+        
+            if(!fmt) { 
+                alert("Selecione o formato (2x0 ou 2x1)!"); 
+                return false; 
+            }
+        
             document.getElementById('inp_t1').disabled = false;
             document.getElementById('inp_t2').disabled = false;
             return true;
