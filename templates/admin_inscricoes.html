@@ -191,6 +191,12 @@
             </div>
 
             <div class="sidebar-rodape">
+                <form action="/admin-painel/admin/reset-mantendo-atletas" method="POST" onsubmit="return confirmarResetMantendoAtletas();">
+                    <button type="submit" class="btn btn-success" style="font-size:0.75rem; padding:10px;">
+                        <i class="fas fa-rotate"></i> Reiniciar mantendo atletas
+                    </button>
+                </form>
+
                 <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
                     <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;"><i class="fas fa-power-off"></i> Reiniciar Salão</button>
                 </form>
@@ -330,6 +336,30 @@
     </div>
 
     <script>
+    function confirmarResetMantendoAtletas() {
+        const passo1 = confirm(
+            "🔄 REINICIAR TORNEIO MANTENDO ATLETAS:\n\n" +
+            "Os confrontos, resultados e andamento do torneio atual serão apagados.\n\n" +
+            "✅ Os atletas cadastrados SERÃO MANTIDOS.\n" +
+            "✅ Atletas desistentes voltarão para APROVADO.\n" +
+            "✅ Nome e entidade dos atletas serão preservados.\n" +
+            "✅ A Galeria de Lendas NÃO será apagada.\n\n" +
+            "O torneio voltará para INSCRIÇÃO para que você possa iniciar novamente.\n\n" +
+            "Deseja realmente continuar?"
+        );
+
+        if (passo1) {
+            return confirm(
+                "⚠️ ÚLTIMA CONFIRMAÇÃO:\n\n" +
+                "O andamento do torneio atual será perdido.\n" +
+                "Os atletas serão mantidos para um novo teste/edição.\n\n" +
+                "CONFIRMAR REINÍCIO?"
+            );
+        }
+
+        return false;
+    }
+
     function confirmarResetMesa() {
         const passo1 = confirm(
             "⚠️ ATENÇÃO:\n\n" +
