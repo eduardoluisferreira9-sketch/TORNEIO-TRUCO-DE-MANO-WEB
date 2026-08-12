@@ -1540,7 +1540,6 @@ def ajustar_confronto_admin(
     jogador_origem_id: int = Form(...),
     confronto_id_destino: int = Form(...),
     jogador_destino_id: int = Form(...),
-    confirmar_excecao: bool = Form(False),
     db=Depends(get_db),
     auth: bool = Depends(verificar_admin)
 ):
@@ -1552,8 +1551,8 @@ def ajustar_confronto_admin(
     - nenhuma das duas partidas pode ter resultado lançado;
     - folga automática não pode ser usada nesta troca;
     - cada atleta continua aparecendo uma única vez na rodada;
-    - se a troca criar adversário repetido, o administrador precisa
-      confirmar explicitamente a exceção.
+    - se a troca criar adversário repetido, a troca é bloqueada
+      definitivamente, sem possibilidade de exceção.
     """
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
@@ -1690,7 +1689,11 @@ def ajustar_confronto_admin(
 
     repetidos = [par for par in novos_pares if par in historico]
 
-    if repetidos and not confirmar_excecao:
+    # Regra absoluta:
+    # confronto já realizado NUNCA pode ser recriado por ajuste manual.
+    # A validação é feita no backend para impedir qualquer contorno
+    # da interface administrativa.
+    if repetidos:
         return RedirectResponse(
             url="/admin-painel/admin/jogos?erro=ajuste_repeticao",
             status_code=303
