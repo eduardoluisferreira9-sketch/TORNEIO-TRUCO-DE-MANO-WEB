@@ -1972,6 +1972,70 @@ def excluir_historico(
         status_code=303
     ) 
 
+@app.post("/admin/reset-mantendo-atletas")
+@app.post("/admin-painel/admin/reset-mantendo-atletas")
+def reset_mantendo_atletas(
+    db=Depends(get_db),
+    auth: bool = Depends(verificar_admin)
+):
+    """
+    Reinicia somente o andamento do torneio atual, preservando os atletas.
+    É diferente do reset-total-testes, que apaga os atletas.
+    """
+    cursor = db.cursor()
+    p = "%s" if DATABASE_URL else "?"
+
+    try:
+        cfg = obtener_torneio_ativo(cursor)
+
+        if not cfg:
+            return RedirectResponse(
+                url="/admin-painel/admin/inscricoes?erro=torneio_nao_encontrado",
+                status_code=303
+            )
+
+        # Apaga somente os confrontos do torneio atual.
+        cursor.execute(
+            f"DELETE FROM confrontos WHERE torneio_id = {p}",
+            (cfg["id"],)
+        )
+
+        # Todos os atletas cadastrados neste torneio voltam a participar.
+        # Isso inclui quem havia sido marcado como DESISTENTE.
+        cursor.execute(
+            f"""
+            UPDATE atletas
+            SET status = 'APROVADO'
+            WHERE torneio_id = {p}
+            """,
+            (cfg["id"],)
+        )
+
+        # O mesmo torneio é devolvido ao estado de inscrição.
+        # Assim preservamos nome, atletas e demais dados cadastrais.
+        cursor.execute(
+            f"""
+            UPDATE torneios
+            SET fase_torneio = 'INSCRICAO',
+                crono_ativo = 0,
+                crono_fim_ms = 0,
+                crono_tempo_restante_seg = 3000
+            WHERE id = {p}
+            """,
+            (cfg["id"],)
+        )
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise
+
+    return RedirectResponse(
+        url="/admin-painel/admin/inscricoes?sucesso=torneio_reiniciado_mantendo_atletas",
+        status_code=303
+    )
+
 @app.post("/admin/reset-total-testes")
 @app.post("/admin-painel/admin/reset-total-testes")
 def reset_total_testes(
