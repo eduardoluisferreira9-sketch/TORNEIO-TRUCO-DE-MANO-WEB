@@ -601,6 +601,217 @@
             .crono-bloco-tempo { justify-content:space-between; }
         }
 
+    
+        /* FASE 2.1 - V6: refinamento visual e usabilidade */
+        :root {
+            --ouro-hover: #f5d76e;
+            --ouro-soft: rgba(212,175,55,0.18);
+            --verde-botao: #16834b;
+            --verde-hover: #20a45e;
+            --laranja-botao: #c86b16;
+            --laranja-hover: #e48625;
+            --sombra-botao: 0 4px 10px rgba(0,0,0,0.28);
+        }
+
+        /* Navegação mais clara e com estados mais evidentes */
+        .nav-link {
+            transition: transform .18s ease, background .18s ease, box-shadow .18s ease,
+                        color .18s ease, border-color .18s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-1px);
+            background: rgba(212,175,55,.10);
+            border-color: rgba(212,175,55,.28);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            box-shadow: 0 3px 10px rgba(212,175,55,.18);
+        }
+
+        /* Fila de lançamento: mais viva e claramente clicável */
+        .fila-lancamento {
+            background:
+                linear-gradient(180deg, rgba(10,37,22,.98), rgba(6,29,16,.98));
+        }
+
+        .fila-mesa-btn {
+            position: relative;
+            border-color: rgba(212,175,55,.55);
+            background:
+                linear-gradient(145deg, rgba(25,72,43,.98), rgba(7,34,20,.98));
+            box-shadow: 0 2px 7px rgba(0,0,0,.22);
+        }
+
+        .fila-mesa-btn::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--ouro);
+            opacity: .85;
+        }
+
+        .fila-mesa-btn:hover {
+            transform: translateY(-2px);
+            background:
+                linear-gradient(145deg, rgba(45,104,65,.98), rgba(13,53,30,.98));
+            border-color: var(--ouro-hover);
+            box-shadow: 0 6px 14px rgba(212,175,55,.18);
+        }
+
+        .fila-mesa-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Botões: uma linguagem visual única */
+        .btn-crono,
+        .btn-impressao-geral,
+        .btn-impressao-mesa,
+        .btn-ajuste,
+        .btn-lancar,
+        .btn-corrigir,
+        .btn-aplicar,
+        .btn-sorteio {
+            transition: transform .16s ease, box-shadow .16s ease,
+                        filter .16s ease, background .16s ease;
+        }
+
+        .btn-crono:hover,
+        .btn-impressao-geral:hover,
+        .btn-impressao-mesa:hover,
+        .btn-ajuste:hover,
+        .btn-lancar:hover,
+        .btn-corrigir:hover,
+        .btn-aplicar:hover,
+        .btn-sorteio:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+            box-shadow: var(--sombra-botao);
+        }
+
+        .btn-crono:active,
+        .btn-impressao-geral:active,
+        .btn-impressao-mesa:active,
+        .btn-ajuste:active,
+        .btn-lancar:active,
+        .btn-corrigir:active,
+        .btn-aplicar:active,
+        .btn-sorteio:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,.25);
+        }
+
+        /* Ação principal de cada mesa */
+        .btn-lancar {
+            background: linear-gradient(135deg, #e0bd3c 0%, #b89220 100%) !important;
+            border: 1px solid #f1d66c !important;
+            color: #17150a !important;
+            font-weight: 900 !important;
+            letter-spacing: .25px;
+            box-shadow: 0 3px 8px rgba(0,0,0,.25);
+        }
+
+        .btn-lancar:hover {
+            background: linear-gradient(135deg, #f3d75f 0%, #d2ad2e 100%) !important;
+            box-shadow: 0 5px 13px rgba(212,175,55,.28);
+        }
+
+        /* Resultado já lançado: aparência de estado, não de botão */
+        .resultado-lancado {
+            border: 1px solid rgba(39,174,96,.25) !important;
+            background: linear-gradient(90deg, rgba(30,132,73,.16), rgba(7,34,20,.4)) !important;
+            color: #48dc86 !important;
+        }
+
+        /* Ações secundárias */
+        .btn-ajuste,
+        .btn-corrigir {
+            background: linear-gradient(135deg, #183e2a, #0a2517) !important;
+            border: 1px solid rgba(212,175,55,.42) !important;
+            color: var(--ouro-brilhante) !important;
+        }
+
+        .btn-ajuste:hover,
+        .btn-corrigir:hover {
+            background: linear-gradient(135deg, #24583b, #103522) !important;
+            border-color: var(--ouro) !important;
+        }
+
+        /* Controle do cronômetro */
+        .btn-iniciar {
+            background: linear-gradient(135deg, #1c9a57, #126c3d) !important;
+            border: 1px solid #48d783 !important;
+            box-shadow: 0 3px 9px rgba(22,131,75,.25);
+        }
+
+        .btn-pausar {
+            background: linear-gradient(135deg, #d77a1c, #a9520c) !important;
+            border: 1px solid #f0a04b !important;
+            box-shadow: 0 3px 9px rgba(200,107,22,.22);
+        }
+
+        /* Cabeçalho da rodada: menos "faixa vazia" e mais hierarquia */
+        .container > div[style*="border-bottom"] {
+            background: linear-gradient(90deg, rgba(212,175,55,.035), transparent);
+            border-bottom-color: rgba(212,175,55,.42) !important;
+        }
+
+        /* Cards das mesas */
+        .mesa-card {
+            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .mesa-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(212,175,55,.34);
+            box-shadow: 0 7px 14px rgba(0,0,0,.38);
+        }
+
+        /* Mesa pendente: chamada visual para ação */
+        .mesa-card:has(.btn-lancar) {
+            border-color: rgba(212,175,55,.24);
+        }
+
+        /* Jogadores: leitura mais limpa */
+        .jogador-linha {
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+        .jogador-linha:hover {
+            background: rgba(255,255,255,.035);
+        }
+
+        /* Foco acessível para teclado */
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--ouro-hover);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nav-link,
+            .fila-mesa-btn,
+            .btn-crono,
+            .btn-impressao-geral,
+            .btn-impressao-mesa,
+            .btn-ajuste,
+            .btn-lancar,
+            .btn-corrigir,
+            .btn-aplicar,
+            .btn-sorteio,
+            .mesa-card,
+            .jogador-linha {
+                transition: none !important;
+            }
+        }
+
     </style>
 </head>
 <body>
