@@ -2161,6 +2161,121 @@
             }
         }
 
+    
+        /* ============================================================
+           V11 — HIERARQUIA DOS SUBTÍTULOS
+           Os textos auxiliares deixam de parecer "texto solto":
+           continuam secundários, mas ganham presença e acabamento.
+           ============================================================ */
+
+        /* Texto auxiliar de configuração */
+        .config-card > .card-note,
+        .config-card .available-note,
+        .config-card .section-note,
+        .config-card .helper-text {
+            color: #b9c5be;
+            font-size: .64rem;
+            font-weight: 600;
+            letter-spacing: .15px;
+        }
+
+        /* "Disponível durante a fase de inscrição" */
+        .config-card .section-head > span,
+        .config-card .section-head > small,
+        .config-card .section-head .note,
+        .config-card .availability-note {
+            color: #cbd4ce;
+            font-size: .66rem;
+            font-weight: 700;
+            letter-spacing: .2px;
+            padding: 5px 9px;
+            border: 1px solid rgba(246,214,90,.16);
+            border-radius: 999px;
+            background: rgba(246,214,90,.045);
+        }
+
+        /* "Cadastro manual" */
+        .cadastro-card .section-head > span,
+        .cadastro-card .section-head > small,
+        .cadastro-card .section-head .note,
+        .cadastro-card .manual-note {
+            color: #cbd4ce;
+            font-size: .66rem;
+            font-weight: 700;
+            letter-spacing: .2px;
+            padding: 5px 9px;
+            border: 1px solid rgba(246,214,90,.16);
+            border-radius: 999px;
+            background: rgba(246,214,90,.045);
+        }
+
+        /* Textos auxiliares que aparecem abaixo dos títulos */
+        .roster-head p,
+        .section-head p,
+        .page-head-copy p,
+        .admin-tools small {
+            color: #aebbb4;
+            font-size: .62rem;
+            font-weight: 600;
+            letter-spacing: .08px;
+        }
+
+        .roster-head p strong,
+        .section-head p strong,
+        .page-head-copy p strong {
+            color: #e5cf78;
+        }
+
+        /* Cabeçalhos laterais: uma pequena "etiqueta" para reforçar
+           a leitura sem competir com o título principal. */
+        .request-card .section-head .section-kicker {
+            color: #f1d25f;
+            font-size: .59rem;
+            font-weight: 900;
+            letter-spacing: 1.15px;
+        }
+
+        /* Descrições/observações de campos */
+        .config-card label,
+        .cadastro-card label {
+            color: #c7d0ca;
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: .45px;
+        }
+
+        /* Nota de cadastro manual fica mais "intencional" */
+        .cadastro-card .manual-note,
+        .cadastro-card .section-head > small {
+            box-shadow: 0 3px 9px rgba(0,0,0,.12);
+        }
+
+        /* No cabeçalho, a frase de apoio continua subordinada ao título. */
+        .page-head-copy p {
+            line-height: 1.35;
+        }
+
+        /* Pequeno ganho de contraste para notas de estado */
+        .status-badge,
+        .roster-status {
+            font-size: .60rem;
+        }
+
+        /* Desktop compacto */
+        @media (min-width: 1101px) {
+            .config-card .section-head > span,
+            .config-card .section-head > small,
+            .config-card .section-head .note,
+            .config-card .availability-note,
+            .cadastro-card .section-head > span,
+            .cadastro-card .section-head > small,
+            .cadastro-card .section-head .note,
+            .cadastro-card .manual-note {
+                font-size: .58rem;
+                padding: 4px 8px;
+            }
+        }
+
     </style>
 </head>
 <body>
