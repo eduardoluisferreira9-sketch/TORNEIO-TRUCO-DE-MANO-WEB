@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel - Classificação & Auditoria</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body { background: #0b140d; color: #e8e6e3; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Tema Feltro Musgo & Ouro */
+        .card { background: #112216; padding: 25px; border-radius: 8px; border: 1px solid #1b3622; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { color: #d4af37; margin-top: 0; border-left: 4px solid #d4af37; padding-left: 10px; font-size: 1.4rem; }
+        h3 { color: #d4af37; margin-top: 0; font-size: 1.2rem; }
+        h4 { color: #bbb; margin-top: 20px; font-size: 1.1rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #0e1b12; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #1b3622; }
+        th { background: #162e1e; color: #d4af37; font-weight: bold; }
+        tr:hover { background: #142a1b; }
+        
+        .filtro-box { background: #162e1e; padding: 15px; border-radius: 4px; border: 1px solid #1b3622; margin-bottom: 20px; }
+        .filtro-box-inner { display: table; width: 100%; }
+        .filtro-cell { display: table-cell; vertical-align: middle; }
+        
+        select, input[type="number"] { padding: 8px 12px; background: #0e1b12; border: 1px solid #1b3622; color: #fff; border-radius: 4px; font-size: 0.95rem; }
+        select:focus, input[type="number"]:focus { border-color: #d4af37; outline: none; }
+        
+        .btn-corrigir { background: #7b241c; color: #fadbd8; border: 1px solid #922b21; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .btn-corrigir:hover { background: #922b21; color: #fff; }
+        
+        .btn-matamata { background: #d4af37; color: #0b140d; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .btn-matamata:hover { background: #f1c40f; }
+        
+        .alerta-box { background: #2a2005; border-left: 5px solid #d4af37; padding: 20px; border-radius: 4px; margin-bottom: 25px; border-top: 1px solid #3a2e07; border-right: 1px solid #3a2e07; border-bottom: 1px solid #3a2e07; }
+        .alerta-box p { color: #f39c12; margin: 5px 0 15px 0; }
+
+        .card-flores-live {
+            border-color: #6d4a88;
+            background: linear-gradient(135deg, #151b17 0%, #1b1721 100%);
+        }
+        .flores-title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+        .flores-title-row h2 { margin-bottom:6px; }
+        .flores-title-row p { margin:0; color:#9ca8a0; font-size:0.88rem; }
+        .flores-badge { background:#6d4a88; color:#fff; border-radius:999px; padding:7px 13px; font-size:0.75rem; font-weight:800; letter-spacing:0.8px; white-space:nowrap; }
+        .flores-ranking { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:18px; }
+        .flor-item { display:flex; align-items:center; gap:12px; padding:14px 15px; background:#0e1b12; border:1px solid #2b3b30; border-radius:8px; }
+        .flor-item.primeiro { border-color:#8d6ab0; background:#171322; }
+        .flor-pos { font-size:1.45rem; min-width:34px; text-align:center; }
+        .flor-info { min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
+        .flor-info strong { color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .flor-info span { color:#89978e; font-size:0.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .flor-total { color:#d9b7f1; font-weight:900; font-size:1.25rem; white-space:nowrap; }
+        .flor-total small { font-size:0.68rem; color:#9d8bab; font-weight:700; }
+        .flores-vazio { grid-column:1/-1; text-align:center; color:#8fa393; padding:12px; font-style:italic; }
+        @media (max-width: 800px) { .flores-ranking { grid-template-columns:1fr; } .flores-title-row { align-items:flex-start; } }
+        
+        /* Classes auxiliares para substituição de Layout Flex/Grid */
+        .layout-table { display: table; width: 100%; }
+        .layout-row { display: table-row; }
+        .layout-cell { display: table-cell; vertical-align: middle; }
+    </style>
+
+<style>
+@media (min-width: 901px) {
+    html, body { height:100%; overflow:hidden; }
+    body { display:flex; flex-direction:column; }
+    .admin-nav { flex:0 0 auto; }
+    .container {
+        flex:1 1 auto; min-height:0; overflow:hidden;
+        display:flex; flex-direction:column;
+    }
+    .container > .card {
+        flex:1 1 auto; min-height:0; overflow:auto;
+        scrollbar-width:none;
+    }
+    .container > .card::-webkit-scrollbar { width:0; height:0; }
+    .container > .card:hover { scrollbar-width:thin; scrollbar-color:rgba(229,195,79,.55) transparent; }
+    .container > .card:hover::-webkit-scrollbar { width:6px; }
+    .container > .card::-webkit-scrollbar-track { background:transparent; }
+    .container > .card::-webkit-scrollbar-thumb { background:rgba(229,195,79,.45); border-radius:10px; }
+}
+</style>
+
+</head>
+<body>
+<nav style="background: #090f0a; padding: 15px 30px; border-bottom: 3px solid #d4af37;">
+        <div style="display: table; width: 100%;">
+            <div style="display: table-cell; text-align: left; vertical-align: middle;">
+                <span style="color: #d4af37; font-weight: bold; font-size: 1.3rem; letter-spacing: 0.5px;">🏆 {{ config.nome_torneio }}</span>
+            </div>
+            <div style="display: table-cell; text-align: right; vertical-align: middle;">
+                <a href="/admin-painel/admin/inscricoes" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">📋 Inscrições & Formato</a>
+                <a href="/admin-painel/admin/jogos" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">🎴 Mesa de Jogos</a>
+                <a href="/admin-painel/admin/classificacao" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; background: #d4af37; color: #0b140d;">📊 Classificação & Auditoria</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="page-heading">
+            <div>
+                <h1>🔎 Conferência</h1>
+                <p>Confira rodadas, resultados e faça correções administrativas quando necessário.</p>
+            </div>
+            <span class="phase-pill">FERRAMENTA ADMINISTRATIVA</span>
+        </div>
+<div class="card" style="border-color: #24472e;">
+            <h2>🔍 Módulo de Auditoria e Correção Lógica</h2>
+            <p style="font-size: 0.9rem; color: #8fa393; margin-bottom: 20px;">Selecione qualquer rodada abaixo (incluindo as eliminatórias) para conferir ou reverter os lançamentos.</p>
+            
+            <div class="filtro-box">
+                <div class="filtro-box-inner">
+                    <div class="filtro-cell" style="width: 130px; font-weight: bold; color: #d4af37;">
+                        Filtrar Histórico:
+                    </div>
+                    <div class="filtro-cell">
+                        <select id="filtro_rodada" onchange="mudarRodadaFiltro(this.value)" style="min-width: 320px;">
+                            {% for r in todas_rodadas %}
+                                <option value="{{ r }}" {% if r == rodada_selecionada %}selected{% endif %}>
+                                    {% if r == -1 %}⚔️ Oitavas de Final
+                                    {% elif r == -2 %}⚔️ Quartas de Final
+                                    {% elif r == -3 %}🔥 Semifinal
+                                    {% elif r == -4 %}🏆 Grande Final / 3º Lugar
+                                    {% else %}Visualizar {{ r }}ª Rodada (Classificatória)
+                                    {% endif %}
+                                </option>
+                            {% else %}
+                                <option>Nenhuma rodada gerada</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Mesas Encontradas na Rodada Selecionada</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">Mesa</th>
+                        <th>Atleta 1</th>
+                        <th>Atleta 2</th>
+                        <th>Placar Registrado</th>
+                        <th style="width: 180px; text-align: center;">Auditoria</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in confrontos_auditoria %}
+                    <tr>
+                        <td><strong>Mesa {{ c.mesa }}</strong></td>
+                        <td style="{% if c.vencedor_id == c.atleta1_id %}color:#2ecc71; font-weight:bold;{% endif %}">{{ c.atleta1_nome }}</td>
+                        <td style="{% if c.vencedor_id == c.atleta2_id %}color:#2ecc71; font-weight:bold;{% endif %}">{{ c.atleta2_nome }}</td>
+                        <td>
+                            {% if c.vencedor_id %}
+                                <span style="color: #cbd5e1;">Tipo: {{ c.tipo_placar }} | Placar: <strong style="color: #fff;">{{ c.tentos1 }} x {{ c.tentos2 }}</strong></span>
+                            {% else %}
+                                <span style="color: #e67e22; font-style: italic;">Sem resultado em aberto / Pendente</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            {% if c.atleta2_id %}
+                                <button class="btn-corrigir" onclick="abrirAuditoria('{{c.id}}', '{{c.atleta1_id}}', '{{c.atleta1_nome}}', '{{c.atleta2_id}}', '{{c.atleta2_nome}}')">Forçar Correção</button>
+                            {% else %}
+                                <span style="color: #666; font-style: italic;">Folga Automática</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; font-style: italic; padding: 25px;">Nenhum confronto registrado para a rodada selecionada.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
