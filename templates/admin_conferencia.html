@@ -82,6 +82,131 @@
 }
 </style>
 
+
+<style>
+/* ==========================================================
+   CONFERÊNCIA — REFINO VISUAL
+   Somente apresentação/UX. Lógica preservada.
+   ========================================================== */
+
+.page-heading{
+    margin-bottom:18px !important;
+}
+
+.page-heading h1{
+    font-size:2rem !important;
+    margin-bottom:5px !important;
+}
+
+.page-heading p{
+    font-size:1rem !important;
+    line-height:1.45 !important;
+}
+
+/* A conferência é uma ferramenta operacional:
+   o filtro ganha destaque, sem competir com a tabela. */
+.card{
+    border-radius:12px !important;
+}
+
+.card h2{
+    font-size:1.18rem !important;
+}
+
+.filtro-box{
+    margin-top:14px !important;
+    padding:14px 16px !important;
+    border-radius:10px !important;
+}
+
+.filtro-box-inner{
+    display:flex !important;
+    align-items:center !important;
+    gap:14px !important;
+}
+
+.filtro-cell{
+    font-size:.9rem !important;
+}
+
+#filtro_rodada{
+    min-width:360px !important;
+    min-height:42px !important;
+    font-size:.9rem !important;
+    padding:8px 12px !important;
+}
+
+/* Tabela: leitura mais confortável. */
+table{
+    width:100% !important;
+    border-collapse:separate !important;
+    border-spacing:0 !important;
+    overflow:hidden !important;
+    border-radius:10px !important;
+}
+
+thead th{
+    font-size:.78rem !important;
+    padding:11px 10px !important;
+    letter-spacing:.35px !important;
+}
+
+tbody td{
+    font-size:.88rem !important;
+    padding:11px 10px !important;
+    vertical-align:middle !important;
+}
+
+tbody tr{
+    transition:background .15s ease !important;
+}
+
+tbody tr:hover{
+    background:rgba(212,175,55,.045) !important;
+}
+
+.btn-corrigir{
+    font-size:.78rem !important;
+    padding:8px 12px !important;
+    border-radius:7px !important;
+    font-weight:800 !important;
+}
+
+/* Modal: menos pesado e mais coerente com as telas novas. */
+#modalAuditoria > div{
+    width:min(500px,calc(100vw - 32px)) !important;
+    padding:24px !important;
+    border-radius:12px !important;
+}
+
+#modalAuditoria h3{
+    font-size:1.15rem !important;
+}
+
+#modalAuditoria label{
+    font-size:.84rem !important;
+}
+
+#modalAuditoria select,
+#modalAuditoria input{
+    min-height:40px !important;
+    font-size:.88rem !important;
+    border-radius:7px !important;
+}
+
+@media(max-width:800px){
+    .filtro-box-inner{
+        flex-direction:column !important;
+        align-items:stretch !important;
+    }
+
+    #filtro_rodada{
+        min-width:0 !important;
+        width:100% !important;
+    }
+}
+</style>
+
 </head>
 <body>
 <nav style="background: #090f0a; padding: 15px 30px; border-bottom: 3px solid #d4af37;">
