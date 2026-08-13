@@ -715,6 +715,225 @@
             .admin-action { flex:1 1 100%;min-width:0; }
         }
 
+    
+        /* ============================================================
+           V3 — identidade do Truco Cego com baralho espanhol
+           Sem emojis/Unicode para os naipes: os quatro símbolos são SVG.
+           ============================================================ */
+
+        body {
+            background:
+                radial-gradient(800px 330px at 14% -5%, rgba(242,201,76,.13), transparent 63%),
+                radial-gradient(720px 420px at 88% 8%, rgba(25,164,88,.13), transparent 67%),
+                linear-gradient(180deg, #04140b 0%, #082218 48%, #06180f 100%);
+        }
+
+        .page-head {
+            position: relative;
+            min-height: 94px;
+            padding: 13px 16px 13px 18px;
+            overflow: hidden;
+            border: 1px solid rgba(242,201,76,.30);
+            border-left: 4px solid #f2c94c;
+            border-radius: 10px;
+            background:
+                radial-gradient(420px 170px at 73% 50%, rgba(242,201,76,.08), transparent 70%),
+                linear-gradient(100deg, rgba(11,48,27,.99), rgba(5,29,17,.97) 68%, rgba(7,37,22,.94));
+            box-shadow: 0 10px 27px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.035);
+        }
+
+        .page-head-copy {
+            position: relative;
+            z-index: 3;
+        }
+
+        .page-head h1 {
+            color: #fff7d7;
+            text-shadow: 0 3px 14px rgba(0,0,0,.50);
+        }
+
+        .page-head p {
+            color: #c3cec6;
+        }
+
+        .page-head p::first-letter {
+            color: #f2c94c;
+        }
+
+        .eyebrow {
+            color: #ffe27a;
+        }
+
+        .eyebrow i {
+            color: #f2c94c;
+            filter: drop-shadow(0 0 6px rgba(242,201,76,.20));
+        }
+
+        /* Emblema central: cartas estilizadas, mas sem caracteres especiais. */
+        .deck-emblem {
+            position: absolute;
+            top: 50%;
+            right: 205px;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            z-index: 2;
+        }
+
+        .spanish-suits {
+            display: flex;
+            align-items: center;
+            height: 52px;
+            padding-left: 5px;
+        }
+
+        .suit-card {
+            width: 31px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            margin-left: -6px;
+            border: 1px solid rgba(116,86,28,.55);
+            border-radius: 5px;
+            background: linear-gradient(145deg, #fff7d9, #d9c77e);
+            box-shadow: 0 6px 13px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.60);
+        }
+
+        .suit-card svg {
+            width: 22px;
+            height: 30px;
+            fill: currentColor;
+        }
+
+        .suit-card.espada { color: #1d3024; transform: rotate(-9deg) translateY(2px); }
+        .suit-card.copa { color: #b53535; transform: rotate(-3deg) translateY(-2px); z-index: 2; }
+        .suit-card.ouro { color: #a47a12; transform: rotate(3deg) translateY(-3px); z-index: 3; }
+        .suit-card.basto { color: #5d4220; transform: rotate(9deg) translateY(2px); z-index: 4; }
+
+        .deck-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 116px;
+        }
+
+        .deck-copy strong {
+            color: #ffe27a;
+            font-family: 'Cinzel', serif;
+            font-size: .72rem;
+            letter-spacing: 1.2px;
+        }
+
+        .deck-copy small {
+            color: #aebbb3;
+            font-size: .50rem;
+            font-weight: 800;
+            letter-spacing: 1.15px;
+        }
+
+        .status-badge {
+            position: relative;
+            z-index: 4;
+            background: linear-gradient(135deg, rgba(31,184,102,.12), rgba(242,201,76,.07));
+            border-color: rgba(242,201,76,.55);
+            color: #ffe98f;
+            box-shadow: 0 5px 17px rgba(0,0,0,.25);
+        }
+
+        .status-dot {
+            background: #35d67c;
+            box-shadow: 0 0 0 3px rgba(53,214,124,.13), 0 0 10px rgba(53,214,124,.40);
+        }
+
+        /* Mais vida nos indicadores, sem trocar a paleta do painel. */
+        .stats-row .stat-card {
+            background: linear-gradient(145deg, rgba(14,53,30,.99), rgba(5,28,16,.99));
+        }
+
+        .stats-row .stat-card:nth-child(1) {
+            border-color: rgba(242,201,76,.38);
+        }
+
+        .stats-row .stat-card:nth-child(2) {
+            border-color: rgba(232,167,55,.32);
+        }
+
+        .stats-row .stat-card:nth-child(3) {
+            border-color: rgba(214,91,79,.28);
+        }
+
+        .stats-row .stat-card:nth-child(4) {
+            border-color: rgba(31,184,102,.28);
+        }
+
+        .stats-row .stat-card:nth-child(1) .stat-icon {
+            color: #ffe27a;
+            background: rgba(242,201,76,.14);
+            border-color: rgba(242,201,76,.24);
+        }
+
+        .stats-row .stat-card:nth-child(4) .stat-icon {
+            color: #55e58c;
+            background: rgba(31,184,102,.13);
+            border-color: rgba(31,184,102,.22);
+        }
+
+        .section-kicker {
+            color: #ffe27a;
+        }
+
+        .section-head h2 {
+            color: #fff8df;
+        }
+
+        .section-head h2 i {
+            color: #f2c94c;
+        }
+
+        .config-field input,
+        .cadastro-form input {
+            border-color: rgba(242,201,76,.25);
+            background: linear-gradient(180deg, rgba(2,14,8,.68), rgba(8,36,21,.52));
+        }
+
+        .config-save,
+        .cadastro-form .action-btn {
+            background: linear-gradient(135deg, #f6d65a 0%, #dfb52f 48%, #bd8f19 100%);
+            border-color: #ffe27a;
+            color: #17130a;
+            box-shadow: 0 6px 16px rgba(0,0,0,.28), 0 0 12px rgba(242,201,76,.07), inset 0 1px 0 rgba(255,255,255,.38);
+        }
+
+        .config-save:hover:not(:disabled),
+        .cadastro-form .action-btn:hover {
+            filter: brightness(1.10);
+            box-shadow: 0 8px 20px rgba(0,0,0,.32), 0 0 20px rgba(242,201,76,.13), inset 0 1px 0 rgba(255,255,255,.45);
+        }
+
+        .cadastro-card {
+            border-color: rgba(242,201,76,.30);
+            background:
+                radial-gradient(420px 180px at 92% 50%, rgba(242,201,76,.075), transparent 70%),
+                linear-gradient(145deg, rgba(12,48,27,.99), rgba(5,26,15,.995));
+        }
+
+        .section-grid > .card:first-child {
+            border-color: rgba(31,184,102,.24);
+        }
+
+        .side-stack > .card:first-child {
+            border-color: rgba(232,167,55,.27);
+        }
+
+        @media (max-width: 1080px) {
+            .deck-emblem { right: 185px; }
+        }
+
+        @media (max-width: 900px) {
+            .deck-emblem { display: none; }
+        }
+
     </style>
 </head>
 <body>
@@ -743,11 +962,43 @@
 
         <main class="admin-main">
             <section class="page-head">
-                <div>
-                    <div class="eyebrow"><i class="fa-solid fa-users"></i> Administração</div>
+                <div class="page-head-copy">
+                    <div class="eyebrow"><i class="fa-solid fa-trophy"></i> Preparação do torneio</div>
                     <h1>Inscrições</h1>
-                    <p>Cadastre, confirme e organize os competidores do torneio.</p>
+                    <p>Cadastre os atletas e prepare o salão para a primeira rodada.</p>
                 </div>
+
+                <div class="deck-emblem" aria-hidden="true">
+                    <div class="spanish-suits">
+                        <span class="suit-card espada">
+                            <svg viewBox="0 0 32 42" role="img">
+                                <path d="M16 4C13 10 8 13 8 19c0 4 2.8 6.5 6 6.5 1.1 0 2-.3 2-.3s-.8 3.8-3.3 7.8h6.6c-3-4-3.3-7.8-3.3-7.8s.9.3 2 .3c3.2 0 6-2.5 6-6.5 0-6-5-9-8-15Z"/>
+                            </svg>
+                        </span>
+                        <span class="suit-card copa">
+                            <svg viewBox="0 0 32 42" role="img">
+                                <path d="M7 7h18v5c0 7-3.4 11.2-7.5 12.2V29h5v5H9.5v-5h5v-4.8C10.4 23.2 7 19 7 12V7Z"/>
+                                <path d="M7 10H3c0 7 2.4 11 8 12M25 10h4c0 7-2.4 11-8 12" fill="none" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </span>
+                        <span class="suit-card ouro">
+                            <svg viewBox="0 0 32 42" role="img">
+                                <path d="M16 4C20 8 25 12 25 18s-4 11-9 16C11 29 7 24 7 18S12 8 16 4Z"/>
+                                <path d="M16 9v18M11 18h10" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                            </svg>
+                        </span>
+                        <span class="suit-card basto">
+                            <svg viewBox="0 0 32 42" role="img">
+                                <path d="M10 7c2-2 4-2 6 0l2 2c2-2 4-2 6 0l-2 4c2 2 2 4 0 6l-3 2 2 10h-5l-1-8-3 2-3-3 3-4-4-2c-2-1-2-4 0-5l4-2-2-2Z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="deck-copy">
+                        <strong>TRUCO CEGO</strong>
+                        <small>BARALHO ESPANHOL</small>
+                    </div>
+                </div>
+
                 <div class="status-badge">
                     <span class="status-dot"></span>
                     {{ config.fase_torneio.replace('INSCRICAO', 'INSCRIÇÃO').replace('CLASSIFICATORIA', 'CLASSIFICATÓRIA') }}
