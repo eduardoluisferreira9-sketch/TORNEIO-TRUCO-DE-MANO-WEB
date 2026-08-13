@@ -1279,6 +1279,248 @@ td{font-size:10px;padding:7px 9px}
 }
 </style>
 
+
+<style>
+/* ==========================================================
+   CORREÇÃO FINAL DA NAVEGAÇÃO
+   Referência visual: admin_inscricoes.html aprovado pelo usuário.
+   ========================================================== */
+
+.admin-nav .nav-links{
+    display:flex !important;
+    flex:0 0 auto !important;
+    width:auto !important;
+    height:100% !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:8px !important;
+    overflow:visible !important;
+}
+
+.admin-nav .nav-item{
+    flex:0 0 auto !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+
+    height:43px !important;
+    padding:0 16px !important;
+    margin:0 !important;
+
+    background:transparent !important;
+    border:1px solid transparent !important;
+    border-radius:8px !important;
+
+    color:#e3e7e4 !important;
+    font-family:'Montserrat',Arial,sans-serif !important;
+    font-size:14px !important;
+    font-weight:800 !important;
+    letter-spacing:.5px !important;
+    line-height:1 !important;
+    text-transform:uppercase !important;
+    text-decoration:none !important;
+    white-space:nowrap !important;
+
+    box-shadow:none !important;
+    transform:none !important;
+}
+
+.admin-nav .nav-item:hover{
+    background:transparent !important;
+    border-color:transparent !important;
+    color:#f3e5ab !important;
+    transform:none !important;
+}
+
+.admin-nav .nav-item.active{
+    flex:0 0 auto !important;
+    width:auto !important;
+
+    background:#d4af37 !important;
+    color:#111 !important;
+    border:1px solid #f3e5ab !important;
+    border-radius:8px !important;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.4) !important;
+}
+
+.admin-nav .nav-item.active:hover{
+    background:#d4af37 !important;
+    color:#111 !important;
+    border-color:#f3e5ab !important;
+}
+
+.admin-nav .nav-item > i{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:16px !important;
+    min-width:16px !important;
+    margin:0 !important;
+    padding:0 !important;
+    font-size:14px !important;
+    line-height:1 !important;
+    color:#e3e7e4 !important;
+}
+
+.admin-nav .nav-item.active > i{
+    color:#111 !important;
+}
+
+/* Impede as regras responsivas antigas do arquivo de igualarem
+   a largura das quatro abas. */
+@media(max-width:850px){
+    .admin-nav .nav-links{
+        width:auto !important;
+        height:100% !important;
+        flex:0 0 auto !important;
+        flex-wrap:nowrap !important;
+        justify-content:flex-start !important;
+        overflow-x:visible !important;
+    }
+
+    .admin-nav .nav-item{
+        flex:0 0 auto !important;
+        width:auto !important;
+        min-width:0 !important;
+        padding:0 12px !important;
+        font-size:13px !important;
+    }
+}
+</style>
+
+
+<style>
+/* ==========================================================
+   AJUSTE FINAL — MESMA FONTE E PROPORÇÃO DA NAVEGAÇÃO
+   ========================================================== */
+
+.admin-nav .nav-item{
+    font-family:'Montserrat', sans-serif !important;
+    font-size:12px !important;
+    font-weight:700 !important;
+    letter-spacing:.5px !important;
+    gap:8px !important;
+    padding:0 15px !important;
+    height:42px !important;
+}
+
+.admin-nav .nav-item > i{
+    font-size:12px !important;
+    width:15px !important;
+    min-width:15px !important;
+}
+
+@media(max-width:850px){
+    .admin-nav .nav-item{
+        font-size:11px !important;
+        padding:0 11px !important;
+    }
+
+    .admin-nav .nav-item > i{
+        font-size:11px !important;
+    }
+}
+</style>
+
+
+<style>
+/* ==========================================================
+   LAYOUT FINAL — CLASSIFICAÇÃO COMO ÁREA PRINCIPAL
+   ========================================================== */
+
+/* Tipografia geral: um pequeno aumento para leitura confortável. */
+body{
+    font-size:14px !important;
+}
+
+.page-heading h1{
+    font-size:2.05rem !important;
+}
+
+.page-heading p{
+    font-size:1rem !important;
+}
+
+.card-title-row h2,
+.section-title h2{
+    font-size:1.18rem !important;
+}
+
+.section-subtitle{
+    font-size:.86rem !important;
+}
+
+/* A classificação ganha mais espaço horizontal. */
+.main-grid{
+    grid-template-columns:minmax(0, 2.25fr) minmax(360px, .95fr) !important;
+    gap:18px !important;
+    align-items:stretch !important;
+}
+
+/* Rei das Flores continua presente, mas deixa de competir com a tabela. */
+.flowers-card,
+.flores-card,
+.queen-card,
+.rei-flores-card{
+    min-width:0 !important;
+}
+
+/* Tabela mais legível. */
+.ranking-card table{
+    font-size:.88rem !important;
+}
+
+.ranking-card th{
+    font-size:.76rem !important;
+    padding:10px 9px !important;
+}
+
+.ranking-card td{
+    font-size:.88rem !important;
+    padding:10px 9px !important;
+}
+
+/* Títulos/avisos da classificação com um pouco mais de presença. */
+.ranking-card .card-title-row{
+    padding-bottom:9px !important;
+}
+
+.ranking-card .criterion,
+.ranking-card .criteria,
+.ranking-card .criterios{
+    font-size:.78rem !important;
+}
+
+/* Rei das Flores: conteúdo proporcionalmente mais compacto. */
+#rei-das-flores,
+.rei-das-flores,
+.flowers-ranking{
+    min-width:0 !important;
+}
+
+@media(max-width:1050px){
+    .main-grid{
+        grid-template-columns:minmax(0, 1.9fr) minmax(300px, 1fr) !important;
+    }
+
+    .page-heading h1{
+        font-size:1.8rem !important;
+    }
+}
+
+@media(max-width:780px){
+    .main-grid{
+        grid-template-columns:1fr !important;
+    }
+}
+</style>
+
 </head>
 <body>
 
@@ -1292,10 +1534,10 @@ td{font-size:10px;padding:7px 9px}
             <i class="fa-solid fa-user-plus"></i><span>Inscrições</span>
         </a>
         <a href="/admin-painel/admin/jogos" class="nav-item">
-            <i class="fa-solid fa-table-cells-large"></i><span>Mesa de Jogos</span>
+            <i class="fa-solid fa-border-all"></i><span>Mesa de Jogos</span>
         </a>
         <a href="/admin-painel/admin/classificacao" class="nav-item active">
-            <i class="fa-solid fa-ranking-star"></i><span>Classificação</span>
+            <i class="fa-solid fa-trophy"></i><span>Classificação</span>
         </a>
         <a href="/admin-painel/admin/conferencia" class="nav-item">
             <i class="fa-solid fa-magnifying-glass"></i><span>Conferência</span>
