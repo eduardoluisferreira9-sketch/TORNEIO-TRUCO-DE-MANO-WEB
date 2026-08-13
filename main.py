@@ -283,10 +283,9 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     for atleta in todos_atletas:
         atleta_id = atleta["id"]
         
-        # Estatísticas da classificação oficial: somente a fase classificatória.
         cursor.execute(f"""
             SELECT COALESCE(SUM(sets1), 0) as s_pro, COALESCE(SUM(tentos1), 0) as t_pro, 
-                   COALESCE(SUM(tentos2), 0) as t_contra,
+                   COALESCE(SUM(tentos2), 0) as t_contra, COALESCE(SUM(flores1), 0) as fl, 
                    SUM(CASE WHEN atleta2_id IS NULL THEN 1 ELSE 0 END) as byes 
             FROM confrontos 
             WHERE atleta1_id = {p} AND torneio_id = {p} AND rodada > 0 AND vencedor_id IS NOT NULL
@@ -295,7 +294,7 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
         
         cursor.execute(f"""
             SELECT COALESCE(SUM(sets2), 0) as s_pro, COALESCE(SUM(tentos2), 0) as t_pro, 
-                   COALESCE(SUM(tentos1), 0) as t_contra
+                   COALESCE(SUM(tentos1), 0) as t_contra, COALESCE(SUM(flores2), 0) as fl 
             FROM confrontos 
             WHERE atleta2_id = {p} AND torneio_id = {p} AND rodada > 0 AND vencedor_id IS NOT NULL
         """, (atleta_id, torneio_id))
@@ -307,27 +306,7 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
         sets_ganhos = p1["s_pro"] + p2["s_pro"]
         tentos_pro = p1["t_pro"] + p2["t_pro"]
         tentos_contra = p1["t_contra"] + p2["t_contra"]
-        # FLORES são acumuladas em TODAS as fases do torneio.
-        # Isso permite que o ranking de flores continue visível
-        # durante o mata-mata, sem alterar os critérios oficiais
-        # da classificação (que continuam sendo calculados acima).
-        cursor.execute(f"""
-            SELECT
-                COALESCE(SUM(flores1), 0) as fl1
-            FROM confrontos
-            WHERE atleta1_id = {p} AND torneio_id = {p}
-        """, (atleta_id, torneio_id))
-        flores1_total = cursor.fetchone()["fl1"]
-
-        cursor.execute(f"""
-            SELECT
-                COALESCE(SUM(flores2), 0) as fl2
-            FROM confrontos
-            WHERE atleta2_id = {p} AND torneio_id = {p}
-        """, (atleta_id, torneio_id))
-        flores2_total = cursor.fetchone()["fl2"]
-
-        flores = flores1_total + flores2_total
+        flores = p1["fl"] + p2["fl"]
         
         lista_classificacao.append({
             "id": atleta_id, "nome": atleta["nome"], "status": atleta["status"], "vitorias": vitorias, "sets_ganhos": sets_ganhos,
@@ -410,23 +389,239 @@ def tela_login(request: Request, erro: str = None):
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
-        <meta charset="UTF-8"><title>Acesso Restrito</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+        <title>Acesso Restrito • Torneio de Truco Cego</title>
         <style>
-            body {{ background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }}
-            .box {{ background: #1e1e1e; padding: 30px; border-radius: 8px; border: 1px solid #333; width: 300px; text-align: center; }}
-            input {{ width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 4px; box-sizing: border-box; }}
-            button {{ background: #d4af37; color: #000; font-weight: bold; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; }}
+            * { box-sizing: border-box; }
+
+            :root {
+                --verde-escuro: #06150c;
+                --verde-card: #102b19;
+                --ouro: #d4af37;
+                --ouro-claro: #f0cf5b;
+                --texto: #f5f1e8;
+                --subtexto: #9eafa3;
+            }
+
+            body {
+                min-height: 100vh;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                color: var(--texto);
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background:
+                    radial-gradient(circle at 50% 34%, rgba(212,175,55,.11), transparent 25%),
+                    radial-gradient(circle at 50% 100%, rgba(12,65,34,.32), transparent 48%),
+                    linear-gradient(145deg, #020a05 0%, var(--verde-escuro) 48%, #020a05 100%);
+                position: relative;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                opacity: .22;
+                background:
+                    repeating-linear-gradient(90deg, transparent 0 95px, rgba(255,255,255,.018) 96px, transparent 98px),
+                    repeating-linear-gradient(0deg, transparent 0 75px, rgba(212,175,55,.012) 76px, transparent 78px);
+            }
+
+            .login-wrap {
+                position: relative;
+                z-index: 1;
+                width: min(440px, calc(100vw - 32px));
+            }
+
+            .brand {
+                text-align: center;
+                margin-bottom: 16px;
+            }
+
+            .brand-mark {
+                width: 66px;
+                height: 66px;
+                margin: 0 auto 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                border: 1px solid rgba(212,175,55,.65);
+                background: linear-gradient(145deg, #173e22, #07160d);
+                box-shadow: 0 8px 25px rgba(0,0,0,.45), inset 0 0 0 5px rgba(212,175,55,.07);
+                font-size: 31px;
+            }
+
+            .brand h1 {
+                margin: 0;
+                color: var(--ouro-claro);
+                font-family: Georgia, 'Times New Roman', serif;
+                font-size: 1.38rem;
+                letter-spacing: .2px;
+            }
+
+            .brand p {
+                margin: 5px 0 0;
+                color: var(--subtexto);
+                font-size: .78rem;
+            }
+
+            .box {
+                position: relative;
+                padding: 28px;
+                border: 1px solid #244b31;
+                border-radius: 14px;
+                background: linear-gradient(145deg, rgba(15,43,25,.96), rgba(5,20,11,.98));
+                box-shadow:
+                    0 24px 60px rgba(0,0,0,.55),
+                    0 0 0 1px rgba(212,175,55,.035),
+                    inset 0 1px 0 rgba(255,255,255,.035);
+            }
+
+            .box::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 24px;
+                right: 24px;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, var(--ouro), transparent);
+                border-radius: 2px;
+            }
+
+            .box h2 {
+                margin: 0 0 6px;
+                color: #f5f1e8;
+                font-size: 1.42rem;
+                font-weight: 800;
+                text-align: center;
+            }
+
+            .box .subtitle {
+                margin: 0 0 22px;
+                color: var(--subtexto);
+                font-size: .82rem;
+                text-align: center;
+            }
+
+            .erro {
+                margin: 0 0 15px;
+                padding: 10px 12px;
+                border: 1px solid rgba(220,70,60,.5);
+                border-radius: 8px;
+                color: #ffb3ab;
+                background: rgba(130,30,24,.18);
+                text-align: center;
+                font-size: .82rem;
+                font-weight: 700;
+            }
+
+            label {
+                display: block;
+                margin: 0 0 7px;
+                color: #d7e0da;
+                font-size: .78rem;
+                font-weight: 700;
+            }
+
+            .input-wrap { position: relative; }
+
+            .input-icon {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                opacity: .75;
+                font-size: 17px;
+                pointer-events: none;
+            }
+
+            input {
+                width: 100%;
+                height: 50px;
+                padding: 0 14px 0 44px;
+                margin: 0 0 16px;
+                border: 1px solid #345541;
+                border-radius: 8px;
+                outline: none;
+                background: #07170d;
+                color: #fff;
+                font-size: .95rem;
+                transition: border-color .2s, box-shadow .2s;
+            }
+
+            input::placeholder { color: #6f8175; }
+
+            input:focus {
+                border-color: var(--ouro);
+                box-shadow: 0 0 0 3px rgba(212,175,55,.10);
+            }
+
+            button {
+                width: 100%;
+                height: 50px;
+                border: 1px solid #f0cf5b;
+                border-radius: 8px;
+                background: linear-gradient(180deg, #e5c247, #d4af37);
+                color: #10150f;
+                font-size: .92rem;
+                font-weight: 800;
+                cursor: pointer;
+                box-shadow: 0 5px 14px rgba(0,0,0,.25);
+                transition: transform .15s, filter .15s;
+            }
+
+            button:hover {
+                filter: brightness(1.06);
+                transform: translateY(-1px);
+            }
+
+            .secure {
+                margin: 17px 0 0;
+                color: #718276;
+                font-size: .7rem;
+                text-align: center;
+            }
+
+            @media (max-width: 520px) {
+                .box { padding: 23px 19px; }
+                .brand h1 { font-size: 1.2rem; }
+            }
         </style>
     </head>
     <body>
-        <div class="box">
-            <h2>🔑 Área do Administrador</h2>
-            {"<p style='color:red;'>Chave incorreta!</p>" if erro else ""}
-            <form action="/admin-painel/login" method="POST">
-                <input type="password" name="chave" placeholder="Digite a chave de acesso" required autofocus>
-                <button type="submit">Entrar no Sistema</button>
-            </form>
-        </div>
+        <main class="login-wrap">
+            <div class="brand">
+                <div class="brand-mark">🏆</div>
+                <h1>Torneio de Truco Cego</h1>
+                <p>Painel de Administração</p>
+            </div>
+
+            <section class="box">
+                <h2>🔐 Acesso do Administrador</h2>
+                <p class="subtitle">Entre com a chave para acessar o painel do torneio.</p>
+
+                {"<div class='erro'>⚠️ Chave incorreta. Tente novamente.</div>" if erro else ""}
+
+                <form action="/admin-painel/login" method="POST">
+                    <label for="chave">Chave de acesso</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">🔑</span>
+                        <input id="chave" type="password" name="chave"
+                               placeholder="Digite sua chave de acesso"
+                               required autofocus autocomplete="current-password">
+                    </div>
+                    <button type="submit">ENTRAR NO SISTEMA&nbsp;&nbsp;→</button>
+                </form>
+
+                <p class="secure">🔒 Área restrita • Acesso administrativo</p>
+            </section>
+        </main>
     </body>
     </html>
     """
@@ -1811,70 +2006,8 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={
-            "config": cfg,
-            "classificacao": lista_classificacao,
-            "top_flores": sorted(
-                [item for item in lista_classificacao if (item.get("flores") or 0) > 0],
-                key=lambda item: (-item.get("flores", 0), item.get("nome", ""))
-            )[:3],
-            "todas_rodadas": todas_rodadas,
-            "rodada_selecionada": rodada_selecionada,
-            "confrontos_auditoria": confrontos_auditoria,
-            "aba_ativa": "classificacao"
-        }
+        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
     )
-
-
-@app.get("/admin/conferencia")
-@app.get("/admin-painel/admin/conferencia")
-def exibir_conferencia(request: Request, rodada_filtro: int = None, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
-    cfg = atualizar_e_obter_cronometro(db)
-    p = "%s" if DATABASE_URL else "?"
-
-    if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(
-            url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio",
-            status_code=303
-        )
-
-    cursor = db.cursor()
-
-    cursor.execute(
-        f"SELECT DISTINCT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY rodada DESC",
-        (cfg["id"],)
-    )
-    todas_rodadas = [r["rodada"] for r in cursor.fetchall()]
-
-    rodada_selecionada = (
-        rodada_filtro
-        if rodada_filtro is not None
-        else (todas_rodadas[0] if todas_rodadas else 1)
-    )
-
-    cursor.execute(
-        f"""
-        SELECT *
-        FROM confrontos
-        WHERE rodada = {p} AND torneio_id = {p}
-        ORDER BY mesa ASC
-        """,
-        (rodada_selecionada, cfg["id"])
-    )
-    confrontos_auditoria = cursor.fetchall()
-
-    return templates.TemplateResponse(
-        request=request,
-        name="admin_conferencia.html",
-        context={
-            "config": cfg,
-            "todas_rodadas": todas_rodadas,
-            "rodada_selecionada": rodada_selecionada,
-            "confrontos_auditoria": confrontos_auditoria,
-            "aba_ativa": "conferencia"
-        }
-    )
-
 
 @app.post("/admin/auditoria/corrigir")
 @app.post("/admin-painel/admin/auditoria/corrigir")
