@@ -154,6 +154,91 @@
             color: #fff; border-radius: 4px; text-align: center; font-weight: bold; font-size: 0.85rem;
         }
 
+
+        /* FASE 2.1 - Barra fixa de mesas pendentes */
+        .fila-lancamento {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            margin: -40px -40px 30px -40px;
+            padding: 12px 40px;
+            background: rgba(5, 13, 8, 0.97);
+            border-bottom: 2px solid rgba(212, 175, 55, 0.45);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+            backdrop-filter: blur(8px);
+        }
+        .fila-lancamento-topo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+        .fila-lancamento-titulo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Cinzel', serif;
+            color: var(--ouro-brilhante);
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .fila-lancamento-contador {
+            color: var(--texto-subtil);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .fila-lancamento-botoes {
+            display: flex;
+            gap: 7px;
+            overflow-x: auto;
+            padding: 2px 2px 5px 2px;
+            scrollbar-width: thin;
+        }
+        .fila-mesa-btn {
+            flex: 0 0 auto;
+            min-width: 58px;
+            padding: 8px 12px;
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 6px;
+            background: linear-gradient(135deg, #1b3d28 0%, #092113 100%);
+            color: var(--ouro-brilhante);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.18s ease;
+            white-space: nowrap;
+        }
+        .fila-mesa-btn:hover {
+            background: var(--ouro);
+            color: var(--texto-escuro);
+            border-color: var(--ouro-brilhante);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(212,175,55,0.2);
+        }
+        .fila-vazia {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            font-style: italic;
+            padding: 6px 0;
+        }
+        @media (max-width: 700px) {
+            .fila-lancamento {
+                margin-left: -20px;
+                margin-right: -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            .fila-lancamento-topo {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 3px;
+            }
+        }
+
         @media print {
             @page { margin: 0; }
             body * { visibility: hidden; }
@@ -188,6 +273,30 @@
             <a href="/admin-painel/admin/classificacao" class="nav-link">📊 Classificação</a>
         </div>
     </nav>
+
+
+    <!-- FASE 2.1: acesso rápido às mesas que já podem receber resultado -->
+    <div class="fila-lancamento" id="filaLancamento">
+        <div class="fila-lancamento-topo">
+            <div class="fila-lancamento-titulo">
+                <span>⚡ Lançamento rápido</span>
+                <span class="fila-lancamento-contador" id="filaLancamentoContador"></span>
+            </div>
+            <span class="fila-lancamento-contador">Clique em qualquer mesa para lançar o resultado</span>
+        </div>
+        <div class="fila-lancamento-botoes" id="filaLancamentoBotoes">
+            {% set mesas_pendentes = confrontos | selectattr('atleta2_id', 'ne', none) | selectattr('vencedor_id', 'equalto', none) | list %}
+            {% if mesas_pendentes %}
+                {% for c in mesas_pendentes %}
+                <button type="button" class="fila-mesa-btn" onclick="abrirFichaPlacar('{{ c.id }}', '{{ c.atleta1_id }}', '{{ c.atleta1_nome|escapejs }}', '{{ c.atleta2_id }}', '{{ c.atleta2_nome|escapejs }}')">
+                    MESA {{ c.mesa }}
+                </button>
+                {% endfor %}
+            {% else %}
+                <span class="fila-vazia">✅ Nenhuma mesa pendente de lançamento.</span>
+            {% endif %}
+        </div>
+    </div>
 
     <div class="crono-container">
         <h3 style="margin: 0; color: var(--ouro); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; font-family: 'Cinzel', serif;">Tempo Restante da Rodada</h3>
@@ -814,6 +923,19 @@
             secao.innerHTML = htmlFinal;
             window.print();
         }
+
+
+        function atualizarFilaLancamento() {
+            const botoes = document.querySelectorAll('#filaLancamentoBotoes .fila-mesa-btn');
+            const contador = document.getElementById('filaLancamentoContador');
+            if (contador) {
+                contador.innerText = botoes.length === 1
+                    ? '1 mesa pendente'
+                    : `${botoes.length} mesas pendentes`;
+            }
+        }
+
+        atualizarFilaLancamento();
 
         function abrirFichaPlacar(confId, id1, nome1, id2, nome2) {
             document.getElementById('m_conf_id').value = confId;
