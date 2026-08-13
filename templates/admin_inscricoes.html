@@ -1063,6 +1063,414 @@
             .start-tournament { align-items:stretch; flex-direction:column; }
         }
 
+    
+        /* ============================================================
+           V5 — "SALÃO VIVO"
+           Objetivo: tirar a sensação de painel frio e criar clima de
+           torneio, sem perder a velocidade operacional.
+           ============================================================ */
+
+        :root {
+            --felt-light: #124b2b;
+            --felt: #0b351f;
+            --felt-dark: #061d11;
+            --gold-bright: #f6d65a;
+            --gold-soft: #e8c65b;
+            --cream: #fff6d3;
+            --green-live: #48df87;
+            --red-card: #c94b43;
+        }
+
+        body {
+            background:
+                radial-gradient(900px 420px at 50% -90px, rgba(246,214,90,.16), transparent 62%),
+                radial-gradient(620px 460px at 5% 32%, rgba(72,223,135,.10), transparent 72%),
+                radial-gradient(620px 460px at 96% 52%, rgba(246,214,90,.065), transparent 72%),
+                linear-gradient(180deg, #031108 0%, #072419 36%, #061b10 100%);
+        }
+
+        /* Uma textura muito discreta de "feltro" feita só com CSS. */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: .18;
+            background-image:
+                radial-gradient(rgba(255,255,255,.08) .45px, transparent .55px),
+                radial-gradient(rgba(0,0,0,.18) .45px, transparent .55px);
+            background-size: 7px 7px, 11px 11px;
+            background-position: 0 0, 3px 4px;
+            mix-blend-mode: soft-light;
+        }
+
+        /* ---------- CABEÇALHO: mais "abertura de torneio" ---------- */
+        .page-head {
+            min-height: 108px;
+            padding: 16px 18px;
+            border: 1px solid rgba(246,214,90,.40);
+            border-left: 5px solid var(--gold-bright);
+            background:
+                radial-gradient(340px 160px at 62% 50%, rgba(246,214,90,.13), transparent 72%),
+                radial-gradient(260px 150px at 78% 0%, rgba(72,223,135,.09), transparent 75%),
+                linear-gradient(110deg, rgba(11,56,31,.99), rgba(5,30,17,.98) 72%, rgba(8,43,24,.96));
+            box-shadow:
+                0 12px 30px rgba(0,0,0,.34),
+                inset 0 1px 0 rgba(255,255,255,.045);
+        }
+
+        .page-head::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #f6d65a, rgba(246,214,90,.20), transparent 80%);
+            opacity: .75;
+        }
+
+        .page-head-copy h1 {
+            font-size: 2rem;
+            color: #fff9df;
+            letter-spacing: .8px;
+        }
+
+        .page-head-copy p {
+            max-width: 620px;
+            font-size: .73rem;
+        }
+
+        .page-head-copy p strong {
+            color: var(--gold-bright);
+        }
+
+        /* O emblema fica mais vivo, mas continua elegante. */
+        .deck-emblem {
+            right: 218px;
+            filter: drop-shadow(0 10px 16px rgba(0,0,0,.28));
+        }
+
+        .suit-card {
+            width: 37px;
+            height: 51px;
+            border-color: rgba(105,77,20,.65);
+            background: linear-gradient(145deg, #fffbe5 0%, #e8dca9 100%);
+        }
+
+        .suit-card svg {
+            width: 27px;
+            height: 36px;
+        }
+
+        .suit-card.basto {
+            color: #704719;
+            transform: rotate(-10deg) translateY(3px);
+        }
+        .suit-card.ouro {
+            color: #a97d0b;
+            transform: rotate(-3deg) translateY(-3px);
+        }
+        .suit-card.espada {
+            color: #1d3024;
+            transform: rotate(3deg) translateY(-5px);
+        }
+        .suit-card.copa {
+            color: #bd3838;
+            transform: rotate(10deg) translateY(3px);
+        }
+
+        .deck-copy strong {
+            color: #fff0a1;
+            font-size: .78rem;
+            text-shadow: 0 2px 8px rgba(246,214,90,.15);
+        }
+
+        /* ---------- INDICADORES: mais energia ---------- */
+        .stats-row {
+            gap: 12px;
+        }
+
+        .stat-card {
+            min-height: 76px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 11px;
+            background:
+                linear-gradient(145deg, rgba(14,61,34,.98), rgba(5,30,17,.99));
+            box-shadow:
+                0 8px 20px rgba(0,0,0,.27),
+                inset 0 1px 0 rgba(255,255,255,.035);
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(246,214,90,.55), transparent);
+        }
+
+        .stat-card strong {
+            color: #fff9df;
+            font-size: 1.25rem;
+        }
+
+        .stat-card small {
+            color: #c1cdc5;
+        }
+
+        .stat-card:nth-child(1) {
+            background: linear-gradient(145deg, rgba(24,73,38,.99), rgba(6,31,18,.99));
+            border-color: rgba(246,214,90,.45);
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            color: #ffe98a;
+            background: linear-gradient(145deg, rgba(246,214,90,.25), rgba(246,214,90,.07));
+            box-shadow: 0 0 14px rgba(246,214,90,.07);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            color: #f6bd4b;
+            background: rgba(246,189,75,.12);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            color: #ef7770;
+            background: rgba(201,75,67,.12);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            color: var(--green-live);
+            background: rgba(72,223,135,.12);
+        }
+
+        /* ---------- CARDS: aparência de mesa de salão ---------- */
+        .card {
+            border-radius: 11px;
+            border-color: rgba(246,214,90,.23);
+            background:
+                linear-gradient(145deg, rgba(10,48,27,.985), rgba(4,24,14,.995));
+            box-shadow:
+                0 10px 25px rgba(0,0,0,.28),
+                inset 0 1px 0 rgba(255,255,255,.03);
+        }
+
+        .card::before {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(246,214,90,.45), transparent);
+        }
+
+        .section-kicker {
+            color: #f7d968;
+            letter-spacing: 1px;
+        }
+
+        .section-head h2,
+        .roster-head h2 {
+            color: var(--cream);
+        }
+
+        /* ---------- CADASTRO: área de "chamada para entrar na peleia" ---------- */
+        .cadastro-card {
+            border-color: rgba(246,214,90,.40);
+            background:
+                radial-gradient(520px 170px at 88% 50%, rgba(246,214,90,.105), transparent 70%),
+                linear-gradient(145deg, rgba(13,57,32,.99), rgba(5,27,16,.995));
+            box-shadow:
+                0 11px 28px rgba(0,0,0,.30),
+                0 0 0 1px rgba(246,214,90,.025) inset;
+        }
+
+        .cadastro-card .section-head h2 i {
+            filter: drop-shadow(0 0 7px rgba(246,214,90,.20));
+        }
+
+        .cadastro-form input {
+            border-color: rgba(246,214,90,.27);
+            background: rgba(2,17,10,.56);
+        }
+
+        .cadastro-form input::placeholder {
+            color: #778a7d;
+        }
+
+        .cadastro-form .action-btn {
+            min-width: 154px;
+            background:
+                linear-gradient(135deg, #f9df68 0%, #e0b933 52%, #bd8d17 100%);
+            border-color: #ffeb91;
+            font-size: .70rem;
+            box-shadow:
+                0 7px 17px rgba(0,0,0,.30),
+                0 0 15px rgba(246,214,90,.09),
+                inset 0 1px 0 rgba(255,255,255,.40);
+        }
+
+        /* ---------- ELENCO: menos "lista", mais "painel de jogadores" ---------- */
+        .roster-card {
+            border-color: rgba(246,214,90,.31);
+            background:
+                radial-gradient(700px 230px at 72% 0%, rgba(246,214,90,.055), transparent 72%),
+                linear-gradient(145deg, rgba(10,49,28,.99), rgba(4,23,14,.995));
+        }
+
+        .roster-head {
+            padding-bottom: 14px;
+            border-bottom-color: rgba(246,214,90,.16);
+        }
+
+        .roster-status {
+            color: #72e99d;
+            border-color: rgba(72,223,135,.27);
+            background: linear-gradient(135deg, rgba(72,223,135,.10), rgba(72,223,135,.035));
+            box-shadow: 0 0 15px rgba(72,223,135,.035);
+        }
+
+        .athlete-card {
+            min-height: 62px;
+            border-color: rgba(246,214,90,.12);
+            background:
+                linear-gradient(145deg, rgba(8,42,24,.97), rgba(5,28,17,.94));
+            box-shadow:
+                0 4px 10px rgba(0,0,0,.17),
+                inset 0 1px 0 rgba(255,255,255,.025);
+        }
+
+        .athlete-card::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            border-radius: 2px;
+            background: rgba(246,214,90,.45);
+        }
+
+        .athlete-card:hover {
+            border-color: rgba(246,214,90,.40);
+            background:
+                linear-gradient(145deg, rgba(13,57,32,.99), rgba(7,37,21,.97));
+            box-shadow:
+                0 8px 16px rgba(0,0,0,.24),
+                0 0 13px rgba(246,214,90,.035);
+        }
+
+        .athlete-number {
+            color: #fff0a0;
+            background: linear-gradient(145deg, rgba(246,214,90,.17), rgba(246,214,90,.045));
+            border-color: rgba(246,214,90,.25);
+        }
+
+        .athlete-info strong {
+            color: #fffced;
+        }
+
+        .athlete-info span {
+            color: #b0bdb5;
+        }
+
+        .athlete-action button {
+            background: rgba(201,75,67,.07);
+            border-color: rgba(201,75,67,.23);
+        }
+
+        /* ---------- "INICIAR TORNEIO" vira um momento de ação ---------- */
+        .start-tournament {
+            margin-top: 14px;
+            padding: 12px 13px;
+            border-color: rgba(72,223,135,.22);
+            background:
+                radial-gradient(360px 90px at 0% 50%, rgba(72,223,135,.07), transparent 75%),
+                linear-gradient(90deg, rgba(18,70,39,.45), rgba(7,31,18,.72));
+        }
+
+        .start-tournament strong {
+            color: #fff0aa;
+            font-size: .72rem;
+        }
+
+        .start-tournament span {
+            color: #aebcb4;
+        }
+
+        .start-tournament-btn {
+            min-width: 170px;
+            height: 41px;
+            color: #05160c;
+            background: linear-gradient(135deg, #53e990, #22ad60);
+            border-color: #73f0a7;
+            box-shadow:
+                0 7px 16px rgba(0,0,0,.28),
+                0 0 17px rgba(72,223,135,.09);
+        }
+
+        /* ---------- PEDIDOS / DESISTENTES ---------- */
+        .bottom-grid .card {
+            background:
+                linear-gradient(145deg, rgba(9,43,24,.97), rgba(4,24,14,.99));
+        }
+
+        .request-item {
+            background: linear-gradient(90deg, rgba(5,30,17,.78), rgba(11,46,26,.52));
+            border-color: rgba(246,214,90,.10);
+        }
+
+        .request-item:hover {
+            border-color: rgba(246,214,90,.25);
+        }
+
+        /* ---------- DETALHES "VIVOS" ---------- */
+        .status-badge {
+            box-shadow:
+                0 5px 17px rgba(0,0,0,.26),
+                0 0 14px rgba(72,223,135,.035);
+        }
+
+        .status-dot {
+            box-shadow:
+                0 0 0 3px rgba(72,223,135,.14),
+                0 0 11px rgba(72,223,135,.50);
+        }
+
+        /* Pequenos naipes abstratos no fundo, sem usar caracteres. */
+        .admin-main {
+            position: relative;
+        }
+
+        .admin-main::before,
+        .admin-main::after {
+            content: "";
+            position: fixed;
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            border: 1px solid rgba(246,214,90,.025);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .admin-main::before {
+            left: -90px;
+            top: 260px;
+            box-shadow: 0 0 0 28px rgba(246,214,90,.012), 0 0 0 56px rgba(246,214,90,.008);
+        }
+
+        .admin-main::after {
+            right: -100px;
+            bottom: 100px;
+            box-shadow: 0 0 0 28px rgba(72,223,135,.012), 0 0 0 56px rgba(72,223,135,.008);
+        }
+
+        @media (max-width: 900px) {
+            .deck-emblem { display:none; }
+        }
+
     </style>
 </head>
 <body>
