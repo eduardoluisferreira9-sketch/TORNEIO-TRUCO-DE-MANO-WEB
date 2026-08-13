@@ -812,6 +812,27 @@
             }
         }
 
+    
+        /* V7: a mesa pendente não precisa de um segundo botão de lançamento.
+           A fila rápida é a única porta de entrada para lançar o resultado. */
+        .mesa-pendente-status {
+            margin-top: 6px;
+            padding: 5px 7px;
+            border-radius: 5px;
+            border: 1px dashed rgba(212,175,55,.32);
+            background: rgba(212,175,55,.055);
+            color: var(--ouro-brilhante);
+            text-align: center;
+            font-size: .62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .35px;
+        }
+
+        .mesa-finalizada-status {
+            margin-top: 6px;
+        }
+
     </style>
 </head>
 <body>
@@ -1021,9 +1042,6 @@
 
             {% if id_atleta2 is not none and id_atleta2 > 0 %}
                 {% if not c.vencedor_id %}
-                    <button class="btn-lancar" onclick="abrirFichaPlacar('{{ c.id }}', '{{ id_atleta1 }}', '{{ c.atleta1_nome|escapejs }}', '{{ id_atleta2 }}', '{{ c.atleta2_nome|escapejs }}')">
-                        <i class="fa-solid fa-pen-to-square"></i> Lançar placar
-                    </button>
                 {% else %}
                     <div class="resultado-confirmado"><i class="fa-solid fa-circle-check"></i> Resultado lançado</div>
                 {% endif %}
