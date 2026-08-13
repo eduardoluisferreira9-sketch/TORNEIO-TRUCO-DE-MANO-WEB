@@ -659,6 +659,62 @@
             }
         }
 
+    
+        /* V2.1 — controles administrativos */
+        .admin-tools { align-items:center; min-height:76px; }
+        .admin-tools-actions { display:flex; align-items:stretch; justify-content:flex-end; gap:8px; }
+        .admin-tools-actions form { margin:0; }
+
+        .admin-action {
+            min-width:154px; min-height:50px; display:inline-flex; align-items:center;
+            gap:10px; padding:7px 11px; border-radius:8px;
+            border:1px solid rgba(212,175,55,.22);
+            color:#e9eee9; background:linear-gradient(145deg,#102c1c,#071b10);
+            box-shadow:0 4px 12px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035);
+            text-decoration:none; cursor:pointer; font-family:'Montserrat',sans-serif;
+            text-align:left; transition:.16s ease;
+        }
+        .admin-action > i {
+            width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;
+            border-radius:7px;font-size:.78rem;
+        }
+        .admin-action span { display:flex;flex-direction:column;gap:2px; }
+        .admin-action strong { color:#f3f1e5;font-size:.66rem;line-height:1.1;text-transform:uppercase;letter-spacing:.25px; }
+        .admin-action small { color:#93a39a;font-size:.56rem;line-height:1.1; }
+        .admin-action.keep > i { color:#e7c653;background:rgba(212,175,55,.12); }
+
+        .admin-action.reset {
+            border-color:rgba(180,70,60,.30);
+            background:linear-gradient(145deg,rgba(73,29,24,.62),rgba(29,16,14,.85));
+        }
+        .admin-action.reset > i { color:#f08b7e;background:rgba(170,58,47,.15); }
+
+        .admin-action.logout {
+            min-width:112px;
+            border-color:rgba(120,135,127,.22);
+            background:linear-gradient(145deg,rgba(26,36,31,.78),rgba(10,19,14,.90));
+        }
+        .admin-action.logout > i { color:#b7c0bb;background:rgba(160,170,164,.08); }
+
+        .admin-action:hover {
+            transform:translateY(-1px);
+            border-color:rgba(212,175,55,.45);
+            box-shadow:0 7px 15px rgba(0,0,0,.28),0 0 12px rgba(212,175,55,.045);
+        }
+        .admin-action.reset:hover {
+            border-color:rgba(240,110,95,.55);
+            box-shadow:0 7px 15px rgba(0,0,0,.28),0 0 12px rgba(180,60,50,.08);
+        }
+        .admin-action.logout:hover { border-color:rgba(180,190,184,.38); }
+
+        @media (max-width:900px) {
+            .admin-tools { align-items:flex-start;flex-direction:column; }
+            .admin-tools-actions { width:100%;flex-wrap:wrap; }
+        }
+        @media (max-width:600px) {
+            .admin-action { flex:1 1 100%;min-width:0; }
+        }
+
     </style>
 </head>
 <body>
@@ -889,18 +945,22 @@
                     <small>Use somente quando necessário. A Galeria de Lendas permanece preservada.</small>
                 </div>
                 <div class="admin-tools-actions">
-                    
-                <form action="/admin-painel/admin/reset-mantendo-atletas" method="POST" onsubmit="return confirmarResetMantendoAtletas();">
-                    <button type="submit" class="btn btn-success" class="action-btn compact success">
-                        <i class="fas fa-rotate"></i> Reiniciar mantendo atletas
-                    </button>
-                </form>
-
-                <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
-                    <button type="submit" class="btn btn-danger" class="action-btn compact success"><i class="fas fa-power-off"></i> Reiniciar Salão</button>
-                </form>
-                <a href="/admin-painel/logout" style="color:var(--ouro); text-align:center; display:block; margin-top:20px; font-size:0.85rem; font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:1px;">🚪 Sair</a>
-
+                    <form action="/admin-painel/admin/reset-mantendo-atletas" method="POST" onsubmit="return confirmarResetMantendoAtletas();">
+                        <button type="submit" class="admin-action keep">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span><strong>Reiniciar torneio</strong><small>Manter atletas</small></span>
+                        </button>
+                    </form>
+                    <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
+                        <button type="submit" class="admin-action reset">
+                            <i class="fa-solid fa-power-off"></i>
+                            <span><strong>Reiniciar salão</strong><small>Limpar testes</small></span>
+                        </button>
+                    </form>
+                    <a href="/admin-painel/logout" class="admin-action logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span><strong>Sair</strong><small>Encerrar sessão</small></span>
+                    </a>
                 </div>
             </section>
         </main>
