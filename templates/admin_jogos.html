@@ -835,7 +835,7 @@
 
     
         /* FASE 2.1 - V8: estados das mesas + cronômetro mais compacto */
-        .mesa-em-andamento {
+        .mesa-status {
             margin-top: 6px;
             padding: 5px 8px;
             min-height: 16px;
@@ -854,7 +854,7 @@
             letter-spacing: .35px;
         }
 
-        .mesa-em-andamento::before {
+        .mesa-status::before {
             content: "";
             width: 6px;
             height: 6px;
@@ -927,10 +927,50 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .mesa-em-andamento::before {
+            .mesa-status::before {
                 animation: none;
             }
         }
+
+    
+        /* V9: status da partida no espaço inferior do card */
+        .mesa-status {
+            margin-top: 6px;
+            padding: 5px 8px;
+            min-height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 5px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: .62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .35px;
+        }
+
+        .mesa-status.andamento {
+            border: 1px solid rgba(212,175,55,.20);
+            background: rgba(212,175,55,.045);
+            color: rgba(245,215,110,.78);
+        }
+
+        .mesa-status.finalizada {
+            border: 1px solid rgba(39,174,96,.25);
+            background: linear-gradient(90deg, rgba(30,132,73,.16), rgba(7,34,20,.4));
+            color: #48dc86;
+        }
+
+        .mesa-status .status-ponto {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+        }
+
+        .mesa-status.andamento .status-ponto { background: #d4af37; }
+        .mesa-status.finalizada .status-ponto { background: #48dc86; }
 
     </style>
 </head>
@@ -1140,9 +1180,16 @@
             </div>
 
             {% if id_atleta2 is not none and id_atleta2 > 0 %}
-                {% if not c.vencedor_id %}
+                {% if c.vencedor_id %}
+                    <div class="mesa-status finalizada">
+                        <span class="status-ponto"></span>
+                        PARTIDA FINALIZADA
+                    </div>
                 {% else %}
-                    <div class="resultado-confirmado"><i class="fa-solid fa-circle-check"></i> Resultado lançado</div>
+                    <div class="mesa-status andamento">
+                        <span class="status-ponto"></span>
+                        PARTIDA EM ANDAMENTO
+                    </div>
                 {% endif %}
             {% else %}
                 <div style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 15px; font-size: 0.9rem;">Folga Automática (+Pontos)</div>
@@ -1715,26 +1762,6 @@
             }
         }
     </script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.mesa-card').forEach(function (card) {
-        const finalizado = card.querySelector('.resultado-lancado');
-        const jogadores = card.querySelectorAll('.jogador-linha');
-        const statusExistente = card.querySelector('.mesa-em-andamento');
-
-        if (!finalizado && jogadores.length >= 2 && !statusExistente) {
-            const status = document.createElement('div');
-            status.className = 'mesa-em-andamento';
-            status.textContent = 'Partida em andamento';
-            const destino = card.querySelector('.mesa-acoes') || card.querySelector('.mesa-header');
-            if (destino) {
-                destino.parentNode.insertBefore(status, destino);
-            }
-        }
-    });
-});
-</script>
 
 </body>
 </html>
