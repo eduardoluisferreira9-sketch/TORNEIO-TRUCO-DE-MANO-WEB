@@ -143,6 +143,25 @@ def init_db():
                 qtd_flores INTEGER
             );
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS historico_classificacao (
+                id SERIAL PRIMARY KEY,
+                torneio_id INTEGER NOT NULL,
+                posicao INTEGER NOT NULL,
+                atleta_id_original INTEGER,
+                nome_atleta VARCHAR(255) NOT NULL,
+                entidade VARCHAR(255),
+                status VARCHAR(50),
+                vitorias INTEGER DEFAULT 0,
+                sets_ganhos INTEGER DEFAULT 0,
+                tentos_pro INTEGER DEFAULT 0,
+                tentos_contra INTEGER DEFAULT 0,
+                saldo_tentos INTEGER DEFAULT 0,
+                flores INTEGER DEFAULT 0,
+                chapeu_jogados INTEGER DEFAULT 0,
+                UNIQUE (torneio_id, posicao)
+            );
+        ''')
         conn.commit()
         cursor.close()
         conn.close()
@@ -219,6 +238,26 @@ def init_db():
                 FOREIGN KEY (torneio_id) REFERENCES torneios(id)
             )
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS historico_classificacao (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                torneio_id INTEGER NOT NULL,
+                posicao INTEGER NOT NULL,
+                atleta_id_original INTEGER,
+                nome_atleta TEXT NOT NULL,
+                entidade TEXT,
+                status TEXT,
+                vitorias INTEGER DEFAULT 0,
+                sets_ganhos INTEGER DEFAULT 0,
+                tentos_pro INTEGER DEFAULT 0,
+                tentos_contra INTEGER DEFAULT 0,
+                saldo_tentos INTEGER DEFAULT 0,
+                flores INTEGER DEFAULT 0,
+                chapeu_jogados INTEGER DEFAULT 0,
+                UNIQUE (torneio_id, posicao),
+                FOREIGN KEY (torneio_id) REFERENCES torneios(id)
+            )
+        ''')
         conn.commit()
         conn.close()
 
@@ -276,7 +315,7 @@ def atualizar_e_obter_cronometro(db):
 
 def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     p = "%s" if DATABASE_URL else "?"
-    cursor.execute(f"SELECT id, nome, status FROM atletas WHERE status IN ('APROVADO', 'DESISTENTE') AND torneio_id = {p} ORDER BY nome ASC", (torneio_id,))
+    cursor.execute(f"SELECT id, nome, entidade, status FROM atletas WHERE status IN ('APROVADO', 'DESISTENTE') AND torneio_id = {p} ORDER BY nome ASC", (torneio_id,))
     todos_atletas = cursor.fetchall()
     lista_classificacao = []
     
@@ -310,10 +349,83 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
         
         lista_classificacao.append({
             "id": atleta_id, "nome": atleta["nome"], "status": atleta["status"], "vitorias": vitorias, "sets_ganhos": sets_ganhos,
-            "saldo_tentos": tentos_pro - tentos_contra, "tentos_pro": tentos_pro, "flores": flores, "chapeu_jogados": p1["byes"]
+            "saldo_tentos": tentos_pro - tentos_contra, "tentos_pro": tentos_pro, "tentos_contra": tentos_contra, "flores": flores, "chapeu_jogados": p1["byes"]
         })
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
+
+def salvar_snapshot_classificacao(cursor, torneio_id: int):
+    """Congela a classificação da fase classificatória para o histórico.
+
+    A fotografia é salva antes do mata-mata e também pode ser chamada no
+    encerramento como garantia. Ela não depende dos confrontos permanecerem
+    no banco depois que a edição for arquivada.
+    """
+    p = "%s" if DATABASE_URL else "?"
+    ranking = obtener_ranking_fase_classificatoria(cursor, torneio_id)
+
+    cursor.execute(
+        f"DELETE FROM historico_classificacao WHERE torneio_id = {p}",
+        (torneio_id,)
+    )
+
+    for posicao, item in enumerate(ranking, start=1):
+        cursor.execute(
+            f"""
+            INSERT INTO historico_classificacao (
+                torneio_id, posicao, atleta_id_original, nome_atleta, entidade,
+                status, vitorias, sets_ganhos, tentos_pro, tentos_contra,
+                saldo_tentos, flores, chapeu_jogados
+            ) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p})
+            """,
+            (
+                torneio_id, posicao, item["id"], item["nome"], item.get("entidade", ""),
+                item.get("status", ""), item["vitorias"], item["sets_ganhos"],
+                item["tentos_pro"], item.get("tentos_contra", 0), item["saldo_tentos"],
+                item["flores"], item["chapeu_jogados"]
+            )
+        )
+
+    return ranking
+
+def obtener_top_flores_torneio(cursor, torneio_id: int, limite: int = 3):
+    """Retorna os maiores acumuladores de flores de toda a edição.
+
+    Diferente da classificação esportiva, considera classificatória e
+    eliminatórias. Isso permite acompanhar o Rei das Flores durante o mata-mata.
+    """
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(
+        f"SELECT id, nome, entidade, status FROM atletas WHERE torneio_id = {p} ORDER BY nome ASC",
+        (torneio_id,)
+    )
+    atletas = cursor.fetchall()
+    ranking = []
+
+    for atleta in atletas:
+        atleta_id = atleta["id"]
+        cursor.execute(
+            f"""SELECT
+                COALESCE(SUM(CASE WHEN atleta1_id = {p} THEN flores1 ELSE 0 END), 0) +
+                COALESCE(SUM(CASE WHEN atleta2_id = {p} THEN flores2 ELSE 0 END), 0) AS flores
+                FROM confrontos
+                WHERE torneio_id = {p}
+                  AND vencedor_id IS NOT NULL
+            """,
+            (atleta_id, atleta_id, torneio_id)
+        )
+        row = cursor.fetchone()
+        flores = int(row["flores"] or 0)
+        ranking.append({
+            "id": atleta_id,
+            "nome": atleta["nome"],
+            "entidade": atleta["entidade"],
+            "status": atleta["status"],
+            "flores": flores
+        })
+
+    ranking.sort(key=lambda x: (-x["flores"], x["nome"].upper(), x["id"]))
+    return ranking[:limite]
 
 # --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
@@ -1392,6 +1504,12 @@ def disparar_matamata(corte: int = Form(...), tempo_minutos: int = Form(None), d
     classificados = [atleta for atleta in ranking if atleta.get("status") != "DESISTENTE"][:corte]
     if len(classificados) < corte:
         return RedirectResponse(url="/admin-painel/admin/classificacao?erro=atletas_insuficientes_para_corte", status_code=303)
+
+    # Congela a classificação exatamente no momento em que a fase
+    # classificatória termina. A partir daqui o mata-mata não altera esse
+    # ranking histórico.
+    salvar_snapshot_classificacao(cursor, cfg["id"])
+
     cursor.execute(f"UPDATE torneios SET fase_torneio = 'MATA_MATA' WHERE id = {p}", (cfg["id"],))
     
     if corte == 16: fase_id = -1
@@ -1780,6 +1898,7 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     cursor = db.cursor()
     lista_classificacao = obtener_ranking_fase_classificatoria(cursor, cfg["id"])
+    top_flores = obtener_top_flores_torneio(cursor, cfg["id"], 3)
 
     cursor.execute(f"SELECT DISTINCT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY rodada DESC", (cfg["id"],))
     todas_rodadas = [r["rodada"] for r in cursor.fetchall()]
@@ -1790,7 +1909,7 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
+        context={"config": cfg, "classificacao": lista_classificacao, "top_flores": top_flores, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
     )
 
 @app.post("/admin/auditoria/corrigir")
@@ -1832,26 +1951,13 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
     third_place = jogo_terceiro["atleta1_nome"] if jogo_terceiro["vencedor_id"] == jogo_terceiro["atleta1_id"] else jogo_terceiro["atleta2_nome"]
     fourth_place = jogo_terceiro["atleta2_nome"] if jogo_terceiro["vencedor_id"] == jogo_terceiro["atleta1_id"] else jogo_terceiro["atleta1_nome"]
 
-    cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
-    atletas = cursor.fetchall()
-    
-    rei_nome = "Nenhum"
-    max_flores = 0
-    for atl in atletas:
-        a_id = atl["id"]
-        cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-        f1 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-        f2 = cursor.fetchone()[0]
-            
-        total_f = f1 + f2
-        if total_f > max_flores:
-            max_flores = total_f
-            rei_nome = atl["nome"]
+    top_flores = obtener_top_flores_torneio(cursor, cfg["id"], 3)
+    rei_nome = top_flores[0]["nome"] if top_flores else "Nenhum"
+    max_flores = top_flores[0]["flores"] if top_flores else 0
 
     return templates.TemplateResponse(
         request=request, name="admin_podio.html",
-        context={"config": cfg, "campeao": campeao, "vice": vice, "terceiro": third_place, "quarto": fourth_place, "rei_nome": rei_nome, "max_flores": max_flores, "aba_ativa": "podio"}
+        context={"config": cfg, "campeao": campeao, "vice": vice, "terceiro": third_place, "quarto": fourth_place, "rei_nome": rei_nome, "max_flores": max_flores, "top_flores": top_flores, "aba_ativa": "podio"}
     )
 
 @app.post("/admin/encerrar-e-salvar")
@@ -1860,6 +1966,13 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
+
+    # Garantia: se a classificação ainda não tiver sido congelada (por
+    # exemplo, em uma edição antiga), salvamos a fotografia agora antes de
+    # arquivar a edição.
+    cursor.execute(f"SELECT COUNT(*) FROM historico_classificacao WHERE torneio_id = {p}", (cfg["id"],))
+    if cursor.fetchone()[0] == 0:
+        salvar_snapshot_classificacao(cursor, cfg["id"])
     
     cursor.execute(f'INSERT INTO historico_campeoes (torneio_id, nome_torneio, campeao, vice, terceiro, quarto, rei_das_flores, qtd_flores) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p})',
                    (cfg["id"], cfg["nome_torneio"], campeao, vice, terceiro, quarto, rei, flores))
@@ -1939,6 +2052,11 @@ def excluir_historico(
         # ==========================================================
 
         if torneio_id is not None:
+
+            cursor.execute(
+                f"DELETE FROM historico_classificacao WHERE torneio_id = {p}",
+                (torneio_id,)
+            )
 
             cursor.execute(
                 f"""
