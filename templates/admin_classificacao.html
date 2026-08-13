@@ -1521,6 +1521,132 @@ body{
 }
 </style>
 
+
+<style>
+/* ==========================================================
+   FINALIZAÇÃO VISUAL — CLASSIFICAÇÃO
+   Refinos finais de hierarquia e aproveitamento.
+   ========================================================== */
+
+/* 1) Primeiro colocado: destaque discreto, sem "pintar" a tabela. */
+.ranking-card tbody tr:first-child{
+    background:linear-gradient(
+        90deg,
+        rgba(212,175,55,.16),
+        rgba(212,175,55,.045) 58%,
+        transparent
+    ) !important;
+}
+
+.ranking-card tbody tr:first-child td:first-child{
+    box-shadow:inset 3px 0 0 #d4af37 !important;
+}
+
+.ranking-card tbody tr:first-child td{
+    font-weight:800 !important;
+}
+
+/* 2) Rei das Flores: pódio mais equilibrado, mantendo o tamanho
+      secundário em relação à classificação. */
+.flores-ranking{
+    align-items:end !important;
+    gap:9px !important;
+    padding:8px 5px 4px !important;
+}
+
+.flor-item{
+    min-height:145px !important;
+    height:76% !important;
+    justify-content:flex-end !important;
+}
+
+.flor-item.primeiro{
+    min-height:165px !important;
+    height:84% !important;
+}
+
+.flor-item:nth-child(2),
+.flor-item:nth-child(3){
+    height:76% !important;
+}
+
+.flor-pos{
+    margin-bottom:6px !important;
+}
+
+.flor-info strong{
+    font-size:10px !important;
+}
+
+.flor-total{
+    margin-top:3px !important;
+}
+
+/* 3) Fase encerrada: menos altura, mesma importância visual. */
+.alerta-box{
+    padding-top:13px !important;
+    padding-bottom:13px !important;
+}
+
+.alerta-box h3{
+    margin-bottom:7px !important;
+}
+
+.alerta-box p{
+    margin-bottom:10px !important;
+    line-height:1.35 !important;
+}
+
+/* 4) Critérios: apoio visual, sem competir com a tabela. */
+.criteria,
+.criterios,
+.criterion{
+    opacity:.9 !important;
+}
+
+/* 5) Área principal continua dominante. */
+.main-grid{
+    grid-template-columns:minmax(0,2.3fr) minmax(340px,.9fr) !important;
+}
+
+/* 6) Rolagem permanece somente no conteúdo da classificação,
+      quando necessária; não criar rolagem na página inteira. */
+.ranking-card{
+    min-height:0 !important;
+}
+
+.ranking-card .table-wrap,
+.ranking-card .ranking-table-wrap,
+.ranking-card .table-container{
+    min-height:0 !important;
+    scrollbar-width:thin;
+}
+
+/* 7) Pequeno reforço de legibilidade nos elementos de apoio. */
+.alerta-box label,
+.alerta-box select,
+.alerta-box button{
+    font-size:.86rem !important;
+}
+
+.phase-pill{
+    font-size:.72rem !important;
+}
+
+/* 8) Evita que o acabamento altere o comportamento em telas menores. */
+@media(max-width:1050px){
+    .main-grid{
+        grid-template-columns:minmax(0,1.85fr) minmax(300px,1fr) !important;
+    }
+}
+
+@media(max-width:780px){
+    .main-grid{
+        grid-template-columns:1fr !important;
+    }
+}
+</style>
+
 </head>
 <body>
 
