@@ -92,7 +92,8 @@
             <div style="display: table-cell; text-align: right; vertical-align: middle;">
                 <a href="/admin-painel/admin/inscricoes" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">📋 Inscrições & Formato</a>
                 <a href="/admin-painel/admin/jogos" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">🎴 Mesa de Jogos</a>
-                <a href="/admin-painel/admin/classificacao" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; background: #d4af37; color: #0b140d;">📊 Classificação & Auditoria</a>
+                <a href="/admin-painel/admin/classificacao" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">🏆 Classificação</a>
+                <a href="/admin-painel/admin/conferencia" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; background: #d4af37; color: #0b140d;">🔎 Conferência</a>
             </div>
         </div>
     </nav>
@@ -173,5 +174,62 @@
             </table>
         </div>
     </div>
+<div class="modal" id="modalAuditoria" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100;">
+        <div style="background: #112216; padding: 30px; border-radius: 8px; border: 2px solid #7b241c; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
+            <h3 style="color: #e74c3c; margin-top: 0; border-bottom: 1px solid #332222; padding-bottom: 10px;">⚠️ Alteração de Auditoria</h3>
+            
+            <form action="/admin-painel/admin/auditoria/corrigir" method="POST">
+                <input type="hidden" name="confronto_id" id="aud_id">
+                <input type="hidden" name="rodada_retorno" value="{{ rodada_selecionada }}">
+
+                <div style="margin-top: 15px;">
+                    <label style="display:block; font-weight:bold; color: #bbb; margin-bottom: 5px;">Vencedor Correto:</label>
+                    <select name="vencedor_id" id="aud_vencedor" style="width:100%;" required></select>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label style="display:block; font-weight:bold; color: #bbb; margin-bottom: 5px;">Tipo de Placar:</label>
+                    <select name="tipo_placar" style="width:100%;" required>
+                        <option value="2x0">2x0 em Sets</option>
+                        <option value="2x1">2x1 em Sets</option>
+                    </select>
+                </div>
+
+                <div class="layout-table" style="margin-top: 20px; border-collapse: separate; border-spacing: 15px 0; margin-left: -15px; width: calc(100% + 30px);">
+                    <div class="layout-row">
+                        <div class="layout-cell" style="width: 50%;">
+                            <label style="display: block; font-weight: bold; color: #bbb; margin-bottom: 5px;">Tentos P1:</label>
+                            <input type="number" name="tentos1" value="0" min="0" style="width:100%;" required>
+                        </div>
+                        <div class="layout-cell" style="width: 50%;">
+                            <label style="display: block; font-weight: bold; color: #bbb; margin-bottom: 5px;">Tentos P2:</label>
+                            <input type="number" name="tentos2" value="0" min="0" style="width:100%;" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; display: table; width: 100%;">
+                    <div style="display: table-cell; text-align: left;">
+                        <button type="button" onclick="document.getElementById('modalAuditoria').style.display='none'" style="background:#455a64; border:none; padding:10px 20px; color:#fff; cursor:pointer; border-radius:4px; font-weight: bold;">Voltar</button>
+                    </div>
+                    <div style="display: table-cell; text-align: right;">
+                        <button type="submit" style="background:#7b241c; color:white; font-weight:bold; border: 1px solid #922b21; padding:10px 25px; cursor:pointer; border-radius:4px; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">Salvar Mudança</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function mudarRodadaFiltro(val) {
+            window.location.href = '/admin-painel/admin/conferencia?rodada_filtro=' + val;
+        }
+        function abrirAuditoria(confId, id1, nome1, id2, nome2) {
+            document.getElementById('aud_id').value = confId;
+            let sel = document.getElementById('aud_vencedor');
+            sel.innerHTML = `<option value="${id1}">${nome1}</option><option value="${id2}">${nome2}</option>`;
+            document.getElementById('modalAuditoria').style.display = 'flex';
+        }
+    </script>
 </body>
 </html>
