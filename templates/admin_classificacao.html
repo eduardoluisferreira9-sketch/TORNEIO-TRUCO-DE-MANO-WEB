@@ -3,63 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <title>Painel - Classificação & Auditoria</title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; }
-        body { background: #0b140d; color: #e8e6e3; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-        .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
-        
-        /* Tema Feltro Musgo & Ouro */
-        .card { background: #112216; padding: 25px; border-radius: 8px; border: 1px solid #1b3622; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h2 { color: #d4af37; margin-top: 0; border-left: 4px solid #d4af37; padding-left: 10px; font-size: 1.4rem; }
-        h3 { color: #d4af37; margin-top: 0; font-size: 1.2rem; }
-        h4 { color: #bbb; margin-top: 20px; font-size: 1.1rem; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #0e1b12; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #1b3622; }
-        th { background: #162e1e; color: #d4af37; font-weight: bold; }
-        tr:hover { background: #142a1b; }
-        
-        .filtro-box { background: #162e1e; padding: 15px; border-radius: 4px; border: 1px solid #1b3622; margin-bottom: 20px; }
-        .filtro-box-inner { display: table; width: 100%; }
-        .filtro-cell { display: table-cell; vertical-align: middle; }
-        
-        select, input[type="number"] { padding: 8px 12px; background: #0e1b12; border: 1px solid #1b3622; color: #fff; border-radius: 4px; font-size: 0.95rem; }
-        select:focus, input[type="number"]:focus { border-color: #d4af37; outline: none; }
-        
-        .btn-corrigir { background: #7b241c; color: #fadbd8; border: 1px solid #922b21; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        .btn-corrigir:hover { background: #922b21; color: #fff; }
-        
-        .btn-matamata { background: #d4af37; color: #0b140d; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .btn-matamata:hover { background: #f1c40f; }
-        
-        .alerta-box { background: #2a2005; border-left: 5px solid #d4af37; padding: 20px; border-radius: 4px; margin-bottom: 25px; border-top: 1px solid #3a2e07; border-right: 1px solid #3a2e07; border-bottom: 1px solid #3a2e07; }
-        .alerta-box p { color: #f39c12; margin: 5px 0 15px 0; }
+    
+<style>
+:root{
+    --bg:#07130c;--bg2:#0a1b10;--panel:#0d2416;--panel2:#102b19;
+    --gold:#e4c247;--gold2:#f2d45f;--text:#f4f3eb;--muted:#9eaca2;
+    --green:#40d982;--red:#ef706b;--purple:#9c6bc3;
+    --line:rgba(228,194,71,.17);--white-line:rgba(255,255,255,.07);
+    --shadow:0 10px 28px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{
+    color:var(--text);font-family:"Segoe UI",Arial,sans-serif;
+    background:
+      radial-gradient(circle at 82% 12%,rgba(55,112,63,.14),transparent 30%),
+      radial-gradient(circle at 12% 75%,rgba(24,93,49,.10),transparent 30%),
+      linear-gradient(135deg,#06110a,#0a1b10 55%,#07130c);
+}
+.admin-nav{
+    height:70px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;background:rgba(5,13,8,.96);
+    border-bottom:2px solid rgba(228,194,71,.45);box-shadow:0 5px 20px rgba(0,0,0,.25);
+}
+.nav-brand{display:flex;align-items:center;gap:11px}
+.nav-brand .brand-icon{
+    width:39px;height:39px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle,#427c42,#16341d);border:1px solid rgba(228,194,71,.45);
+}
+.nav-brand strong{color:var(--gold2);font-size:17px;font-weight:900}
+.nav-links{height:100%;display:flex;align-items:stretch;gap:4px}
+.nav-link{
+    display:flex;align-items:center;padding:0 16px;color:#bcc6bf;text-decoration:none;
+    font-size:11px;font-weight:900;border-bottom:3px solid transparent;transition:.18s;
+}
+.nav-link:hover{background:rgba(255,255,255,.035);color:#fff}
+.nav-link.active{
+    color:#11180f;background:linear-gradient(180deg,#f1d45d,#d7ae30);
+    border-bottom-color:#fff0a1;box-shadow:0 0 18px rgba(228,194,71,.13)
+}
+.container{
+    width:100%;height:calc(100vh - 70px);padding:15px 24px 18px;
+    display:flex;flex-direction:column;gap:11px;overflow:hidden;
+}
+.page-heading{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:40px}
+.page-heading h1{margin:0;color:#fff;font-size:23px;font-weight:900}
+.page-heading p{margin:2px 0 0;color:var(--muted);font-size:10px}
+.phase-pill{
+    padding:7px 11px;border-radius:999px;color:#dce8de;background:rgba(64,217,130,.07);
+    border:1px solid rgba(64,217,130,.32);font-size:8px;font-weight:900;letter-spacing:.55px
+}
+.alerta-box{
+    flex:0 0 auto;margin:0;padding:11px 15px;border-radius:9px;
+    border-left:3px solid var(--gold);border-top:1px solid rgba(228,194,71,.18);
+    border-right:1px solid rgba(228,194,71,.14);border-bottom:1px solid rgba(228,194,71,.14);
+    background:linear-gradient(90deg,rgba(75,56,7,.52),rgba(43,34,7,.25));box-shadow:var(--shadow)
+}
+.alerta-box h3{margin:0 0 3px;color:var(--gold2);font-size:13px}
+.alerta-box p{margin:0 0 8px;color:#d4c078;font-size:9px}
+.alerta-box form{margin:0}
+.layout-table{display:table}.layout-row{display:table-row}.layout-cell{display:table-cell;vertical-align:middle}
+.alerta-box label{color:#f4f0df;font-size:10px;font-weight:800}
+select{
+    background:#07170d;color:#f2f4ef;border:1px solid rgba(64,217,130,.23);
+    border-radius:7px;padding:7px 9px;font-size:10px;font-weight:800
+}
+.btn-matamata{
+    border:0;border-radius:7px;padding:8px 13px;color:#11180f;
+    background:linear-gradient(135deg,#f2d45f,#d6ab2d);font-size:10px;font-weight:900;
+    cursor:pointer;box-shadow:0 5px 14px rgba(228,194,71,.12)
+}
+.main-grid{
+    flex:1 1 auto;min-height:0;display:grid;
+    grid-template-columns:minmax(0,1.55fr) minmax(320px,.85fr);gap:12px
+}
+.card{
+    border:1px solid var(--line);border-radius:12px;
+    background:linear-gradient(145deg,rgba(16,43,25,.98),rgba(7,23,13,.98));box-shadow:var(--shadow)
+}
+.ranking-card{min-height:0;margin:0;padding:13px;display:flex;flex-direction:column}
+.card-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.section-title{display:flex;align-items:center;gap:9px}
+.section-icon{
+    width:32px;height:32px;display:grid;place-items:center;border-radius:9px;
+    background:rgba(228,194,71,.08);border:1px solid rgba(228,194,71,.18);font-size:16px
+}
+h2{margin:0;color:#fff;font-size:15px;font-weight:900}
+.section-subtitle{margin:2px 0 0;color:var(--muted);font-size:8px}
+.criteria{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+.criteria-label{color:#cfb65a;font-size:7px;font-weight:900;letter-spacing:.4px}
+.criteria span{
+    padding:3px 6px;border-radius:5px;color:#bdc9c1;background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.05);font-size:7px;font-weight:800
+}
+.criteria .arrow{padding:0;border:0;background:none;color:#74693a}
+.notice{
+    margin-bottom:7px;padding:6px 8px;border-radius:6px;color:#aebbb2;
+    background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.045);
+    font-size:7px;font-weight:600
+}
+.ranking-wrap{
+    flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+    border:1px solid rgba(255,255,255,.055);border-radius:8px;background:#07170d;
+    scrollbar-width:none
+}
+.ranking-wrap::-webkit-scrollbar{width:0;height:0}
+.ranking-wrap:hover,.ranking-wrap:focus-within{
+    scrollbar-width:thin;scrollbar-color:rgba(228,194,71,.55) transparent
+}
+.ranking-wrap:hover::-webkit-scrollbar,.ranking-wrap:focus-within::-webkit-scrollbar{width:5px}
+.ranking-wrap::-webkit-scrollbar-track{background:transparent}
+.ranking-wrap::-webkit-scrollbar-thumb{background:rgba(228,194,71,.42);border-radius:10px}
+table{width:100%;border-collapse:collapse}
+th{
+    position:sticky;top:0;z-index:2;padding:7px 8px;background:#12321c;
+    border-bottom:1px solid rgba(64,217,130,.12);color:#d5bc5d;
+    font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.35px
+}
+td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.035);color:#e0e6e2;font-size:9px}
+tbody tr:hover{background:rgba(228,194,71,.035)}
+.pos-cell{width:50px;text-align:center;color:#f0d45e;font-weight:900;font-size:11px}
+.athlete-cell{color:#fff;font-weight:850;font-size:10px}
+.athlete-cell .desistente{
+    margin-left:5px;padding:2px 5px;border-radius:999px;color:#efa19b;
+    background:rgba(239,112,107,.08);border:1px solid rgba(239,112,107,.13);
+    font-size:6px;font-weight:900
+}
+.num-cell{text-align:center;font-weight:800}
+.wins,.saldo-pos{color:var(--green);font-weight:900}
+.saldo-neg{color:var(--red);font-weight:900}
+.flores-cell{color:#e4c64e;font-weight:900}
+.right-column{min-height:0;display:grid;grid-template-rows:minmax(0,1.18fr) minmax(0,.82fr);gap:12px}
+.card-flores-live{
+    min-height:0;margin:0;padding:14px;overflow:hidden;border-color:rgba(156,107,195,.34);
+    background:radial-gradient(circle at 50% -10%,rgba(156,107,195,.14),transparent 42%),
+               linear-gradient(145deg,#15151b,#111118)
+}
+.flores-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.flores-title-row h2{font-size:15px;color:#f6eff9}
+.flores-title-row p{margin:2px 0 0;color:#9da49f;font-size:8px}
+.flores-badge{
+    padding:5px 8px;border-radius:999px;color:#ead8f4;background:rgba(156,107,195,.18);
+    border:1px solid rgba(156,107,195,.30);font-size:7px;font-weight:900
+}
+.flores-ranking{
+    height:calc(100% - 52px);min-height:0;display:grid;grid-template-columns:repeat(3,1fr);
+    align-items:end;gap:7px
+}
+.flor-item{
+    height:75%;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    gap:4px;padding:7px 4px 8px;border-radius:9px 9px 6px 6px;
+    border:1px solid rgba(255,255,255,.07);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.2))
+}
+.flor-item.primeiro{
+    height:92%;border-color:rgba(228,194,71,.45);
+    background:radial-gradient(circle at 50% 15%,rgba(228,194,71,.17),transparent 45%),
+               linear-gradient(180deg,rgba(101,75,8,.34),rgba(0,0,0,.24))
+}
+.flor-pos{font-size:25px;line-height:1}
+.flor-info{width:100%;min-width:0;text-align:center}
+.flor-info strong{display:block;color:#f7f3ed;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flor-info span{display:none}
+.flor-total{color:#dfbfea;font-size:11px;font-weight:900}
+.flor-total small{color:#9f84ae;font-size:6px}
+.flores-vazio{grid-column:1/-1;align-self:center;text-align:center;color:#8c9790;font-size:9px;font-style:italic}
+.criteria-card{min-height:0;margin:0;padding:14px;overflow:hidden}
+.criteria-card .section-title{margin-bottom:10px}
+.criteria-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.criteria-step{text-align:center}
+.criteria-step .number{
+    width:27px;height:27px;margin:0 auto 4px;display:grid;place-items:center;border-radius:50%;
+    color:#efd25d;border:1px solid rgba(228,194,71,.55);background:#10251a;font-size:9px;font-weight:900
+}
+.criteria-step strong{display:block;color:#e4e8e4;font-size:7px;line-height:1.15}
+.criteria-note{
+    margin-top:10px;padding:7px 8px;border-radius:7px;color:#aab7ae;
+    background:rgba(64,217,130,.035);border:1px solid rgba(64,217,130,.09);font-size:7px;line-height:1.3
+}
+@media(max-width:950px){
+    html,body{overflow:auto}
+    .admin-nav{height:auto;min-height:70px;flex-direction:column;align-items:flex-start;padding:11px 15px}
+    .nav-links{height:auto;flex-wrap:wrap}
+    .nav-link{padding:9px 10px}
+    .container{height:auto;min-height:calc(100vh - 70px);overflow:visible;padding:13px 12px 22px}
+    .main-grid{grid-template-columns:1fr}
+    .right-column{grid-template-rows:320px 240px}
+    .ranking-card{min-height:500px}
+}
+</style>
 
-        .card-flores-live {
-            border-color: #6d4a88;
-            background: linear-gradient(135deg, #151b17 0%, #1b1721 100%);
-        }
-        .flores-title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
-        .flores-title-row h2 { margin-bottom:6px; }
-        .flores-title-row p { margin:0; color:#9ca8a0; font-size:0.88rem; }
-        .flores-badge { background:#6d4a88; color:#fff; border-radius:999px; padding:7px 13px; font-size:0.75rem; font-weight:800; letter-spacing:0.8px; white-space:nowrap; }
-        .flores-ranking { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:18px; }
-        .flor-item { display:flex; align-items:center; gap:12px; padding:14px 15px; background:#0e1b12; border:1px solid #2b3b30; border-radius:8px; }
-        .flor-item.primeiro { border-color:#8d6ab0; background:#171322; }
-        .flor-pos { font-size:1.45rem; min-width:34px; text-align:center; }
-        .flor-info { min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
-        .flor-info strong { color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .flor-info span { color:#89978e; font-size:0.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .flor-total { color:#d9b7f1; font-weight:900; font-size:1.25rem; white-space:nowrap; }
-        .flor-total small { font-size:0.68rem; color:#9d8bab; font-weight:700; }
-        .flores-vazio { grid-column:1/-1; text-align:center; color:#8fa393; padding:12px; font-style:italic; }
-        @media (max-width: 800px) { .flores-ranking { grid-template-columns:1fr; } .flores-title-row { align-items:flex-start; } }
-        
-        /* Classes auxiliares para substituição de Layout Flex/Grid */
-        .layout-table { display: table; width: 100%; }
-        .layout-row { display: table-row; }
-        .layout-cell { display: table-cell; vertical-align: middle; }
-    </style>
 
 <style>
 /* Fase 2 — Classificação sem rolagem da página.
@@ -140,49 +272,99 @@
 </head>
 <body>
 
-    <nav style="background: #090f0a; padding: 15px 30px; border-bottom: 3px solid #d4af37;">
-        <div style="display: table; width: 100%;">
-            <div style="display: table-cell; text-align: left; vertical-align: middle;">
-                <span style="color: #d4af37; font-weight: bold; font-size: 1.3rem; letter-spacing: 0.5px;">🏆 {{ config.nome_torneio }}</span>
-            </div>
-            <div style="display: table-cell; text-align: right; vertical-align: middle;">
-                <a href="/admin-painel/admin/inscricoes" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">📋 Inscrições & Formato</a>
-                <a href="/admin-painel/admin/jogos" style="text-decoration: none; padding: 8px 16px; margin-right: 10px; border-radius: 4px; font-weight: bold; color: #a2b3a5;">🎴 Mesa de Jogos</a>
-                <a href="/admin-painel/admin/classificacao" style="text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; background: #d4af37; color: #0b140d;">📊 Classificação & Auditoria</a>
-            </div>
+    <nav class="admin-nav">
+        <div class="nav-brand">
+            <span class="brand-icon">🏆</span>
+            <strong>{{ config.nome_torneio }}</strong>
+        </div>
+        <div class="nav-links">
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link">🎴 Mesa de Jogos</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link active">📊 Classificação</a>
+            <a href="/admin-painel/admin/conferencia" class="nav-link">🔎 Conferência</a>
         </div>
     </nav>
 
     <div class="container">
-        
-        {% if config.fase_torneio == 'CLASSIFICATORIA' %}
+        <div class="page-heading">
+            <div><h1>🏆 Classificação do Torneio</h1><p>Acompanhe o desempenho, a disputa de flores e a evolução da fase atual.</p></div>
+            <span class="phase-pill">{{ config.fase_torneio }}</span>
+        </div>
         <div class="alerta-box">
             <h3>📢 Fase Classificatória Encerrada!</h3>
             <p>Todas as rodadas planejadas da primeira fase foram concluídas com sucesso. Defina abaixo quantos atletas avançam para iniciar as chaves eliminatórias:</p>
-            
             <form action="/admin-painel/admin/disparar-matamata" method="POST">
-                <div class="layout-table" style="width: auto;">
+                <div class="layout-table">
                     <div class="layout-row">
-                        <div class="layout-cell" style="padding-right: 15px;">
-                            <label style="color: #fff; font-weight: bold;">Corte do Mata-Mata:</label>
-                        </div>
-                        <div class="layout-cell" style="padding-right: 20px;">
-                            <select name="corte" required style="min-width: 250px;">
+                        <div class="layout-cell" style="padding-right:12px;"><label>Corte do Mata-Mata:</label></div>
+                        <div class="layout-cell" style="padding-right:12px;">
+                            <select name="corte" required style="min-width:230px;">
                                 <option value="4">Top 4 (Direto para Semifinal)</option>
                                 <option value="8" selected>Top 8 (Quartas de Final)</option>
                                 <option value="16">Top 16 (Oitavas de Final)</option>
                             </select>
                         </div>
-                        <div class="layout-cell">
-                            <button type="submit" class="btn-matamata">⚡ Gerar Chaveamento Eliminatório</button>
-                        </div>
+                        <div class="layout-cell"><button type="submit" class="btn-matamata">⚡ Gerar Chaveamento Eliminatório</button></div>
                     </div>
                 </div>
             </form>
         </div>
-        {% endif %}
-
-        <div class="card card-flores-live">
+        <div class="main-grid">
+            <div class="card ranking-card">
+            <div class="card-title-row">
+                <div class="section-title">
+                    <span class="section-icon">🏆</span>
+                    <div>
+                        <h2>Classificação Geral</h2>
+                        <p class="section-subtitle">Ranking da fase atual considerando todos os critérios oficiais de desempate.</p>
+                    </div>
+                </div>
+                <span class="phase-pill">↻ ATUALIZADO</span>
+            </div>
+            <div class="criteria">
+                <span class="criteria-label">CRITÉRIO</span>
+                <span>Vitórias</span><span class="arrow">›</span><span>Sets</span><span class="arrow">›</span>
+                <span>Saldo</span><span class="arrow">›</span><span>Tentos Pró</span><span class="arrow">›</span><span>Flores</span>
+            </div>
+            <div class="notice">🚫 Desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase.</div>
+            <div class="ranking-wrap"><table>
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Pos</th>
+                        <th>Atleta</th>
+                        <th style="text-align: center;">Vitórias</th>
+                        <th style="text-align: center;">Sets Ganhos</th>
+                        <th style="text-align: center;">Saldo Tentos</th>
+                        <th style="text-align: center;">Tentos Pró</th>
+                        <th style="text-align: center;">Flores</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in classificacao %}
+                    <tr>
+                        <td class="pos-cell">{{ loop.index }}º</td>
+                        <td class="athlete-cell">
+                            {{ item.nome }}
+                            {% if item.status == 'DESISTENTE' %}<span class="desistente">🚫 DESISTENTE</span>{% endif %}
+                        </td>
+                        <td class="num-cell wins">{{ item.vitorias }}</td>
+                        <td class="num-cell">{{ item.sets_ganhos }}</td>
+                        <td class="num-cell {% if item.saldo_tentos >= 0 %}saldo-pos{% else %}saldo-neg{% endif %}">
+                            {% if item.saldo_tentos > 0 %}+{% endif %}{{ item.saldo_tentos }}
+                        </td>
+                        <td class="num-cell">{{ item.tentos_pro }}</td>
+                        <td class="num-cell flores-cell">🌸 {{ item.flores }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 30px;">Nenhum atleta listado na classificação.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table></div>
+        </div>
+            <div class="right-column">
+                <div class="card card-flores-live">
             <div class="flores-title-row">
                 <div>
                     <h2>🌸 Rei das Flores — disputa em andamento</h2>
@@ -205,107 +387,28 @@
                 {% endfor %}
             </div>
         </div>
-
-        <div class="card">
-            <h2>Tabela de Classificação Geral (Classificatória)</h2>
-            <p style="font-size: 0.9rem; color: #8fa393; margin-bottom: 20px;">Critério Oficial: Vitórias > Sets Ganhos > Saldo Tentos > Tentos Pró > Flores.</p>
-            <p style="font-size: 0.88rem; color: #f39c12; margin-bottom: 20px;">🚫 Atletas marcados como desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase. O sistema busca o próximo atleta elegível para completar o corte.</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">Pos</th>
-                        <th>Atleta</th>
-                        <th style="text-align: center;">Vitórias</th>
-                        <th style="text-align: center;">Sets Ganhos</th>
-                        <th style="text-align: center;">Saldo Tentos</th>
-                        <th style="text-align: center;">Tentos Pró</th>
-                        <th style="text-align: center;">Flores</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in classificacao %}
-                    <tr>
-                        <td><strong>{{ loop.index }}º</strong></td>
-                        <td style="color: {% if item.status == 'DESISTENTE' %}#e67e22{% else %}#fff{% endif %}; font-weight: bold;">
-                            {{ item.nome }}
-                            {% if item.status == 'DESISTENTE' %}<span style="margin-left:8px; color:#e67e22; font-size:0.72rem; font-weight:800;">🚫 DESISTENTE</span>{% endif %}
-                        </td>
-                        <td style="color: #2ecc71; font-weight: bold; text-align: center;">{{ item.vitorias }}</td>
-                        <td style="text-align: center;">{{ item.sets_ganhos }}</td>
-                        <td style="color: {% if item.saldo_tentos >= 0 %}#2ecc71{% else %}#e74c3c{% endif %}; font-weight: bold; text-align: center;">
-                            {% if item.saldo_tentos > 0 %}+{% endif %}{{ item.saldo_tentos }}
-                        </td>
-                        <td style="text-align: center;">{{ item.tentos_pro }}</td>
-                        <td style="text-align: center; color: #f1c40f;">{{ item.flores }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #888; font-style: italic; padding: 30px;">Nenhum atleta listado na classificação.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <div class="card criteria-card">
+            <div class="section-title">
+                <span class="section-icon">⚖️</span>
+                <div>
+                    <h2>Critério oficial de desempate</h2>
+                    <p class="section-subtitle">A ordem usada pelo sistema para definir a posição.</p>
+                </div>
+            </div>
+            <div class="criteria-steps">
+                <div class="criteria-step"><div class="number">1</div><strong>Vitórias</strong></div>
+                <div class="criteria-step"><div class="number">2</div><strong>Sets Ganhos</strong></div>
+                <div class="criteria-step"><div class="number">3</div><strong>Saldo de Tentos</strong></div>
+                <div class="criteria-step"><div class="number">4</div><strong>Tentos Pró</strong></div>
+                <div class="criteria-step"><div class="number">5</div><strong>Flores</strong></div>
+            </div>
+            <div class="criteria-note">ℹ️ Atletas marcados como desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase.</div>
         </div>
 
-        
-    </div>
-
-    <div class="modal" id="modalAuditoria" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100;">
-        <div style="background: #112216; padding: 30px; border-radius: 8px; border: 2px solid #7b241c; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
-            <h3 style="color: #e74c3c; margin-top: 0; border-bottom: 1px solid #332222; padding-bottom: 10px;">⚠️ Alteração de Auditoria</h3>
-            
-            <form action="/admin-painel/admin/auditoria/corrigir" method="POST">
-                <input type="hidden" name="confronto_id" id="aud_id">
-                <input type="hidden" name="rodada_retorno" value="{{ rodada_selecionada }}">
-
-                <div style="margin-top: 15px;">
-                    <label style="display:block; font-weight:bold; color: #bbb; margin-bottom: 5px;">Vencedor Correto:</label>
-                    <select name="vencedor_id" id="aud_vencedor" style="width:100%;" required></select>
-                </div>
-
-                <div style="margin-top: 15px;">
-                    <label style="display:block; font-weight:bold; color: #bbb; margin-bottom: 5px;">Tipo de Placar:</label>
-                    <select name="tipo_placar" style="width:100%;" required>
-                        <option value="2x0">2x0 em Sets</option>
-                        <option value="2x1">2x1 em Sets</option>
-                    </select>
-                </div>
-
-                <div class="layout-table" style="margin-top: 20px; border-collapse: separate; border-spacing: 15px 0; margin-left: -15px; width: calc(100% + 30px);">
-                    <div class="layout-row">
-                        <div class="layout-cell" style="width: 50%;">
-                            <label style="display: block; font-weight: bold; color: #bbb; margin-bottom: 5px;">Tentos P1:</label>
-                            <input type="number" name="tentos1" value="0" min="0" style="width:100%;" required>
-                        </div>
-                        <div class="layout-cell" style="width: 50%;">
-                            <label style="display: block; font-weight: bold; color: #bbb; margin-bottom: 5px;">Tentos P2:</label>
-                            <input type="number" name="tentos2" value="0" min="0" style="width:100%;" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 30px; display: table; width: 100%;">
-                    <div style="display: table-cell; text-align: left;">
-                        <button type="button" onclick="document.getElementById('modalAuditoria').style.display='none'" style="background:#455a64; border:none; padding:10px 20px; color:#fff; cursor:pointer; border-radius:4px; font-weight: bold;">Voltar</button>
-                    </div>
-                    <div style="display: table-cell; text-align: right;">
-                        <button type="submit" style="background:#7b241c; color:white; font-weight:bold; border: 1px solid #922b21; padding:10px 25px; cursor:pointer; border-radius:4px; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">Salvar Mudança</button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+    </div>    </div>
 
-    <script>
-        function mudarRodadaFiltro(val) {
-            window.location.href = '/admin-painel/admin/classificacao?rodada_filtro=' + val;
-        }
-        function abrirAuditoria(confId, id1, nome1, id2, nome2) {
-            document.getElementById('aud_id').value = confId;
-            let sel = document.getElementById('aud_vencedor');
-            sel.innerHTML = `<option value="${id1}">${nome1}</option><option value="${id2}">${nome2}</option>`;
-            document.getElementById('modalAuditoria').style.display = 'flex';
-        }
-    </script>
+
 </body>
 </html>
