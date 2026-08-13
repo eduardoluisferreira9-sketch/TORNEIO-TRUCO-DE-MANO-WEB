@@ -850,6 +850,82 @@ td{font-size:10px;padding:7px 9px}
 }
 </style>
 
+
+<style>
+/* PADRÃO APROVADO DA NAVEGAÇÃO — aplicado à Classificação */
+.admin-nav{
+    background:#06100a !important;
+    padding:10px 28px !important;
+    min-height:68px !important;
+    border-bottom:2px solid #d4af37 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    box-sizing:border-box !important;
+}
+
+#nome-torneio-global{
+    color:#f4f1e8 !important;
+    font-family:'Cinzel',Georgia,serif !important;
+    font-size:1.15rem !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
+}
+
+.admin-nav .nav-links{
+    display:flex !important;
+    align-items:center !important;
+    gap:4px !important;
+}
+
+.admin-nav .nav-link{
+    display:flex !important;
+    align-items:center !important;
+    gap:8px !important;
+    padding:9px 16px !important;
+    margin:0 2px !important;
+    border-radius:7px !important;
+    color:#e5e7e5 !important;
+    background:transparent !important;
+    border:1px solid transparent !important;
+    font-family:'Montserrat',Arial,sans-serif !important;
+    font-size:14px !important;
+    font-weight:800 !important;
+    text-decoration:none !important;
+    white-space:nowrap !important;
+    transition:background .18s ease,color .18s ease,transform .18s ease !important;
+}
+
+.admin-nav .nav-link i{
+    font-size:13px !important;
+}
+
+.admin-nav .nav-link:hover{
+    color:#fff !important;
+    background:rgba(212,175,55,.08) !important;
+}
+
+.admin-nav .nav-link.active{
+    color:#10170f !important;
+    background:#d4af37 !important;
+    border-color:#edcf63 !important;
+    box-shadow:0 3px 10px rgba(212,175,55,.18) !important;
+}
+
+.admin-nav .nav-link.active:hover{
+    color:#10170f !important;
+    background:#e0bd42 !important;
+}
+
+@media(max-width:950px){
+    .admin-nav .nav-link{
+        padding:8px 11px !important;
+        font-size:12px !important;
+    }
+    #nome-torneio-global{font-size:1rem !important;}
+}
+</style>
+
 </head>
 <body>
 
