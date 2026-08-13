@@ -1972,6 +1972,121 @@
             }
         }
 
+    
+        /* ============================================================
+           V8 — LATERAL SEM CORTE
+           Os cards laterais ocupam a coluna inteira. Cada lista tem
+           espaço real para crescer; se faltar espaço, só a lista rola.
+           ============================================================ */
+
+        @media (min-width: 1101px) {
+            .inscricoes-workspace {
+                min-height: 0 !important;
+                height: 100% !important;
+                align-items: stretch;
+            }
+
+            .inscricoes-workspace > .bottom-grid {
+                min-width: 0;
+                min-height: 0 !important;
+                height: 100% !important;
+                align-self: stretch;
+                display: grid !important;
+                grid-template-rows: minmax(105px, 1fr) minmax(105px, 1fr) !important;
+                gap: 8px;
+                overflow: hidden !important;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card {
+                min-width: 0;
+                min-height: 0 !important;
+                height: auto !important;
+                max-height: none !important;
+                margin: 0 !important;
+                padding: 10px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .section-head {
+                flex: 0 0 auto !important;
+                min-height: 30px;
+                margin-bottom: 7px !important;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .section-head h2 {
+                font-size: .82rem;
+                line-height: 1.15;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .request-list {
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                padding: 2px 3px 3px 0;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .request-item {
+                min-height: 42px !important;
+                height: auto !important;
+                margin-bottom: 5px;
+                padding: 6px 7px;
+                box-sizing: border-box;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .request-person {
+                min-width: 0;
+                max-width: 100%;
+                flex: 1 1 auto;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .request-person strong {
+                display: block !important;
+                max-width: 100%;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+                word-break: normal;
+                overflow-wrap: anywhere;
+                line-height: 1.2;
+                font-size: .62rem;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .request-person span {
+                display: block;
+                max-width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 1.15;
+            }
+
+            .inscricoes-workspace > .bottom-grid > .request-card .request-actions {
+                flex: 0 0 auto;
+            }
+
+            /* Quando não há pedidos, o espaço vazio vira uma área elegante,
+               não um card minúsculo no topo. */
+            .inscricoes-workspace > .bottom-grid > .request-card .empty-state {
+                flex: 1 1 auto;
+                min-height: 0;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .inscricoes-workspace > .bottom-grid > .request-card .request-person strong {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+            }
+        }
+
     </style>
 </head>
 <body>
