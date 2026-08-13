@@ -6,152 +6,458 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+
+        /* FASE 2 - INSCRIÇÕES V1: painel administrativo compacto */
         :root {
-            /* PALETA TRADICIONAL - FELTRO MUSGO PROFUNDO */
-            --bg-principal: #0d2e1b; /* Verde-Musgo Fechado e Elegante */
-            --bg-cards: #092113; /* Tom ainda mais profundo para destacar os painéis */
-            --ouro: #d4af37; /* Ouro Velho Clássico */
-            --ouro-brilhante: #f3e5ab;
-            --vermelho-pampa: #922b21; 
-            --verde-sucesso: #1e8449; 
-            --azul-info: #17a2b8; /* Cor para o botão de ver pix */
-            --texto-claro: #ffffff; 
-            --texto-subtil: #bdc3c7; 
-            --texto-escuro: #111;
+            --bg: #071c10;
+            --bg-2: #0b2818;
+            --card: #092113;
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --text: #f6f6f3;
+            --muted: #aeb8b3;
+            --green: #1e8449;
+            --red: #922b21;
+            --blue: #238da0;
         }
 
-        body { 
-            background: var(--bg-principal); 
-            color: var(--texto-claro); 
-            font-family: 'Montserrat', sans-serif; 
-            margin: 0; 
-            padding: 0;
-            /* Textura suave simulando o tecido de feltro fosco */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 0);
-            background-size: 100% 4px;
-            position: relative;
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at 80% 10%, rgba(212,175,55,.035), transparent 28%),
+                linear-gradient(180deg, #07170e 0%, var(--bg) 100%);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
         }
 
-        /* Detalhe sutil de fundo em marca d'água */
-        body::after {
-            content: "⚔️ 🌿 💰 🏆";
-            position: fixed;
-            bottom: 5%;
-            right: 3%;
-            font-size: 5rem;
-            opacity: 0.02;
-            pointer-events: none;
-            letter-spacing: 15px;
-        }
+        .admin-shell { min-height: 100vh; }
 
-        .wrapper { display: grid; grid-template-columns: 340px 1fr; min-height: 100vh; }
-        
-        /* BARRA LATERAL */
-        .sidebar { 
-            background: linear-gradient(135deg, #050d08 0%, #0c1a11 100%); 
-            padding: 25px; 
-            border-right: 3px solid var(--ouro);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+        .admin-nav {
+            height: 64px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: space-between;
-            position: relative;
-            z-index: 5;
+            gap: 20px;
+            padding: 8px 24px;
+            background: rgba(4,16,10,.96);
+            border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 14px rgba(0,0,0,.35);
         }
 
-        .sidebar-topo h2 {
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
             font-family: 'Cinzel', serif;
-            color: var(--ouro);
-            text-shadow: 0px 3px 6px rgba(0,0,0,0.9);
+            font-size: 1.15rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .brand i { color: var(--gold); font-size: 1.15rem; }
+
+        .nav-links { display: flex; align-items: center; gap: 6px; }
+        .nav-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 13px;
+            border-radius: 7px;
+            border: 1px solid transparent;
+            color: #dfe4e1;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .35px;
+            transition: .18s ease;
+        }
+        .nav-item:hover {
+            color: #fff;
+            background: rgba(212,175,55,.08);
+            border-color: rgba(212,175,55,.25);
+            transform: translateY(-1px);
+        }
+        .nav-item.active {
+            color: #15120a;
+            background: linear-gradient(135deg, #e1bd3c, #b79220);
+            border-color: var(--gold-light);
+            box-shadow: 0 3px 10px rgba(212,175,55,.18);
+        }
+
+        .admin-main {
+            width: min(1500px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 18px 0 30px;
+        }
+
+        .page-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 14px;
+        }
+        .eyebrow, .section-kicker {
+            color: var(--gold);
+            font-size: .65rem;
+            font-weight: 800;
+            text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 2px double var(--ouro);
-            padding-bottom: 15px;
-            margin-top: 0;
-            text-align: center;
+        }
+        .page-head h1 {
+            margin: 2px 0 2px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.65rem;
+            color: #fff;
+        }
+        .page-head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: .78rem;
         }
 
-        .content { padding: 40px; position: relative; z-index: 2; }
-        
-        /* CARDS NO ESTILO TABULEIRO */
-        .card { 
-            background: var(--bg-cards); 
-            border: 1px solid rgba(212, 175, 55, 0.3); 
-            border-radius: 12px; 
-            padding: 25px; 
-            margin-bottom: 30px; 
-            box-shadow: 0 12px 25px rgba(0,0,0,0.5);
-            position: relative;
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border: 1px solid rgba(212,175,55,.45);
+            border-radius: 999px;
+            color: var(--gold-light);
+            background: rgba(212,175,55,.06);
+            font-size: .68rem;
+            font-weight: 800;
+            text-transform: uppercase;
         }
-        
-        /* Moldura interna fina */
-        .card::before {
-            content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 1px solid rgba(212, 175, 55, 0.08); border-radius: 6px; pointer-events: none;
+        .status-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #46d77f;
+            box-shadow: 0 0 0 3px rgba(70,215,127,.12);
         }
 
-        .form-group { margin-bottom: 18px; position: relative; z-index: 2; }
-        label { display: block; margin-bottom: 7px; color: var(--texto-subtil); font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input, select { 
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.4); color: #fff; 
-            border: 1px solid #273746; border-radius: 6px; box-sizing: border-box;
-            transition: all 0.3s ease; font-family: 'Montserrat', sans-serif;
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 9px;
+            margin-bottom: 10px;
+        }
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 11px;
+            background: linear-gradient(135deg, rgba(9,33,19,.98), rgba(6,27,16,.98));
+            border: 1px solid rgba(212,175,55,.20);
+            border-radius: 7px;
+        }
+        .stat-icon {
+            width: 32px; height: 32px;
+            display: grid; place-items: center;
+            border-radius: 7px;
+            color: var(--gold);
+            background: rgba(212,175,55,.09);
+        }
+        .stat-icon.warning { color: #e6b65a; background: rgba(230,182,90,.09); }
+        .stat-icon.danger { color: #df786d; background: rgba(146,43,33,.12); }
+        .stat-card strong { display: block; font-size: 1.05rem; }
+        .stat-card small { display: block; color: var(--muted); font-size: .64rem; margin-top: 1px; }
+
+        .card {
+            background: linear-gradient(145deg, rgba(9,33,19,.98), rgba(7,27,16,.98));
+            border: 1px solid rgba(212,175,55,.23);
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,.22);
+            margin-bottom: 10px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .section-head h2 {
+            margin: 2px 0 0;
+            font-family: 'Cinzel', serif;
+            font-size: .98rem;
+            color: #fff;
+        }
+        .section-head h2 i { color: var(--gold); margin-right: 5px; }
+        .small-note { color: var(--muted); font-size: .63rem; }
+
+        .config-card form {
+            display: grid;
+            grid-template-columns: minmax(250px, 2fr) 130px 130px auto;
+            align-items: end;
+            gap: 9px;
+        }
+        .form-group { margin: 0 !important; }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: .63rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .65px;
+        }
+        input {
+            width: 100%;
+            padding: 9px 10px;
+            background: rgba(0,0,0,.25);
+            color: #fff;
+            border: 1px solid #273b31;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 600;
+            font-size: .78rem;
         }
-        input:focus { border-color: var(--ouro); outline: none; box-shadow: 0 0 12px rgba(212,175,55,0.4); background: rgba(0,0,0,0.6); }
-
-        /* BOTÕES */
-        .btn { 
-            background: linear-gradient(135deg, var(--ouro) 0%, #9a7d28 100%); 
-            color: var(--texto-escuro); font-family: 'Cinzel', serif; font-weight: 800; border: none; padding: 14px 20px; 
-            border-radius: 6px; cursor: pointer; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; 
-            text-decoration: none; transition: all 0.3s ease; text-transform: uppercase; font-size: 0.9rem;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5); letter-spacing: 1px;
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(212,175,55,.10);
         }
-        .btn:hover { background: linear-gradient(135deg, var(--ouro-brilhante) 0%, var(--ouro) 100%); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212,175,55,0.4); }
-        .btn:active { transform: translateY(0); }
 
-        .btn-danger { background: linear-gradient(135deg, var(--vermelho-pampa) 0%, #5c1d16 100%); color: white; }
-        .btn-danger:hover { background: linear-gradient(135deg, #ba3c2f 0%, var(--vermelho-pampa) 100%); box-shadow: 0 10px 20px rgba(146,43,33,0.4); }
-
-        .btn-success { background: linear-gradient(135deg, var(--verde-sucesso) 0%, #0e4827 100%); color: white; }
-        .btn-success:hover { background: linear-gradient(135deg, #27ae60 0%, var(--verde-sucesso) 100%); box-shadow: 0 10px 20px rgba(30,132,73,0.4); }
-
-        .btn-info { background: linear-gradient(135deg, var(--azul-info) 0%, #117a8b 100%); color: white; }
-        .btn-info:hover { background: linear-gradient(135deg, #138496 0%, var(--azul-info) 100%); box-shadow: 0 6px 12px rgba(23,162,184,0.4); }
-
-        /* TABELAS */
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 15px; }
-        th, td { padding: 16px; text-align: left; vertical-align: middle; }
-        th { background: #050d08; color: var(--ouro); font-family: 'Cinzel', serif; font-size: 0.9rem; border-bottom: 2px solid var(--ouro); text-transform: uppercase; letter-spacing: 1px; }
-        td { background: rgba(0,0,0,0.25); border-top: 1px solid rgba(212,175,55,0.05); border-bottom: 1px solid rgba(212,175,55,0.05); color: var(--texto-claro); font-weight: 600; }
-        tr td:first-child { border-left: 1px solid rgba(212,175,55,0.05); border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-        tr td:last-child { border-right: 1px solid rgba(212,175,55,0.05); border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
-
-        /* MENU LATERAL - ABAS PURIFICADAS */
-        .nav-links { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
-        .nav-item { 
-            padding: 15px 18px; color: #dfdfdf; text-decoration: none; border-radius: 8px; 
-            transition: all 0.3s ease; display: flex; align-items: center; gap: 14px; font-weight: 700;
-            border: 2px solid transparent; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;
+        .config-card .btn {
+            width: auto !important;
+            padding: 9px 13px !important;
+            font-size: .68rem !important;
+            height: 38px;
+            border-radius: 6px;
         }
-        .nav-item:hover { background: rgba(212, 175, 55, 0.1); color: var(--ouro-brilhante); border-color: rgba(212,175,55,0.2); padding-left: 26px; }
-        .nav-item.active { background: linear-gradient(90deg, var(--ouro) 0%, rgba(212,175,55,0.15) 100%); color: var(--texto-escuro); font-weight: 800; box-shadow: 0 6px 15px rgba(0,0,0,0.6); border-color: var(--ouro-brilhante); }
-        .nav-item.active:hover { color: var(--texto-escuro); padding-left: 18px; }
 
-        .naipe-icon { font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center; width: 24px; text-align: center; }
-        .grid-tabelas { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; }
+        .cadastro-form {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr auto;
+            gap: 9px;
+            align-items: end;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 8px 13px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: .68rem;
+            font-weight: 900;
+            letter-spacing: .3px;
+            transition: .16s ease;
+            white-space: nowrap;
+        }
+        .action-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .action-btn.primary {
+            color: #16130a;
+            background: linear-gradient(135deg, #e0bd3c, #b89220);
+            border-color: #f1d66c;
+        }
+        .action-btn.success { color: #fff; background: linear-gradient(135deg, #1c9a57, #126c3d); border-color: #48d783; }
+        .action-btn.danger { color: #fff; background: linear-gradient(135deg, #a93a2d, #682019); border-color: #d76c60; }
+        .action-btn.compact { min-height: 34px; font-size: .62rem; padding: 6px 9px; }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.75fr) minmax(330px, .85fr);
+            gap: 10px;
+            align-items: start;
+        }
+        .side-stack { min-width: 0; }
+
+        .count-badge {
+            display: inline-flex;
+            min-width: 22px; height: 22px;
+            padding: 0 6px;
+            align-items: center; justify-content: center;
+            margin-left: 4px;
+            border-radius: 999px;
+            color: #17140b;
+            background: var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-size: .64rem;
+            vertical-align: middle;
+        }
+        .count-badge.warning { background: #d9902d; }
+        .count-badge.danger { color: #fff; background: var(--red); }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 4px; }
+        th, td { padding: 8px 9px; text-align: left; vertical-align: middle; }
+        th {
+            color: var(--gold);
+            background: rgba(0,0,0,.25);
+            font-family: 'Cinzel', serif;
+            font-size: .64rem;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+        td {
+            background: rgba(0,0,0,.18);
+            border-top: 1px solid rgba(212,175,55,.04);
+            border-bottom: 1px solid rgba(212,175,55,.04);
+            font-size: .76rem;
+        }
+        td strong { color: #fff; }
+        .entity-text { color: var(--gold-light); font-size: .7rem; font-weight: 700; }
+        .action-col { text-align: right; width: 110px; }
+
+        .inline-form { display: inline-flex; margin: 0; }
+        .icon-action, .mini-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border: 1px solid rgba(212,175,55,.24);
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            transition: .16s ease;
+        }
+        .icon-action { padding: 6px 8px; font-size: .62rem; }
+        .mini-btn { width: 29px; height: 29px; font-size: .68rem; }
+        .icon-action:hover, .mini-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .icon-action.danger, .mini-btn.danger { color: #ffb4ab; background: rgba(146,43,33,.16); }
+        .mini-btn.success { color: #72e59b; background: rgba(30,132,73,.16); }
+        .mini-btn.info { color: #7bd7e4; background: rgba(35,141,160,.16); }
+
+        .start-form { margin-top: 10px; }
+        .start-form .action-btn { width: 100%; }
+
+        .request-list { display: flex; flex-direction: column; gap: 5px; }
+        .request-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 9px;
+            background: rgba(0,0,0,.18);
+            border: 1px solid rgba(212,175,55,.06);
+            border-radius: 6px;
+        }
+        .request-person { min-width: 0; }
+        .request-person strong { display: block; font-size: .72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .request-person span { display: block; color: var(--muted); font-size: .62rem; margin-top: 2px; }
+        .request-actions { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+        .empty-state, .empty-row { color: var(--muted); text-align: center; font-size: .7rem; padding: 12px !important; }
+        .disabled-note { color: var(--muted); font-size: .58rem; text-align: right; }
+
+        .warning-text { color: #e6b65a; }
+        .danger-text { color: #df786d; }
+
+        .admin-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 10px 12px;
+            margin-top: 2px;
+            border: 1px solid rgba(212,175,55,.13);
+            border-radius: 7px;
+            background: rgba(0,0,0,.16);
+        }
+        .admin-tools strong { display: block; font-size: .72rem; margin-top: 2px; }
+        .admin-tools small { display: block; color: var(--muted); font-size: .58rem; margin-top: 2px; }
+        .admin-tools-actions { display: flex; gap: 6px; align-items: center; }
+
+        @media (max-width: 1050px) {
+            .section-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 760px) {
+            .admin-nav { height: auto; min-height: 58px; padding: 7px 10px; flex-wrap: wrap; }
+            .brand { font-size: .9rem; }
+            .nav-links { width: 100%; overflow-x: auto; }
+            .nav-item { padding: 6px 8px; font-size: .61rem; }
+            .admin-main { width: min(100% - 16px, 1500px); }
+            .page-head { align-items: flex-start; flex-direction: column; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .config-card form, .cadastro-form { grid-template-columns: 1fr; }
+            .config-card .btn, .cadastro-form .action-btn { width: 100% !important; }
+            .admin-tools { align-items: flex-start; flex-direction: column; }
+            .admin-tools-actions { width: 100%; }
+            .admin-tools-actions .action-btn { flex: 1; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <div class="sidebar">
-            <div class="sidebar-topo">
-                <h2>⚔️ {{ config.nome_torneio }} ⚔️</h2>
-                
-                <div style="background: rgba(0,0,0,0.4); padding: 18px; border-radius: 10px; border: 1px solid rgba(212,175,55,0.3); margin-top: 25px;">
-                    <form action="/admin-painel/admin/salvar-configuracoes" method="POST">
+    <div class="admin-shell">
+        <header class="admin-nav">
+            <div class="brand">
+                <i class="fa-solid fa-trophy"></i>
+                <span>{{ config.nome_torneio }}</span>
+            </div>
+            <nav class="nav-links">
+                <a href="/admin-painel/admin/inscricoes" class="nav-item active">
+                    <i class="fa-solid fa-user-plus"></i><span>Inscrições</span>
+                </a>
+                <a href="/admin-painel/admin/jogos" class="nav-item">
+                    <i class="fa-solid fa-table-cells-large"></i><span>Mesa de Jogos</span>
+                </a>
+                <a href="/admin-painel/admin/classificacao" class="nav-item">
+                    <i class="fa-solid fa-ranking-star"></i><span>Classificação</span>
+                </a>
+                <a href="/admin-painel/admin/historico" class="nav-item">
+                    <i class="fa-solid fa-trophy"></i><span>Galeria de Lendas</span>
+                </a>
+            </nav>
+        </header>
+
+        <main class="admin-main">
+            <section class="page-head">
+                <div>
+                    <div class="eyebrow"><i class="fa-solid fa-users"></i> Administração</div>
+                    <h1>Inscrições</h1>
+                    <p>Cadastre, confirme e organize os competidores do torneio.</p>
+                </div>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    {{ config.fase_torneio.replace('INSCRICAO', 'INSCRIÇÃO').replace('CLASSIFICATORIA', 'CLASSIFICATÓRIA') }}
+                </div>
+            </section>
+
+            <section class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-icon"><i class="fa-solid fa-users"></i></span>
+                    <div><strong>{{ oficiais|length }}</strong><small>Confirmados</small></div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon warning"><i class="fa-solid fa-user-clock"></i></span>
+                    <div><strong>{{ pendentes|length }}</strong><small>Pedidos web</small></div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon danger"><i class="fa-solid fa-user-slash"></i></span>
+                    <div><strong>{{ desistentes|length }}</strong><small>Desistentes</small></div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon"><i class="fa-solid fa-layer-group"></i></span>
+                    <div><strong>{{ config.max_rodadas_classificatoria }}</strong><small>Rodadas</small></div>
+                </div>
+            </section>
+
+            <section class="card config-card">
+                <div class="section-head">
+                    <div>
+                        <span class="section-kicker">Configuração</span>
+                        <h2><i class="fa-solid fa-sliders"></i> Dados do torneio</h2>
+                    </div>
+                    <span class="small-note">Disponível durante a fase de inscrição</span>
+                </div>
+                <form action="/admin-painel/admin/salvar-configuracoes" method="POST">
                         <div class="form-group">
                             <label>Nome do Torneio</label>
                             <input type="text" name="nome_torneio" value="{{ config.nome_torneio }}" required>
@@ -172,219 +478,165 @@
                             <button type="button" class="btn" style="background:#222; color:#555; cursor:not-allowed; font-size: 0.8rem; padding: 10px;" disabled>Em Andamento</button>
                         {% endif %}
                     </form>
+            </section>
+
+            <section class="card cadastro-card">
+                <div class="section-head">
+                    <div>
+                        <span class="section-kicker">Entrada rápida</span>
+                        <h2><i class="fa-solid fa-user-plus"></i> Novo competidor</h2>
+                    </div>
+                    <span class="small-note">Cadastro manual</span>
+                </div>
+                <form action="/admin-painel/admin/cadastrar-direto" method="POST" class="cadastro-form">
+                    <div>
+                        <label>Nome do competidor</label>
+                        <input type="text" name="nome" placeholder="Ex.: Teixeirinha" required>
+                    </div>
+                    <div>
+                        <label>CTG / Entidade</label>
+                        <input type="text" name="entity" placeholder="Ex.: Passo Fundo">
+                    </div>
+                    <button type="submit" class="action-btn primary"><i class="fa-solid fa-plus"></i> Inscrever</button>
+                </form>
+            </section>
+
+            <section class="section-grid">
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <span class="section-kicker">Participantes</span>
+                            <h2><i class="fa-solid fa-users"></i> Confirmados <span class="count-badge">{{ oficiais|length }}</span></h2>
+                        </div>
+                        <span class="small-note">Atletas aptos a jogar</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Atleta</th><th>Entidade</th><th class="action-col">Ação</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for a in oficiais %}
+                                <tr>
+                                    <td><strong>{{ a.nome }}</strong></td>
+                                    <td><span class="entity-text">{{ a.entidade }}</span></td>
+                                    <td class="action-col">
+                                        {% if config.fase_torneio == 'INSCRICAO' %}
+                                        <form action="/admin-painel/admin/acao-atleta" method="POST" class="inline-form">
+                                            <input type="hidden" name="id_atleta" value="{{ a.id }}">
+                                            <button type="submit" name="acao" value="excluir" class="icon-action danger" onclick="return confirm('Excluir competidor?')" title="Excluir competidor">
+                                                <i class="fa-solid fa-user-xmark"></i><span>Excluir</span>
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <form action="/admin-painel/admin/acao-atleta" method="POST" class="inline-form">
+                                            <input type="hidden" name="id_atleta" value="{{ a.id }}">
+                                            <button type="submit" name="acao" value="desistir" class="icon-action danger" onclick="return confirm('MARCAR COMO DESISTENTE?\n\nO atleta permanecerá no histórico e não será apagado.\n\nEle não participará dos próximos sorteios.\n\nContinuar?')">
+                                                <i class="fa-solid fa-user-slash"></i><span>Desistir</span>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="3" class="empty-row">Nenhum competidor confirmado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
+                    <form action="/admin-painel/admin/iniciar-torneio" method="POST" class="start-form">
+                        <button type="submit" class="action-btn success"><i class="fa-solid fa-flag-checkered"></i> Iniciar torneio</button>
+                    </form>
+                    {% endif %}
                 </div>
 
-                <div class="nav-links">
-                    <a href="/admin-painel/admin/inscricoes" class="nav-item active">
-                        <span class="naipe-icon" style="color: #922b21;"><i class="fas fa-user-plus"></i></span> Inscrições
-                    </a>
-                    <a href="/admin-painel/admin/jogos" class="nav-item">
-                        <span class="naipe-icon" style="color: #1e8449;"><i class="fas fa-border-all"></i></span> Mesa de Jogos
-                    </a>
-                    <a href="/admin-painel/admin/classificacao" class="nav-item">
-                        <span class="naipe-icon" style="color: #d4af37;"><i class="fas fa-trophy"></i></span> Classificação
-                    </a>
-                    <a href="/admin-painel/admin/historico" class="nav-item">
-                        <span class="naipe-icon" style="color: #f1c40f;"><i class="fas fa-award"></i></span> Galeria de Lendas
-                    </a>
-                </div>
-            </div>
+                <div class="side-stack">
+                    <div class="card">
+                        <div class="section-head">
+                            <div>
+                                <span class="section-kicker warning-text">Aguardando</span>
+                                <h2><i class="fa-solid fa-hourglass-half"></i> Pedidos web <span class="count-badge warning">{{ pendentes|length }}</span></h2>
+                            </div>
+                        </div>
+                        <div class="request-list">
+                            {% for p in pendentes %}
+                            <div class="request-item">
+                                <div class="request-person">
+                                    <strong>{{ p.nome }}</strong>
+                                    <span>{{ p.entidade }}</span>
+                                </div>
+                                <div class="request-actions">
+                                    {% if p.comprovante_url %}
+                                    <a href="{{ p.comprovante_url }}" target="_blank" class="mini-btn info" title="Ver comprovante"><i class="fa-solid fa-receipt"></i></a>
+                                    {% endif %}
+                                    <form action="/admin-painel/admin/acao-atleta" method="POST" class="inline-form">
+                                        <input type="hidden" name="id_atleta" value="{{ p.id }}">
+                                        <button type="submit" name="acao" value="aprovar" class="mini-btn success" title="Aceitar"><i class="fa-solid fa-check"></i></button>
+                                        <button type="submit" name="acao" value="recusar" class="mini-btn danger" title="Rejeitar"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="empty-state">Nenhum pedido aguardando.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
 
-            <div class="sidebar-rodape">
+                    {% if desistentes|length > 0 %}
+                    <div class="card">
+                        <div class="section-head">
+                            <div>
+                                <span class="section-kicker danger-text">Atenção</span>
+                                <h2><i class="fa-solid fa-user-slash"></i> Desistentes <span class="count-badge danger">{{ desistentes|length }}</span></h2>
+                            </div>
+                        </div>
+                        <div class="request-list">
+                            {% for a in desistentes %}
+                            <div class="request-item">
+                                <div class="request-person">
+                                    <strong>{{ a.nome }}</strong>
+                                    <span>{{ a.entidade }}</span>
+                                </div>
+                                <div class="request-actions">
+                                    {% if config.fase_torneio == 'CLASSIFICATORIA' %}
+                                    <form action="/admin-painel/admin/acao-atleta" method="POST" class="inline-form">
+                                        <input type="hidden" name="id_atleta" value="{{ a.id }}">
+                                        <button type="submit" name="acao" value="reativar" class="mini-btn success" title="Reativar" onclick="return confirm('Reativar este atleta para os próximos sorteios?')"><i class="fa-solid fa-user-check"></i></button>
+                                    </form>
+                                    {% else %}
+                                    <span class="disabled-note">Reativação disponível na classificatória</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="admin-tools">
+                <div>
+                    <span class="section-kicker">Administração</span>
+                    <strong>Controles de reinício</strong>
+                    <small>Use somente quando necessário. A Galeria de Lendas permanece preservada.</small>
+                </div>
+                <div class="admin-tools-actions">
+                    
                 <form action="/admin-painel/admin/reset-mantendo-atletas" method="POST" onsubmit="return confirmarResetMantendoAtletas();">
-                    <button type="submit" class="btn btn-success" style="font-size:0.75rem; padding:10px;">
+                    <button type="submit" class="btn btn-success" class="action-btn compact success">
                         <i class="fas fa-rotate"></i> Reiniciar mantendo atletas
                     </button>
                 </form>
 
                 <form action="/admin-painel/admin/reset-total-testes" method="POST" onsubmit="return confirmarResetMesa();">
-                    <button type="submit" class="btn btn-danger" style="font-size:0.75rem; padding:10px;"><i class="fas fa-power-off"></i> Reiniciar Salão</button>
+                    <button type="submit" class="btn btn-danger" class="action-btn compact success"><i class="fas fa-power-off"></i> Reiniciar Salão</button>
                 </form>
                 <a href="/admin-painel/logout" style="color:var(--ouro); text-align:center; display:block; margin-top:20px; font-size:0.85rem; font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:1px;">🚪 Sair</a>
-            </div>
-        </div>
 
-        <div class="content">
-            <h1 style="margin-top: 0; font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; border-bottom: 2px solid var(--ouro); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-shadow: 0 3px 6px rgba(0,0,0,0.4);">
-                Cadastro do Competidor
-                <span style="font-size: 0.9rem; font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.4); color: var(--ouro); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--ouro); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Status: {{ config.fase_torneio.replace('INSCRICAO', 'INSCRIÇÃO').replace('CLASSIFICATORIA', 'CLASSIFICATÓRIA') }}</span>
-            </h1>
-            
-            <div class="card">
-                <h3 style="margin-top:0; color:var(--ouro); font-family: 'Cinzel', serif; letter-spacing: 1px; font-size: 1.3rem;"><i class="fas fa-feather-alt"></i> Nova Inscrição </h3>
-                <form action="/admin-painel/admin/cadastrar-direto" method="POST" style="display:flex; gap:25px; align-items:flex-end;">
-                    <div style="flex:2;">
-                        <label>Nome do Competidor</label>
-                        <input type="text" name="nome" placeholder="Ex: Teixeirinha" required>
-                    </div>
-                    <div style="flex:1;">
-                        <label>CTG / Entidade </label>
-                        <input type="text" name="entity" placeholder="Ex: Passo Fundo">
-                    </div>
-                    <button type="submit" class="btn" style="width:auto; height:50px; padding: 0 35px; font-size: 0.95rem;"><i class="fas fa-plus"></i> Inscrever</button>
-                </form>
-            </div>
-
-            <div class="grid-tabelas">
-                <div class="card">
-                    <h3 style="color:var(--ouro); margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"><i class="fas fa-users"></i> Competidores Confirmados ({{ oficiais|length }})</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Atleta</th><th>Entidade</th><th style="text-align: right;">Ação</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for a in oficiais %}
-                            <tr>
-                                <td><strong style="color: #fff; font-size: 1.05rem;">{{ a.nome }}</strong></td>
-                                <td><span style="color:var(--ouro-brilhante); font-size: 0.85rem; font-weight: 700;">{{ a.entidade }}</span></td>
-                                <td style="text-align: right;">
-                                    {% if config.fase_torneio == 'INSCRICAO' %}
-                                        <form action="/admin-painel/admin/acao-atleta" method="POST" style="margin:0;">
-                                            <input type="hidden" name="id_atleta" value="{{ a.id }}">
-                                            <button type="submit" name="acao" value="excluir" style="background:none; border:none; color:var(--vermelho-pampa); font-weight:800; cursor:pointer; font-size: 0.85rem;" onclick="return confirm('Excluir competidor?')"><i class="fas fa-user-xmark"></i> Excluir</button>
-                                        </form>
-                                    {% else %}
-                                        <form action="/admin-painel/admin/acao-atleta" method="POST" style="margin:0;">
-                                            <input type="hidden" name="id_atleta" value="{{ a.id }}">
-                                            <button type="submit" name="acao" value="desistir" class="btn btn-danger" style="width:auto; padding:8px 12px; font-family:'Montserrat',sans-serif; font-size:0.75rem;" onclick="return confirm('MARCAR COMO DESISTENTE?\n\nO atleta permanecerá no histórico e não será apagado.\n\nEle não participará dos próximos sorteios.\n\nContinuar?')"><i class="fas fa-user-slash"></i> Desistir</button>
-                                        </form>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="3" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhum gaudério confirmado na mesa.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    
-                    {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
-                    <form action="/admin-painel/admin/iniciar-torneio" method="POST" style="margin-top:30px;">
-                        <button type="submit" class="btn btn-success" style="font-size:1.1rem; padding:16px; font-family:'Cinzel', serif;"><i class="fas fa-flag-checkered"></i> Iniciar Torneio</button>
-                    </form>
-                    {% endif %}
                 </div>
-
-                {% if desistentes|length > 0 %}
-                <div class="card" style="border-color:#922b21;">
-                    <h3 style="color:#e67e22; margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"><i class="fas fa-user-slash"></i> Atletas Desistentes ({{ desistentes|length }})</h3>
-                    <p style="color:var(--texto-subtil); font-size:0.82rem; line-height:1.5;">Os atletas permanecem no histórico, mas não participam dos próximos sorteios e não ocupam vaga na próxima fase.</p>
-                    <table>
-                        <thead><tr><th>Atleta</th><th>Entidade</th><th style="text-align:right;">Ação</th></tr></thead>
-                        <tbody>
-                            {% for a in desistentes %}
-                            <tr>
-                                <td><strong style="color:#e67e22; font-size:1.05rem;">{{ a.nome }}</strong></td>
-                                <td><span style="color:var(--texto-subtil); font-size:0.85rem;">{{ a.entidade }}</span></td>
-                                <td style="text-align:right;">
-                                    {% if config.fase_torneio == 'CLASSIFICATORIA' %}
-                                    <form action="/admin-painel/admin/acao-atleta" method="POST" style="margin:0;">
-                                        <input type="hidden" name="id_atleta" value="{{ a.id }}">
-                                        <button type="submit" name="acao" value="reativar" class="btn btn-success" style="width:auto; padding:8px 12px; font-family:'Montserrat',sans-serif; font-size:0.75rem;" onclick="return confirm('Reativar este atleta para os próximos sorteios?')"><i class="fas fa-user-check"></i> Reativar</button>
-                                    </form>
-                                    {% else %}
-                                    <span style="color:var(--texto-subtil); font-size:0.75rem;">Reativação disponível somente na classificatória</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% endif %}
-
-                <div class="card">
-                    <h3 style="color:#e67e22; margin-top:0; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"><i class="fas fa-hourglass-half"></i> Pedindo Entrada (Web)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Atleta</th>
-                                <th>Entidade</th>
-                                <th style="text-align: center;">Comprovante</th>
-                                <th style="text-align: right;">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for p in pendentes %}
-                            <tr>
-                                <td>{{ p.nome }}</td>
-                                <td>{{ p.entidade }}</td>
-                                <td style="text-align: center;">
-                                    {% if p.comprovante_url %}
-                                        <a href="{{ p.comprovante_url }}" target="_blank" class="btn btn-info" style="font-size: 0.75rem; padding: 6px 12px; width: auto; font-family: 'Montserrat', sans-serif;">
-                                            <i class="fas fa-receipt"></i> Ver Pix
-                                        </a>
-                                    {% else %}
-                                        <span style="color: var(--texto-subtil); font-style: italic; font-size: 0.8rem;">Sem foto</span>
-                                    {% endif %}
-                                </td>
-                                <td style="text-align: right;">
-                                    <form action="/admin-painel/admin/acao-atleta" method="POST" style="display:inline-block; margin:0;">
-                                        <input type="hidden" name="id_atleta" value="{{ p.id }}">
-                                        <button type="submit" name="acao" value="aprovar" style="background:var(--verde-sucesso); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem;"><i class="fas fa-check"></i> Aceitar</button>
-                                        <button type="submit" name="acao" value="recusar" style="background:var(--vermelho-pampa); border:none; color:white; padding:8px 14px; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.8rem; margin-left:5px;"><i class="fas fa-xmark"></i> Rejeitar</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="4" style="color:var(--texto-subtil); text-align:center; font-style: italic; background: rgba(0,0,0,0.1);">Nenhuma cancela aberta no momento.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    function confirmarResetMantendoAtletas() {
-        const passo1 = confirm(
-            "🔄 REINICIAR TORNEIO MANTENDO ATLETAS:\n\n" +
-            "Os confrontos, resultados e andamento do torneio atual serão apagados.\n\n" +
-            "✅ Os atletas cadastrados SERÃO MANTIDOS.\n" +
-            "✅ Atletas desistentes voltarão para APROVADO.\n" +
-            "✅ Nome e entidade dos atletas serão preservados.\n" +
-            "✅ A Galeria de Lendas NÃO será apagada.\n\n" +
-            "O torneio voltará para INSCRIÇÃO para que você possa iniciar novamente.\n\n" +
-            "Deseja realmente continuar?"
-        );
-
-        if (passo1) {
-            return confirm(
-                "⚠️ ÚLTIMA CONFIRMAÇÃO:\n\n" +
-                "O andamento do torneio atual será perdido.\n" +
-                "Os atletas serão mantidos para um novo teste/edição.\n\n" +
-                "CONFIRMAR REINÍCIO?"
-            );
-        }
-
-        return false;
-    }
-
-    function confirmarResetMesa() {
-        const passo1 = confirm(
-            "⚠️ ATENÇÃO:\n\n" +
-            "Isso irá limpar os dados OPERACIONAIS do torneio atual:\n\n" +
-            "• Competidores cadastrados\n" +
-            "• Confrontos e resultados\n" +
-            "• Mesas e dados da edição atual\n\n" +
-            "✅ A GALERIA DE LENDAS NÃO SERÁ APAGADA.\n" +
-            "As edições já finalizadas permanecerão preservadas.\n\n" +
-            "Um novo torneio será preparado para você iniciar.\n\n" +
-            "Deseja realmente continuar?"
-        );
-    
-        if (passo1) {
-            return confirm(
-                "🔴 ÚLTIMO AVISO:\n\n" +
-                "Você está prestes a reiniciar o salão para uma nova edição.\n\n" +
-                "A Galeria de Lendas continuará preservada.\n\n" +
-                "Os dados operacionais do torneio atual serão limpos.\n\n" +
-                "Deseja confirmar o reinício?"
-            );
-        }
-    
-        return false;
-    }
-    </script>
-</body>
+            </section>
+        </main>
+    </div></body>
 </html>
