@@ -269,6 +269,80 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
 }
 </style>
 
+
+<style>
+/* V5 — Destaque visual do pódio e liderança de flores */
+.ranking-wrap tbody tr:nth-child(1) {
+    background:
+        linear-gradient(90deg, rgba(228,194,71,.13), rgba(228,194,71,.035) 55%, transparent);
+}
+.ranking-wrap tbody tr:nth-child(1) td:first-child {
+    box-shadow: inset 3px 0 0 var(--gold2);
+}
+.ranking-wrap tbody tr:nth-child(2) {
+    background: linear-gradient(90deg, rgba(205,210,204,.07), transparent 65%);
+}
+.ranking-wrap tbody tr:nth-child(3) {
+    background: linear-gradient(90deg, rgba(177,116,64,.065), transparent 65%);
+}
+.ranking-wrap tbody tr:nth-child(-n+3) .pos-cell {
+    font-size: 14px;
+}
+.ranking-wrap tbody tr:nth-child(1) .pos-cell::first-letter {
+    color: var(--gold2);
+}
+.ranking-wrap tbody tr:nth-child(-n+3) .athlete-cell {
+    font-size: 11px;
+}
+
+.card-flores-live {
+    position: relative;
+}
+.card-flores-live::before {
+    content:"";
+    position:absolute;
+    left:14px;
+    right:14px;
+    top:0;
+    height:2px;
+    border-radius:0 0 5px 5px;
+    background:linear-gradient(90deg, transparent, rgba(156,107,195,.75), transparent);
+}
+.flor-item {
+    position:relative;
+    transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.flor-item:hover {
+    transform:translateY(-3px);
+    border-color:rgba(201,143,233,.36);
+}
+.flor-item.primeiro {
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.25),
+        inset 0 1px rgba(255,255,255,.07);
+}
+.flor-item.primeiro::before {
+    content:"LÍDER";
+    position:absolute;
+    top:7px;
+    right:7px;
+    padding:3px 5px;
+    border-radius:999px;
+    color:#f0d9ff;
+    background:rgba(156,107,195,.16);
+    border:1px solid rgba(201,143,233,.22);
+    font-size:5px;
+    font-weight:900;
+    letter-spacing:.55px;
+}
+.flor-total {
+    font-size:13px;
+}
+.criteria-card .criteria-note {
+    background:linear-gradient(90deg, rgba(64,217,130,.045), rgba(64,217,130,.015));
+}
+</style>
+
 </head>
 <body>
 
@@ -327,7 +401,11 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
                 <span>Saldo</span><span class="arrow">›</span><span>Tentos Pró</span><span class="arrow">›</span><span>Flores</span>
             </div>
             <div class="notice">🚫 Desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase.</div>
-            <div class="ranking-wrap"><table>
+            <div class="ranking-wrap">
+                <div style="padding:6px 9px;background:#0b2114;border-bottom:1px solid rgba(255,255,255,.035);color:#87968d;font-size:7px;font-weight:700;">
+                    🥇 1º lugar &nbsp;•&nbsp; 🥈 2º lugar &nbsp;•&nbsp; 🥉 3º lugar
+                </div>
+                <table>
                 <thead>
                     <tr>
                         <th style="width: 80px;">Pos</th>
