@@ -2292,7 +2292,7 @@
                     </div>
                     <span class="small-note">Cadastro manual</span>
                 </div>
-                <form action="/admin-painel/admin/cadastrar-direto" method="POST" class="cadastro-form">
+                <form id="cadastro-competidor-form" action="/admin-painel/admin/cadastrar-direto" method="POST" class="cadastro-form">
                     <div>
                         <label>Nome do competidor</label>
                         <input type="text" name="nome" placeholder="Ex.: Teixeirinha" required>
@@ -2457,5 +2457,44 @@
                 </div>
             </section>
         </main>
-    </div></body>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('cadastro-competidor-form');
+    if (!form) return;
+
+    const nome = form.querySelector('input[name="nome"]');
+    const entidade = form.querySelector('input[name="entidade"]');
+    const botao = form.querySelector('button[type="submit"], input[type="submit"]');
+
+    if (!nome || !entidade || !botao) return;
+
+    // Fluxo operacional:
+    // Nome -> TAB -> Entidade -> TAB -> Inscrever -> ENTER -> Nome
+    //
+    // O TAB normal do navegador já faz os dois primeiros movimentos.
+    // Depois do envio, o navegador recarrega a página; este código devolve
+    // automaticamente o foco ao campo Nome para o próximo cadastro.
+    form.addEventListener('submit', function () {
+        sessionStorage.setItem('focoCadastroCompetidor', 'nome');
+    });
+
+    // Se o botão receber foco via TAB, ENTER envia o formulário normalmente.
+    // Após o reload, o foco volta para Nome.
+    if (sessionStorage.getItem('focoCadastroCompetidor') === 'nome') {
+        sessionStorage.removeItem('focoCadastroCompetidor');
+        window.requestAnimationFrame(function () {
+            nome.focus();
+            nome.select();
+        });
+    } else {
+        // Primeiro acesso à tela: deixa o operador pronto para digitar.
+        window.requestAnimationFrame(function () {
+            nome.focus();
+        });
+    }
+});
+</script>
+
+</body>
 </html>
