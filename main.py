@@ -283,9 +283,10 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     for atleta in todos_atletas:
         atleta_id = atleta["id"]
         
+        # Estatísticas da classificação oficial: somente a fase classificatória.
         cursor.execute(f"""
             SELECT COALESCE(SUM(sets1), 0) as s_pro, COALESCE(SUM(tentos1), 0) as t_pro, 
-                   COALESCE(SUM(tentos2), 0) as t_contra, COALESCE(SUM(flores1), 0) as fl, 
+                   COALESCE(SUM(tentos2), 0) as t_contra,
                    SUM(CASE WHEN atleta2_id IS NULL THEN 1 ELSE 0 END) as byes 
             FROM confrontos 
             WHERE atleta1_id = {p} AND torneio_id = {p} AND rodada > 0 AND vencedor_id IS NOT NULL
@@ -294,7 +295,7 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
         
         cursor.execute(f"""
             SELECT COALESCE(SUM(sets2), 0) as s_pro, COALESCE(SUM(tentos2), 0) as t_pro, 
-                   COALESCE(SUM(tentos1), 0) as t_contra, COALESCE(SUM(flores2), 0) as fl 
+                   COALESCE(SUM(tentos1), 0) as t_contra
             FROM confrontos 
             WHERE atleta2_id = {p} AND torneio_id = {p} AND rodada > 0 AND vencedor_id IS NOT NULL
         """, (atleta_id, torneio_id))
@@ -306,7 +307,27 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
         sets_ganhos = p1["s_pro"] + p2["s_pro"]
         tentos_pro = p1["t_pro"] + p2["t_pro"]
         tentos_contra = p1["t_contra"] + p2["t_contra"]
-        flores = p1["fl"] + p2["fl"]
+        # FLORES são acumuladas em TODAS as fases do torneio.
+        # Isso permite que o ranking de flores continue visível
+        # durante o mata-mata, sem alterar os critérios oficiais
+        # da classificação (que continuam sendo calculados acima).
+        cursor.execute(f"""
+            SELECT
+                COALESCE(SUM(flores1), 0) as fl1
+            FROM confrontos
+            WHERE atleta1_id = {p} AND torneio_id = {p}
+        """, (atleta_id, torneio_id))
+        flores1_total = cursor.fetchone()["fl1"]
+
+        cursor.execute(f"""
+            SELECT
+                COALESCE(SUM(flores2), 0) as fl2
+            FROM confrontos
+            WHERE atleta2_id = {p} AND torneio_id = {p}
+        """, (atleta_id, torneio_id))
+        flores2_total = cursor.fetchone()["fl2"]
+
+        flores = flores1_total + flores2_total
         
         lista_classificacao.append({
             "id": atleta_id, "nome": atleta["nome"], "status": atleta["status"], "vitorias": vitorias, "sets_ganhos": sets_ganhos,
