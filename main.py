@@ -1811,7 +1811,18 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
+        context={
+            "config": cfg,
+            "classificacao": lista_classificacao,
+            "top_flores": sorted(
+                [item for item in lista_classificacao if (item.get("flores") or 0) > 0],
+                key=lambda item: (-item.get("flores", 0), item.get("nome", ""))
+            )[:3],
+            "todas_rodadas": todas_rodadas,
+            "rodada_selecionada": rodada_selecionada,
+            "confrontos_auditoria": confrontos_auditoria,
+            "aba_ativa": "classificacao"
+        }
     )
 
 
