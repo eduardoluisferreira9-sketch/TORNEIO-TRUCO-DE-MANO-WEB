@@ -626,21 +626,251 @@ td{font-size:10px;padding:7px 9px}
 }
 </style>
 
+
+<style>
+/* ==========================================================
+   V4 — NAVEGAÇÃO PADRÃO DEFINITIVA
+   Referência: padrão visual aprovado das telas anteriores.
+   ========================================================== */
+
+.admin-nav{
+    height:68px !important;
+    padding:0 24px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    background:#06100a !important;
+    border-bottom:2px solid #d8b438 !important;
+    box-shadow:none !important;
+}
+
+.nav-brand{
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    min-width:auto !important;
+}
+
+.nav-brand .brand-icon{
+    width:34px !important;
+    height:34px !important;
+    border-radius:50% !important;
+    display:grid !important;
+    place-items:center !important;
+    background:#102817 !important;
+    border:1px solid rgba(228,194,71,.65) !important;
+    box-shadow:none !important;
+    font-size:17px !important;
+}
+
+.nav-brand strong{
+    color:#f5f1e8 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:19px !important;
+    font-weight:700 !important;
+    letter-spacing:.1px !important;
+}
+
+.nav-links{
+    height:100% !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:4px !important;
+}
+
+.nav-link{
+    position:relative !important;
+    height:48px !important;
+    min-width:auto !important;
+    padding:0 18px !important;
+    margin:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:7px !important;
+    color:#e2e5e1 !important;
+    background:transparent !important;
+    border:0 !important;
+    border-radius:8px !important;
+    text-decoration:none !important;
+    font-family:Arial,Helvetica,sans-serif !important;
+    font-size:12px !important;
+    font-weight:800 !important;
+    letter-spacing:.1px !important;
+    transition:all .18s ease !important;
+}
+
+.nav-link::after{
+    display:none !important;
+}
+
+.nav-link:hover{
+    color:#fff !important;
+    background:rgba(255,255,255,.045) !important;
+}
+
+.nav-link.active{
+    height:50px !important;
+    color:#17150b !important;
+    background:linear-gradient(180deg,#f0d35b 0%,#d7b437 100%) !important;
+    border:1px solid rgba(255,239,150,.55) !important;
+    border-radius:8px !important;
+    box-shadow:
+        0 3px 12px rgba(216,180,56,.13),
+        inset 0 1px rgba(255,255,255,.42) !important;
+}
+
+.nav-link.active:hover{
+    background:linear-gradient(180deg,#f4d968 0%,#d9b638 100%) !important;
+}
+
+@media(max-width:1050px){
+    .admin-nav{
+        padding:0 16px !important;
+    }
+    .nav-link{
+        padding:0 13px !important;
+    }
+}
+
+@media(max-width:850px){
+    .admin-nav{
+        height:auto !important;
+        min-height:68px !important;
+        padding:7px 12px !important;
+        flex-wrap:wrap !important;
+    }
+    .nav-links{
+        height:48px !important;
+        width:100% !important;
+        justify-content:flex-end !important;
+    }
+    .nav-link{
+        flex:1 1 0 !important;
+        padding:0 8px !important;
+    }
+}
+</style>
+
+
+<style>
+/* ==========================================================
+   V5 — PADRÃO EXATO DA NAVEGAÇÃO APROVADA
+   Referência: barra da tela Mesa de Jogos.
+   ========================================================== */
+
+.admin-nav{
+    height:auto !important;
+    min-height:68px !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    padding:12px 28px !important;
+    background:#090f0a !important;
+    border-bottom:3px solid #d4af37 !important;
+    box-shadow:none !important;
+}
+
+#nome-torneio-global{
+    color:#d4af37 !important;
+    font-weight:bold !important;
+    font-size:1.3rem !important;
+    letter-spacing:.5px !important;
+    white-space:nowrap !important;
+}
+
+.admin-nav .nav-links{
+    display:flex !important;
+    align-items:center !important;
+    gap:0 !important;
+    height:auto !important;
+}
+
+.admin-nav .nav-link{
+    text-decoration:none !important;
+    padding:8px 16px !important;
+    margin-right:10px !important;
+    border-radius:4px !important;
+    font-weight:bold !important;
+    font-family:inherit !important;
+    font-size:inherit !important;
+    color:#a2b3a5 !important;
+    background:transparent !important;
+    border:0 !important;
+    height:auto !important;
+    min-width:auto !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:7px !important;
+    box-shadow:none !important;
+    transition:all .2s ease !important;
+}
+
+.admin-nav .nav-link:last-child{
+    margin-right:0 !important;
+}
+
+.admin-nav .nav-link:hover{
+    color:#fff !important;
+    background:rgba(255,255,255,.045) !important;
+}
+
+.admin-nav .nav-link.active{
+    background:#d4af37 !important;
+    color:#0b140d !important;
+    border-radius:4px !important;
+    border:0 !important;
+    box-shadow:none !important;
+}
+
+.admin-nav .nav-link i{
+    font-size:.9rem !important;
+    line-height:1 !important;
+}
+
+@media(max-width:850px){
+    .admin-nav{
+        flex-wrap:wrap !important;
+        gap:10px !important;
+        padding:10px 16px !important;
+    }
+
+    .admin-nav .nav-links{
+        width:100% !important;
+        justify-content:flex-end !important;
+        flex-wrap:wrap !important;
+    }
+
+    .admin-nav .nav-link{
+        padding:7px 11px !important;
+        margin-right:5px !important;
+    }
+}
+</style>
+
 </head>
 <body>
 
     <nav class="admin-nav">
-        <div class="nav-brand">
-            <span class="brand-icon">🏆</span>
-            <strong>{{ config.nome_torneio }}</strong>
-        </div>
-        <div class="nav-links">
-            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
-            <a href="/admin-painel/admin/jogos" class="nav-link">🎴 Mesa de Jogos</a>
-            <a href="/admin-painel/admin/classificacao" class="nav-link active">🏆 Classificação</a>
-            <a href="/admin-painel/admin/conferencia" class="nav-link">🔎 Conferência</a>
-        </div>
-    </nav>
+    <span id="nome-torneio-global">🏆 {{ config.nome_torneio }}</span>
+
+    <div class="nav-links">
+        <a href="/admin-painel/admin/inscricoes" class="nav-link">
+            <i class="fas fa-user-plus"></i> Inscrições
+        </a>
+        <a href="/admin-painel/admin/jogos" class="nav-link">
+            <i class="fas fa-border-all"></i> Mesa de Jogos
+        </a>
+        <a href="/admin-painel/admin/classificacao" class="nav-link active">
+            <i class="fas fa-chart-bar"></i> Classificação
+        </a>
+        <a href="/admin-painel/admin/conferencia" class="nav-link">
+            <i class="fas fa-search"></i> Conferência
+        </a>
+    </div>
+</nav>
 
     <div class="container">
         <div class="page-heading">
