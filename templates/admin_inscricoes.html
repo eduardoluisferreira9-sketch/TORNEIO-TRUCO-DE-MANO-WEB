@@ -2276,6 +2276,39 @@
             }
         }
 
+    
+        /* V13 — rolagem do elenco discreta e acompanhamento automático */
+        @media (min-width: 1101px) {
+            #roster-scroll {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(246,214,90,.42) transparent;
+                scrollbar-gutter: stable;
+                overscroll-behavior: contain;
+                scroll-behavior: smooth;
+            }
+
+            #roster-scroll::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            #roster-scroll::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            #roster-scroll::-webkit-scrollbar-thumb {
+                background: rgba(246,214,90,.38);
+                border-radius: 10px;
+            }
+
+            #roster-scroll::-webkit-scrollbar-thumb:hover {
+                background: rgba(246,214,90,.65);
+            }
+
+            #roster-scroll:focus {
+                outline: none;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -2434,7 +2467,7 @@
                         </div>
                     </div>
 
-                    <div class="roster-grid">
+                    <div class="roster-grid" id="roster-scroll" tabindex="0" aria-label="Lista de atletas confirmados">
                         {% for a in oficiais %}
                         <article class="athlete-card">
                             <div class="athlete-number">{{ loop.index }}</div>
@@ -2606,6 +2639,26 @@ document.addEventListener('DOMContentLoaded', function () {
         // Primeiro acesso à tela: deixa o operador pronto para digitar.
         window.requestAnimationFrame(function () {
             nome.focus();
+        });
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const roster = document.getElementById('roster-scroll');
+    if (!roster) return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('sucesso') === 'cadastrado') {
+        window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+                roster.scrollTo({
+                    top: roster.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
         });
     }
 });
