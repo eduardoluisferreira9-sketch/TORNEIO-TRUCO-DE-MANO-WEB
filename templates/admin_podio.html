@@ -119,6 +119,7 @@
 
         /* Responsividade para telas menores (Dispositivos Móveis) */
         @media (max-width: 850px) {
+            .card-flores > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
             .podio-container {
                 flex-direction: column;
                 align-items: center;
@@ -192,10 +193,19 @@
         <!-- Bloco Temático: Rei das Flores -->
         <div class="card-flores">
             <h2 style="color: var(--rei-flores); margin: 0 0 10px 0;">🌸 Troféu Rei das Flores 🌸</h2>
-            <p style="font-size: 1.1rem; margin: 5px 0; font-weight: 600; color: var(--texto-subtil);">O maior cantador de flores de toda a edição é:</p>
-            <div style="font-size: 2rem; font-weight: bold; color: #fff; margin: 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">{{ rei_nome }}</div>
-            <span style="background: var(--rei-flores); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(155,89,182,0.3);">
-                🎯 {{ max_flores }} Flores Cantadas no Torneio
+            <p style="font-size: 1.05rem; margin: 5px 0 14px 0; font-weight: 600; color: var(--texto-subtil);">Disputa de flores acumulada durante toda a edição:</p>
+            <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; max-width:760px; margin:0 auto 16px;">
+                {% for item in top_flores %}
+                <div style="background:rgba(0,0,0,0.22); border:1px solid rgba(155,89,182,0.35); border-radius:10px; padding:12px 10px;">
+                    <div style="font-size:1.25rem;">{% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}</div>
+                    <div style="color:#fff; font-weight:800; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ item.nome }}</div>
+                    <div style="color:var(--rei-flores); font-weight:900; font-size:1.15rem; margin-top:3px;">{{ item.flores }} <span style="font-size:.72rem;">flores</span></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="font-size:1.8rem; font-weight:900; color:#fff; margin:8px 0 4px; text-transform:uppercase; letter-spacing:.5px;">{{ rei_nome }}</div>
+            <span style="background:var(--rei-flores); color:#fff; padding:6px 16px; border-radius:20px; font-weight:700; font-size:.9rem; box-shadow:0 4px 10px rgba(155,89,182,.3);">
+                👑 Rei das Flores · {{ max_flores }} Flores
             </span>
         </div>
 
