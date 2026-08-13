@@ -1471,6 +1471,367 @@
             .deck-emblem { display:none; }
         }
 
+    
+        /* ============================================================
+           V6 — TELA OPERACIONAL EM UMA ÚNICA ÁREA
+           Desktop:
+           - elenco + pedidos lado a lado
+           - página sem scrollbar
+           - somente o elenco recebe scroll interno quando necessário
+           ============================================================ */
+
+        @media (min-width: 1101px) {
+            html, body {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            body {
+                min-height: 100vh;
+            }
+
+            .admin-nav {
+                height: 68px;
+                min-height: 68px;
+            }
+
+            .admin-main {
+                width: min(1540px, calc(100% - 24px));
+                height: calc(100vh - 68px);
+                min-height: 0;
+                box-sizing: border-box;
+                margin: 0 auto;
+                padding: 10px 0 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                overflow: hidden;
+            }
+
+            /* Cada bloco ganha uma altura previsível. */
+            .page-head {
+                flex: 0 0 76px;
+                min-height: 76px;
+                margin: 0;
+                padding: 10px 15px;
+                box-sizing: border-box;
+            }
+
+            .page-head-copy h1 {
+                font-size: 1.58rem;
+                margin: 1px 0;
+            }
+
+            .page-head-copy p {
+                font-size: .68rem;
+            }
+
+            .deck-emblem {
+                transform: translateY(-50%) scale(.88);
+                right: 190px;
+            }
+
+            .stats-row {
+                flex: 0 0 58px;
+                min-height: 58px;
+                margin: 0;
+                gap: 8px;
+            }
+
+            .stat-card {
+                min-height: 58px;
+                height: 58px;
+                padding: 8px 11px;
+            }
+
+            .stat-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .stat-card strong {
+                font-size: 1.05rem;
+            }
+
+            .stat-card small {
+                font-size: .58rem;
+            }
+
+            .card.config-card,
+            .card.cadastro-card {
+                flex: 0 0 auto;
+                margin: 0;
+                padding: 10px 13px;
+            }
+
+            .config-card .section-head,
+            .cadastro-card .section-head {
+                min-height: 22px;
+                margin-bottom: 6px;
+            }
+
+            .config-card .section-head h2,
+            .cadastro-card .section-head h2 {
+                font-size: .86rem;
+            }
+
+            .config-card .section-kicker,
+            .cadastro-card .section-kicker {
+                font-size: .55rem;
+            }
+
+            .config-card form {
+                gap: 8px;
+            }
+
+            .config-field input,
+            .config-save {
+                height: 34px;
+            }
+
+            .cadastro-form {
+                gap: 8px;
+            }
+
+            .cadastro-form input,
+            .cadastro-form .action-btn {
+                height: 35px;
+            }
+
+            /* ÁREA PRINCIPAL: elenco à esquerda + pedidos à direita. */
+            .inscricoes-workspace {
+                flex: 1 1 auto;
+                min-height: 0;
+                display: grid;
+                grid-template-columns: minmax(0, 1.78fr) minmax(300px, .72fr);
+                gap: 8px;
+                overflow: hidden;
+            }
+
+            .roster-card {
+                min-height: 0;
+                height: 100%;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                padding: 11px;
+                overflow: hidden;
+            }
+
+            .roster-head {
+                flex: 0 0 auto;
+                padding-bottom: 7px;
+                gap: 10px;
+            }
+
+            .roster-head h2 {
+                font-size: .88rem;
+                margin: 2px 0;
+            }
+
+            .roster-head p {
+                font-size: .54rem;
+            }
+
+            .roster-status {
+                padding: 6px 9px;
+                font-size: .51rem;
+            }
+
+            /* Aqui está o único scroll da tela. */
+            .roster-grid {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                align-content: start;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 6px;
+                padding: 8px 4px 7px 1px;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(212,175,55,.45) rgba(0,0,0,.16);
+            }
+
+            .roster-grid::-webkit-scrollbar {
+                width: 7px;
+            }
+
+            .roster-grid::-webkit-scrollbar-track {
+                background: rgba(0,0,0,.16);
+                border-radius: 10px;
+            }
+
+            .roster-grid::-webkit-scrollbar-thumb {
+                background: rgba(212,175,55,.42);
+                border-radius: 10px;
+                border: 1px solid rgba(0,0,0,.25);
+            }
+
+            .athlete-card {
+                min-height: 48px;
+                height: 48px;
+                padding: 5px 6px;
+            }
+
+            .athlete-number {
+                width: 22px;
+                height: 22px;
+                flex-basis: 22px;
+                font-size: .52rem;
+            }
+
+            .athlete-info strong {
+                font-size: .60rem;
+            }
+
+            .athlete-info span {
+                font-size: .49rem;
+                margin-top: 2px;
+            }
+
+            .athlete-action button {
+                width: 25px;
+                height: 25px;
+            }
+
+            .start-tournament {
+                flex: 0 0 auto;
+                margin-top: 5px;
+                padding: 7px 9px;
+            }
+
+            .start-tournament strong {
+                font-size: .60rem;
+            }
+
+            .start-tournament span {
+                font-size: .50rem;
+            }
+
+            .start-tournament-btn {
+                height: 33px;
+                min-width: 145px;
+                font-size: .58rem;
+            }
+
+            /* Coluna direita: sem tabela gigante; dois cards compactos. */
+            .bottom-grid {
+                min-width: 0;
+                min-height: 0;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                overflow: hidden;
+            }
+
+            .bottom-grid .request-card {
+                min-height: 0;
+                margin: 0;
+                padding: 11px;
+                overflow: hidden;
+            }
+
+            .bottom-grid .request-card:first-child {
+                flex: 1 1 58%;
+            }
+
+            .bottom-grid .request-card:last-child {
+                flex: 1 1 42%;
+            }
+
+            .request-card .section-head {
+                min-height: 26px;
+                margin-bottom: 6px;
+            }
+
+            .request-card .section-head h2 {
+                font-size: .82rem;
+            }
+
+            .request-list {
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .request-item {
+                min-height: 42px;
+                padding: 6px 8px;
+                margin-bottom: 5px;
+            }
+
+            .request-person strong {
+                font-size: .58rem;
+            }
+
+            .request-person span {
+                font-size: .49rem;
+            }
+
+            .mini-btn {
+                width: 27px;
+                height: 27px;
+            }
+
+            /* Administração fica compacta no rodapé. */
+            .admin-tools {
+                flex: 0 0 50px;
+                min-height: 50px;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 6px 9px;
+            }
+
+            .admin-tools strong {
+                font-size: .61rem;
+            }
+
+            .admin-tools small {
+                font-size: .49rem;
+            }
+
+            .admin-action {
+                min-height: 37px;
+                padding: 5px 8px;
+                min-width: 132px;
+            }
+
+            .admin-action > i {
+                width: 24px;
+                height: 24px;
+                flex-basis: 24px;
+                font-size: .65rem;
+            }
+
+            .admin-action strong {
+                font-size: .56rem;
+            }
+
+            .admin-action small {
+                font-size: .47rem;
+            }
+
+            .admin-action.logout {
+                min-width: 98px;
+            }
+        }
+
+        /* Em telas menores, devolvemos o comportamento normal de rolagem. */
+        @media (max-width: 1100px) {
+            html, body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .inscricoes-workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .roster-grid {
+                overflow: visible;
+            }
+        }
+
     </style>
 </head>
 <body>
