@@ -926,27 +926,382 @@ td{font-size:10px;padding:7px 9px}
 }
 </style>
 
+
+<style>
+/* ==========================================================
+   V7 — NAVEGAÇÃO: REPRODUÇÃO DA REFERÊNCIA APROVADA
+   Referência visual enviada pelo usuário.
+   ========================================================== */
+
+.admin-nav{
+    background:#06100a !important;
+    min-height:68px !important;
+    height:68px !important;
+    padding:0 28px !important;
+    border-bottom:2px solid #d4af37 !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+}
+
+#nome-torneio-global{
+    color:#f4f1e8 !important;
+    font-family:'Cinzel', Georgia, serif !important;
+    font-size:1.18rem !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
+}
+
+.admin-nav .nav-links{
+    display:flex !important;
+    align-items:center !important;
+    gap:4px !important;
+    height:100% !important;
+}
+
+.admin-nav .nav-link{
+    box-sizing:border-box !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+
+    /* medidas e proporção da referência */
+    height:43px !important;
+    padding:0 17px !important;
+    margin:0 !important;
+
+    border:1px solid transparent !important;
+    border-radius:8px !important;
+
+    background:transparent !important;
+    color:#e5e7e5 !important;
+
+    font-family:'Montserrat', Arial, sans-serif !important;
+    font-size:14px !important;
+    font-weight:800 !important;
+    line-height:1 !important;
+    letter-spacing:.1px !important;
+    text-decoration:none !important;
+    white-space:nowrap !important;
+
+    box-shadow:none !important;
+    transition:background .18s ease, color .18s ease !important;
+}
+
+.admin-nav .nav-link i{
+    display:inline-block !important;
+    width:auto !important;
+    font-size:13px !important;
+    line-height:1 !important;
+    color:inherit !important;
+}
+
+.admin-nav .nav-link:hover{
+    color:#fff !important;
+    background:rgba(255,255,255,.035) !important;
+}
+
+/* EXATAMENTE o comportamento da referência:
+   somente a aba atual vira o botão dourado. */
+.admin-nav .nav-link.active{
+    color:#11170e !important;
+    background:#d4af37 !important;
+    border:1px solid #e6c653 !important;
+    border-radius:8px !important;
+    box-shadow:0 4px 12px rgba(212,175,55,.16) !important;
+}
+
+.admin-nav .nav-link.active:hover{
+    color:#11170e !important;
+    background:#d4af37 !important;
+}
+
+/* Na classificação, Conferência é o quarto item.
+   Não recebe fundo próprio: segue o padrão dos demais inativos. */
+
+@media(max-width:950px){
+    .admin-nav{
+        padding:0 18px !important;
+    }
+    .admin-nav .nav-link{
+        height:41px !important;
+        padding:0 13px !important;
+        font-size:13px !important;
+    }
+}
+
+@media(max-width:760px){
+    .admin-nav{
+        height:auto !important;
+        min-height:68px !important;
+        flex-wrap:wrap !important;
+        gap:6px !important;
+        padding:8px 12px !important;
+    }
+    .admin-nav .nav-links{
+        height:48px !important;
+        width:100% !important;
+        justify-content:flex-end !important;
+    }
+    .admin-nav .nav-link{
+        flex:0 1 auto !important;
+    }
+}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* ==========================================================
+   NAVEGAÇÃO — PADRÃO DA TELA INSCRIÇÕES (REFERÊNCIA)
+   Não alterar o restante da classificação.
+   ========================================================== */
+
+.admin-nav{
+    width:100% !important;
+    height:68px !important;
+    min-height:68px !important;
+    box-sizing:border-box !important;
+    padding:0 28px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+
+    background:#06100a !important;
+    border-bottom:2px solid #d4af37 !important;
+    box-shadow:none !important;
+}
+
+.admin-nav #nome-torneio-global{
+    color:#f3f0e8 !important;
+    font-family:'Cinzel',Georgia,serif !important;
+    font-size:1.15rem !important;
+    font-weight:800 !important;
+    letter-spacing:.2px !important;
+    white-space:nowrap !important;
+}
+
+.admin-nav .nav-links{
+    display:flex !important;
+    align-items:center !important;
+    gap:8px !important;
+    height:100% !important;
+}
+
+.admin-nav .nav-item{
+    box-sizing:border-box !important;
+
+    height:43px !important;
+    padding:0 17px !important;
+    margin:0 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+
+    color:#e3e6e3 !important;
+    background:transparent !important;
+    border:1px solid transparent !important;
+    border-radius:8px !important;
+
+    font-family:'Montserrat',Arial,sans-serif !important;
+    font-size:14px !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    letter-spacing:.1px !important;
+    text-decoration:none !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+
+    transition:background .18s ease,color .18s ease,box-shadow .18s ease !important;
+}
+
+.admin-nav .nav-item:hover{
+    color:#fff !important;
+    background:rgba(212,175,55,.07) !important;
+    border-color:rgba(212,175,55,.10) !important;
+}
+
+/* Somente a aba atual vira o botão dourado. */
+.admin-nav .nav-item.active{
+    color:#10160e !important;
+    background:#d4af37 !important;
+    border-color:#e9c958 !important;
+    box-shadow:0 4px 12px rgba(212,175,55,.18) !important;
+}
+
+.admin-nav .nav-item.active:hover{
+    color:#10160e !important;
+    background:#d4af37 !important;
+}
+
+/* Ícones — mesmo peso visual do padrão aprovado. */
+.admin-nav .naipe-icon{
+    width:auto !important;
+    height:auto !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:14px !important;
+    line-height:1 !important;
+    color:#dfe5df !important;
+}
+
+.admin-nav .inscricoes-icon{color:#dfe5df !important;}
+.admin-nav .jogos-icon{color:#dfe5df !important;}
+.admin-nav .classificacao-icon{color:#dfe5df !important;}
+.admin-nav .conferencia-icon{color:#dfe5df !important;}
+
+.admin-nav .nav-item.active .naipe-icon{
+    color:#10160e !important;
+}
+
+@media(max-width:1000px){
+    .admin-nav{
+        padding:0 18px !important;
+    }
+
+    .admin-nav .nav-item{
+        padding:0 12px !important;
+        font-size:13px !important;
+    }
+}
+
+@media(max-width:780px){
+    .admin-nav{
+        height:auto !important;
+        min-height:68px !important;
+        flex-wrap:wrap !important;
+        padding:8px 12px !important;
+        gap:5px !important;
+    }
+
+    .admin-nav .nav-links{
+        height:48px !important;
+        width:100% !important;
+        justify-content:flex-end !important;
+        flex-wrap:wrap !important;
+    }
+
+    .admin-nav .nav-item{
+        height:40px !important;
+        padding:0 9px !important;
+        font-size:12px !important;
+    }
+}
+</style>
+
+
+<style id="nav-padrao-inscricoes">
+/* ==========================================================
+   NAVEGAÇÃO PADRÃO OFICIAL — BASEADA NO ADMIN_INSCRICOES V14
+   Classificação usa Conferência como quarto item contextual.
+   ========================================================== */
+.admin-nav{
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:8px 24px;
+    background:rgba(4,16,10,.96);
+    border-bottom:2px solid var(--gold, #d4af37);
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:0 4px 14px rgba(0,0,0,.35);
+}
+.admin-nav .brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    font-family:'Cinzel',serif;
+    font-size:1.15rem;
+    font-weight:800;
+    white-space:nowrap;
+}
+.admin-nav .brand i{
+    color:var(--gold,#d4af37);
+    font-size:1.15rem;
+}
+.admin-nav .nav-links{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.admin-nav .nav-item{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 13px;
+    border-radius:7px;
+    border:1px solid transparent;
+    color:#dfe4e1;
+    text-decoration:none;
+    text-transform:uppercase;
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.35px;
+    transition:.18s ease;
+}
+.admin-nav .nav-item:hover{
+    color:#fff;
+    background:rgba(212,175,55,.08);
+    border-color:rgba(212,175,55,.25);
+    transform:translateY(-1px);
+}
+.admin-nav .nav-item.active{
+    color:#15120a;
+    background:linear-gradient(135deg,#e1bd3c,#b79220);
+    border-color:var(--gold-light,#f0d56a);
+    box-shadow:0 3px 10px rgba(212,175,55,.18);
+}
+@media(max-width:760px){
+    .admin-nav{
+        height:auto;
+        min-height:58px;
+        padding:7px 10px;
+        flex-wrap:wrap;
+    }
+    .admin-nav .brand{font-size:.9rem}
+    .admin-nav .nav-links{
+        width:100%;
+        overflow-x:auto;
+    }
+    .admin-nav .nav-item{
+        padding:6px 8px;
+        font-size:.61rem;
+    }
+}
+</style>
+
 </head>
 <body>
 
-    <nav class="admin-nav">
-    <span id="nome-torneio-global">🏆 {{ config.nome_torneio }}</span>
-
-    <div class="nav-links">
-        <a href="/admin-painel/admin/inscricoes" class="nav-link">
-            <i class="fas fa-user-plus"></i> Inscrições
-        </a>
-        <a href="/admin-painel/admin/jogos" class="nav-link">
-            <i class="fas fa-border-all"></i> Mesa de Jogos
-        </a>
-        <a href="/admin-painel/admin/classificacao" class="nav-link active">
-            <i class="fas fa-chart-bar"></i> Classificação
-        </a>
-        <a href="/admin-painel/admin/conferencia" class="nav-link">
-            <i class="fas fa-search"></i> Conferência
-        </a>
+    <header class="admin-nav">
+    <div class="brand">
+        <i class="fa-solid fa-trophy"></i>
+        <span>{{ config.nome_torneio }}</span>
     </div>
-</nav>
+    <nav class="nav-links">
+        <a href="/admin-painel/admin/inscricoes" class="nav-item">
+            <i class="fa-solid fa-user-plus"></i><span>Inscrições</span>
+        </a>
+        <a href="/admin-painel/admin/jogos" class="nav-item">
+            <i class="fa-solid fa-table-cells-large"></i><span>Mesa de Jogos</span>
+        </a>
+        <a href="/admin-painel/admin/classificacao" class="nav-item active">
+            <i class="fa-solid fa-ranking-star"></i><span>Classificação</span>
+        </a>
+        <a href="/admin-painel/admin/conferencia" class="nav-item">
+            <i class="fa-solid fa-magnifying-glass"></i><span>Conferência</span>
+        </a>
+    </nav>
+</header>
 
     <div class="container">
         <div class="page-heading">
