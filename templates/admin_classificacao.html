@@ -34,6 +34,26 @@
         
         .alerta-box { background: #2a2005; border-left: 5px solid #d4af37; padding: 20px; border-radius: 4px; margin-bottom: 25px; border-top: 1px solid #3a2e07; border-right: 1px solid #3a2e07; border-bottom: 1px solid #3a2e07; }
         .alerta-box p { color: #f39c12; margin: 5px 0 15px 0; }
+
+        .card-flores-live {
+            border-color: #6d4a88;
+            background: linear-gradient(135deg, #151b17 0%, #1b1721 100%);
+        }
+        .flores-title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+        .flores-title-row h2 { margin-bottom:6px; }
+        .flores-title-row p { margin:0; color:#9ca8a0; font-size:0.88rem; }
+        .flores-badge { background:#6d4a88; color:#fff; border-radius:999px; padding:7px 13px; font-size:0.75rem; font-weight:800; letter-spacing:0.8px; white-space:nowrap; }
+        .flores-ranking { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:18px; }
+        .flor-item { display:flex; align-items:center; gap:12px; padding:14px 15px; background:#0e1b12; border:1px solid #2b3b30; border-radius:8px; }
+        .flor-item.primeiro { border-color:#8d6ab0; background:#171322; }
+        .flor-pos { font-size:1.45rem; min-width:34px; text-align:center; }
+        .flor-info { min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
+        .flor-info strong { color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .flor-info span { color:#89978e; font-size:0.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .flor-total { color:#d9b7f1; font-weight:900; font-size:1.25rem; white-space:nowrap; }
+        .flor-total small { font-size:0.68rem; color:#9d8bab; font-weight:700; }
+        .flores-vazio { grid-column:1/-1; text-align:center; color:#8fa393; padding:12px; font-style:italic; }
+        @media (max-width: 800px) { .flores-ranking { grid-template-columns:1fr; } .flores-title-row { align-items:flex-start; } }
         
         /* Classes auxiliares para substituição de Layout Flex/Grid */
         .layout-table { display: table; width: 100%; }
@@ -84,6 +104,30 @@
             </form>
         </div>
         {% endif %}
+
+        <div class="card card-flores-live">
+            <div class="flores-title-row">
+                <div>
+                    <h2>🌸 Rei das Flores — disputa em andamento</h2>
+                    <p>Ranking acumulado de toda a edição, incluindo a fase mata-mata.</p>
+                </div>
+                <span class="flores-badge">TOP 3</span>
+            </div>
+            <div class="flores-ranking">
+                {% for item in top_flores %}
+                <div class="flor-item {% if loop.index == 1 %}primeiro{% endif %}">
+                    <div class="flor-pos">{% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}</div>
+                    <div class="flor-info">
+                        <strong>{{ item.nome }}</strong>
+                        <span>{{ item.entidade }}</span>
+                    </div>
+                    <div class="flor-total">{{ item.flores }} <small>flores</small></div>
+                </div>
+                {% else %}
+                <div class="flores-vazio">Ainda não há flores lançadas neste torneio.</div>
+                {% endfor %}
+            </div>
+        </div>
 
         <div class="card">
             <h2>Tabela de Classificação Geral (Classificatória)</h2>
