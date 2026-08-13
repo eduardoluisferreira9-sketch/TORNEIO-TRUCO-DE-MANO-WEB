@@ -315,6 +315,51 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
 
+
+def obter_top_flores_torneio(cursor, torneio_id: int, limite: int = 3):
+    """
+    Retorna o Top de Flores acumulado em toda a edição.
+
+    Importante: esta consulta NÃO altera a lógica da classificação oficial.
+    Ela apenas expõe, para a interface, o mesmo acumulado de flores que o
+    sistema já utiliza para o Rei das Flores, considerando também as rodadas
+    do mata-mata (rodadas negativas).
+    """
+    p = "%s" if DATABASE_URL else "?"
+
+    cursor.execute(
+        f"SELECT id, nome, entidade FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}",
+        (torneio_id,)
+    )
+    atletas = cursor.fetchall()
+
+    ranking_flores = []
+    for atleta in atletas:
+        atleta_id = atleta["id"]
+
+        cursor.execute(
+            f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}",
+            (atleta_id, torneio_id)
+        )
+        f1 = cursor.fetchone()[0] or 0
+
+        cursor.execute(
+            f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}",
+            (atleta_id, torneio_id)
+        )
+        f2 = cursor.fetchone()[0] or 0
+
+        ranking_flores.append({
+            "id": atleta_id,
+            "nome": atleta["nome"],
+            "entidade": atleta["entidade"],
+            "flores": int(f1 + f2)
+        })
+
+    ranking_flores.sort(key=lambda x: (-x["flores"], x["id"]))
+    return ranking_flores[:limite]
+
+
 # --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
 @app.get("/admin-painel/inscrever", response_class=HTMLResponse)
@@ -1771,69 +1816,30 @@ def ajustar_confronto_admin(
 
 @app.get("/admin/classificacao")
 @app.get("/admin-painel/admin/classificacao")
-def aba_classificacao(request: Request, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
+def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, db=Depends(get_db), auth: bool = Depends(verificar_admin)):
     cfg = atualizar_e_obter_cronometro(db)
-
+    p = "%s" if DATABASE_URL else "?"
+    
     if cfg["fase_torneio"] == "INSCRICAO":
         return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
 
     cursor = db.cursor()
     lista_classificacao = obtener_ranking_fase_classificatoria(cursor, cfg["id"])
+    # Dados do painel visual do Rei das Flores. A classificação oficial acima
+    # permanece exatamente a mesma; aqui apenas disponibilizamos o acumulado
+    # de flores de toda a edição para o template.
+    top_flores = obter_top_flores_torneio(cursor, cfg["id"], limite=3)
 
-    return templates.TemplateResponse(
-        request=request,
-        name="admin_classificacao.html",
-        context={
-            "config": cfg,
-            "classificacao": lista_classificacao,
-            "aba_ativa": "classificacao"
-        }
-    )
-
-@app.get("/admin/conferencia")
-@app.get("/admin-painel/admin/conferencia")
-def aba_conferencia(
-    request: Request,
-    rodada_filtro: int = None,
-    db=Depends(get_db),
-    auth: bool = Depends(verificar_admin)
-):
-    cfg = atualizar_e_obter_cronometro(db)
-
-    if cfg["fase_torneio"] == "INSCRICAO":
-        return RedirectResponse(url="/admin-painel/admin/inscricoes?erro=inicie_o_torneio", status_code=303)
-
-    cursor = db.cursor()
-    p = "%s" if DATABASE_URL else "?"
-
-    cursor.execute(
-        f"SELECT DISTINCT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY rodada DESC",
-        (cfg["id"],)
-    )
+    cursor.execute(f"SELECT DISTINCT rodada FROM confrontos WHERE torneio_id = {p} ORDER BY rodada DESC", (cfg["id"],))
     todas_rodadas = [r["rodada"] for r in cursor.fetchall()]
-
-    rodada_selecionada = (
-        rodada_filtro
-        if rodada_filtro is not None
-        else (todas_rodadas[0] if todas_rodadas else 1)
-    )
-
-    cursor.execute(
-        f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC",
-        (rodada_selecionada, cfg["id"])
-    )
+    
+    rodada_selecionada = rodada_filtro if rodada_filtro is not None else (todas_rodadas[0] if todas_rodadas else 1)
+    cursor.execute(f"SELECT * FROM confrontos WHERE rodada = {p} AND torneio_id = {p} ORDER BY mesa ASC", (rodada_selecionada, cfg["id"]))
     confrontos_auditoria = cursor.fetchall()
 
     return templates.TemplateResponse(
-        request=request,
-        name="admin_conferencia.html",
-        context={
-            "config": cfg,
-            "todas_rodadas": todas_rodadas,
-            "rodada_selecionada": rodada_selecionada,
-            "confrontos_auditoria": confrontos_auditoria,
-            "aba_ativa": "conferencia"
-        }
+        request=request, name="admin_classificacao.html",
+        context={"config": cfg, "classificacao": lista_classificacao, "top_flores": top_flores, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
     )
 
 @app.post("/admin/auditoria/corrigir")
@@ -1845,7 +1851,7 @@ def corrigir_placar_auditoria(confronto_id: int = Form(...), vencedor_id: int = 
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"erro": e.detail})
     db.commit()
-    return RedirectResponse(url=f"/admin-painel/admin/conferencia?rodada_filtro={rodada_retorno}", status_code=303)
+    return RedirectResponse(url=f"/admin-painel/admin/classificacao?rodada_filtro={rodada_retorno}", status_code=303)
 
 @app.get("/admin/podio")
 @app.get("/admin-painel/admin/podio")
