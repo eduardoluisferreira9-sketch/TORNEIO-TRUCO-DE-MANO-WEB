@@ -187,7 +187,7 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
     .nav-link{padding:9px 10px}
     .container{height:auto;min-height:calc(100vh - 70px);overflow:visible;padding:13px 12px 22px}
     .main-grid{grid-template-columns:1fr}
-    .right-column{grid-template-rows:420px}
+    .right-column{grid-template-rows:320px 240px}
     .ranking-card{min-height:500px}
 }
 </style>
@@ -343,54 +343,145 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
 }
 </style>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* V6 — Padronização visual + legibilidade. Somente UI/UX. */
-.admin-nav{height:64px;padding:8px 24px;gap:20px}
-.brand{display:flex;align-items:center;gap:11px;font-family:'Cinzel',serif;font-size:1.15rem;font-weight:800;white-space:nowrap}
-.brand i{color:var(--gold);font-size:1.15rem}
-.nav-links{display:flex;align-items:center;gap:6px;height:auto}
-.nav-item{
-    display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:7px;
-    border:1px solid transparent;color:#dfe4e1;text-decoration:none;text-transform:uppercase;
-    font-size:.76rem;font-weight:800;letter-spacing:.35px;transition:.18s ease
-}
-.nav-item:hover{color:#fff;background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.25);transform:translateY(-1px)}
-.nav-item.active{color:#15120a;background:linear-gradient(135deg,#e1bd3c,#b79220);border-color:#f1d66b;box-shadow:0 3px 10px rgba(212,175,55,.18)}
-.page-heading h1{font-size:27px;line-height:1.08}
+/* FINAL VISUAL — apenas interface/usabilidade */
+.page-heading h1{font-size:26px}
 .page-heading p{font-size:11px}
-.phase-pill{font-size:9px;padding:8px 12px}
-.alerta-box{padding:13px 17px}
-.alerta-box h3{font-size:15px}
-.alerta-box p{font-size:10px}
-.alerta-box label{font-size:11px}
-select{font-size:11px;padding:8px 10px}
-.btn-matamata{font-size:11px;padding:10px 16px}
-.ranking-card{padding:15px}
-.section-icon{width:36px;height:36px;font-size:18px}
-h2{font-size:18px}
-.section-subtitle{font-size:10px}
-.criteria{gap:5px;margin-bottom:9px}
-.criteria-label{font-size:8px}
-.criteria span{padding:4px 7px;font-size:8px}
-.notice{padding:7px 9px;font-size:9px;margin-bottom:9px}
-th{padding:9px 10px;font-size:9px}
-td{padding:8px 10px;font-size:11px}
-.pos-cell{font-size:13px}
-.athlete-cell{font-size:12px}
-.athlete-cell .desistente{font-size:7px;padding:2px 6px}
-.ranking-wrap tbody tr:nth-child(-n+3) .pos-cell{font-size:15px}
-.flores-title-row h2{font-size:19px}
-.flores-title-row p{font-size:10px}
-.flores-badge{font-size:8px;padding:6px 10px}
-.flor-info strong{font-size:11px}
-.flor-total{font-size:14px}
-.flores-vazio{font-size:11px}
 
-@media(max-width:950px){
-    .admin-nav{height:auto;min-height:64px;padding:10px 15px}
-    .nav-item{font-size:.72rem}
+.nav-link{font-size:12px;padding-left:17px;padding-right:17px}
+
+h2{font-size:17px}
+.section-subtitle{font-size:10px}
+
+.criteria span{font-size:8px;padding:4px 7px}
+.criteria-label{font-size:8px}
+
+.notice{font-size:8px}
+
+th{font-size:8px;padding:8px 9px}
+td{font-size:10px;padding:7px 9px}
+.athlete-cell{font-size:11px}
+.pos-cell{font-size:12px}
+
+.flores-title-row h2{font-size:17px}
+.flores-title-row p{font-size:9px}
+.flor-info strong{font-size:10px}
+.flor-total{font-size:13px}
+
+.phase-pill{font-size:9px}
+
+.ranking-wrap tbody tr:nth-child(1){
+    background:linear-gradient(90deg,rgba(228,194,71,.14),rgba(228,194,71,.035) 58%,transparent);
+}
+.ranking-wrap tbody tr:nth-child(1) td:first-child{
+    box-shadow:inset 3px 0 0 var(--gold2);
+}
+</style>
+
+
+<style>
+.criteria-card{display:none !important}
+.right-column{grid-template-rows:minmax(0,1fr)!important}
+.card-flores-live{height:100%}
+</style>
+
+
+<style>
+/* V2 — refinamento final de hierarquia visual */
+.ranking-wrap tbody tr:nth-child(1),
+.ranking-wrap tbody tr:nth-child(2),
+.ranking-wrap tbody tr:nth-child(3){
+    position:relative;
+}
+.ranking-wrap tbody tr:nth-child(1){
+    background:linear-gradient(90deg,rgba(228,194,71,.14),rgba(228,194,71,.035) 58%,transparent);
+}
+.ranking-wrap tbody tr:nth-child(1) td:first-child{
+    box-shadow:inset 3px 0 0 #e4c247;
+}
+.ranking-wrap tbody tr:nth-child(2){
+    background:linear-gradient(90deg,rgba(210,216,212,.075),rgba(210,216,212,.018) 58%,transparent);
+}
+.ranking-wrap tbody tr:nth-child(2) td:first-child{
+    box-shadow:inset 3px 0 0 rgba(210,216,212,.55);
+}
+.ranking-wrap tbody tr:nth-child(3){
+    background:linear-gradient(90deg,rgba(183,121,69,.07),rgba(183,121,69,.015) 58%,transparent);
+}
+.ranking-wrap tbody tr:nth-child(3) td:first-child{
+    box-shadow:inset 3px 0 0 rgba(183,121,69,.55);
+}
+.ranking-wrap tbody tr:nth-child(-n+3) .pos-cell{
+    font-size:13px;
+}
+.ranking-wrap tbody tr:nth-child(-n+3) .athlete-cell{
+    font-size:11px;
+}
+
+/* Rei das Flores: pódio equilibrado, sem o primeiro card ocupar espaço vazio */
+.card-flores-live{
+    display:flex;
+    flex-direction:column;
+}
+.flores-ranking{
+    flex:1 1 auto;
+    height:auto;
+    min-height:0;
+    align-items:end;
+    gap:9px;
+    padding:4px 3px 2px;
+}
+.flor-item{
+    height:78%;
+    min-height:150px;
+    justify-content:flex-end;
+    padding:10px 6px 12px;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.flor-item.primeiro{
+    height:88%;
+    min-height:175px;
+    justify-content:flex-end;
+    box-shadow:0 10px 25px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.07);
+}
+.flor-item:nth-child(2),
+.flor-item:nth-child(3){
+    height:78%;
+}
+.flor-item:hover{
+    transform:translateY(-3px);
+}
+.flor-pos{
+    font-size:30px;
+    line-height:1;
+    margin-bottom:7px;
+}
+.flor-item.primeiro .flor-pos{
+    font-size:36px;
+}
+.flor-info strong{
+    font-size:10px;
+    letter-spacing:.15px;
+}
+.flor-total{
+    margin-top:3px;
+    font-size:14px;
+}
+.flor-total small{
+    font-size:7px;
+}
+.flor-item.primeiro .flor-total{
+    color:#efd5ff;
+    font-size:16px;
+}
+.flor-item.primeiro::after{
+    content:"";
+    width:48px;
+    height:2px;
+    margin-top:5px;
+    border-radius:99px;
+    background:rgba(228,194,71,.55);
 }
 </style>
 
@@ -398,23 +489,15 @@ td{padding:8px 10px;font-size:11px}
 <body>
 
     <nav class="admin-nav">
-        <div class="brand">
-            <i class="fa-solid fa-trophy"></i>
-            <span>{{ config.nome_torneio }}</span>
+        <div class="nav-brand">
+            <span class="brand-icon">🏆</span>
+            <strong>{{ config.nome_torneio }}</strong>
         </div>
         <div class="nav-links">
-            <a href="/admin-painel/admin/inscricoes" class="nav-item">
-                <i class="fa-solid fa-user-plus"></i><span>Inscrições</span>
-            </a>
-            <a href="/admin-painel/admin/jogos" class="nav-item">
-                <i class="fa-solid fa-table-cells-large"></i><span>Mesa de Jogos</span>
-            </a>
-            <a href="/admin-painel/admin/classificacao" class="nav-item active">
-                <i class="fa-solid fa-ranking-star"></i><span>Classificação</span>
-            </a>
-            <a href="/admin-painel/admin/conferencia" class="nav-item">
-                <i class="fa-solid fa-magnifying-glass-chart"></i><span>Conferência</span>
-            </a>
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link">🎴 Mesa de Jogos</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link active">🏆 Classificação</a>
+            <a href="/admin-painel/admin/conferencia" class="nav-link">🔎 Conferência</a>
         </div>
     </nav>
 
@@ -524,7 +607,16 @@ td{padding:8px 10px;font-size:11px}
                 {% endfor %}
             </div>
         </div>
-                
+                </div>
+            <div class="criteria-steps">
+                <div class="criteria-step"><div class="number">1</div><strong>Vitórias</strong></div>
+                <div class="criteria-step"><div class="number">2</div><strong>Sets Ganhos</strong></div>
+                <div class="criteria-step"><div class="number">3</div><strong>Saldo de Tentos</strong></div>
+                <div class="criteria-step"><div class="number">4</div><strong>Tentos Pró</strong></div>
+                <div class="criteria-step"><div class="number">5</div><strong>Flores</strong></div>
+            </div>
+            <div class="criteria-note">ℹ️ Atletas marcados como desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase.</div>
+        </div>
 
             </div>
         </div>
