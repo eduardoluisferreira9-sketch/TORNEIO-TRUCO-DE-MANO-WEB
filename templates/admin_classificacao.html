@@ -133,7 +133,7 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
 .wins,.saldo-pos{color:var(--green);font-weight:900}
 .saldo-neg{color:var(--red);font-weight:900}
 .flores-cell{color:#e4c64e;font-weight:900}
-.right-column{min-height:0;display:grid;grid-template-rows:minmax(0,1.18fr) minmax(0,.82fr);gap:12px}
+.right-column{min-height:0;display:grid;grid-template-rows:minmax(0,1fr);gap:12px}
 .card-flores-live{
     min-height:0;margin:0;padding:14px;overflow:hidden;border-color:rgba(156,107,195,.34);
     background:radial-gradient(circle at 50% -10%,rgba(156,107,195,.14),transparent 42%),
@@ -187,7 +187,7 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
     .nav-link{padding:9px 10px}
     .container{height:auto;min-height:calc(100vh - 70px);overflow:visible;padding:13px 12px 22px}
     .main-grid{grid-template-columns:1fr}
-    .right-column{grid-template-rows:320px 240px}
+    .right-column{grid-template-rows:420px}
     .ranking-card{min-height:500px}
 }
 </style>
@@ -343,19 +343,78 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
 }
 </style>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* V6 — Padronização visual + legibilidade. Somente UI/UX. */
+.admin-nav{height:64px;padding:8px 24px;gap:20px}
+.brand{display:flex;align-items:center;gap:11px;font-family:'Cinzel',serif;font-size:1.15rem;font-weight:800;white-space:nowrap}
+.brand i{color:var(--gold);font-size:1.15rem}
+.nav-links{display:flex;align-items:center;gap:6px;height:auto}
+.nav-item{
+    display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:7px;
+    border:1px solid transparent;color:#dfe4e1;text-decoration:none;text-transform:uppercase;
+    font-size:.76rem;font-weight:800;letter-spacing:.35px;transition:.18s ease
+}
+.nav-item:hover{color:#fff;background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.25);transform:translateY(-1px)}
+.nav-item.active{color:#15120a;background:linear-gradient(135deg,#e1bd3c,#b79220);border-color:#f1d66b;box-shadow:0 3px 10px rgba(212,175,55,.18)}
+.page-heading h1{font-size:27px;line-height:1.08}
+.page-heading p{font-size:11px}
+.phase-pill{font-size:9px;padding:8px 12px}
+.alerta-box{padding:13px 17px}
+.alerta-box h3{font-size:15px}
+.alerta-box p{font-size:10px}
+.alerta-box label{font-size:11px}
+select{font-size:11px;padding:8px 10px}
+.btn-matamata{font-size:11px;padding:10px 16px}
+.ranking-card{padding:15px}
+.section-icon{width:36px;height:36px;font-size:18px}
+h2{font-size:18px}
+.section-subtitle{font-size:10px}
+.criteria{gap:5px;margin-bottom:9px}
+.criteria-label{font-size:8px}
+.criteria span{padding:4px 7px;font-size:8px}
+.notice{padding:7px 9px;font-size:9px;margin-bottom:9px}
+th{padding:9px 10px;font-size:9px}
+td{padding:8px 10px;font-size:11px}
+.pos-cell{font-size:13px}
+.athlete-cell{font-size:12px}
+.athlete-cell .desistente{font-size:7px;padding:2px 6px}
+.ranking-wrap tbody tr:nth-child(-n+3) .pos-cell{font-size:15px}
+.flores-title-row h2{font-size:19px}
+.flores-title-row p{font-size:10px}
+.flores-badge{font-size:8px;padding:6px 10px}
+.flor-info strong{font-size:11px}
+.flor-total{font-size:14px}
+.flores-vazio{font-size:11px}
+
+@media(max-width:950px){
+    .admin-nav{height:auto;min-height:64px;padding:10px 15px}
+    .nav-item{font-size:.72rem}
+}
+</style>
+
 </head>
 <body>
 
     <nav class="admin-nav">
-        <div class="nav-brand">
-            <span class="brand-icon">🏆</span>
-            <strong>{{ config.nome_torneio }}</strong>
+        <div class="brand">
+            <i class="fa-solid fa-trophy"></i>
+            <span>{{ config.nome_torneio }}</span>
         </div>
         <div class="nav-links">
-            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
-            <a href="/admin-painel/admin/jogos" class="nav-link">🎴 Mesa de Jogos</a>
-            <a href="/admin-painel/admin/classificacao" class="nav-link active">📊 Classificação</a>
-            <a href="/admin-painel/admin/conferencia" class="nav-link">🔎 Conferência</a>
+            <a href="/admin-painel/admin/inscricoes" class="nav-item">
+                <i class="fa-solid fa-user-plus"></i><span>Inscrições</span>
+            </a>
+            <a href="/admin-painel/admin/jogos" class="nav-item">
+                <i class="fa-solid fa-table-cells-large"></i><span>Mesa de Jogos</span>
+            </a>
+            <a href="/admin-painel/admin/classificacao" class="nav-item active">
+                <i class="fa-solid fa-ranking-star"></i><span>Classificação</span>
+            </a>
+            <a href="/admin-painel/admin/conferencia" class="nav-item">
+                <i class="fa-solid fa-magnifying-glass-chart"></i><span>Conferência</span>
+            </a>
         </div>
     </nav>
 
@@ -465,23 +524,7 @@ tbody tr:hover{background:rgba(228,194,71,.035)}
                 {% endfor %}
             </div>
         </div>
-                <div class="card criteria-card">
-            <div class="section-title">
-                <span class="section-icon">⚖️</span>
-                <div>
-                    <h2>Critério oficial de desempate</h2>
-                    <p class="section-subtitle">A ordem usada pelo sistema para definir a posição.</p>
-                </div>
-            </div>
-            <div class="criteria-steps">
-                <div class="criteria-step"><div class="number">1</div><strong>Vitórias</strong></div>
-                <div class="criteria-step"><div class="number">2</div><strong>Sets Ganhos</strong></div>
-                <div class="criteria-step"><div class="number">3</div><strong>Saldo de Tentos</strong></div>
-                <div class="criteria-step"><div class="number">4</div><strong>Tentos Pró</strong></div>
-                <div class="criteria-step"><div class="number">5</div><strong>Flores</strong></div>
-            </div>
-            <div class="criteria-note">ℹ️ Atletas marcados como desistentes permanecem no histórico e na classificação, mas não ocupam vaga na próxima fase.</div>
-        </div>
+                
 
             </div>
         </div>
