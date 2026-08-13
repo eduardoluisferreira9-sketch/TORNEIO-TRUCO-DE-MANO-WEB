@@ -2309,6 +2309,53 @@
             }
         }
 
+    
+        /* ============================================================
+           V14 — BARRA DE ROLAGEM AUTOMÁTICA/DISCRETA DO ELENCO
+           A scrollbar não fica permanentemente visível.
+           Ela aparece durante interação e some quando fica parada.
+           ============================================================ */
+
+        @media (min-width: 1101px) {
+            #roster-scroll {
+                scrollbar-width: none;
+                scrollbar-color: transparent transparent;
+            }
+
+            #roster-scroll::-webkit-scrollbar {
+                width: 0;
+                height: 0;
+            }
+
+            /* JS adiciona esta classe enquanto o operador está usando
+               a área; a barra reaparece sem alterar o layout. */
+            #roster-scroll.roster-scrolling {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(246,214,90,.58) transparent;
+            }
+
+            #roster-scroll.roster-scrolling::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            #roster-scroll.roster-scrolling::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            #roster-scroll.roster-scrolling::-webkit-scrollbar-thumb {
+                background: rgba(246,214,90,.50);
+                border-radius: 10px;
+            }
+
+            #roster-scroll.roster-scrolling::-webkit-scrollbar-thumb:hover {
+                background: rgba(246,214,90,.75);
+            }
+
+            #roster-scroll:focus {
+                outline: none;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -2645,13 +2692,42 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 
+
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const roster = document.getElementById('roster-scroll');
     if (!roster) return;
 
+    let hideTimer = null;
+
+    function showRosterScrollbar() {
+        roster.classList.add('roster-scrolling');
+
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function () {
+            roster.classList.remove('roster-scrolling');
+        }, 900);
+    }
+
+    /* Roda do mouse: mostra enquanto o operador está navegando. */
+    roster.addEventListener('wheel', showRosterScrollbar, { passive: true });
+
+    /* Mouse sobre a área: a barra fica disponível para interação direta. */
+    roster.addEventListener('mouseenter', showRosterScrollbar);
+    roster.addEventListener('mousemove', showRosterScrollbar);
+
+    /* Arrastar/usar teclado também mantém a barra visível por um instante. */
+    roster.addEventListener('scroll', showRosterScrollbar, { passive: true });
+    roster.addEventListener('keydown', showRosterScrollbar);
+
+    /* Se um cadastro acabou de acontecer, mostra a barra durante a
+       rolagem automática até o novo atleta e depois a esconde. */
     const params = new URLSearchParams(window.location.search);
     if (params.get('sucesso') === 'cadastrado') {
+        showRosterScrollbar();
+
         window.requestAnimationFrame(function () {
             window.requestAnimationFrame(function () {
                 roster.scrollTo({
