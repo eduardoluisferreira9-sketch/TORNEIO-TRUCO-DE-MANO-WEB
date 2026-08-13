@@ -156,19 +156,88 @@
             .grid-historico { grid-template-columns: 1fr; }
         }
     </style>
+
+<style>
+/* GALERIA — acabamento no mesmo padrão das demais telas */
+.admin-nav{
+    background:linear-gradient(135deg,#050d08,#0c1a11)!important;
+    padding:16px 32px!important; min-height:72px!important;
+    border-bottom:2px solid #d4af37!important;
+    display:flex!important; justify-content:space-between!important;
+    align-items:center!important; gap:24px!important;
+    box-shadow:0 4px 20px rgba(0,0,0,.6)!important;
+}
+.admin-nav .brand{
+    color:#d4af37!important; font-family:'Cinzel',serif!important;
+    font-size:1.35rem!important; font-weight:700!important; white-space:nowrap!important;
+}
+.admin-nav .nav-links{display:flex!important;align-items:center!important;gap:8px!important}
+.admin-nav .nav-link{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    height:42px!important;padding:0 15px!important;border-radius:7px!important;
+    border:1px solid transparent!important;text-decoration:none!important;
+    color:#d7ddd9!important;font-family:'Montserrat',sans-serif!important;
+    font-size:12px!important;font-weight:700!important;letter-spacing:.45px!important;
+    white-space:nowrap!important;
+}
+.admin-nav .nav-link:hover{color:#f3d75b!important;background:rgba(212,175,55,.08)!important}
+.admin-nav .nav-link.active{
+    background:#d4af37!important;color:#0b140d!important;
+    border-color:#f3d75b!important;box-shadow:0 4px 12px rgba(0,0,0,.4)!important;
+}
+
+.container{max-width:1540px!important;width:calc(100% - 60px)!important;padding:30px 0 40px!important;margin:auto!important}
+.container > h2{
+    font-size:2rem!important;margin:0 0 5px!important;color:#f4f1eb!important;
+}
+.container > p{
+    margin:0 0 22px!important;color:#a7b2aa!important;font-size:.95rem!important;
+}
+.grid-historico{
+    display:grid!important;grid-template-columns:repeat(auto-fit,minmax(390px,1fr))!important;
+    gap:18px!important;margin-top:0!important;
+}
+.card-historico{
+    background:linear-gradient(145deg,#10291a,#0a1c11)!important;
+    border:1px solid #24472e!important;border-radius:12px!important;
+    padding:20px!important;box-shadow:0 8px 22px rgba(0,0,0,.32)!important;
+    transition:.2s ease!important;
+}
+.card-historico:hover{
+    border-color:rgba(212,175,55,.65)!important;
+    transform:translateY(-2px)!important;box-shadow:0 12px 28px rgba(0,0,0,.4)!important;
+}
+.edicao-titulo{
+    font-size:1.12rem!important;margin-bottom:16px!important;
+    border-bottom:1px solid rgba(212,175,55,.16)!important;padding-bottom:11px!important;
+}
+.linha-podio{margin:10px 0!important;font-size:.9rem!important;gap:10px!important}
+.linha-podio strong{font-size:.68rem!important;width:82px!important}
+.linha-podio .nome-destaque{font-size:.88rem!important}
+.tag-flores{
+    margin-top:13px!important;padding:12px 14px!important;
+    border-radius:9px!important;
+}
+.botao-excluir-historico{margin-top:12px!important;padding:8px 12px!important;font-size:.7rem!important}
+@media(max-width:850px){
+    .admin-nav{padding:12px 18px!important;flex-direction:column!important;align-items:flex-start!important}
+    .admin-nav .nav-links{width:100%!important;flex-wrap:wrap!important}
+    .container{width:calc(100% - 28px)!important}
+    .grid-historico{grid-template-columns:1fr!important}
+}
+</style>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307130c'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-size='40'%3E🏆%3C/text%3E%3C/svg%3E">
 </head>
 <body>
 
-    <nav>
-        <div class="nav-brand">
-            <span>🏆 {{ config.nome_torneio }}</span>
-        </div>
-        <div class="nav-container-links">
-            <a href="/admin-painel/admin/inscricoes" class="nav-link">📋 Inscrições</a>
-            <a href="/admin-painel/admin/jogos" class="nav-link">🎴 Mesa de Jogos</a>
-            <a href="/admin-painel/admin/classificacao" class="nav-link">📊 Classificação</a>
-            <a href="/admin-painel/admin/podio" class="nav-link">🥇 Pódio Final</a>
-            <a href="/admin-painel/admin/historico" class="nav-link active">📜 Galeria</a>
+    <nav class="admin-nav">
+        <span class="brand">🏆 {{ config.nome_torneio }}</span>
+        <div class="nav-links">
+            <a href="/admin-painel/admin/inscricoes" class="nav-link">👤 INSCRIÇÕES</a>
+            <a href="/admin-painel/admin/jogos" class="nav-link">▦ MESA DE JOGOS</a>
+            <a href="/admin-painel/admin/classificacao" class="nav-link">♟ CLASSIFICAÇÃO</a>
+            <a href="/admin-painel/admin/historico" class="nav-link active">🏆 GALERIA DE LENDAS</a>
         </div>
     </nav>
 
