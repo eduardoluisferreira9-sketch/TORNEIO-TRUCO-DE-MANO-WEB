@@ -354,6 +354,137 @@ tbody tr:hover td{
 </style>
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307130c'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-size='40'%3E🔎%3C/text%3E%3C/svg%3E">
+
+<style>
+/* ==========================================================
+   CONFERÊNCIA — APROVEITAMENTO MELHOR DA TELA
+   Mantém a lógica existente. Apenas layout/UX.
+   ========================================================== */
+
+/* A tela deixa de ficar estreita e centralizada demais. */
+.container{
+    max-width:1680px !important;
+    width:calc(100% - 56px) !important;
+    padding:26px 0 30px !important;
+    margin:0 auto !important;
+}
+
+/* Cabeçalho ocupa a largura disponível. */
+.page-heading{
+    margin-bottom:16px !important;
+}
+
+/* O card de conferência passa a usar toda a largura. */
+.card{
+    width:100% !important;
+    box-sizing:border-box !important;
+    padding:20px 22px !important;
+}
+
+/* Filtro horizontal, compacto e funcional. */
+.filtro-box{
+    margin:14px 0 16px !important;
+    padding:12px 16px !important;
+}
+
+.filtro-box-inner{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:16px !important;
+}
+
+#filtro_rodada{
+    min-width:420px !important;
+}
+
+/* Cabeçalho da tabela mais claro. */
+h4{
+    margin:16px 0 8px !important;
+}
+
+/* A tabela é a protagonista da Conferência. */
+table{
+    width:100% !important;
+    table-layout:fixed !important;
+    margin-top:8px !important;
+}
+
+th, td{
+    padding:12px 14px !important;
+}
+
+th:nth-child(1), td:nth-child(1){
+    width:9% !important;
+}
+
+th:nth-child(2), td:nth-child(2),
+th:nth-child(3), td:nth-child(3){
+    width:18% !important;
+}
+
+th:nth-child(4), td:nth-child(4){
+    width:37% !important;
+}
+
+th:nth-child(5), td:nth-child(5){
+    width:18% !important;
+    text-align:center !important;
+}
+
+/* Resultado registrado ganha leitura rápida. */
+td:nth-child(4){
+    font-size:.9rem !important;
+}
+
+/* Botão administrativo mantém destaque, mas ocupa menos espaço. */
+.btn-corrigir{
+    min-width:145px !important;
+}
+
+/* Espaço para várias mesas sem alongar exageradamente a página. */
+tbody tr{
+    height:52px !important;
+}
+
+/* Em telas grandes, aproveita o espaço vertical também. */
+@media(min-width:1200px){
+    .card{
+        padding-left:24px !important;
+        padding-right:24px !important;
+    }
+
+    tbody td{
+        font-size:.9rem !important;
+    }
+}
+
+@media(max-width:850px){
+    .container{
+        width:calc(100% - 28px) !important;
+    }
+
+    .filtro-box-inner{
+        flex-direction:column !important;
+        align-items:stretch !important;
+    }
+
+    #filtro_rodada{
+        min-width:0 !important;
+        width:100% !important;
+    }
+
+    table{
+        table-layout:auto !important;
+        min-width:760px !important;
+    }
+
+    .card{
+        overflow-x:auto !important;
+    }
+}
+</style>
+
 </head>
 <body>
 <nav class="admin-nav">
