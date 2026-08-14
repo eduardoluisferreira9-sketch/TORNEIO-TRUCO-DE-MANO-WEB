@@ -429,6 +429,7 @@ def tela_login(request: Request, erro: str = None):
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{nome_html} — Acesso Administrativo</title>
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -436,21 +437,22 @@ def tela_login(request: Request, erro: str = None):
 
         <style>
             :root {{
-                --verde-0:#020a06;
-                --verde-1:#06170d;
-                --verde-2:#0a2415;
-                --verde-3:#12351f;
-                --ouro:#d4af37;
-                --ouro-claro:#f1d76b;
-                --marfim:#f5f0df;
-                --muted:#b9c1ba;
+                --verde-fundo:#02110a;
+                --verde-escuro:#061b10;
+                --verde-mesa:#0a2a18;
+                --verde-luz:#124b2a;
+                --ouro:#d6ae32;
+                --ouro-claro:#f4d56a;
+                --ouro-brilho:#ffe48a;
+                --marfim:#f7f0dd;
+                --cinza:#aeb8b0;
             }}
 
             * {{ box-sizing:border-box; }}
 
-            html, body {{
+            html,body {{
                 width:100%;
-                min-height:100%;
+                height:100%;
                 margin:0;
             }}
 
@@ -460,122 +462,237 @@ def tela_login(request: Request, erro: str = None):
                 color:var(--marfim);
                 font-family:'Montserrat',Arial,sans-serif;
                 background:
-                    radial-gradient(circle at 50% 18%, rgba(212,175,55,.13), transparent 27%),
-                    radial-gradient(circle at 15% 50%, rgba(15,75,42,.22), transparent 34%),
-                    radial-gradient(circle at 85% 50%, rgba(15,75,42,.22), transparent 34%),
-                    linear-gradient(145deg,#010805 0%,#06180d 47%,#020b07 100%);
+                    radial-gradient(ellipse at 50% 24%, rgba(35,111,62,.18), transparent 32%),
+                    radial-gradient(circle at 50% 5%, rgba(214,174,50,.12), transparent 24%),
+                    linear-gradient(145deg,#010704 0%,#03170d 48%,#010a06 100%);
                 position:relative;
             }}
 
-            /* Moldura dourada */
+            /* Moldura externa: aparência de carta/mesa de jogo */
             body::before {{
                 content:"";
                 position:fixed;
-                inset:16px;
-                border:1px solid rgba(212,175,55,.72);
+                inset:10px;
+                border:1px solid rgba(244,213,106,.82);
                 pointer-events:none;
-                z-index:20;
+                z-index:50;
             }}
 
             body::after {{
                 content:"";
                 position:fixed;
-                inset:22px;
-                border:1px solid rgba(212,175,55,.12);
+                inset:17px;
+                border:1px solid rgba(214,174,50,.18);
                 pointer-events:none;
-                z-index:20;
+                z-index:50;
             }}
 
             .cantinho {{
                 position:fixed;
-                width:22px;
-                height:22px;
-                border-color:var(--ouro);
-                opacity:.9;
-                z-index:21;
+                width:25px;
+                height:25px;
+                border-color:var(--ouro-claro);
+                opacity:.95;
+                z-index:51;
             }}
-            .cantinho.tl {{top:16px;left:16px;border-top:2px solid;border-left:2px solid}}
-            .cantinho.tr {{top:16px;right:16px;border-top:2px solid;border-right:2px solid}}
-            .cantinho.bl {{bottom:16px;left:16px;border-bottom:2px solid;border-left:2px solid}}
-            .cantinho.br {{bottom:16px;right:16px;border-bottom:2px solid;border-right:2px solid}}
+            .cantinho.tl {{top:10px;left:10px;border-top:2px solid;border-left:2px solid}}
+            .cantinho.tr {{top:10px;right:10px;border-top:2px solid;border-right:2px solid}}
+            .cantinho.bl {{bottom:10px;left:10px;border-bottom:2px solid;border-left:2px solid}}
+            .cantinho.br {{bottom:10px;right:10px;border-bottom:2px solid;border-right:2px solid}}
 
+            /* Mesa de truco ao fundo */
             .mesa {{
                 position:fixed;
-                left:-5%;
-                right:-5%;
-                bottom:-13vh;
-                height:34vh;
+                left:-8%;
+                right:-8%;
+                bottom:-22vh;
+                height:38vh;
                 border-radius:50% 50% 0 0;
                 background:
-                    radial-gradient(ellipse at 50% 5%, rgba(29,94,55,.26), transparent 58%),
-                    linear-gradient(180deg,#0b2a18,#06150d 78%);
-                border-top:2px solid rgba(212,175,55,.55);
-                box-shadow:0 -10px 45px rgba(0,0,0,.45), inset 0 18px 40px rgba(0,0,0,.22);
-                transform:rotate(-1deg);
+                    radial-gradient(ellipse at 50% 0%, rgba(29,103,58,.34), transparent 56%),
+                    linear-gradient(180deg,#0b301b 0%,#062014 65%,#03120b 100%);
+                border-top:2px solid rgba(214,174,50,.65);
+                box-shadow:
+                    0 -18px 60px rgba(0,0,0,.48),
+                    inset 0 20px 50px rgba(0,0,0,.20);
+                transform:rotate(-.5deg);
+                z-index:1;
+            }}
+
+            .mesa::before {{
+                content:"";
+                position:absolute;
+                left:8%;
+                right:8%;
+                top:15%;
+                height:78%;
+                border:1px solid rgba(214,174,50,.26);
+                border-radius:50%;
+                box-shadow:0 0 0 12px rgba(214,174,50,.018);
             }}
 
             .mesa::after {{
                 content:"";
                 position:absolute;
-                left:12%;
-                right:12%;
-                top:15%;
-                height:65%;
-                border:1px solid rgba(212,175,55,.42);
+                left:15%;
+                right:15%;
+                top:28%;
+                height:55%;
+                border:1px solid rgba(214,174,50,.10);
                 border-radius:50%;
-                box-shadow:0 0 0 10px rgba(212,175,55,.025);
             }}
 
+            /* Marca d'água */
             .marca {{
                 position:fixed;
-                top:15%;
+                top:12%;
                 font-family:'Cinzel',serif;
-                font-size:clamp(3rem,6vw,7rem);
+                font-size:clamp(4rem,8vw,9rem);
                 font-weight:900;
-                letter-spacing:3px;
-                color:rgba(28,91,52,.13);
+                letter-spacing:5px;
+                color:rgba(21,91,49,.11);
                 text-align:center;
-                line-height:.9;
+                line-height:.78;
                 pointer-events:none;
                 z-index:0;
+                text-shadow:0 10px 35px rgba(0,0,0,.18);
             }}
-            .marca.esquerda {{left:4%; transform:rotate(-8deg)}}
-            .marca.direita {{right:4%; transform:rotate(8deg)}}
+            .marca.esquerda {{left:2%;transform:rotate(-9deg)}}
+            .marca.direita {{right:2%;transform:rotate(9deg)}}
 
+            /* Naipes espanhóis — desenhados como elementos próprios, não como
+               símbolos de baralho francês. */
             .naipe {{
                 position:fixed;
                 z-index:2;
-                opacity:.78;
-                filter:drop-shadow(0 8px 16px rgba(0,0,0,.42));
                 color:var(--ouro);
+                filter:drop-shadow(0 7px 12px rgba(0,0,0,.55));
+                opacity:.90;
+                pointer-events:none;
             }}
-            .naipe.espadas {{left:4%;top:8%;font-size:clamp(2rem,4vw,4rem);transform:rotate(-12deg)}}
-            .naipe.bastos {{left:12%;top:20%;font-size:clamp(2rem,4vw,4rem);transform:rotate(-6deg)}}
-            .naipe.copas {{right:11%;top:19%;font-size:clamp(2rem,4vw,4rem);transform:rotate(7deg)}}
-            .naipe.ouros {{right:4%;top:8%;font-size:clamp(2rem,4vw,4rem);transform:rotate(12deg)}}
+
+            .naipe .simbolo {{
+                display:block;
+                font-family:'Cinzel',serif;
+                font-weight:900;
+                line-height:1;
+                text-shadow:0 4px 18px rgba(214,174,50,.12);
+            }}
+
+            /* Espadas: lâmina estilizada */
+            .espadas {{left:4.5%;top:7%;transform:rotate(-12deg)}}
+            .espadas .simbolo::before {{
+                content:"⚔";
+                font-size:clamp(3.3rem,5.7vw,5.7rem);
+                opacity:.9;
+            }}
+
+            /* Bastos: representados por bastões cruzados */
+            .bastos {{left:12%;top:21%;transform:rotate(-9deg)}}
+            .bastos .simbolo::before {{
+                content:"╱╲";
+                white-space:pre;
+                font-size:clamp(3rem,5vw,5rem);
+                letter-spacing:-12px;
+            }}
+
+            /* Copas: taça */
+            .copas {{right:12%;top:20%;transform:rotate(8deg)}}
+            .copas .simbolo::before {{
+                content:"⌒";
+                font-size:clamp(4rem,6vw,6rem);
+                opacity:.88;
+                border-bottom:6px solid var(--ouro);
+                border-left:7px solid transparent;
+                border-right:7px solid transparent;
+                width:62px;
+                height:42px;
+                margin-left:8px;
+            }}
+
+            /* Ouros: moedas */
+            .ouros {{right:4.5%;top:7%;transform:rotate(11deg)}}
+            .ouros .simbolo::before {{
+                content:"◉";
+                font-size:clamp(4rem,6vw,6rem);
+                letter-spacing:-10px;
+                text-shadow:0 0 0 var(--ouro), 14px 10px 0 rgba(214,174,50,.72), 28px 20px 0 rgba(214,174,50,.48);
+            }}
+
+            /* Cartas decorativas ao redor do painel */
+            .cartas {{
+                position:fixed;
+                inset:0;
+                pointer-events:none;
+                z-index:2;
+            }}
+
+            .carta {{
+                position:absolute;
+                width:108px;
+                height:154px;
+                border:1px solid rgba(214,174,50,.36);
+                border-radius:10px;
+                background:
+                    linear-gradient(135deg,rgba(10,48,27,.84),rgba(2,15,9,.92));
+                box-shadow:0 18px 40px rgba(0,0,0,.40);
+                opacity:.52;
+            }}
+
+            .carta::before {{
+                content:"";
+                position:absolute;
+                inset:8px;
+                border:1px solid rgba(214,174,50,.20);
+                border-radius:6px;
+                background:
+                    repeating-linear-gradient(45deg,transparent 0 7px,rgba(214,174,50,.045) 7px 8px),
+                    repeating-linear-gradient(-45deg,transparent 0 7px,rgba(214,174,50,.035) 7px 8px);
+            }}
+
+            .carta::after {{
+                position:absolute;
+                inset:0;
+                display:grid;
+                place-items:center;
+                color:rgba(244,213,106,.72);
+                font-family:'Cinzel',serif;
+                font-size:3.2rem;
+                font-weight:900;
+            }}
+
+            .carta.um {{left:17%;top:15%;transform:rotate(-13deg)}}
+            .carta.um::after {{content:"1"}}
+            .carta.dois {{right:17%;top:15%;transform:rotate(13deg)}}
+            .carta.dois::after {{content:"3"}}
+            .carta.tres {{left:5%;bottom:24%;transform:rotate(13deg);opacity:.28}}
+            .carta.tres::after {{content:"7"}}
+            .carta.quatro {{right:5%;bottom:24%;transform:rotate(-13deg);opacity:.28}}
+            .carta.quatro::after {{content:"12"}}
 
             .pagina {{
                 position:relative;
-                z-index:5;
+                z-index:10;
+                width:100%;
                 min-height:100vh;
                 display:flex;
                 align-items:center;
                 justify-content:center;
-                padding:32px 20px 90px;
+                padding:45px 20px 105px;
             }}
 
             .painel {{
-                width:min(560px,92vw);
-                padding:30px 42px 28px;
-                border:1px solid rgba(212,175,55,.78);
-                border-radius:18px;
+                width:min(650px,92vw);
+                padding:34px 48px 30px;
+                border:1px solid rgba(244,213,106,.80);
+                border-radius:20px;
                 background:
-                    radial-gradient(circle at 50% 0%, rgba(212,175,55,.10), transparent 32%),
-                    linear-gradient(145deg,rgba(11,34,20,.98),rgba(2,14,8,.985));
+                    radial-gradient(circle at 50% 0%,rgba(214,174,50,.11),transparent 34%),
+                    linear-gradient(145deg,rgba(7,34,19,.975),rgba(1,13,7,.985));
                 box-shadow:
-                    0 28px 80px rgba(0,0,0,.60),
-                    0 0 0 6px rgba(212,175,55,.035),
-                    0 0 45px rgba(212,175,55,.09);
+                    0 35px 100px rgba(0,0,0,.62),
+                    0 0 0 7px rgba(214,174,50,.025),
+                    0 0 55px rgba(214,174,50,.10);
                 position:relative;
                 text-align:center;
             }}
@@ -583,56 +700,80 @@ def tela_login(request: Request, erro: str = None):
             .painel::before {{
                 content:"";
                 position:absolute;
-                inset:8px;
-                border:1px solid rgba(212,175,55,.15);
-                border-radius:12px;
+                inset:9px;
+                border:1px solid rgba(244,213,106,.16);
+                border-radius:13px;
                 pointer-events:none;
             }}
 
+            .painel::after {{
+                content:"";
+                position:absolute;
+                left:12%;
+                right:12%;
+                bottom:-12px;
+                height:1px;
+                background:linear-gradient(90deg,transparent,var(--ouro),transparent);
+                box-shadow:0 0 18px rgba(214,174,50,.30);
+            }}
+
             .trofeu {{
-                width:72px;
-                height:72px;
-                margin:-62px auto 13px;
+                width:78px;
+                height:78px;
+                margin:-64px auto 15px;
                 display:grid;
                 place-items:center;
                 border-radius:50%;
-                border:1px solid rgba(212,175,55,.72);
-                background:radial-gradient(circle,#173d24,#06140b 70%);
-                box-shadow:0 0 26px rgba(212,175,55,.16);
+                border:1px solid var(--ouro);
+                background:
+                    radial-gradient(circle at 40% 30%,#235a34,#07160c 68%);
+                box-shadow:
+                    0 0 0 6px rgba(214,174,50,.035),
+                    0 0 30px rgba(214,174,50,.18);
                 color:var(--ouro-claro);
-                font-size:31px;
+                font-size:34px;
+                position:relative;
+                z-index:3;
+            }}
+
+            .trofeu::before {{
+                content:"";
+                position:absolute;
+                inset:-7px;
+                border:1px solid rgba(214,174,50,.18);
+                border-radius:50%;
             }}
 
             .marca-titulo {{
                 font-family:'Cinzel',serif;
                 font-weight:900;
                 color:var(--ouro-claro);
-                font-size:clamp(1.45rem,3vw,2.35rem);
+                font-size:clamp(1.9rem,3.4vw,2.85rem);
                 line-height:1.02;
-                letter-spacing:1px;
-                text-shadow:0 3px 15px rgba(0,0,0,.6);
+                letter-spacing:1.5px;
+                text-shadow:0 4px 20px rgba(0,0,0,.62);
                 text-transform:uppercase;
             }}
 
             .edicao {{
-                margin:10px 0 19px;
+                margin:11px 0 22px;
                 color:var(--ouro);
                 font-family:'Cinzel',serif;
-                font-size:.9rem;
+                font-size:1rem;
                 font-weight:800;
-                letter-spacing:4px;
+                letter-spacing:5px;
             }}
 
-            .edicao::before, .edicao::after {{
+            .edicao::before,.edicao::after {{
                 content:"✦";
-                margin:0 12px;
-                color:var(--ouro);
+                margin:0 14px;
+                color:var(--ouro-claro);
             }}
 
             .separador {{
                 height:1px;
-                background:linear-gradient(90deg,transparent,rgba(212,175,55,.72),transparent);
-                margin:0 auto 20px;
+                background:linear-gradient(90deg,transparent,rgba(214,174,50,.72),transparent);
+                margin:0 auto 21px;
                 width:86%;
             }}
 
@@ -643,18 +784,18 @@ def tela_login(request: Request, erro: str = None):
                 gap:13px;
                 color:var(--marfim);
                 font-family:'Cinzel',serif;
-                font-size:clamp(.88rem,1.6vw,1.1rem);
+                font-size:clamp(.95rem,1.8vw,1.18rem);
                 font-weight:800;
-                letter-spacing:1px;
+                letter-spacing:1.1px;
                 text-transform:uppercase;
             }}
 
-            .subtitulo i {{color:var(--ouro);font-size:.8rem}}
+            .subtitulo i {{color:var(--ouro-claro);font-size:.82rem}}
 
             .descricao {{
-                margin:9px 0 23px;
-                color:#d4b85d;
-                font-size:.78rem;
+                margin:10px 0 24px;
+                color:#d8bd61;
+                font-size:.82rem;
                 font-weight:600;
             }}
 
@@ -665,59 +806,68 @@ def tela_login(request: Request, erro: str = None):
 
             .campo i {{
                 position:absolute;
-                left:17px;
+                left:18px;
                 top:50%;
                 transform:translateY(-50%);
-                color:var(--ouro);
+                color:var(--ouro-claro);
                 font-size:22px;
                 z-index:2;
             }}
 
             input {{
                 width:100%;
-                height:57px;
-                padding:0 18px 0 56px;
-                border:1px solid rgba(212,175,55,.65);
-                border-radius:9px;
+                height:60px;
+                padding:0 18px 0 58px;
+                border:1px solid rgba(244,213,106,.72);
+                border-radius:10px;
                 outline:none;
-                background:rgba(2,13,8,.82);
+                background:rgba(1,12,7,.90);
                 color:#fff;
                 font-family:'Montserrat',sans-serif;
                 font-size:1rem;
-                box-shadow:inset 0 0 18px rgba(0,0,0,.26);
+                box-shadow:
+                    inset 0 0 20px rgba(0,0,0,.30),
+                    0 0 0 1px rgba(214,174,50,.03);
             }}
 
-            input::placeholder {{color:#8d978f}}
+            input::placeholder {{color:#909b93}}
 
             input:focus {{
-                border-color:var(--ouro-claro);
-                box-shadow:0 0 0 3px rgba(212,175,55,.12),inset 0 0 18px rgba(0,0,0,.25);
+                border-color:var(--ouro-brilho);
+                box-shadow:
+                    0 0 0 3px rgba(214,174,50,.11),
+                    0 0 25px rgba(214,174,50,.08),
+                    inset 0 0 20px rgba(0,0,0,.28);
             }}
 
             button {{
                 width:100%;
-                height:58px;
-                border:1px solid #f0cf59;
-                border-radius:9px;
+                height:61px;
+                border:1px solid #f7d866;
+                border-radius:10px;
                 cursor:pointer;
-                background:linear-gradient(180deg,#f0c94c,#d3a92d);
-                color:#15120a;
+                background:linear-gradient(180deg,#f2cd51,#d6aa2d);
+                color:#171207;
                 font-family:'Cinzel',serif;
-                font-size:1rem;
+                font-size:1.02rem;
                 font-weight:900;
-                letter-spacing:.6px;
-                box-shadow:0 9px 24px rgba(0,0,0,.35),0 0 25px rgba(212,175,55,.12);
-                transition:.18s ease;
+                letter-spacing:.7px;
+                box-shadow:
+                    0 12px 28px rgba(0,0,0,.40),
+                    0 0 28px rgba(214,174,50,.14);
+                transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
             }}
 
             button:hover {{
                 transform:translateY(-2px);
-                background:linear-gradient(180deg,#f5d665,#dbb438);
-                box-shadow:0 12px 28px rgba(0,0,0,.42),0 0 30px rgba(212,175,55,.18);
+                filter:brightness(1.06);
+                box-shadow:
+                    0 15px 32px rgba(0,0,0,.46),
+                    0 0 34px rgba(214,174,50,.20);
             }}
 
             .erro {{
-                margin:-7px 0 15px;
+                margin:-8px 0 15px;
                 padding:10px;
                 border:1px solid rgba(231,76,60,.42);
                 border-radius:7px;
@@ -728,43 +878,56 @@ def tela_login(request: Request, erro: str = None):
             }}
 
             .restrito {{
-                margin-top:17px;
+                margin-top:18px;
                 color:#8e9991;
-                font-size:.7rem;
+                font-size:.72rem;
             }}
             .restrito i {{color:var(--ouro);margin-right:5px}}
 
-            .naipes {{
+            .legenda-naipes {{
                 position:fixed;
                 left:50%;
-                bottom:27px;
+                bottom:24px;
                 transform:translateX(-50%);
-                z-index:8;
+                z-index:12;
                 display:flex;
                 align-items:center;
-                gap:clamp(10px,2vw,30px);
-                color:var(--ouro);
+                justify-content:center;
+                gap:clamp(12px,2.4vw,32px);
+                color:var(--ouro-claro);
                 font-family:'Cinzel',serif;
                 font-size:clamp(.58rem,.9vw,.78rem);
                 font-weight:800;
-                letter-spacing:1.2px;
+                letter-spacing:1.4px;
                 white-space:nowrap;
+                text-shadow:0 2px 8px rgba(0,0,0,.5);
             }}
 
-            .naipes span {{display:flex;align-items:center;gap:7px}}
-            .naipes b {{color:#9a7d28}}
+            .legenda-naipes span {{
+                display:flex;
+                align-items:center;
+                gap:7px;
+            }}
+
+            .legenda-naipes b {{color:#8e6f20}}
+
+            @media(max-width:850px){{
+                .carta {{display:none}}
+                .naipe {{opacity:.22}}
+                .marca {{font-size:4rem}}
+                .painel {{width:min(610px,92vw)}}
+            }}
 
             @media(max-width:700px){{
                 body {{overflow:auto}}
                 body::before {{inset:7px}}
                 body::after {{inset:12px}}
-                .pagina {{padding:55px 14px 90px}}
+                .pagina {{padding:58px 14px 105px}}
                 .painel {{padding:28px 20px 25px}}
                 .trofeu {{margin-top:-58px}}
-                .naipe {{opacity:.22}}
-                .marca {{font-size:3rem}}
-                .naipes {{bottom:17px;gap:8px;font-size:.5rem}}
-                .naipes b {{display:none}}
+                .marca {{font-size:3rem;top:18%}}
+                .mesa {{bottom:-14vh;height:27vh}}
+                .legenda-naipes {{bottom:17px;gap:8px;font-size:.48rem}}
             }}
         </style>
     </head>
@@ -776,10 +939,17 @@ def tela_login(request: Request, erro: str = None):
         <div class="marca esquerda">TRUCO<br>CEGO</div>
         <div class="marca direita">TRUCO<br>CEGO</div>
 
-        <div class="naipe espadas"><i class="fa-solid fa-khanda"></i></div>
-        <div class="naipe bastos"><i class="fa-solid fa-staff-snake"></i></div>
-        <div class="naipe copas"><i class="fa-solid fa-trophy"></i></div>
-        <div class="naipe ouros"><i class="fa-solid fa-coins"></i></div>
+        <div class="naipe espadas"><span class="simbolo"></span></div>
+        <div class="naipe bastos"><span class="simbolo"></span></div>
+        <div class="naipe copas"><span class="simbolo"></span></div>
+        <div class="naipe ouros"><span class="simbolo"></span></div>
+
+        <div class="cartas">
+            <div class="carta um"></div>
+            <div class="carta dois"></div>
+            <div class="carta tres"></div>
+            <div class="carta quatro"></div>
+        </div>
 
         <div class="mesa"></div>
 
@@ -808,6 +978,7 @@ def tela_login(request: Request, erro: str = None):
                                placeholder="Digite a chave de acesso"
                                required autofocus autocomplete="current-password">
                     </div>
+
                     <button type="submit">
                         ENTRAR NO TORNEIO <i class="fa-solid fa-arrow-right"></i>
                     </button>
@@ -820,14 +991,14 @@ def tela_login(request: Request, erro: str = None):
             </section>
         </main>
 
-        <div class="naipes">
-            <span><i class="fa-solid fa-khanda"></i> ESPADAS</span>
+        <div class="legenda-naipes">
+            <span>⚔ ESPADAS</span>
             <b>◆</b>
-            <span><i class="fa-solid fa-staff-snake"></i> BASTOS</span>
+            <span>╱╲ BASTOS</span>
             <b>◆</b>
-            <span><i class="fa-solid fa-trophy"></i> COPAS</span>
+            <span>⌒ COPAS</span>
             <b>◆</b>
-            <span><i class="fa-solid fa-coins"></i> OUROS</span>
+            <span>● OUROS</span>
         </div>
     </body>
     </html>
