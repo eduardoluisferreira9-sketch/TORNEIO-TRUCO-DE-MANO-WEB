@@ -5,51 +5,390 @@
     <title>Pódio & Premiação</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-:root{--bg:#0b4020;--card:#101b15;--ouro:#d4af37;--ouro2:#f3e5ab;--prata:#b0bec5;--bronze:#cd7f32;--madeira:#8d6e63;--sub:#aeb9b1;--flores:#9b59b6}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;color:#fff;font-family:'Montserrat',sans-serif;background:radial-gradient(circle at 50% 0,rgba(212,175,55,.08),transparent 38%),linear-gradient(180deg,#0d2e1b,#06180d)}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;background:linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:46px 46px}
-nav{background:rgba(5,15,9,.96);padding:14px 28px;border-bottom:2px solid rgba(212,175,55,.75);display:flex;justify-content:space-between;align-items:center;gap:18px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
-nav span{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:800;color:var(--ouro);white-space:nowrap}
-.nav-links{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.nav-link{text-decoration:none;padding:8px 11px;border-radius:5px;font-weight:700;color:var(--sub);text-transform:uppercase;font-size:.66rem;border:1px solid transparent}
-.nav-link:hover{color:var(--ouro2);background:rgba(212,175,55,.08)}
-.nav-link.active{background:var(--ouro);color:#111;border-color:var(--ouro2)}
-.container{width:min(1180px,calc(100% - 40px));margin:auto;padding:32px 0 46px;text-align:center}
-.cabecalho-podio{margin-bottom:20px}
-.linha-superior{display:flex;align-items:center;justify-content:center;gap:13px;color:var(--ouro);font-family:'Cinzel',serif;font-size:.75rem;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.linha-superior:before,.linha-superior:after{content:"";width:65px;height:1px;background:linear-gradient(90deg,transparent,var(--ouro))}
-.linha-superior:after{background:linear-gradient(90deg,var(--ouro),transparent)}
-h1{margin:8px 0 5px!important;font-size:clamp(2rem,4vw,3rem)!important;line-height:1.1}
-.subtitulo-podio{margin:0;color:var(--sub);font-size:.88rem;font-weight:600}
-.podio-container{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin:38px auto 28px;max-width:1060px}
-.podio-col{position:relative;width:23%;min-width:165px;padding:18px 12px 18px;background:linear-gradient(180deg,rgba(16,27,21,.98),rgba(7,18,12,.98));border:1px solid rgba(255,255,255,.1);border-bottom-width:4px;border-radius:10px 10px 4px 4px;box-shadow:0 16px 30px rgba(0,0,0,.32);display:flex;flex-direction:column;align-items:center}
-.primeiro{height:300px;border-color:rgba(212,175,55,.8);border-bottom-color:var(--ouro);background:linear-gradient(180deg,rgba(55,43,8,.9),rgba(10,23,15,.98) 55%);box-shadow:0 18px 42px rgba(212,175,55,.13)}
-.segundo{height:235px;border-color:rgba(176,190,197,.55);border-bottom-color:var(--prata)}
-.terceiro{height:205px;border-color:rgba(205,127,50,.55);border-bottom-color:var(--bronze)}
-.quarto{height:175px;border-color:rgba(141,110,99,.45);border-bottom-color:var(--madeira)}
-.medalha{font-size:2.7rem;line-height:1;margin:4px 0 13px;filter:drop-shadow(0 4px 5px rgba(0,0,0,.45))}
-.primeiro .medalha{font-size:4.2rem;margin-top:-31px;margin-bottom:8px}
-.medalha-quarto{font-size:2rem;font-weight:900;color:var(--madeira);font-family:'Cinzel',serif;margin:10px 0 17px}
-.nome-atleta{width:100%;font-weight:800;color:#fff;font-size:1rem;line-height:1.2;word-break:break-word}
-.primeiro .nome-atleta{color:var(--ouro2);font-size:1.25rem;text-transform:uppercase}
-.titulo-posicao{margin-top:7px;font-family:'Cinzel',serif;color:var(--sub);font-size:.7rem;letter-spacing:.9px;font-weight:800;text-transform:uppercase}
-.base-podio{width:min(1060px,100%);height:9px;margin:-27px auto 30px;border-radius:5px;background:linear-gradient(90deg,transparent,rgba(212,175,55,.35),var(--ouro),rgba(212,175,55,.35),transparent);box-shadow:0 0 20px rgba(212,175,55,.12)}
-.card-flores{max-width:1000px;margin:0 auto 30px;padding:21px 23px 23px;border:1px solid rgba(155,89,182,.5);border-top:3px solid var(--flores);border-radius:10px;background:linear-gradient(135deg,rgba(31,17,46,.82),rgba(9,23,15,.97));box-shadow:0 12px 30px rgba(0,0,0,.28)}
-.card-flores h2{margin:0 0 5px!important;font-family:'Cinzel',serif;font-size:1.18rem;letter-spacing:1px;color:#d9a9ed!important}
-.flores-descricao{margin:0 0 14px;color:var(--sub);font-size:.8rem;font-weight:600}
-.flores-ranking{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:780px;margin:0 auto 15px}
-.flores-item{padding:10px 8px;border-radius:7px;background:rgba(0,0,0,.22);border:1px solid rgba(155,89,182,.3)}
-.flores-item:first-child{border-color:rgba(212,175,55,.45);background:rgba(212,175,55,.06)}
-.flores-medalha{font-size:1.25rem}.flores-nome{margin-top:3px;color:#fff;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.flores-qtd{margin-top:2px;color:#d9a9ed;font-weight:900;font-size:1rem}
-.rei-final{margin-top:7px;font-size:1.35rem;font-weight:900;color:#fff;text-transform:uppercase}
-.rei-selo{display:inline-block;margin-top:7px;padding:6px 15px;border-radius:18px;background:var(--flores);color:#fff;font-weight:800;font-size:.78rem;box-shadow:0 4px 12px rgba(155,89,182,.25)}
-.encerramento-area{padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
-.encerramento-aviso{margin:0 0 13px;color:var(--sub);font-size:.76rem}
-.btn-encerrar{background:linear-gradient(135deg,#27ae60,#1e8449);color:#fff;font-family:'Cinzel',serif;font-size:.92rem;font-weight:800;border:1px solid rgba(255,255,255,.1);padding:13px 28px;border-radius:6px;cursor:pointer;box-shadow:0 6px 18px rgba(39,174,96,.22);text-transform:uppercase;letter-spacing:.5px}
-.btn-encerrar:hover{transform:translateY(-2px)}
-@media(max-width:900px){nav{flex-direction:column;padding:14px 16px}.nav-links{justify-content:center}.podio-container{flex-wrap:wrap;align-items:stretch;margin-top:28px}.podio-col{width:calc(50% - 6px);min-width:0;height:190px!important;border-radius:9px}.primeiro{order:-1;width:100%;height:235px!important}.flores-ranking{grid-template-columns:1fr}}
-@media(max-width:560px){.container{width:calc(100% - 22px);padding-top:24px}.podio-container{gap:7px}.podio-col{width:calc(50% - 4px);padding:13px 8px}.nome-atleta{font-size:.84rem}.primeiro .nome-atleta{font-size:1.05rem}.nav-link{padding:7px 8px;font-size:.59rem}.card-flores{padding:18px 12px}}
+        :root{
+            --feltro:#0b4020;
+            --feltro-escuro:#06180d;
+            --card:#0b1f13;
+            --ouro:#d4af37;
+            --ouro-brilhante:#f3cf5d;
+            --prata:#b8c2c8;
+            --bronze:#cd7f32;
+            --madeira:#9a806f;
+            --flores:#9b59b6;
+            --texto:#fff;
+            --sub:#9eaaa2;
+        }
+
+        *{box-sizing:border-box}
+
+        html,body{width:100%;height:100%;margin:0}
+
+        body{
+            overflow:hidden;
+            color:var(--texto);
+            font-family:'Montserrat','Segoe UI',sans-serif;
+            background:
+                radial-gradient(circle at 50% 35%,rgba(212,175,55,.08),transparent 34%),
+                linear-gradient(145deg,#0c321c 0%,#06180d 100%);
+        }
+
+        body:before{
+            content:"";
+            position:fixed;
+            inset:0;
+            pointer-events:none;
+            opacity:.16;
+            background:
+                linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+                linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);
+            background-size:42px 42px;
+        }
+
+        nav{
+            height:54px;
+            position:relative;
+            z-index:5;
+            padding:0 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:18px;
+            background:rgba(4,13,8,.94);
+            border-bottom:1px solid rgba(212,175,55,.65);
+            box-shadow:0 5px 18px rgba(0,0,0,.35);
+        }
+
+        nav span{
+            color:var(--ouro);
+            font-family:'Cinzel',serif;
+            font-size:.95rem;
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .nav-links{display:flex;gap:5px;align-items:center}
+
+        .nav-link{
+            color:#aab5ad;
+            text-decoration:none;
+            padding:6px 9px;
+            border:1px solid transparent;
+            border-radius:4px;
+            font-size:.6rem;
+            font-weight:800;
+            text-transform:uppercase;
+            white-space:nowrap;
+        }
+
+        .nav-link:hover{color:var(--ouro-brilhante);background:rgba(212,175,55,.07)}
+        .nav-link.active{color:#111;background:var(--ouro);border-color:var(--ouro-brilhante)}
+
+        .container{
+            width:100%;
+            height:calc(100dvh - 54px);
+            min-height:0;
+            padding:clamp(10px,2vh,22px) clamp(16px,3vw,46px);
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            text-align:center;
+        }
+
+        .cabecalho-podio{flex:0 0 auto;margin-bottom:clamp(7px,1.5vh,14px)}
+
+        .podio-titulo-linha{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:12px;
+        }
+
+        .podio-titulo-linha .linha{
+            width:clamp(35px,6vw,95px);
+            height:1px;
+            background:linear-gradient(90deg,transparent,var(--ouro));
+        }
+
+        .podio-titulo-linha .linha:last-child{
+            background:linear-gradient(90deg,var(--ouro),transparent);
+        }
+
+        .podio-titulo{
+            color:var(--ouro);
+            font-family:'Cinzel',serif;
+            font-size:clamp(.7rem,1.1vw,1rem);
+            font-weight:900;
+            letter-spacing:clamp(1px,.3vw,3px);
+        }
+
+        .podio-subtitulo{
+            margin-top:4px;
+            color:var(--sub);
+            font-size:clamp(.58rem,.8vw,.78rem);
+            font-weight:600;
+            letter-spacing:.5px;
+        }
+
+        .podio-palco{
+            width:min(1240px,100%);
+            margin:0 auto;
+            display:grid;
+            grid-template-columns:minmax(130px,1fr) minmax(540px,4.2fr) minmax(130px,1fr);
+            align-items:center;
+            gap:clamp(10px,2vw,28px);
+            flex:0 1 auto;
+            min-height:0;
+        }
+
+        .podio-centro{
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            justify-content:flex-end;
+        }
+
+        .podio-linha{
+            display:flex;
+            align-items:flex-end;
+            justify-content:center;
+            gap:clamp(5px,.8vw,12px);
+            min-height:clamp(245px,39vh,390px);
+        }
+
+        .podio-pilar{
+            position:relative;
+            flex:1 1 0;
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:flex-end;
+        }
+
+        .podio-pilar.prata{height:78%}
+        .podio-pilar.campeao{height:100%}
+        .podio-pilar.bronze{height:70%}
+
+        .podio-atleta{
+            width:100%;
+            padding:0 6px 5px;
+            color:#f1f4f2;
+            font-size:clamp(.8rem,1.25vw,1.18rem);
+            font-weight:800;
+            line-height:1.05;
+            text-transform:uppercase;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            text-shadow:0 2px 5px rgba(0,0,0,.6);
+        }
+
+        .podio-atleta.destaque{
+            color:var(--ouro-brilhante);
+            font-size:clamp(1rem,1.65vw,1.55rem);
+            text-shadow:0 0 14px rgba(212,175,55,.18),0 2px 5px rgba(0,0,0,.65);
+        }
+
+        .podio-posicao{
+            color:#9ea9a2;
+            font-family:'Cinzel',serif;
+            font-size:clamp(.55rem,.72vw,.72rem);
+            font-weight:900;
+            letter-spacing:.6px;
+            margin-bottom:6px;
+        }
+
+        .campeao .podio-posicao{color:var(--ouro);font-size:clamp(.62rem,.82vw,.82rem)}
+
+        .pedestal{
+            position:relative;
+            width:100%;
+            min-height:clamp(135px,24vh,235px);
+            border-radius:7px 7px 3px 3px;
+            border:1px solid rgba(255,255,255,.12);
+            background:linear-gradient(180deg,#14271a,#08170e);
+            box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 10px 22px rgba(0,0,0,.35);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .prata .pedestal{
+            min-height:clamp(105px,19vh,185px);
+            border-color:rgba(184,194,200,.48);
+            box-shadow:inset 0 0 22px rgba(184,194,200,.035),0 10px 22px rgba(0,0,0,.35);
+        }
+
+        .campeao .pedestal{
+            min-height:clamp(160px,29vh,275px);
+            border:2px solid var(--ouro);
+            background:linear-gradient(180deg,rgba(55,43,8,.72),#09170e 72%);
+            box-shadow:0 0 22px rgba(212,175,55,.15),inset 0 0 20px rgba(255,255,255,.025);
+        }
+
+        .bronze .pedestal{
+            min-height:clamp(95px,17vh,165px);
+            border-color:rgba(205,127,50,.52);
+        }
+
+        .pedestal:after{
+            content:"";
+            position:absolute;
+            left:10%;
+            right:10%;
+            top:7px;
+            height:2px;
+            border-radius:20px;
+            background:linear-gradient(90deg,transparent,rgba(243,207,93,.22),var(--ouro),rgba(243,207,93,.22),transparent);
+        }
+
+        .indice{
+            position:absolute;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:1px;
+            color:rgba(255,255,255,.52);
+            font-family:'Cinzel',serif;
+            font-size:.58rem;
+            font-weight:800;
+        }
+
+        .indice-superior{top:12px;left:14px}
+        .indice-inferior{bottom:12px;right:14px;transform:rotate(180deg)}
+
+        .numero-carta{font-size:clamp(.72rem,1vw,.95rem)}
+        .naipe{font-size:clamp(.72rem,1vw,.9rem)}
+
+        .colocacao{
+            color:rgba(255,255,255,.72);
+            font-family:'Cinzel',serif;
+            font-size:clamp(2rem,4vw,4rem);
+            font-weight:900;
+            text-shadow:0 3px 8px rgba(0,0,0,.5);
+        }
+
+        .campeao .colocacao{
+            color:var(--ouro-brilhante);
+            font-size:clamp(2.5rem,5vw,5rem);
+            text-shadow:0 0 20px rgba(212,175,55,.15);
+        }
+
+        .podio-base{
+            height:clamp(8px,1vh,12px);
+            margin-top:5px;
+            border-radius:4px;
+            background:linear-gradient(90deg,transparent,var(--ouro),transparent);
+            box-shadow:0 0 15px rgba(212,175,55,.12);
+        }
+
+        .podio-lateral{
+            min-height:clamp(145px,25vh,235px);
+            padding:clamp(12px,1.5vw,20px) 10px;
+            border-radius:9px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(180deg,rgba(8,30,15,.94),rgba(3,12,6,.97));
+            box-shadow:0 10px 25px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.025);
+        }
+
+        .podio-lateral.esquerda{
+            border:1px solid rgba(154,128,111,.5);
+            border-top:2px solid var(--madeira);
+        }
+
+        .podio-lateral.direita{
+            border:1px solid rgba(155,89,182,.5);
+            border-top:2px solid var(--flores);
+            background:linear-gradient(180deg,rgba(31,17,46,.72),rgba(3,12,6,.97));
+        }
+
+        .lateral-icone{font-size:clamp(1.6rem,2.6vw,2.7rem);margin-bottom:6px}
+        .lateral-titulo{
+            color:var(--ouro);
+            font-family:'Cinzel',serif;
+            font-size:clamp(.58rem,.8vw,.78rem);
+            font-weight:900;
+            letter-spacing:.8px;
+        }
+
+        .esquerda .lateral-titulo{color:var(--madeira)}
+        .direita .lateral-titulo{color:#d9a9ed}
+
+        .lateral-nome{
+            max-width:100%;
+            margin-top:8px;
+            color:#fff;
+            font-size:clamp(.72rem,1vw,1rem);
+            font-weight:900;
+            line-height:1.1;
+            text-transform:uppercase;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .lateral-extra{
+            margin-top:7px;
+            color:#d9a9ed;
+            font-size:clamp(.55rem,.75vw,.72rem);
+            font-weight:800;
+        }
+
+        .esquerda .lateral-extra{color:var(--sub)}
+
+        .encerramento-area{
+            flex:0 0 auto;
+            margin-top:clamp(9px,1.5vh,16px);
+        }
+
+        .encerramento-aviso{
+            margin:0 0 7px;
+            color:#78867d;
+            font-size:.62rem;
+        }
+
+        .btn-encerrar{
+            padding:9px 20px;
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:5px;
+            background:linear-gradient(135deg,#27ae60,#1e8449);
+            color:#fff;
+            font-family:'Cinzel',serif;
+            font-size:.68rem;
+            font-weight:900;
+            letter-spacing:.4px;
+            text-transform:uppercase;
+            cursor:pointer;
+            box-shadow:0 5px 15px rgba(39,174,96,.2);
+        }
+
+        .btn-encerrar:hover{transform:translateY(-1px)}
+
+        @media(max-width:950px){
+            body{overflow:auto}
+            .container{height:auto;min-height:calc(100dvh - 54px)}
+            .podio-palco{grid-template-columns:1fr}
+            .podio-lateral{min-height:90px}
+            .podio-lateral.esquerda{order:2}
+            .podio-centro{order:1}
+            .podio-lateral.direita{order:3}
+            .podio-linha{min-height:260px}
+        }
+
+        @media(max-width:650px){
+            nav{height:auto;min-height:54px;padding:10px 12px}
+            .nav-links{justify-content:center;flex-wrap:wrap}
+            .nav-link{font-size:.55rem;padding:5px 6px}
+            .container{padding:15px 10px}
+            .podio-linha{gap:4px;min-height:225px}
+            .pedestal{min-height:120px!important}
+            .campeao .pedestal{min-height:155px!important}
+            .podio-atleta{font-size:.7rem}
+            .podio-atleta.destaque{font-size:.86rem}
+        }
     </style>
 </head>
 <body>
@@ -67,63 +406,95 @@ h1{margin:8px 0 5px!important;font-size:clamp(2rem,4vw,3rem)!important;line-heig
 
     <div class="container">
         <div class="cabecalho-podio">
-            <div class="linha-superior">Encerramento oficial</div>
-            <h1 style="color: var(--ouro); font-family: 'Cinzel', serif; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">👑 Cerimônia de Premiação</h1>
-            <p class="subtitulo-podio">O pódio oficial da edição está consolidado.</p>
+            <div class="podio-titulo-linha">
+                <span class="linha"></span>
+                <div class="podio-titulo">CERIMÔNIA DE PREMIAÇÃO</div>
+                <span class="linha"></span>
+            </div>
+            <div class="podio-subtitulo">O PÓDIO DE HONRA ESTÁ CONSOLIDADO</div>
         </div>
 
-        <div class="podio-container">
-            <!-- Segundo Lugar -->
-            <div class="podio-col segundo">
-                <span class="medalha">🥈</span>
-                <div class="nome-atleta">{{ vice }}</div>
-                <div class="titulo-posicao" style="color: var(--prata);">Vice-Campeão</div>
+        <div class="podio-palco">
+
+            <!-- 4º LUGAR -->
+            <div class="podio-lateral esquerda">
+                <div class="lateral-icone">🏅</div>
+                <div class="lateral-titulo">4º LUGAR</div>
+                <div class="lateral-nome">{{ quarto }}</div>
             </div>
 
-            <!-- Primeiro Lugar -->
-            <div class="podio-col primeiro">
-                <span class="medalha" style="font-size: 4rem; margin-top: -35px; margin-bottom: 5px;">👑</span>
-                <div class="nome-atleta" style="font-size: 1.4rem; color: var(--ouro-brilhante); text-transform: uppercase;">{{ campeao }}</div>
-                <div class="titulo-posicao" style="color: var(--ouro); font-weight: 900; font-size: 0.9rem;">Grande Campeão</div>
-            </div>
+            <!-- PÓDIO CENTRAL -->
+            <div class="podio-centro">
+                <div class="podio-linha">
 
-            <!-- Terceiro Lugar -->
-            <div class="podio-col terceiro">
-                <span class="medalha">🥉</span>
-                <div class="nome-atleta">{{ terceiro }}</div>
-                <div class="titulo-posicao" style="color: var(--bronze);">3º Colocado</div>
-            </div>
+                    <!-- VICE -->
+                    <div class="podio-pilar prata">
+                        <div class="podio-atleta">{{ vice }}</div>
+                        <div class="podio-posicao">VICE-CAMPEÃO</div>
+                        <div class="pedestal">
+                            <div class="indice indice-superior">
+                                <span class="numero-carta">2</span>
+                                <span class="naipe">⚔</span>
+                            </div>
+                            <span class="colocacao">2º</span>
+                            <div class="indice indice-inferior">
+                                <span class="numero-carta">2</span>
+                                <span class="naipe">⚔</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Quarto Lugar -->
-            <div class="podio-col quarto">
-                <span class="medalha-quarto">IV</span>
-                <div class="nome-atleta">{{ quarto }}</div>
-                <div class="titulo-posicao" style="color: var(--madeira);">4º Colocado</div>
-            </div>
-        </div>
+                    <!-- CAMPEÃO -->
+                    <div class="podio-pilar campeao">
+                        <div class="podio-atleta destaque">{{ campeao }}</div>
+                        <div class="podio-posicao">GRANDE CAMPEÃO</div>
+                        <div class="pedestal">
+                            <div class="indice indice-superior">
+                                <span class="numero-carta">1</span>
+                                <span class="naipe">⚔</span>
+                            </div>
+                            <span class="colocacao">1º</span>
+                            <div class="indice indice-inferior">
+                                <span class="numero-carta">1</span>
+                                <span class="naipe">⚔</span>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="base-podio"></div>
+                    <!-- TERCEIRO -->
+                    <div class="podio-pilar bronze">
+                        <div class="podio-atleta">{{ terceiro }}</div>
+                        <div class="podio-posicao">3º COLOCADO</div>
+                        <div class="pedestal">
+                            <div class="indice indice-superior">
+                                <span class="numero-carta">3</span>
+                                <span class="naipe">⚔</span>
+                            </div>
+                            <span class="colocacao">3º</span>
+                            <div class="indice indice-inferior">
+                                <span class="numero-carta">3</span>
+                                <span class="naipe">⚔</span>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Bloco Temático: Rei das Flores -->
-        <div class="card-flores">
-            <h2 style="color: var(--rei-flores); margin: 0 0 10px 0;">🌸 Troféu Rei das Flores 🌸</h2>
-            <p class="flores-descricao">Disputa de flores acumulada durante toda a edição.</p>
-            <div class="flores-ranking">
-                {% for item in top_flores %}
-                <div class="flores-item">
-                    <div class="flores-medalha">{% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}</div>
-                    <div class="flores-nome">{{ item.nome }}</div>
-                    <div class="flores-qtd">{{ item.flores }} <span style="font-size:.68rem;">flores</span></div>
                 </div>
-                {% endfor %}
+                <div class="podio-base"></div>
             </div>
-            <div class="rei-final">{{ rei_nome }}</div>
-            <span class="rei-selo">👑 Rei das Flores · {{ max_flores }} Flores</span>
+
+            <!-- REI DAS FLORES -->
+            <div class="podio-lateral direita">
+                <div class="lateral-icone">🌸</div>
+                <div class="lateral-titulo">REI DAS FLORES</div>
+                <div class="lateral-nome">{{ rei_nome }}</div>
+                <div class="lateral-extra">🎯 {{ max_flores }} FLORES</div>
+            </div>
+
         </div>
 
-        <!-- Formulário de Encerramento Permanente -->
         <div class="encerramento-area">
-        <p class="encerramento-aviso">Ao finalizar, esta edição será registrada permanentemente na Galeria dos Campeões.</p>
+        <p class="encerramento-aviso">Ao finalizar, esta edição será registrada na Galeria dos Campeões.</p>
+        <!-- Formulário de Encerramento Permanente -->
         <form action="/admin-painel/admin/encerrar-e-salvar" method="POST">
             <!-- Dica: Se seu backend aceitar, inclua aqui também os ID's ex: <input type="hidden" name="campeao_id" value="{{ id_campeao }}"> -->
             <input type="hidden" name="campeao" value="{{ campeao }}">
