@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import random
+import re
 import shutil
 import json
 import base64
@@ -315,93 +316,6 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
 
-def obtener_ranking_flores(cursor, torneio_id: int, limite: int = 3):
-    """Retorna o ranking de flores de toda a edição, incluindo mata-mata."""
-    p = "%s" if DATABASE_URL else "?"
-
-    cursor.execute(
-        f"""
-        SELECT id, nome, entidade
-        FROM atletas
-        WHERE status IN ('APROVADO', 'DESISTENTE')
-          AND torneio_id = {p}
-        ORDER BY id ASC
-        """,
-        (torneio_id,)
-    )
-    atletas = cursor.fetchall()
-    ranking = []
-
-    for atl in atletas:
-        atleta_id = atl["id"]
-        cursor.execute(
-            f"""
-            SELECT COALESCE(SUM(flores1), 0)
-            FROM confrontos
-            WHERE atleta1_id = {p} AND torneio_id = {p}
-            """,
-            (atleta_id, torneio_id)
-        )
-        f1 = int(cursor.fetchone()[0] or 0)
-
-        cursor.execute(
-            f"""
-            SELECT COALESCE(SUM(flores2), 0)
-            FROM confrontos
-            WHERE atleta2_id = {p} AND torneio_id = {p}
-            """,
-            (atleta_id, torneio_id)
-        )
-        f2 = int(cursor.fetchone()[0] or 0)
-
-        total_flores = f1 + f2
-        if total_flores > 0:
-            ranking.append({
-                "id": atleta_id,
-                "nome": str(atl["nome"]).strip(),
-                "entidade": str(atl["entidade"] or "").strip(),
-                "flores": total_flores
-            })
-
-    ranking.sort(key=lambda x: (-x["flores"], x["nome"], x["id"]))
-
-    for posicao, item in enumerate(ranking, start=1):
-        item["posicao"] = posicao
-
-    return ranking[:limite]
-
-
-def obtener_rei_das_flores(cursor, torneio_id: int):
-    """Retorna o atleta com mais flores em TODO o torneio, incluindo mata-mata."""
-    p = "%s" if DATABASE_URL else "?"
-    cursor.execute(
-        f"SELECT id, nome FROM atletas WHERE status IN (\'APROVADO\', \'DESISTENTE\') AND torneio_id = {p}",
-        (torneio_id,)
-    )
-    atletas = cursor.fetchall()
-
-    rei_nome = "Nenhum"
-    max_flores = 0
-    for atl in atletas:
-        atleta_id = atl["id"]
-        cursor.execute(
-            f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}",
-            (atleta_id, torneio_id)
-        )
-        f1 = int(cursor.fetchone()[0] or 0)
-        cursor.execute(
-            f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}",
-            (atleta_id, torneio_id)
-        )
-        f2 = int(cursor.fetchone()[0] or 0)
-
-        total_f = f1 + f2
-        if total_f > max_flores:
-            max_flores = total_f
-            rei_nome = str(atl["nome"]).strip()
-
-    return rei_nome, max_flores
-
 # --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
 @app.get("/admin-painel/inscrever", response_class=HTMLResponse)
@@ -472,26 +386,433 @@ async def processar_inscricao_atleta(
 @app.get("/login", response_class=HTMLResponse)
 @app.get("/admin-painel/login", response_class=HTMLResponse)
 def tela_login(request: Request, erro: str = None):
+    # Busca o torneio atual para que a porta de entrada use os mesmos dados
+    # configurados no sistema, em vez de deixar nome/edição fixos no HTML.
+    nome_torneio = "Torneio de Truco Cego"
+    edicao = ""
+    try:
+        with next(get_db()) as db:
+            cursor = db.cursor()
+            cfg = obtener_torneio_ativo(cursor)
+            if cfg:
+                nome_torneio = str(cfg.get("nome_torneio") or nome_torneio).strip()
+                # A edição já pode fazer parte do nome salvo (ex.: "... - Edição 4").
+                # Removemos esse sufixo para não exibi-lo duas vezes no novo layout.
+                nome_torneio = re.sub(r"\\s*[-–—]?\\s*EDIÇÃO\\s+\\d+\\s*$", "", nome_torneio, flags=re.IGNORECASE).strip(" -–—")
+                edicao = f"EDIÇÃO {cfg['id']}"
+    except Exception:
+        # A tela de login continua disponível mesmo se a consulta do banco falhar.
+        pass
+
+    nome_html = html.escape(nome_torneio)
+    edicao_html = html.escape(edicao)
+
     html_content = f"""
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
-        <meta charset="UTF-8"><title>Acesso Restrito</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{nome_html} — Acesso Administrativo</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
         <style>
-            body {{ background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }}
-            .box {{ background: #1e1e1e; padding: 30px; border-radius: 8px; border: 1px solid #333; width: 300px; text-align: center; }}
-            input {{ width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 4px; box-sizing: border-box; }}
-            button {{ background: #d4af37; color: #000; font-weight: bold; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; }}
+            :root {{
+                --verde-0:#020a06;
+                --verde-1:#06170d;
+                --verde-2:#0a2415;
+                --verde-3:#12351f;
+                --ouro:#d4af37;
+                --ouro-claro:#f1d76b;
+                --marfim:#f5f0df;
+                --muted:#b9c1ba;
+            }}
+
+            * {{ box-sizing:border-box; }}
+
+            html, body {{
+                width:100%;
+                min-height:100%;
+                margin:0;
+            }}
+
+            body {{
+                min-height:100vh;
+                overflow:hidden;
+                color:var(--marfim);
+                font-family:'Montserrat',Arial,sans-serif;
+                background:
+                    radial-gradient(circle at 50% 18%, rgba(212,175,55,.13), transparent 27%),
+                    radial-gradient(circle at 15% 50%, rgba(15,75,42,.22), transparent 34%),
+                    radial-gradient(circle at 85% 50%, rgba(15,75,42,.22), transparent 34%),
+                    linear-gradient(145deg,#010805 0%,#06180d 47%,#020b07 100%);
+                position:relative;
+            }}
+
+            /* Moldura dourada */
+            body::before {{
+                content:"";
+                position:fixed;
+                inset:16px;
+                border:1px solid rgba(212,175,55,.72);
+                pointer-events:none;
+                z-index:20;
+            }}
+
+            body::after {{
+                content:"";
+                position:fixed;
+                inset:22px;
+                border:1px solid rgba(212,175,55,.12);
+                pointer-events:none;
+                z-index:20;
+            }}
+
+            .cantinho {{
+                position:fixed;
+                width:22px;
+                height:22px;
+                border-color:var(--ouro);
+                opacity:.9;
+                z-index:21;
+            }}
+            .cantinho.tl {{top:16px;left:16px;border-top:2px solid;border-left:2px solid}}
+            .cantinho.tr {{top:16px;right:16px;border-top:2px solid;border-right:2px solid}}
+            .cantinho.bl {{bottom:16px;left:16px;border-bottom:2px solid;border-left:2px solid}}
+            .cantinho.br {{bottom:16px;right:16px;border-bottom:2px solid;border-right:2px solid}}
+
+            .mesa {{
+                position:fixed;
+                left:-5%;
+                right:-5%;
+                bottom:-13vh;
+                height:34vh;
+                border-radius:50% 50% 0 0;
+                background:
+                    radial-gradient(ellipse at 50% 5%, rgba(29,94,55,.26), transparent 58%),
+                    linear-gradient(180deg,#0b2a18,#06150d 78%);
+                border-top:2px solid rgba(212,175,55,.55);
+                box-shadow:0 -10px 45px rgba(0,0,0,.45), inset 0 18px 40px rgba(0,0,0,.22);
+                transform:rotate(-1deg);
+            }}
+
+            .mesa::after {{
+                content:"";
+                position:absolute;
+                left:12%;
+                right:12%;
+                top:15%;
+                height:65%;
+                border:1px solid rgba(212,175,55,.42);
+                border-radius:50%;
+                box-shadow:0 0 0 10px rgba(212,175,55,.025);
+            }}
+
+            .marca {{
+                position:fixed;
+                top:15%;
+                font-family:'Cinzel',serif;
+                font-size:clamp(3rem,6vw,7rem);
+                font-weight:900;
+                letter-spacing:3px;
+                color:rgba(28,91,52,.13);
+                text-align:center;
+                line-height:.9;
+                pointer-events:none;
+                z-index:0;
+            }}
+            .marca.esquerda {{left:4%; transform:rotate(-8deg)}}
+            .marca.direita {{right:4%; transform:rotate(8deg)}}
+
+            .naipe {{
+                position:fixed;
+                z-index:2;
+                opacity:.78;
+                filter:drop-shadow(0 8px 16px rgba(0,0,0,.42));
+                color:var(--ouro);
+            }}
+            .naipe.espadas {{left:4%;top:8%;font-size:clamp(2rem,4vw,4rem);transform:rotate(-12deg)}}
+            .naipe.bastos {{left:12%;top:20%;font-size:clamp(2rem,4vw,4rem);transform:rotate(-6deg)}}
+            .naipe.copas {{right:11%;top:19%;font-size:clamp(2rem,4vw,4rem);transform:rotate(7deg)}}
+            .naipe.ouros {{right:4%;top:8%;font-size:clamp(2rem,4vw,4rem);transform:rotate(12deg)}}
+
+            .pagina {{
+                position:relative;
+                z-index:5;
+                min-height:100vh;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                padding:32px 20px 90px;
+            }}
+
+            .painel {{
+                width:min(560px,92vw);
+                padding:30px 42px 28px;
+                border:1px solid rgba(212,175,55,.78);
+                border-radius:18px;
+                background:
+                    radial-gradient(circle at 50% 0%, rgba(212,175,55,.10), transparent 32%),
+                    linear-gradient(145deg,rgba(11,34,20,.98),rgba(2,14,8,.985));
+                box-shadow:
+                    0 28px 80px rgba(0,0,0,.60),
+                    0 0 0 6px rgba(212,175,55,.035),
+                    0 0 45px rgba(212,175,55,.09);
+                position:relative;
+                text-align:center;
+            }}
+
+            .painel::before {{
+                content:"";
+                position:absolute;
+                inset:8px;
+                border:1px solid rgba(212,175,55,.15);
+                border-radius:12px;
+                pointer-events:none;
+            }}
+
+            .trofeu {{
+                width:72px;
+                height:72px;
+                margin:-62px auto 13px;
+                display:grid;
+                place-items:center;
+                border-radius:50%;
+                border:1px solid rgba(212,175,55,.72);
+                background:radial-gradient(circle,#173d24,#06140b 70%);
+                box-shadow:0 0 26px rgba(212,175,55,.16);
+                color:var(--ouro-claro);
+                font-size:31px;
+            }}
+
+            .marca-titulo {{
+                font-family:'Cinzel',serif;
+                font-weight:900;
+                color:var(--ouro-claro);
+                font-size:clamp(1.45rem,3vw,2.35rem);
+                line-height:1.02;
+                letter-spacing:1px;
+                text-shadow:0 3px 15px rgba(0,0,0,.6);
+                text-transform:uppercase;
+            }}
+
+            .edicao {{
+                margin:10px 0 19px;
+                color:var(--ouro);
+                font-family:'Cinzel',serif;
+                font-size:.9rem;
+                font-weight:800;
+                letter-spacing:4px;
+            }}
+
+            .edicao::before, .edicao::after {{
+                content:"✦";
+                margin:0 12px;
+                color:var(--ouro);
+            }}
+
+            .separador {{
+                height:1px;
+                background:linear-gradient(90deg,transparent,rgba(212,175,55,.72),transparent);
+                margin:0 auto 20px;
+                width:86%;
+            }}
+
+            .subtitulo {{
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:13px;
+                color:var(--marfim);
+                font-family:'Cinzel',serif;
+                font-size:clamp(.88rem,1.6vw,1.1rem);
+                font-weight:800;
+                letter-spacing:1px;
+                text-transform:uppercase;
+            }}
+
+            .subtitulo i {{color:var(--ouro);font-size:.8rem}}
+
+            .descricao {{
+                margin:9px 0 23px;
+                color:#d4b85d;
+                font-size:.78rem;
+                font-weight:600;
+            }}
+
+            .campo {{
+                position:relative;
+                margin-bottom:15px;
+            }}
+
+            .campo i {{
+                position:absolute;
+                left:17px;
+                top:50%;
+                transform:translateY(-50%);
+                color:var(--ouro);
+                font-size:22px;
+                z-index:2;
+            }}
+
+            input {{
+                width:100%;
+                height:57px;
+                padding:0 18px 0 56px;
+                border:1px solid rgba(212,175,55,.65);
+                border-radius:9px;
+                outline:none;
+                background:rgba(2,13,8,.82);
+                color:#fff;
+                font-family:'Montserrat',sans-serif;
+                font-size:1rem;
+                box-shadow:inset 0 0 18px rgba(0,0,0,.26);
+            }}
+
+            input::placeholder {{color:#8d978f}}
+
+            input:focus {{
+                border-color:var(--ouro-claro);
+                box-shadow:0 0 0 3px rgba(212,175,55,.12),inset 0 0 18px rgba(0,0,0,.25);
+            }}
+
+            button {{
+                width:100%;
+                height:58px;
+                border:1px solid #f0cf59;
+                border-radius:9px;
+                cursor:pointer;
+                background:linear-gradient(180deg,#f0c94c,#d3a92d);
+                color:#15120a;
+                font-family:'Cinzel',serif;
+                font-size:1rem;
+                font-weight:900;
+                letter-spacing:.6px;
+                box-shadow:0 9px 24px rgba(0,0,0,.35),0 0 25px rgba(212,175,55,.12);
+                transition:.18s ease;
+            }}
+
+            button:hover {{
+                transform:translateY(-2px);
+                background:linear-gradient(180deg,#f5d665,#dbb438);
+                box-shadow:0 12px 28px rgba(0,0,0,.42),0 0 30px rgba(212,175,55,.18);
+            }}
+
+            .erro {{
+                margin:-7px 0 15px;
+                padding:10px;
+                border:1px solid rgba(231,76,60,.42);
+                border-radius:7px;
+                background:rgba(120,20,20,.16);
+                color:#ff9d94;
+                font-size:.78rem;
+                font-weight:700;
+            }}
+
+            .restrito {{
+                margin-top:17px;
+                color:#8e9991;
+                font-size:.7rem;
+            }}
+            .restrito i {{color:var(--ouro);margin-right:5px}}
+
+            .naipes {{
+                position:fixed;
+                left:50%;
+                bottom:27px;
+                transform:translateX(-50%);
+                z-index:8;
+                display:flex;
+                align-items:center;
+                gap:clamp(10px,2vw,30px);
+                color:var(--ouro);
+                font-family:'Cinzel',serif;
+                font-size:clamp(.58rem,.9vw,.78rem);
+                font-weight:800;
+                letter-spacing:1.2px;
+                white-space:nowrap;
+            }}
+
+            .naipes span {{display:flex;align-items:center;gap:7px}}
+            .naipes b {{color:#9a7d28}}
+
+            @media(max-width:700px){{
+                body {{overflow:auto}}
+                body::before {{inset:7px}}
+                body::after {{inset:12px}}
+                .pagina {{padding:55px 14px 90px}}
+                .painel {{padding:28px 20px 25px}}
+                .trofeu {{margin-top:-58px}}
+                .naipe {{opacity:.22}}
+                .marca {{font-size:3rem}}
+                .naipes {{bottom:17px;gap:8px;font-size:.5rem}}
+                .naipes b {{display:none}}
+            }}
         </style>
     </head>
+
     <body>
-        <div class="box">
-            <h2>🔑 Área do Administrador</h2>
-            {"<p style='color:red;'>Chave incorreta!</p>" if erro else ""}
-            <form action="/admin-painel/login" method="POST">
-                <input type="password" name="chave" placeholder="Digite a chave de acesso" required autofocus>
-                <button type="submit">Entrar no Sistema</button>
-            </form>
+        <span class="cantinho tl"></span><span class="cantinho tr"></span>
+        <span class="cantinho bl"></span><span class="cantinho br"></span>
+
+        <div class="marca esquerda">TRUCO<br>CEGO</div>
+        <div class="marca direita">TRUCO<br>CEGO</div>
+
+        <div class="naipe espadas"><i class="fa-solid fa-khanda"></i></div>
+        <div class="naipe bastos"><i class="fa-solid fa-staff-snake"></i></div>
+        <div class="naipe copas"><i class="fa-solid fa-trophy"></i></div>
+        <div class="naipe ouros"><i class="fa-solid fa-coins"></i></div>
+
+        <div class="mesa"></div>
+
+        <main class="pagina">
+            <section class="painel">
+                <div class="trofeu"><i class="fa-solid fa-trophy"></i></div>
+
+                <div class="marca-titulo">{nome_html}</div>
+                <div class="edicao">{edicao_html}</div>
+                <div class="separador"></div>
+
+                <div class="subtitulo">
+                    <i class="fa-solid fa-key"></i>
+                    Área do Administrador
+                    <i class="fa-solid fa-key"></i>
+                </div>
+
+                <div class="descricao">Entre para comandar o campeonato</div>
+
+                {"<div class='erro'>Chave incorreta. Tente novamente.</div>" if erro else ""}
+
+                <form action="/admin-painel/login" method="POST">
+                    <div class="campo">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" name="chave"
+                               placeholder="Digite a chave de acesso"
+                               required autofocus autocomplete="current-password">
+                    </div>
+                    <button type="submit">
+                        ENTRAR NO TORNEIO <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="restrito">
+                    <i class="fa-solid fa-lock"></i>
+                    Área administrativa restrita
+                </div>
+            </section>
+        </main>
+
+        <div class="naipes">
+            <span><i class="fa-solid fa-khanda"></i> ESPADAS</span>
+            <b>◆</b>
+            <span><i class="fa-solid fa-staff-snake"></i> BASTOS</span>
+            <b>◆</b>
+            <span><i class="fa-solid fa-trophy"></i> COPAS</span>
+            <b>◆</b>
+            <span><i class="fa-solid fa-coins"></i> OUROS</span>
         </div>
     </body>
     </html>
@@ -1877,15 +2198,7 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={
-            "config": cfg,
-            "classificacao": lista_classificacao,
-            "top_flores": obtener_ranking_flores(cursor, cfg["id"], 3),
-            "todas_rodadas": todas_rodadas,
-            "rodada_selecionada": rodada_selecionada,
-            "confrontos_auditoria": confrontos_auditoria,
-            "aba_ativa": "classificacao"
-        }
+        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
     )
 
 @app.post("/admin/auditoria/corrigir")
@@ -1955,9 +2268,6 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     cursor = db.cursor()
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
-    
-    # O Rei das Flores é sempre recalculado a partir de TODOS os confrontos do torneio.
-    rei, flores = obtener_rei_das_flores(cursor, cfg["id"])
     
     cursor.execute(f'INSERT INTO historico_campeoes (torneio_id, nome_torneio, campeao, vice, terceiro, quarto, rei_das_flores, qtd_flores) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p})',
                    (cfg["id"], cfg["nome_torneio"], campeao, vice, terceiro, quarto, rei, flores))
@@ -2316,8 +2626,23 @@ def api_dados_publicos_telao(db=Depends(get_db)):
             "max_flores": int(hist["qtd_flores"])
         }
     else:
-        rei_nome, max_flores = obtener_rei_das_flores(cursor, cfg["id"])
-
+        cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
+        atletas = cursor.fetchall()
+        
+        rei_nome = "---"
+        max_flores = 0
+        for atl in atletas:
+            a_id = atl["id"]
+            cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
+            f1 = cursor.fetchone()[0]
+            cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
+            f2 = cursor.fetchone()[0]
+            
+            total_f = f1 + f2
+            if total_f > max_flores:
+                max_flores = total_f
+                rei_nome = str(atl["nome"]).strip()
+        
         podio_dados = {
             "primeiro": "---",
             "segundo": "---",
@@ -2344,7 +2669,6 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         "rodada": rodada_atual,
         "confrontos": confrontos,
         "ranking": ranking,
-        "ranking_flores": obtener_ranking_flores(cursor, cfg["id"], 3),
         "podio": podio_dados
     }
 
