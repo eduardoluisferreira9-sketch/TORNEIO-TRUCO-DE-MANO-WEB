@@ -315,6 +315,62 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
 
+def obtener_ranking_flores(cursor, torneio_id: int, limite: int = 3):
+    """Retorna o ranking de flores de toda a edição, incluindo mata-mata."""
+    p = "%s" if DATABASE_URL else "?"
+
+    cursor.execute(
+        f"""
+        SELECT id, nome, entidade
+        FROM atletas
+        WHERE status IN ('APROVADO', 'DESISTENTE')
+          AND torneio_id = {p}
+        ORDER BY id ASC
+        """,
+        (torneio_id,)
+    )
+    atletas = cursor.fetchall()
+    ranking = []
+
+    for atl in atletas:
+        atleta_id = atl["id"]
+        cursor.execute(
+            f"""
+            SELECT COALESCE(SUM(flores1), 0)
+            FROM confrontos
+            WHERE atleta1_id = {p} AND torneio_id = {p}
+            """,
+            (atleta_id, torneio_id)
+        )
+        f1 = int(cursor.fetchone()[0] or 0)
+
+        cursor.execute(
+            f"""
+            SELECT COALESCE(SUM(flores2), 0)
+            FROM confrontos
+            WHERE atleta2_id = {p} AND torneio_id = {p}
+            """,
+            (atleta_id, torneio_id)
+        )
+        f2 = int(cursor.fetchone()[0] or 0)
+
+        total_flores = f1 + f2
+        if total_flores > 0:
+            ranking.append({
+                "id": atleta_id,
+                "nome": str(atl["nome"]).strip(),
+                "entidade": str(atl["entidade"] or "").strip(),
+                "flores": total_flores
+            })
+
+    ranking.sort(key=lambda x: (-x["flores"], x["nome"], x["id"]))
+
+    for posicao, item in enumerate(ranking, start=1):
+        item["posicao"] = posicao
+
+    return ranking[:limite]
+
+
 def obtener_rei_das_flores(cursor, torneio_id: int):
     """Retorna o atleta com mais flores em TODO o torneio, incluindo mata-mata."""
     p = "%s" if DATABASE_URL else "?"
@@ -1821,7 +1877,15 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
+        context={
+            "config": cfg,
+            "classificacao": lista_classificacao,
+            "top_flores": obtener_ranking_flores(cursor, cfg["id"], 3),
+            "todas_rodadas": todas_rodadas,
+            "rodada_selecionada": rodada_selecionada,
+            "confrontos_auditoria": confrontos_auditoria,
+            "aba_ativa": "classificacao"
+        }
     )
 
 @app.post("/admin/auditoria/corrigir")
@@ -2280,6 +2344,7 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         "rodada": rodada_atual,
         "confrontos": confrontos,
         "ranking": ranking,
+        "ranking_flores": obtener_ranking_flores(cursor, cfg["id"], 3),
         "podio": podio_dados
     }
 
