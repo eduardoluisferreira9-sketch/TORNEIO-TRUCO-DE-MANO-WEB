@@ -469,6 +469,194 @@ nav span{color:var(--ouro);font-family:'Cinzel',serif;font-size:.92rem;font-weig
                 font-size:12px !important;
             }
         }
+
+        /* ===== ACABAMENTO FINAL — PADRÃO DA IMAGEM APROVADA ===== */
+
+        .admin-nav .nav-item.active{
+            min-width:150px !important;
+            height:46px !important;
+            color:#111 !important;
+            background:#d4af37 !important;
+            border:1px solid #e8c957 !important;
+            border-radius:7px !important;
+            box-shadow:0 4px 12px rgba(212,175,55,.16) !important;
+            position:relative !important;
+        }
+
+        .admin-nav .nav-item.active:after{
+            content:"";
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:-17px;
+            height:3px;
+            background:#d4af37;
+        }
+
+        .admin-nav .nav-item.active i,
+        .admin-nav .nav-item.active span{
+            color:#111 !important;
+        }
+
+        /* Cabeçalho da cerimônia */
+        .cabecalho-podio{
+            margin-bottom:clamp(12px,2vh,22px) !important;
+            transform:translateY(clamp(-20px,-2.2vh,-10px)) !important;
+        }
+
+        .podio-titulo-linha{
+            gap:16px !important;
+        }
+
+        .podio-titulo-linha .linha{
+            width:clamp(65px,8vw,125px) !important;
+            height:1px !important;
+            background:linear-gradient(90deg,transparent,#b99728,#e3c44f) !important;
+        }
+
+        .podio-titulo-linha .linha:last-child{
+            background:linear-gradient(90deg,#e3c44f,#b99728,transparent) !important;
+        }
+
+        .podio-titulo:before{
+            content:"✦";
+            display:inline-block;
+            margin-right:9px;
+            color:#d4af37;
+            font-size:.7em;
+            transform:translateY(-2px);
+        }
+
+        .podio-titulo:after{
+            content:"✦";
+            display:inline-block;
+            margin-left:9px;
+            color:#d4af37;
+            font-size:.7em;
+            transform:translateY(-2px);
+        }
+
+        .podio-titulo{
+            font-size:clamp(1rem,1.65vw,1.48rem) !important;
+            letter-spacing:clamp(1.5px,.42vw,4px) !important;
+            text-shadow:0 2px 14px rgba(212,175,55,.14);
+        }
+
+        .podio-subtitulo{
+            font-size:clamp(.67rem,.9vw,.9rem) !important;
+            font-weight:700 !important;
+            letter-spacing:.7px !important;
+        }
+
+        /* Nome do campeão com acabamento mais cerimonial */
+        .podio-atleta.destaque{
+            font-family:'Cinzel',Georgia,serif !important;
+            font-size:clamp(1.25rem,1.95vw,1.9rem) !important;
+            letter-spacing:.5px !important;
+            text-shadow:0 0 20px rgba(212,175,55,.24),0 2px 6px rgba(0,0,0,.7) !important;
+        }
+
+        .campeao .podio-posicao{
+            letter-spacing:1px !important;
+        }
+
+        /* Pedestais: brilho mais próximo do acabamento da imagem */
+        .pedestal{
+            box-shadow:
+                inset 0 0 0 1px rgba(255,255,255,.025),
+                inset 0 0 30px rgba(255,255,255,.018),
+                0 15px 28px rgba(0,0,0,.42) !important;
+        }
+
+        .prata .pedestal{
+            border-color:rgba(205,214,218,.65) !important;
+            box-shadow:
+                inset 0 0 24px rgba(205,214,218,.035),
+                0 14px 26px rgba(0,0,0,.42) !important;
+        }
+
+        .campeao .pedestal{
+            border-color:#e0bd3f !important;
+            box-shadow:
+                0 0 30px rgba(212,175,55,.19),
+                inset 0 0 34px rgba(255,255,255,.025),
+                0 17px 32px rgba(0,0,0,.44) !important;
+        }
+
+        .bronze .pedestal{
+            border-color:rgba(213,138,67,.68) !important;
+        }
+
+        .pedestal:after{
+            left:10% !important;
+            right:10% !important;
+            background:linear-gradient(
+                90deg,
+                transparent,
+                rgba(212,175,55,.15),
+                #d4af37,
+                rgba(212,175,55,.15),
+                transparent
+            ) !important;
+        }
+
+        /* Cards laterais mais sofisticados */
+        .podio-lateral{
+            box-shadow:
+                0 14px 30px rgba(0,0,0,.42),
+                inset 0 0 0 1px rgba(255,255,255,.025) !important;
+        }
+
+        .podio-lateral.esquerda{
+            border-color:rgba(183,158,136,.62) !important;
+        }
+
+        .podio-lateral.direita{
+            border-color:rgba(174,100,200,.62) !important;
+        }
+
+        .lateral-titulo{
+            letter-spacing:1px !important;
+        }
+
+        /* Botão: agora parece parte da cerimônia, não um botão administrativo comum */
+        .encerramento-area{
+            margin-top:clamp(20px,3vh,34px) !important;
+        }
+
+        .btn-encerrar{
+            min-width:clamp(320px,31vw,470px) !important;
+            min-height:50px !important;
+            padding:12px 28px !important;
+            border:1px solid #d4af37 !important;
+            border-radius:7px !important;
+            background:linear-gradient(
+                180deg,
+                rgba(14,39,23,.98),
+                rgba(6,25,14,.98)
+            ) !important;
+            color:#e2bd42 !important;
+            font-family:'Cinzel',Georgia,serif !important;
+            font-size:clamp(.7rem,.8vw,.86rem) !important;
+            letter-spacing:.6px !important;
+            box-shadow:
+                0 8px 20px rgba(0,0,0,.28),
+                0 0 18px rgba(212,175,55,.07) !important;
+        }
+
+        .btn-encerrar:hover{
+            background:linear-gradient(
+                180deg,
+                rgba(25,55,33,.99),
+                rgba(8,31,18,.99)
+            ) !important;
+            color:#f3d66c !important;
+            border-color:#e8ca58 !important;
+            transform:translateY(-2px) !important;
+            box-shadow:
+                0 10px 24px rgba(0,0,0,.34),
+                0 0 24px rgba(212,175,55,.13) !important;
+        }
     </style>
 </head>
 <body>
