@@ -2273,43 +2273,20 @@ def api_dados_publicos_telao(db=Depends(get_db)):
     ranking = obtener_ranking_fase_classificatoria(cursor, cfg["id"])
 
     # Ranking acumulado do Rei das Flores.
-    # Mantém o total de flores durante a classificatória e também
-    # depois que o torneio entra no mata-mata.
-    ranking_flores = []
-    flores_por_atleta = {}
+    # Reaproveita o mesmo cálculo de flores já usado pela classificação.
+    # Assim não criamos uma segunda consulta ao banco e o total continua
+    # acumulado também durante o mata-mata.
+    ranking_flores = [
+        {
+            "id": atleta["id"],
+            "nome": atleta["nome"],
+            "flores": int(atleta.get("flores", 0) or 0),
+        }
+        for atleta in ranking
+    ]
 
-    cursor.execute(
-        f"""
-        SELECT atleta1_id AS atleta_id, atleta1_nome AS nome,
-               COALESCE(SUM(COALESCE(flores1, 0)), 0) AS flores
-        FROM confrontos
-        WHERE torneio_id = {p} AND atleta1_id IS NOT NULL
-        GROUP BY atleta1_id, atleta1_nome
-
-        UNION ALL
-
-        SELECT atleta2_id AS atleta_id, atleta2_nome AS nome,
-               COALESCE(SUM(COALESCE(flores2, 0)), 0) AS flores
-        FROM confrontos
-        WHERE torneio_id = {p} AND atleta2_id IS NOT NULL
-        GROUP BY atleta2_id, atleta2_nome
-        """,
-        (cfg["id"], cfg["id"])
-    )
-
-    for linha in cursor.fetchall():
-        atleta_id = linha["atleta_id"]
-        if atleta_id not in flores_por_atleta:
-            flores_por_atleta[atleta_id] = {
-                "id": atleta_id,
-                "nome": str(linha["nome"]).strip(),
-                "flores": 0
-            }
-        flores_por_atleta[atleta_id]["flores"] += int(linha["flores"] or 0)
-
-    ranking_flores = sorted(
-        flores_por_atleta.values(),
-        key=lambda item: (-item["flores"], item["nome"].upper())
+    ranking_flores.sort(
+        key=lambda item: (-item["flores"], item["nome"].upper(), item["id"])
     )
 
     for posicao, item in enumerate(ranking_flores, start=1):
