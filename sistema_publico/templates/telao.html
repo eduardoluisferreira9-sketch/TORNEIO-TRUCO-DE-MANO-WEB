@@ -1238,7 +1238,75 @@
 
             }
         
-        \n        /* ===== RANKING DO REI DAS FLORES ===== */\n        .ranking-flores-lateral {\n            margin-top: 10px;\n            padding-top: 9px;\n            border-top: 1px solid rgba(212,175,55,.32);\n            flex-shrink: 0;\n        }\n        .ranking-flores-lateral-titulo {\n            color: var(--dourado-brilhante);\n            font-family: 'Cinzel', serif;\n            font-weight: 800;\n            font-size: .72rem;\n            letter-spacing: .7px;\n            margin-bottom: 5px;\n        }\n        .ranking-flores-lateral-conteudo {\n            display: grid;\n            grid-template-columns: 1fr;\n            gap: 3px;\n        }\n        .flores-lateral-item {\n            display: flex;\n            align-items: center;\n            justify-content: space-between;\n            gap: 8px;\n            padding: 4px 5px;\n            border-radius: 3px;\n            background: rgba(212,175,55,.045);\n            color: #fff;\n            font-size: .72rem;\n            font-weight: 700;\n        }\n        .flores-lateral-item .pos { color: var(--dourado-brilhante); font-weight: 900; }\n        .flores-lateral-item .nome { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n        .flores-lateral-item .qtd { color: #e9d27a; white-space: nowrap; }\n\n        .faixa-ranking-flores {\n            display: none;\n            align-items: center;\n            gap: 16px;\n            width: 100%;\n            min-height: 44px;\n            padding: 6px 12px;\n            margin: 0 0 9px;\n            border: 1px solid rgba(212,175,55,.72);\n            border-radius: 6px;\n            background: linear-gradient(90deg, rgba(5,20,10,.96), rgba(10,31,17,.92));\n            box-shadow: 0 5px 16px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.035);\n            flex-shrink: 0;\n        }\n        .flores-cabecalho {\n            color: var(--dourado-brilhante);\n            font-family: 'Cinzel', serif;\n            font-size: .74rem;\n            font-weight: 800;\n            letter-spacing: .7px;\n            white-space: nowrap;\n        }\n        .ranking-flores-conteudo {\n            display: grid;\n            grid-template-columns: repeat(3, minmax(0,1fr));\n            align-items: center;\n            flex: 1;\n            min-width: 0;\n        }\n        .flores-faixa-item {\n            min-width: 0;\n            padding: 4px 9px;\n            border-left: 1px solid rgba(212,175,55,.22);\n            color: #fff;\n            font-size: .76rem;\n            font-weight: 700;\n            white-space: nowrap;\n            overflow: hidden;\n            text-overflow: ellipsis;\n            text-align: center;\n        }\n        .flores-faixa-item .pos { color: var(--dourado-brilhante); font-weight: 900; margin-right: 4px; }\n        .flores-faixa-item .qtd { color: #e9d27a; margin-left: 4px; }\n\n        @media (max-width: 900px) {\n            html, body { height: auto !important; min-height: 100% !important; overflow-y: auto !important; overflow-x: hidden !important; }\n            body { padding: 10px !important; }\n            .faixa-ranking-flores { display: flex; flex-wrap: wrap; gap: 4px; padding: 7px 8px; }\n            .flores-cabecalho { width: 100%; text-align: center; font-size: .72rem; }\n            .ranking-flores-conteudo { width: 100%; }\n            .flores-faixa-item { padding: 4px 2px; font-size: .66rem; border-left: 0; }\n            .container-telao { grid-template-columns: 1fr !important; height: auto !important; min-height: 0 !important; gap: 10px !important; }\n            .grid-jogos { grid-template-columns: 1fr !important; overflow: visible !important; gap: 8px !important; }\n            .ranking-container { display: flex !important; height: auto !important; max-height: none !important; min-height: 0 !important; }\n            .ranking-scroller-box { max-height: 280px; overflow: auto; }\n            .ranking-flores-lateral { display: none !important; }\n            .rodape-publicidade { margin-top: 10px !important; }\n            .publicidade-grid { grid-template-columns: 1fr !important; }\n        }\n
+        \n        /* ===== RANKING DO REI DAS FLORES ===== */\n        .ranking-flores-lateral {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(212,175,55,.32);
+    flex-shrink: 0;
+}
+
+.ranking-flores-lateral-titulo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--dourado-brilhante);
+    font-family: 'Cinzel', serif;
+    font-weight: 800;
+    font-size: .78rem;
+    letter-spacing: .7px;
+    margin-bottom: 7px;
+}
+
+.ranking-flores-lateral-conteudo {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.flores-lateral-item {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 5px 7px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,.025);
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.flores-lateral-item:first-child {
+    background: linear-gradient(90deg, rgba(212,175,55,.13), rgba(212,175,55,.025));
+    border-color: rgba(212,175,55,.20);
+}
+
+.flores-lateral-item .pos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .88rem;
+    font-weight: 900;
+}
+
+.flores-lateral-item .nome {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.flores-lateral-item .qtd {
+    min-width: 55px;
+    text-align: right;
+    color: #f5df8a;
+    font-weight: 900;
+    white-space: nowrap;
+}\n\n        .faixa-ranking-flores {\n            display: none;\n            align-items: center;\n            gap: 16px;\n            width: 100%;\n            min-height: 44px;\n            padding: 6px 12px;\n            margin: 0 0 9px;\n            border: 1px solid rgba(212,175,55,.72);\n            border-radius: 6px;\n            background: linear-gradient(90deg, rgba(5,20,10,.96), rgba(10,31,17,.92));\n            box-shadow: 0 5px 16px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.035);\n            flex-shrink: 0;\n        }\n        .flores-cabecalho {\n            color: var(--dourado-brilhante);\n            font-family: 'Cinzel', serif;\n            font-size: .74rem;\n            font-weight: 800;\n            letter-spacing: .7px;\n            white-space: nowrap;\n        }\n        .ranking-flores-conteudo {\n            display: grid;\n            grid-template-columns: repeat(3, minmax(0,1fr));\n            align-items: center;\n            flex: 1;\n            min-width: 0;\n        }\n        .flores-faixa-item {\n            min-width: 0;\n            padding: 4px 9px;\n            border-left: 1px solid rgba(212,175,55,.22);\n            color: #fff;\n            font-size: .76rem;\n            font-weight: 700;\n            white-space: nowrap;\n            overflow: hidden;\n            text-overflow: ellipsis;\n            text-align: center;\n        }\n        .flores-faixa-item .pos { color: var(--dourado-brilhante); font-weight: 900; margin-right: 4px; }\n        .flores-faixa-item .qtd { color: #e9d27a; margin-left: 4px; }\n\n        @media (max-width: 900px) {\n            html, body { height: auto !important; min-height: 100% !important; overflow-y: auto !important; overflow-x: hidden !important; }\n            body { padding: 10px !important; }\n            .faixa-ranking-flores { display: flex; flex-wrap: wrap; gap: 4px; padding: 7px 8px; }\n            .flores-cabecalho { width: 100%; text-align: center; font-size: .72rem; }\n            .ranking-flores-conteudo { width: 100%; }\n            .flores-faixa-item { padding: 4px 2px; font-size: .66rem; border-left: 0; }\n            .container-telao { grid-template-columns: 1fr !important; height: auto !important; min-height: 0 !important; gap: 10px !important; }\n            .grid-jogos { grid-template-columns: 1fr !important; overflow: visible !important; gap: 8px !important; }\n            .ranking-container { display: flex !important; height: auto !important; max-height: none !important; min-height: 0 !important; }\n            .ranking-scroller-box { max-height: 280px; overflow: auto; }\n            .ranking-flores-lateral { display: none !important; }\n            .rodape-publicidade { margin-top: 10px !important; }\n            .publicidade-grid { grid-template-columns: 1fr !important; }\n        }\n
 </style>
     
 </head>
@@ -2077,7 +2145,12 @@
                 topFlores.forEach((player) => {
                     const item = document.createElement('div');
                     item.className = 'flores-lateral-item';
-                    item.innerHTML = `<span><span class="pos">${player.posicao}º</span> <span class="nome">${player.nome}</span></span><span class="qtd">${player.flores} 🌸</span>`;
+                    const medalhas = ['🥇', '🥈', '🥉'];
+                        item.innerHTML = `
+                            <span class="pos">${medalhas[topFlores.indexOf(player)] || player.posicao + 'º'}</span>
+                            <span class="nome">${player.nome}</span>
+                            <span class="qtd">${player.flores} 🌸</span>
+                        `;
                     lateralFlores.appendChild(item);
                 });
                 if (!topFlores.length) lateralFlores.innerHTML = '<div class="flores-lateral-item"><span class="nome">Ainda não há flores lançadas.</span></div>';
@@ -2089,7 +2162,8 @@
                 topFlores.forEach((player) => {
                     const item = document.createElement('div');
                     item.className = 'flores-faixa-item';
-                    item.innerHTML = `<span class="pos">${player.posicao}º</span>${player.nome}<span class="qtd">${player.flores} 🌸</span>`;
+                    const medalhasFaixa = ['🥇', '🥈', '🥉'];
+                     item.innerHTML = `<span class="pos">${medalhasFaixa[topFlores.indexOf(player)] || player.posicao + 'º'}</span> ${player.nome}<span class="qtd">${player.flores} 🌸</span>`;
                     faixaFloresConteudo.appendChild(item);
                 });
                 if (!topFlores.length) faixaFloresConteudo.innerHTML = '<div class="flores-faixa-item">Ainda não há flores lançadas.</div>';
