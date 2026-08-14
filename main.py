@@ -6,6 +6,7 @@ import re
 import shutil
 import json
 import base64
+import html
 
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, UploadFile, File
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
@@ -108,9 +109,11 @@ def init_db():
                 nome VARCHAR(255) NOT NULL,
                 entidade VARCHAR(255) NOT NULL DEFAULT 'AVULSO',
                 whatsapp VARCHAR(50),
-                status VARCHAR(50) DEFAULT 'PENDENTE'
+                status VARCHAR(50) DEFAULT 'PENDENTE',
+                comprovante_url TEXT
             );
         ''')
+        cursor.execute("ALTER TABLE atletas ADD COLUMN IF NOT EXISTS comprovante_url TEXT;")
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS confrontos (
                 id SERIAL PRIMARY KEY,
@@ -182,9 +185,14 @@ def init_db():
                 entidade TEXT NOT NULL DEFAULT 'AVULSO',
                 whatsapp TEXT,
                 status TEXT DEFAULT 'PENDENTE',
+                comprovante_url TEXT,
                 FOREIGN KEY (torneio_id) REFERENCES torneios(id)
             )
         ''')
+        cursor.execute("PRAGMA table_info(atletas)")
+        colunas_atletas = [row[1] for row in cursor.fetchall()]
+        if "comprovante_url" not in colunas_atletas:
+            cursor.execute("ALTER TABLE atletas ADD COLUMN comprovante_url TEXT")
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS confrontos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -390,19 +398,26 @@ def tela_login(request: Request, erro: str = None):
     # configurados no sistema, em vez de deixar nome/edição fixos no HTML.
     nome_torneio = "Torneio de Truco Cego"
     edicao = ""
+    db_gen = get_db()
+    db = None
     try:
-        with next(get_db()) as db:
-            cursor = db.cursor()
-            cfg = obtener_torneio_ativo(cursor)
-            if cfg:
-                nome_torneio = str(cfg.get("nome_torneio") or nome_torneio).strip()
-                # A edição já pode fazer parte do nome salvo (ex.: "... - Edição 4").
-                # Removemos esse sufixo para não exibi-lo duas vezes no novo layout.
-                nome_torneio = re.sub(r"\\s*[-–—]?\\s*EDIÇÃO\\s+\\d+\\s*$", "", nome_torneio, flags=re.IGNORECASE).strip(" -–—")
-                edicao = f"EDIÇÃO {cfg['id']}"
-    except Exception:
+        db = next(db_gen)
+        cursor = db.cursor()
+        cfg = obtener_torneio_ativo(cursor)
+        if cfg:
+            nome_torneio = str(cfg.get("nome_torneio") or nome_torneio).strip()
+            # A edição já pode fazer parte do nome salvo (ex.: "... - Edição 4").
+            # Removemos esse sufixo para não exibi-lo duas vezes no novo layout.
+            nome_torneio = re.sub(r"\s*[-–—]?\s*EDIÇÃO\s+\d+\s*$", "", nome_torneio, flags=re.IGNORECASE).strip(" -–—")
+            edicao = f"EDIÇÃO {cfg['id']}"
+    except Exception as e:
         # A tela de login continua disponível mesmo se a consulta do banco falhar.
-        pass
+        print(f"Aviso ao carregar dados do torneio na tela de login: {e}", file=sys.stderr)
+    finally:
+        try:
+            db_gen.close()
+        except Exception:
+            pass
 
     nome_html = html.escape(nome_torneio)
     edicao_html = html.escape(edicao)
@@ -2741,4 +2756,3 @@ async def redirecionar_links_antigos(request: Request, exc: Exception):
     if url_path.startswith("/admin") or url_path == "/login" or url_path == "/logout":
         return RedirectResponse(url=f"/admin-painel{url_path}", status_code=303)
     return HTMLResponse(content="Página não encontrada no Panel", status_code=404)
-
