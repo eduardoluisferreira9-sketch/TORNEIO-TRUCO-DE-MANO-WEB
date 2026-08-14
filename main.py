@@ -315,6 +315,37 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
 
+def obtener_rei_das_flores(cursor, torneio_id: int):
+    """Retorna o atleta com mais flores em TODO o torneio, incluindo mata-mata."""
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(
+        f"SELECT id, nome FROM atletas WHERE status IN (\'APROVADO\', \'DESISTENTE\') AND torneio_id = {p}",
+        (torneio_id,)
+    )
+    atletas = cursor.fetchall()
+
+    rei_nome = "Nenhum"
+    max_flores = 0
+    for atl in atletas:
+        atleta_id = atl["id"]
+        cursor.execute(
+            f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}",
+            (atleta_id, torneio_id)
+        )
+        f1 = int(cursor.fetchone()[0] or 0)
+        cursor.execute(
+            f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}",
+            (atleta_id, torneio_id)
+        )
+        f2 = int(cursor.fetchone()[0] or 0)
+
+        total_f = f1 + f2
+        if total_f > max_flores:
+            max_flores = total_f
+            rei_nome = str(atl["nome"]).strip()
+
+    return rei_nome, max_flores
+
 # --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
 @app.get("/admin-painel/inscrever", response_class=HTMLResponse)
@@ -385,107 +416,30 @@ async def processar_inscricao_atleta(
 @app.get("/login", response_class=HTMLResponse)
 @app.get("/admin-painel/login", response_class=HTMLResponse)
 def tela_login(request: Request, erro: str = None):
-    erro_html = '<div class="erro">⚠️ Chave incorreta. Tente novamente.</div>' if erro else ""
-
-    html_content = """
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/static/favicon.ico" type="image/x-icon">
-<title>Acesso Restrito • Torneio de Truco Cego</title>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;min-height:100%;font-family:"Segoe UI",Arial,sans-serif}
-body{
- min-height:100vh;display:flex;align-items:center;justify-content:center;
- position:relative;overflow:hidden;color:#f5f1e8;
- background:
- radial-gradient(circle at 50% 28%,rgba(212,175,55,.13),transparent 27%),
- radial-gradient(circle at 50% 100%,rgba(18,80,42,.30),transparent 50%),
- linear-gradient(145deg,#020a05 0%,#06150c 48%,#031008 100%);
-}
-body:before{
- content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;
- background:
- repeating-linear-gradient(90deg,transparent 0 110px,rgba(255,255,255,.018) 111px,transparent 113px),
- repeating-linear-gradient(0deg,transparent 0 84px,rgba(212,175,55,.012) 85px,transparent 87px);
-}
-body:after{
- content:"";position:fixed;inset:0;pointer-events:none;
- background:linear-gradient(90deg,rgba(0,0,0,.38),transparent 22%,transparent 78%,rgba(0,0,0,.38));
-}
-.login-wrap{position:relative;z-index:2;width:min(460px,calc(100vw - 32px))}
-.brand{text-align:center;margin-bottom:18px}
-.brand-mark{
- width:68px;height:68px;margin:0 auto 11px;display:flex;align-items:center;justify-content:center;
- border-radius:50%;border:1px solid rgba(212,175,55,.72);
- background:radial-gradient(circle at 35% 28%,#1d4a27,#0b1f12 68%);
- box-shadow:0 10px 28px rgba(0,0,0,.48),inset 0 0 0 5px rgba(212,175,55,.07);
- font-size:31px
-}
-.brand h1{margin:0;color:#f1cf54;font-family:Georgia,"Times New Roman",serif;font-size:1.48rem}
-.brand p{margin:5px 0 0;color:#a8b5ac;font-size:.80rem;letter-spacing:.35px}
-.box{
- position:relative;padding:30px;
- border:1px solid #295238;border-radius:14px;
- background:linear-gradient(145deg,rgba(16,43,25,.985),rgba(5,19,10,.99));
- box-shadow:0 26px 65px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.045);
-}
-.box:before{
- content:"";position:absolute;top:0;left:25px;right:25px;height:2px;
- background:linear-gradient(90deg,transparent,#d4af37,transparent)
-}
-.box h2{margin:0;color:#f7f3eb;font-size:1.46rem;text-align:center}
-.subtitle{margin:7px 0 23px;color:#a8b5ac;font-size:.84rem;text-align:center}
-.erro{
- margin:0 0 16px;padding:11px 13px;border:1px solid rgba(224,74,63,.48);
- border-radius:8px;background:rgba(128,30,24,.18);color:#ffb9b2;text-align:center;font-size:.82rem;font-weight:700
-}
-label{display:block;margin:0 0 7px;color:#d9e2dc;font-size:.78rem;font-weight:800}
-.input-wrap{position:relative}
-.input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#d4af37;font-size:17px}
-input{
- width:100%;height:52px;margin:0 0 16px;padding:0 14px 0 44px;
- border:1px solid #3a5d45;border-radius:8px;outline:none;background:#06150c;color:#fff;font-size:.96rem
-}
-input::placeholder{color:#718278}
-input:focus{border-color:#d4af37;box-shadow:0 0 0 3px rgba(212,175,55,.10)}
-button{
- width:100%;height:52px;border:1px solid #f1cf54;border-radius:8px;
- background:linear-gradient(180deg,#e7c74d,#d4af37);color:#10150f;font-size:.92rem;font-weight:900;cursor:pointer;
- box-shadow:0 6px 16px rgba(0,0,0,.28)
-}
-button:hover{filter:brightness(1.06);transform:translateY(-1px)}
-.secure{margin:17px 0 0;color:#718177;font-size:.70rem;text-align:center}
-@media(max-width:520px){.login-wrap{width:calc(100vw - 24px)}.box{padding:25px 20px}.brand h1{font-size:1.28rem}}
-</style>
-</head>
-<body>
-<main class="login-wrap">
-<header class="brand">
-<div class="brand-mark">🏆</div>
-<h1>Torneio de Truco Cego</h1>
-<p>Painel de Administração</p>
-</header>
-<section class="box">
-<h2>🔐 Acesso do Administrador</h2>
-<p class="subtitle">Entre com a chave para acessar o painel do torneio.</p>
-__ERRO__
-<form action="/admin-painel/login" method="POST">
-<label for="chave">Chave de acesso</label>
-<div class="input-wrap"><span class="input-icon">🔑</span>
-<input id="chave" type="password" name="chave" placeholder="Digite sua chave de acesso" required autofocus autocomplete="current-password">
-</div>
-<button type="submit">ENTRAR NO SISTEMA&nbsp;&nbsp;→</button>
-</form>
-<p class="secure">🔒 Área administrativa restrita</p>
-</section>
-</main>
-</body>
-</html>
-""".replace("__ERRO__", erro_html)
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8"><title>Acesso Restrito</title>
+        <style>
+            body {{ background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }}
+            .box {{ background: #1e1e1e; padding: 30px; border-radius: 8px; border: 1px solid #333; width: 300px; text-align: center; }}
+            input {{ width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 4px; box-sizing: border-box; }}
+            button {{ background: #d4af37; color: #000; font-weight: bold; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; }}
+        </style>
+    </head>
+    <body>
+        <div class="box">
+            <h2>🔑 Área do Administrador</h2>
+            {"<p style='color:red;'>Chave incorreta!</p>" if erro else ""}
+            <form action="/admin-painel/login" method="POST">
+                <input type="password" name="chave" placeholder="Digite a chave de acesso" required autofocus>
+                <button type="submit">Entrar no Sistema</button>
+            </form>
+        </div>
+    </body>
+    </html>
+    """
     return HTMLResponse(content=html_content)
 
 @app.post("/login")
@@ -1938,6 +1892,9 @@ def encerrar_e_salvar(campeao: str = Form(...), vice: str = Form(...), terceiro:
     cfg = obtener_torneio_ativo(cursor)
     p = "%s" if DATABASE_URL else "?"
     
+    # O Rei das Flores é sempre recalculado a partir de TODOS os confrontos do torneio.
+    rei, flores = obtener_rei_das_flores(cursor, cfg["id"])
+    
     cursor.execute(f'INSERT INTO historico_campeoes (torneio_id, nome_torneio, campeao, vice, terceiro, quarto, rei_das_flores, qtd_flores) VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p})',
                    (cfg["id"], cfg["nome_torneio"], campeao, vice, terceiro, quarto, rei, flores))
     
@@ -2271,27 +2228,6 @@ def api_dados_publicos_telao(db=Depends(get_db)):
     confrontos = [dict(row) for row in cursor.fetchall()]
     
     ranking = obtener_ranking_fase_classificatoria(cursor, cfg["id"])
-
-    # Ranking acumulado do Rei das Flores.
-    # Reaproveita o mesmo cálculo de flores já usado pela classificação.
-    # Assim não criamos uma segunda consulta ao banco e o total continua
-    # acumulado também durante o mata-mata.
-    ranking_flores = [
-        {
-            "id": atleta["id"],
-            "nome": atleta["nome"],
-            "flores": int(atleta.get("flores", 0) or 0),
-        }
-        for atleta in ranking
-    ]
-
-    ranking_flores.sort(
-        key=lambda item: (-item["flores"], item["nome"].upper(), item["id"])
-    )
-
-    for posicao, item in enumerate(ranking_flores, start=1):
-        item["posicao"] = posicao
-
     
     mins = cfg["crono_tempo_restante_seg"] // 60
     segs = cfg["crono_tempo_restante_seg"] % 60
@@ -2316,23 +2252,8 @@ def api_dados_publicos_telao(db=Depends(get_db)):
             "max_flores": int(hist["qtd_flores"])
         }
     else:
-        cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
-        atletas = cursor.fetchall()
-        
-        rei_nome = "---"
-        max_flores = 0
-        for atl in atletas:
-            a_id = atl["id"]
-            cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-            f1 = cursor.fetchone()[0]
-            cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-            f2 = cursor.fetchone()[0]
-            
-            total_f = f1 + f2
-            if total_f > max_flores:
-                max_flores = total_f
-                rei_nome = str(atl["nome"]).strip()
-        
+        rei_nome, max_flores = obtener_rei_das_flores(cursor, cfg["id"])
+
         podio_dados = {
             "primeiro": "---",
             "segundo": "---",
@@ -2359,7 +2280,6 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         "rodada": rodada_atual,
         "confrontos": confrontos,
         "ranking": ranking,
-        "ranking_flores": ranking_flores,
         "podio": podio_dados
     }
 
