@@ -2271,6 +2271,50 @@ def api_dados_publicos_telao(db=Depends(get_db)):
     confrontos = [dict(row) for row in cursor.fetchall()]
     
     ranking = obtener_ranking_fase_classificatoria(cursor, cfg["id"])
+
+    # Ranking acumulado do Rei das Flores.
+    # Mantém o total de flores durante a classificatória e também
+    # depois que o torneio entra no mata-mata.
+    ranking_flores = []
+    flores_por_atleta = {}
+
+    cursor.execute(
+        f"""
+        SELECT atleta1_id AS atleta_id, atleta1_nome AS nome,
+               COALESCE(SUM(COALESCE(flores1, 0)), 0) AS flores
+        FROM confrontos
+        WHERE torneio_id = {p} AND atleta1_id IS NOT NULL
+        GROUP BY atleta1_id, atleta1_nome
+
+        UNION ALL
+
+        SELECT atleta2_id AS atleta_id, atleta2_nome AS nome,
+               COALESCE(SUM(COALESCE(flores2, 0)), 0) AS flores
+        FROM confrontos
+        WHERE torneio_id = {p} AND atleta2_id IS NOT NULL
+        GROUP BY atleta2_id, atleta2_nome
+        """,
+        (cfg["id"], cfg["id"])
+    )
+
+    for linha in cursor.fetchall():
+        atleta_id = linha["atleta_id"]
+        if atleta_id not in flores_por_atleta:
+            flores_por_atleta[atleta_id] = {
+                "id": atleta_id,
+                "nome": str(linha["nome"]).strip(),
+                "flores": 0
+            }
+        flores_por_atleta[atleta_id]["flores"] += int(linha["flores"] or 0)
+
+    ranking_flores = sorted(
+        flores_por_atleta.values(),
+        key=lambda item: (-item["flores"], item["nome"].upper())
+    )
+
+    for posicao, item in enumerate(ranking_flores, start=1):
+        item["posicao"] = posicao
+
     
     mins = cfg["crono_tempo_restante_seg"] // 60
     segs = cfg["crono_tempo_restante_seg"] % 60
@@ -2338,6 +2382,7 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         "rodada": rodada_atual,
         "confrontos": confrontos,
         "ranking": ranking,
+        "ranking_flores": ranking_flores,
         "podio": podio_dados
     }
 
