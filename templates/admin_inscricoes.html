@@ -2961,6 +2961,99 @@
             }
         }
 
+
+        /* ============================================================
+           V11 — "O SALÃO ESTÁ PRONTO?" JUNTO A PEDIDOS WEB
+           O retângulo inteiro passa para o painel lateral.
+           ============================================================ */
+        @media (min-width: 1101px) {
+
+            .bottom-grid {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+                align-items: stretch;
+            }
+
+            .bottom-grid > .request-card:first-child {
+                grid-column: 1;
+                grid-row: 1;
+            }
+
+            .bottom-grid > .start-tournament {
+                grid-column: 2;
+                grid-row: 1;
+                position: static !important;
+                width: auto !important;
+                min-width: 0 !important;
+                height: auto !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                padding: 14px !important;
+                border: 1px solid rgba(242,201,76,.42) !important;
+                border-radius: 10px !important;
+                background:
+                    radial-gradient(280px 140px at 100% 0%, rgba(242,201,76,.08), transparent 72%),
+                    linear-gradient(145deg, rgba(10,43,24,.99), rgba(4,23,14,.995)) !important;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                justify-content: space-between !important;
+                gap: 12px !important;
+            }
+
+            .bottom-grid > .start-tournament > div {
+                padding: 3px 2px 8px;
+            }
+
+            .bottom-grid > .start-tournament strong {
+                color: #f6e5a0 !important;
+                font-family: 'Cinzel', serif;
+                font-size: .78rem !important;
+                letter-spacing: .35px;
+            }
+
+            .bottom-grid > .start-tournament span {
+                color: #98aaa0 !important;
+                font-size: .58rem !important;
+                line-height: 1.45;
+            }
+
+            .bottom-grid > .start-tournament form {
+                position: static !important;
+                width: 100%;
+                margin: 0 !important;
+            }
+
+            .bottom-grid > .start-tournament .start-tournament-btn {
+                width: 100% !important;
+                min-width: 0 !important;
+                height: 46px !important;
+                font-size: .70rem !important;
+                border-radius: 8px !important;
+            }
+
+            /* Se houver desistentes, eles ocupam a linha seguinte sem
+               empurrar o painel de início para longe dos pedidos web. */
+            .bottom-grid > .request-card:nth-of-type(2) {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            /* O painel lateral ganha altura suficiente para os dois
+               blocos respirarem sem precisar de scroll. */
+            .bottom-grid {
+                min-height: 0;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .bottom-grid > .start-tournament {
+                position: static !important;
+                width: auto !important;
+                margin: 0 !important;
+            }
+        }
+
 </style>
 </head>
 <body>
@@ -3152,20 +3245,6 @@
                         {% endfor %}
                     </div>
 
-                    {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
-                    <div class="start-tournament">
-                        <div>
-                            <strong>O salão está pronto?</strong>
-                            <span>Com os atletas confirmados, podemos iniciar o torneio.</span>
-                        </div>
-                        <form action="/admin-painel/admin/iniciar-torneio" method="POST">
-                            <button type="submit" class="start-tournament-btn">
-                                <i class="fa-solid fa-flag-checkered"></i>
-                                <span>Iniciar torneio</span>
-                            </button>
-                        </form>
-                    </div>
-                    {% endif %}
                 </div>
 
                 <div class="bottom-grid">
@@ -3199,6 +3278,21 @@
                             {% endfor %}
                         </div>
                     </div>
+
+                    {% if config.fase_torneio == "INSCRICAO" and oficiais|length >= 2 %}
+                    <div class="start-tournament">
+                        <div>
+                            <strong>O salão está pronto?</strong>
+                            <span>Com os atletas confirmados, podemos iniciar o torneio.</span>
+                        </div>
+                        <form action="/admin-painel/admin/iniciar-torneio" method="POST">
+                            <button type="submit" class="start-tournament-btn">
+                                <i class="fa-solid fa-flag-checkered"></i>
+                                <span>Iniciar torneio</span>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
 
                     {% if desistentes|length > 0 %}
                     <div class="card request-card">
