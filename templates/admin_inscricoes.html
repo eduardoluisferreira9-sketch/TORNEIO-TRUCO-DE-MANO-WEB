@@ -2913,6 +2913,54 @@
             }
         }
 
+
+        /* ============================================================
+           V10 — POSIÇÃO DO BOTÃO INICIAR TORNEIO
+           O botão sai da base do card do elenco e vai para a área livre
+           à direita da tela, acima da gaveta "ADMINISTRAÇÃO".
+
+           Assim ele fica visualmente separado e não pode ser confundido
+           ou sobreposto pela gaveta administrativa.
+           ============================================================ */
+        @media (min-width: 1101px) {
+
+            .start-tournament {
+                /* Mantém a mensagem "O salão está pronto?" no elenco. */
+                padding-right: 12px !important;
+            }
+
+            .start-tournament > form {
+                position: fixed !important;
+                right: 22px !important;
+                bottom: 64px !important;
+                z-index: 950 !important;
+                margin: 0 !important;
+            }
+
+            .start-tournament-btn {
+                min-width: 190px !important;
+                width: 190px !important;
+                height: 42px !important;
+                border-radius: 9px !important;
+                font-size: .67rem !important;
+                box-shadow:
+                    0 8px 20px rgba(0,0,0,.34),
+                    0 0 20px rgba(31,184,102,.16) !important;
+            }
+
+            .start-tournament-btn:hover {
+                transform: translateY(-2px) !important;
+            }
+        }
+
+        /* Em telas menores o botão continua dentro do bloco normal,
+           evitando sobreposição em celulares/tablets. */
+        @media (max-width: 1100px) {
+            .start-tournament > form {
+                position: static !important;
+            }
+        }
+
 </style>
 </head>
 <body>
