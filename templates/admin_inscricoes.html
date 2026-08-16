@@ -2587,6 +2587,332 @@
             }
         }
 
+
+        /* ============================================================
+           V9 — TELA ÚNICA / OPERAÇÃO SEM ROLAGEM
+           Objetivo:
+           - tudo importante visível em uma única tela;
+           - nenhum scrollbar da página em desktop;
+           - Administração fica recolhida e aparece ao passar o mouse
+             pela faixa inferior;
+           - o elenco continua visível, sem cortar os atletas.
+           ============================================================ */
+
+        @media (min-width: 1101px) {
+
+            html, body {
+                height: 100%;
+                min-height: 100%;
+                overflow: hidden !important;
+            }
+
+            body {
+                min-height: 100vh;
+            }
+
+            .admin-main {
+                width: min(1540px, calc(100% - 24px));
+                height: calc(100vh - 68px) !important;
+                min-height: 0 !important;
+                margin: 0 auto;
+                padding: 7px 0 0;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                overflow: hidden !important;
+            }
+
+            /* Cabeçalho mais compacto */
+            .page-head {
+                flex: 0 0 62px !important;
+                min-height: 62px !important;
+                padding: 7px 13px !important;
+            }
+
+            .page-head-copy h1 {
+                font-size: 1.42rem !important;
+            }
+
+            .page-head-copy p {
+                font-size: .64rem !important;
+            }
+
+            /* Cards de configuração/cadastro compactos */
+            .card.config-card,
+            .card.cadastro-card {
+                padding: 7px 11px !important;
+            }
+
+            .config-card .section-head,
+            .cadastro-card .section-head {
+                min-height: 19px !important;
+                margin-bottom: 4px !important;
+            }
+
+            .config-card .section-head h2,
+            .cadastro-card .section-head h2 {
+                font-size: .78rem !important;
+            }
+
+            .config-card .section-kicker,
+            .cadastro-card .section-kicker {
+                font-size: .50rem !important;
+            }
+
+            .config-field input,
+            .config-save,
+            .cadastro-form input,
+            .cadastro-form .action-btn {
+                height: 30px !important;
+            }
+
+            .config-card form,
+            .cadastro-form {
+                gap: 6px !important;
+            }
+
+            /* Área principal usa todo o espaço restante */
+            .inscricoes-workspace {
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                overflow: hidden !important;
+                grid-template-columns: minmax(0, 1.72fr) minmax(335px, .78fr) !important;
+                gap: 7px !important;
+            }
+
+            /* ELENCO */
+            .roster-card {
+                min-height: 0 !important;
+                height: 100% !important;
+                padding: 10px !important;
+                overflow: hidden !important;
+            }
+
+            .roster-head {
+                padding-bottom: 6px !important;
+                gap: 8px !important;
+            }
+
+            .roster-head h2 {
+                font-size: .90rem !important;
+            }
+
+            .roster-head p {
+                font-size: .53rem !important;
+            }
+
+            .roster-status {
+                padding: 5px 8px !important;
+                font-size: .49rem !important;
+            }
+
+            /* Para 8 atletas: 4 x 2, todos visíveis. */
+            .roster-grid {
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: hidden !important;
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+                grid-auto-rows: minmax(52px, 1fr) !important;
+                align-content: start !important;
+                gap: 6px !important;
+                padding: 5px 3px 5px 1px !important;
+            }
+
+            .athlete-card {
+                min-height: 52px !important;
+                height: auto !important;
+                padding: 5px 6px !important;
+            }
+
+            .athlete-number {
+                width: 23px !important;
+                height: 23px !important;
+                flex-basis: 23px !important;
+                font-size: .54rem !important;
+            }
+
+            .athlete-info strong {
+                font-size: .61rem !important;
+                line-height: 1.1 !important;
+            }
+
+            .athlete-info span {
+                font-size: .47rem !important;
+                margin-top: 2px !important;
+            }
+
+            .athlete-action button {
+                width: 25px !important;
+                height: 25px !important;
+            }
+
+            /* Botão de início mais forte, mas sem roubar espaço */
+            .start-tournament {
+                flex: 0 0 52px !important;
+                min-height: 52px !important;
+                margin-top: 5px !important;
+                padding: 6px 9px !important;
+            }
+
+            .start-tournament strong {
+                font-size: .61rem !important;
+            }
+
+            .start-tournament > div > span {
+                font-size: .49rem !important;
+            }
+
+            .start-tournament-btn {
+                min-width: 165px !important;
+                height: 36px !important;
+                font-size: .60rem !important;
+            }
+
+            /* Lateral */
+            .inscricoes-workspace > .bottom-grid {
+                height: 100% !important;
+                min-height: 0 !important;
+                overflow: hidden !important;
+                gap: 7px !important;
+            }
+
+            .bottom-grid .request-card,
+            .bottom-grid .request-card:first-child,
+            .bottom-grid .request-card:last-child {
+                padding: 8px !important;
+            }
+
+            .bottom-grid .request-card .section-head {
+                margin-bottom: 5px !important;
+            }
+
+            .bottom-grid .request-card .section-head h2 {
+                font-size: .73rem !important;
+            }
+
+            .bottom-grid .request-list {
+                overflow: hidden !important;
+            }
+
+            .bottom-grid .request-item {
+                min-height: 38px !important;
+                padding: 5px 6px !important;
+                margin-bottom: 4px !important;
+            }
+
+            .bottom-grid .request-person strong {
+                font-size: .55rem !important;
+            }
+
+            .bottom-grid .request-person span {
+                font-size: .45rem !important;
+            }
+
+            .bottom-grid .mini-btn {
+                width: 24px !important;
+                height: 24px !important;
+            }
+
+            /* ========================================================
+               ADMINISTRAÇÃO OCULTA
+               Uma pequena "gaveta" no rodapé.
+               ======================================================== */
+
+            .admin-tools {
+                position: fixed !important;
+                left: 50% !important;
+                bottom: 0 !important;
+                transform: translate(-50%, calc(100% - 10px)) !important;
+                width: min(720px, calc(100vw - 40px)) !important;
+                z-index: 1000 !important;
+                min-height: 52px !important;
+                height: 52px !important;
+                box-sizing: border-box !important;
+                padding: 7px 10px !important;
+                border: 1px solid rgba(212,175,55,.45) !important;
+                border-bottom: 0 !important;
+                border-radius: 12px 12px 0 0 !important;
+                background: rgba(4, 24, 14, .98) !important;
+                box-shadow: 0 -8px 28px rgba(0,0,0,.28) !important;
+                transition: transform .22s ease, height .22s ease !important;
+            }
+
+            /* pequena alça que denuncia que existe uma gaveta */
+            .admin-tools::before {
+                content: "⚙  ADMINISTRAÇÃO";
+                position: absolute;
+                left: 50%;
+                top: -25px;
+                transform: translateX(-50%);
+                height: 25px;
+                padding: 5px 14px 4px;
+                box-sizing: border-box;
+                border: 1px solid rgba(212,175,55,.45);
+                border-bottom: 0;
+                border-radius: 9px 9px 0 0;
+                background: rgba(4, 24, 14, .98);
+                color: #d4af37;
+                font-size: .55rem;
+                font-weight: 800;
+                letter-spacing: .08em;
+                white-space: nowrap;
+            }
+
+            .admin-tools:hover,
+            .admin-tools:focus-within {
+                transform: translate(-50%, 0) !important;
+                height: 64px !important;
+            }
+
+            .admin-tools > div:first-child {
+                min-width: 0;
+            }
+
+            .admin-tools .section-kicker,
+            .admin-tools > div:first-child strong,
+            .admin-tools > div:first-child small {
+                display: none;
+            }
+
+            .admin-tools-actions {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 7px;
+            }
+
+            .admin-action {
+                min-height: 38px !important;
+                height: 38px !important;
+                padding: 5px 9px !important;
+                min-width: 140px !important;
+            }
+
+            .admin-action > i {
+                width: 23px !important;
+                height: 23px !important;
+                flex-basis: 23px !important;
+            }
+
+            .admin-action strong {
+                font-size: .55rem !important;
+            }
+
+            .admin-action small {
+                font-size: .46rem !important;
+            }
+
+            .admin-action.logout {
+                min-width: 95px !important;
+            }
+        }
+
 </style>
 </head>
 <body>
