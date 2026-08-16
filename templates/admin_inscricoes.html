@@ -3054,6 +3054,150 @@
             }
         }
 
+
+        /* ============================================================
+           V12 — PAINEL "O SALÃO ESTÁ PRONTO?"
+           Versão final: transformar a área de início em um verdadeiro
+           convite para começar o torneio.
+           ============================================================ */
+        @media (min-width: 1101px) {
+
+            .bottom-grid > .start-tournament {
+                position: relative !important;
+                overflow: hidden !important;
+                isolation: isolate;
+                justify-content: space-between !important;
+                padding: 16px !important;
+                border: 1px solid rgba(242, 201, 76, .70) !important;
+                border-radius: 12px !important;
+                background:
+                    radial-gradient(circle at 50% 28%, rgba(212,175,55,.14), transparent 34%),
+                    radial-gradient(circle at 100% 100%, rgba(28,190,103,.10), transparent 45%),
+                    linear-gradient(145deg, #0b3820 0%, #062617 52%, #041b10 100%) !important;
+                box-shadow:
+                    inset 0 1px 0 rgba(255,255,255,.045),
+                    0 8px 24px rgba(0,0,0,.24),
+                    0 0 24px rgba(212,175,55,.08) !important;
+            }
+
+            /* brilho decorativo */
+            .bottom-grid > .start-tournament::before {
+                content: "";
+                position: absolute;
+                width: 180px;
+                height: 180px;
+                right: -65px;
+                top: -75px;
+                border-radius: 50%;
+                background: rgba(212,175,55,.08);
+                box-shadow: 0 0 70px rgba(212,175,55,.12);
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            .bottom-grid > .start-tournament::after {
+                content: "✦   ✦   ✦";
+                position: absolute;
+                right: 15px;
+                top: 13px;
+                color: rgba(212,175,55,.34);
+                font-size: .55rem;
+                letter-spacing: 5px;
+                pointer-events: none;
+            }
+
+            .bottom-grid > .start-tournament > div {
+                text-align: center;
+                padding: 1px 4px 7px !important;
+            }
+
+            .bottom-grid > .start-tournament > div::before {
+                content: "🏆";
+                display: block;
+                width: 46px;
+                height: 46px;
+                margin: 0 auto 7px;
+                border: 1px solid rgba(242,201,76,.55);
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(212,175,55,.20), rgba(5,29,17,.75));
+                box-shadow: 0 0 18px rgba(212,175,55,.16);
+                font-size: 1.55rem;
+                line-height: 45px;
+            }
+
+            .bottom-grid > .start-tournament strong {
+                display: block;
+                color: #f6d76c !important;
+                font-family: 'Cinzel', serif;
+                font-size: .92rem !important;
+                font-weight: 900 !important;
+                letter-spacing: .7px;
+                text-transform: uppercase;
+                text-shadow: 0 2px 8px rgba(0,0,0,.35);
+            }
+
+            .bottom-grid > .start-tournament > div > span {
+                display: block;
+                max-width: 285px;
+                margin: 5px auto 0;
+                color: #b8c8bf !important;
+                font-size: .60rem !important;
+                line-height: 1.45 !important;
+            }
+
+            .bottom-grid > .start-tournament form {
+                position: static !important;
+                width: 100%;
+                margin: 0 !important;
+                padding-top: 4px;
+            }
+
+            .bottom-grid > .start-tournament .start-tournament-btn {
+                position: relative;
+                width: 100% !important;
+                min-width: 0 !important;
+                height: 52px !important;
+                border: 1px solid #82ffc0 !important;
+                border-radius: 10px !important;
+                background:
+                    linear-gradient(135deg, #5bf0a0 0%, #28c977 48%, #18a85b 100%) !important;
+                color: #062214 !important;
+                font-size: .78rem !important;
+                font-weight: 950 !important;
+                letter-spacing: .7px;
+                text-shadow: none !important;
+                box-shadow:
+                    inset 0 1px 0 rgba(255,255,255,.38),
+                    0 8px 20px rgba(0,0,0,.30),
+                    0 0 25px rgba(54,230,133,.18) !important;
+            }
+
+            .bottom-grid > .start-tournament .start-tournament-btn i {
+                color: #062214 !important;
+                font-size: .95rem !important;
+            }
+
+            .bottom-grid > .start-tournament .start-tournament-btn > span {
+                color: #062214 !important;
+                font-size: .78rem !important;
+                font-weight: 950 !important;
+                letter-spacing: .7px;
+            }
+
+            .bottom-grid > .start-tournament .start-tournament-btn:hover {
+                transform: translateY(-2px) !important;
+                filter: brightness(1.08);
+                box-shadow:
+                    inset 0 1px 0 rgba(255,255,255,.45),
+                    0 11px 25px rgba(0,0,0,.34),
+                    0 0 34px rgba(54,230,133,.32) !important;
+            }
+
+            .bottom-grid > .start-tournament::marker {
+                display: none;
+            }
+        }
+
 </style>
 </head>
 <body>
