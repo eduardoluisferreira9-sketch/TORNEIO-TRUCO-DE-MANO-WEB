@@ -2433,6 +2433,160 @@
             }
         }
 
+
+        /* ============================================================
+           AJUSTE DE LAYOUT — ELENCO VISÍVEL
+           Problema identificado no teste:
+           o modo "tela operacional" estava comprimindo o roster-card
+           para caber tudo em 100vh, fazendo os atletas ficarem cortados.
+
+           Nova abordagem:
+           - o elenco ganha altura real;
+           - 8 atletas cabem em 2 linhas de 4;
+           - o botão "Iniciar torneio" fica abaixo da lista, sem sobrepor;
+           - só haverá scroll interno quando a quantidade de atletas
+             realmente exigir.
+           ============================================================ */
+
+        @media (min-width: 1101px) {
+
+            /* A página deixa de esmagar o conteúdo para caber à força
+               em uma única viewport. */
+            html, body {
+                height: auto;
+                min-height: 100%;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .admin-main {
+                height: auto;
+                min-height: calc(100vh - 68px);
+                overflow: visible;
+                padding-bottom: 24px;
+            }
+
+            /* O espaço de inscrições passa a crescer conforme o elenco. */
+            .inscricoes-workspace {
+                flex: 0 0 auto !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+                align-items: stretch;
+            }
+
+            /* O card do elenco não fica mais preso à altura disponível
+               do restante da página. */
+            .roster-card {
+                height: auto !important;
+                min-height: 250px;
+                overflow: visible !important;
+                padding: 14px;
+            }
+
+            .roster-head {
+                padding-bottom: 11px;
+            }
+
+            .roster-head h2 {
+                font-size: .98rem;
+            }
+
+            .roster-head p {
+                font-size: .60rem;
+            }
+
+            /* Para até 8 atletas: 4 colunas x 2 linhas.
+               A altura passa a ser natural, sem cortar nomes. */
+            .roster-grid {
+                flex: 0 0 auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                max-height: 300px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                grid-auto-rows: minmax(58px, auto);
+                align-content: start;
+                gap: 8px;
+                padding: 10px 4px 8px 1px;
+            }
+
+            .athlete-card {
+                min-height: 58px;
+                height: auto;
+                padding: 7px 8px;
+            }
+
+            .athlete-number {
+                width: 25px;
+                height: 25px;
+                flex-basis: 25px;
+                font-size: .58rem;
+            }
+
+            .athlete-info strong {
+                font-size: .66rem;
+            }
+
+            .athlete-info span {
+                font-size: .53rem;
+                margin-top: 3px;
+            }
+
+            .athlete-action button {
+                width: 28px;
+                height: 28px;
+            }
+
+            /* O bloco de início fica claramente separado do elenco. */
+            .start-tournament {
+                flex: 0 0 auto !important;
+                margin-top: 10px;
+                padding: 11px 12px;
+                min-height: 60px;
+            }
+
+            .start-tournament strong {
+                font-size: .68rem;
+            }
+
+            .start-tournament > div > span {
+                font-size: .56rem;
+            }
+
+            .start-tournament-btn {
+                min-width: 184px;
+                height: 44px;
+            }
+
+            /* A lateral acompanha a altura do elenco, mas não força
+               o card principal a ficar menor. */
+            .inscricoes-workspace > .bottom-grid {
+                height: auto !important;
+                min-height: 250px;
+                overflow: visible !important;
+                align-self: stretch;
+            }
+
+            .inscricoes-workspace > .bottom-grid .request-card {
+                min-height: 0;
+            }
+        }
+
+        /* Em telas menores mantemos o comportamento responsivo. */
+        @media (max-width: 1100px) {
+            .roster-grid {
+                max-height: none;
+                overflow: visible;
+            }
+
+            .roster-card {
+                height: auto;
+                overflow: visible;
+            }
+        }
+
 </style>
 </head>
 <body>
