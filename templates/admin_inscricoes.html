@@ -2356,7 +2356,84 @@
             }
         }
 
-    </style>
+    
+        /* ============================================================
+           AJUSTE FINAL — BOTÃO INICIAR TORNEIO
+           Mantém a estrutura/ação original e melhora apenas a leitura
+           e a presença visual do botão.
+           ============================================================ */
+        .start-tournament > div > span {
+            display: block;
+            margin-top: 3px;
+            color: #b9c8bf;
+            font-size: .58rem;
+            line-height: 1.25;
+        }
+
+        .start-tournament > form {
+            margin: 0;
+            flex: 0 0 auto;
+        }
+
+        .start-tournament-btn {
+            min-width: 184px;
+            height: 44px;
+            padding: 0 18px;
+            gap: 9px;
+            color: #06170d !important;
+            background: linear-gradient(135deg, #63efa0 0%, #35ce79 52%, #1fa85b 100%);
+            border: 1px solid #8af5b7;
+            border-radius: 8px;
+            font-size: .72rem;
+            font-weight: 900;
+            letter-spacing: .35px;
+            line-height: 1;
+            text-shadow: none;
+            box-shadow:
+                0 7px 16px rgba(0,0,0,.30),
+                0 0 18px rgba(72,223,135,.12),
+                inset 0 1px 0 rgba(255,255,255,.30);
+        }
+
+        .start-tournament-btn i {
+            color: #06170d !important;
+            font-size: .78rem;
+            line-height: 1;
+        }
+
+        .start-tournament-btn > span {
+            display: inline;
+            margin-top: 0;
+            color: #06170d !important;
+            font-size: .72rem;
+            font-weight: 900;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .start-tournament-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.06);
+            box-shadow:
+                0 9px 20px rgba(0,0,0,.34),
+                0 0 22px rgba(72,223,135,.18),
+                inset 0 1px 0 rgba(255,255,255,.36);
+        }
+
+        @media (max-width: 560px) {
+            .start-tournament-btn {
+                width: 100%;
+                min-width: 0;
+                height: 42px;
+                font-size: .68rem;
+            }
+
+            .start-tournament-btn > span {
+                font-size: .68rem;
+            }
+        }
+
+</style>
 </head>
 <body>
 
