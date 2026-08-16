@@ -324,6 +324,62 @@ def obtener_ranking_fase_classificatoria(cursor, torneio_id: int):
     lista_classificacao.sort(key=lambda x: (-x["vitorias"], -x["sets_ganhos"], -x["saldo_tentos"], -x["tentos_pro"], -x["flores"], x["id"]))
     return lista_classificacao
 
+
+def obtener_ranking_flores(cursor, torneio_id: int):
+    """Ranking oficial de flores acumulado em TODA a edição.
+
+    Diferente da classificação geral, o Rei das Flores não reinicia
+    quando começa o mata-mata. Portanto, soma flores de todas as
+    confrontos do torneio, inclusive rodadas negativas (-1, -2, -3, -4).
+    A mesma função é usada pela classificação, pelo telão e pelo pódio,
+    evitando que cada tela tenha uma regra diferente.
+    """
+    p = "%s" if DATABASE_URL else "?"
+    cursor.execute(
+        f"SELECT id, nome, entidade, status FROM atletas "
+        f"WHERE status IN ('APROVADO', 'DESISTENTE') AND torneio_id = {p} "
+        f"ORDER BY id ASC",
+        (torneio_id,)
+    )
+    atletas = cursor.fetchall()
+    ranking = []
+
+    for atleta in atletas:
+        atleta_id = atleta["id"]
+
+        cursor.execute(
+            f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos "
+            f"WHERE atleta1_id = {p} AND torneio_id = {p}",
+            (atleta_id, torneio_id)
+        )
+        flores1 = cursor.fetchone()[0] or 0
+
+        cursor.execute(
+            f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos "
+            f"WHERE atleta2_id = {p} AND torneio_id = {p}",
+            (atleta_id, torneio_id)
+        )
+        flores2 = cursor.fetchone()[0] or 0
+
+        total_flores = int(flores1) + int(flores2)
+
+        ranking.append({
+            "id": atleta_id,
+            "nome": str(atleta["nome"] or "").strip(),
+            "entidade": str(atleta["entidade"] or "AVULSO").strip(),
+            "status": atleta["status"],
+            "flores": total_flores
+        })
+
+    # Mais flores primeiro. Em empate, mantém uma ordem determinística
+    # pelo ID do atleta para que as três telas nunca troquem as posições.
+    ranking.sort(key=lambda x: (-x["flores"], x["id"]))
+
+    for posicao, item in enumerate(ranking, start=1):
+        item["posicao"] = posicao
+
+    return ranking
+
 # --- ROTAS DE INSCRIÇÃO E LOGIN ---
 @app.get("/inscrever", response_class=HTMLResponse)
 @app.get("/admin-painel/inscrever", response_class=HTMLResponse)
@@ -2384,7 +2440,7 @@ def aba_classificacao_e_auditoria(request: Request, rodada_filtro: int = None, d
 
     return templates.TemplateResponse(
         request=request, name="admin_classificacao.html",
-        context={"config": cfg, "classificacao": lista_classificacao, "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
+        context={"config": cfg, "classificacao": lista_classificacao, "top_flores": obtener_ranking_flores(cursor, cfg["id"])[:3], "todas_rodadas": todas_rodadas, "rodada_selecionada": rodada_selecionada, "confrontos_auditoria": confrontos_auditoria, "aba_ativa": "classificacao"}
     )
 
 @app.post("/admin/auditoria/corrigir")
@@ -2426,22 +2482,10 @@ def exibir_podio(request: Request, db=Depends(get_db), auth: bool = Depends(veri
     third_place = jogo_terceiro["atleta1_nome"] if jogo_terceiro["vencedor_id"] == jogo_terceiro["atleta1_id"] else jogo_terceiro["atleta2_nome"]
     fourth_place = jogo_terceiro["atleta2_nome"] if jogo_terceiro["vencedor_id"] == jogo_terceiro["atleta1_id"] else jogo_terceiro["atleta1_nome"]
 
-    cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
-    atletas = cursor.fetchall()
-    
-    rei_nome = "Nenhum"
-    max_flores = 0
-    for atl in atletas:
-        a_id = atl["id"]
-        cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-        f1 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-        f2 = cursor.fetchone()[0]
-            
-        total_f = f1 + f2
-        if total_f > max_flores:
-            max_flores = total_f
-            rei_nome = atl["nome"]
+    ranking_flores = obtener_ranking_flores(cursor, cfg["id"])
+    lider_flores = ranking_flores[0] if ranking_flores else None
+    rei_nome = lider_flores["nome"] if lider_flores else "Nenhum"
+    max_flores = lider_flores["flores"] if lider_flores else 0
 
     return templates.TemplateResponse(
         request=request, name="admin_podio.html",
@@ -2788,6 +2832,7 @@ def api_dados_publicos_telao(db=Depends(get_db)):
     confrontos = [dict(row) for row in cursor.fetchall()]
     
     ranking = obtener_ranking_fase_classificatoria(cursor, cfg["id"])
+    ranking_flores = obtener_ranking_flores(cursor, cfg["id"])
     
     mins = cfg["crono_tempo_restante_seg"] // 60
     segs = cfg["crono_tempo_restante_seg"] % 60
@@ -2812,22 +2857,9 @@ def api_dados_publicos_telao(db=Depends(get_db)):
             "max_flores": int(hist["qtd_flores"])
         }
     else:
-        cursor.execute(f"SELECT id, nome FROM atletas WHERE status = 'APROVADO' AND torneio_id = {p}", (cfg["id"],))
-        atletas = cursor.fetchall()
-        
-        rei_nome = "---"
-        max_flores = 0
-        for atl in atletas:
-            a_id = atl["id"]
-            cursor.execute(f"SELECT COALESCE(SUM(flores1), 0) FROM confrontos WHERE atleta1_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-            f1 = cursor.fetchone()[0]
-            cursor.execute(f"SELECT COALESCE(SUM(flores2), 0) FROM confrontos WHERE atleta2_id = {p} AND torneio_id = {p}", (a_id, cfg["id"]))
-            f2 = cursor.fetchone()[0]
-            
-            total_f = f1 + f2
-            if total_f > max_flores:
-                max_flores = total_f
-                rei_nome = str(atl["nome"]).strip()
+        lider_flores = ranking_flores[0] if ranking_flores else None
+        rei_nome = str(lider_flores["nome"]).strip() if lider_flores else "---"
+        max_flores = int(lider_flores["flores"]) if lider_flores else 0
         
         podio_dados = {
             "primeiro": "---",
@@ -2837,8 +2869,8 @@ def api_dados_publicos_telao(db=Depends(get_db)):
             "rei": rei_nome,
             "rei_nome": rei_nome,
             "rei_flores": rei_nome,
-            "flores": int(max_flores),
-            "max_flores": int(max_flores)
+            "flores": max_flores,
+            "max_flores": max_flores
         }
 
     nome_fase = f"{rodada_atual}ª Rodada"
@@ -2855,6 +2887,7 @@ def api_dados_publicos_telao(db=Depends(get_db)):
         "rodada": rodada_atual,
         "confrontos": confrontos,
         "ranking": ranking,
+        "ranking_flores": ranking_flores,
         "podio": podio_dados
     }
 
